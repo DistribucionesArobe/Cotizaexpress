@@ -85,11 +85,11 @@ mypy_extensions==1.1.0
 numpy==1.26.4
 oauthlib==3.3.1
 openai==1.99.9
-openpyxl==3.1.5
+openpyxl==3.1.2
 orjson==3.11.5
 ormsgpack==1.12.2
 packaging==25.0
-pandas==2.3.3
+pandas==2.1.4
 passlib==1.7.4
 pathspec==1.0.3
 pillow==12.1.0
