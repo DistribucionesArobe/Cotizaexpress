@@ -87,6 +87,9 @@ async def webhook_whatsapp_entrante(request: Request):
         
         respuesta_texto = resultado['respuesta']
         
+        # Limpiar caracteres problemáticos para encoding
+        respuesta_texto = respuesta_texto.encode('utf-8', errors='ignore').decode('utf-8')
+        
         # Guardar mensaje saliente
         mensaje_saliente = {
             'id': str(uuid.uuid4()),
@@ -103,7 +106,7 @@ async def webhook_whatsapp_entrante(request: Request):
         # Enviar respuesta vía Twilio
         respuesta_twiml = whatsapp_service.generar_respuesta_twiml(respuesta_texto)
         
-        return Response(content=respuesta_twiml, media_type="application/xml")
+        return Response(content=respuesta_twiml, media_type="application/xml", charset="utf-8")
         
     except Exception as e:
         logger.error(f"Error en webhook WhatsApp: {str(e)}")
