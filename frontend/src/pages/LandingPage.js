@@ -30,19 +30,33 @@ export default function LandingPage() {
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/dashboard">
+              <Link to="/registro">
                 <Button
                   size="lg"
                   className="text-lg px-8 py-6 bg-emerald-600 hover:bg-emerald-700 shadow-xl hover:shadow-2xl transition-all"
-                  data-testid="btn-dashboard"
+                  data-testid="btn-registro"
                 >
-                  Ir al Dashboard
+                  Prueba Gratis
                   <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
                 </Button>
               </Link>
+              
+              <Link to="/precios">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="text-lg px-8 py-6 border-2 border-slate-300 hover:border-emerald-600 hover:text-emerald-600"
+                >
+                  Ver Precios
+                </Button>
+              </Link>
             </div>
+
+            <p className="text-sm text-slate-500 mt-4">
+              Demo gratuito • Sin tarjeta de crédito
+            </p>
           </div>
         </div>
       </section>
@@ -105,6 +119,46 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Pricing Preview */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl font-bold text-slate-900 mb-4">
+            Inversión Simple y Transparente
+          </h2>
+          <div className="bg-white rounded-2xl shadow-xl p-8 mt-8">
+            <div className="text-5xl font-bold text-emerald-600 mb-2">
+              $1,000 <span className="text-2xl text-slate-600">MXN/mes</span>
+            </div>
+            <p className="text-sm text-slate-500 mb-6">+ IVA</p>
+            <ul className="text-left space-y-3 mb-8">
+              <li className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Cotizaciones ilimitadas</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Dashboard completo</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Soporte técnico incluido</span>
+              </li>
+            </ul>
+            <Link to="/precios">
+              <Button size="lg" className="w-full">
+                Ver Detalles
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-emerald-600 to-teal-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -112,14 +166,14 @@ export default function LandingPage() {
             ¿Listo para automatizar tu negocio?
           </h2>
           <p className="text-xl text-emerald-50 mb-10">
-            Únete a las empresas que ya venden más con CotizaBot
+            Prueba gratis por 7 días. Sin compromiso.
           </p>
-          <Link to="/dashboard">
+          <Link to="/registro">
             <Button
               size="lg"
               className="text-lg px-8 py-6 bg-white text-emerald-600 hover:bg-slate-50 shadow-xl"
             >
-              Comenzar Ahora
+              Comenzar Prueba Gratuita
             </Button>
           </Link>
         </div>
