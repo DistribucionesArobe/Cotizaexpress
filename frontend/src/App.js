@@ -106,11 +106,13 @@ function App() {
         {/* Main Content */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/cotizaciones" element={<Cotizaciones />} />
             <Route path="/productos" element={<Productos />} />
             <Route path="/clientes" element={<Clientes />} />
             <Route path="/conversaciones" element={<Conversaciones />} />
+            <Route path="/carga-productos" element={<CargaProductos />} />
           </Routes>
         </main>
       </BrowserRouter>
