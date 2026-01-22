@@ -62,6 +62,7 @@ async def health_check():
     }
 
 # Incluir routers
+api_router.include_router(auth.router)
 api_router.include_router(webhook.router)
 api_router.include_router(cotizaciones.router)
 api_router.include_router(productos.router)
