@@ -106,7 +106,7 @@ async def webhook_whatsapp_entrante(request: Request):
         # Enviar respuesta vía Twilio
         respuesta_twiml = whatsapp_service.generar_respuesta_twiml(respuesta_texto)
         
-        return Response(content=respuesta_twiml, media_type="application/xml", charset="utf-8")
+        return Response(content=respuesta_twiml, media_type="application/xml")
         
     except Exception as e:
         logger.error(f"Error en webhook WhatsApp: {str(e)}")
