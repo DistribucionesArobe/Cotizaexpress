@@ -39,7 +39,7 @@ function App() {
 
               <nav className="hidden md:flex items-center gap-1">
                 <Link
-                  to="/"
+                  to="/dashboard"
                   data-testid="nav-dashboard"
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     activeTab === 'dashboard'
@@ -73,6 +73,18 @@ function App() {
                   onClick={() => setActiveTab('productos')}
                 >
                   Productos
+                </Link>
+                <Link
+                  to="/carga-productos"
+                  data-testid="nav-carga-productos"
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    activeTab === 'carga-productos'
+                      ? 'bg-emerald-50 text-emerald-700'
+                      : 'text-slate-600 hover:bg-slate-100'
+                  }`}
+                  onClick={() => setActiveTab('carga-productos')}
+                >
+                  Carga Masiva
                 </Link>
                 <Link
                   to="/clientes"
