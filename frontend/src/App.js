@@ -9,6 +9,8 @@ import Cotizaciones from './pages/Cotizaciones';
 import Productos from './pages/Productos';
 import Clientes from './pages/Clientes';
 import Conversaciones from './pages/Conversaciones';
+import CargaProductos from './pages/CargaProductos';
+import LandingPage from './pages/LandingPage';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
