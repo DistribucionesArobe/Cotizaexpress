@@ -77,12 +77,19 @@ async def webhook_whatsapp_entrante(request: Request):
         }
         await mensajes_collection.insert_one(mensaje_entrante)
         
+        # Obtener historial reciente de la conversación (últimos 5 mensajes)
+        historial_mensajes = await mensajes_collection.find(
+            {'conversacion_id': conversacion_id},
+            {'_id': 0, 'direccion': 1, 'contenido': 1, 'timestamp': 1}
+        ).sort('timestamp', -1).limit(5).to_list(5)
+        
         # Procesar con orquestador
         resultado = await orquestador.procesar_mensaje(
             mensaje=body,
             cliente_telefono=from_number,
             conversacion_id=conversacion_id,
-            cliente_nombre=cliente.get('nombre', 'Cliente')
+            cliente_nombre=cliente.get('nombre', 'Cliente'),
+            historial=historial_mensajes
         )
         
         respuesta_texto = resultado['respuesta']
