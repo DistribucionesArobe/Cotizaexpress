@@ -39,9 +39,22 @@ Responde SOLO en formato JSON:
         """Clasifica la intención del mensaje"""
         try:
             mensaje = state['mensaje']
+            historial = state.get('historial_cliente', [])
+            
+            # Construir contexto con historial reciente
+            contexto = f"Mensaje actual del cliente: {mensaje}\n\n"
+            
+            # Si hay historial reciente, agregarlo para contexto
+            if historial and len(historial) > 0:
+                contexto += "Historial reciente de la conversación:\n"
+                for msg in historial[-3:]:  # Últimos 3 mensajes
+                    direccion = msg.get('direccion', '')
+                    contenido = msg.get('contenido', '')
+                    contexto += f"- {direccion}: {contenido}\n"
+                contexto += "\nSi el mensaje actual parece ser una respuesta o continuación de una cotización en curso, clasifícalo como COTIZAR."
             
             user_message = UserMessage(
-                text=f"Mensaje del cliente: {mensaje}"
+                text=contexto
             )
             
             response = await self.chat.send_message(user_message)
