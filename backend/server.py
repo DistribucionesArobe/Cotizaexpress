@@ -7,7 +7,7 @@ import logging
 
 from config import settings
 from database import client, init_indexes, seed_catalogo
-from routes import webhook, cotizaciones, productos, clientes, conversaciones, dashboard
+from routes import webhook, cotizaciones, productos, clientes, conversaciones, dashboard, carga_productos
 
 # Configurar logging
 logging.basicConfig(
