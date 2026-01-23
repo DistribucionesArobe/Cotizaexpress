@@ -61,39 +61,43 @@ async def seed_catalogo():
         logger.info(f"Catálogo demo ya existe con {count} productos")
         return
     
-    # Catálogo de abarrotes/canasta básica para demo
+    # Catálogo de materiales de construcción para demo
     catalogo_demo = [
-        # Abarrotes básicos
-        {'sku': 'AB-001', 'nombre': 'Arroz Morelos 1kg', 'categoria': 'Abarrotes', 'precio_base': 28.50, 'unidad': 'Bolsa'},
-        {'sku': 'AB-002', 'nombre': 'Frijol negro 1kg', 'categoria': 'Abarrotes', 'precio_base': 32.00, 'unidad': 'Bolsa'},
-        {'sku': 'AB-003', 'nombre': 'Azúcar estándar 1kg', 'categoria': 'Abarrotes', 'precio_base': 24.50, 'unidad': 'Bolsa'},
-        {'sku': 'AB-004', 'nombre': 'Sal de mesa 1kg', 'categoria': 'Abarrotes', 'precio_base': 12.00, 'unidad': 'Bolsa'},
-        {'sku': 'AB-005', 'nombre': 'Aceite vegetal 1L', 'categoria': 'Abarrotes', 'precio_base': 38.00, 'unidad': 'Botella'},
-        {'sku': 'AB-006', 'nombre': 'Harina de trigo 1kg', 'categoria': 'Abarrotes', 'precio_base': 22.00, 'unidad': 'Bolsa'},
-        {'sku': 'AB-007', 'nombre': 'Avena Quaker 800g', 'categoria': 'Abarrotes', 'precio_base': 45.00, 'unidad': 'Caja'},
-        {'sku': 'AB-008', 'nombre': 'Leche Lala entera 1L', 'categoria': 'Lácteos', 'precio_base': 26.00, 'unidad': 'Litro'},
+        # Acero y Varilla
+        {'sku': 'AC-001', 'nombre': 'Varilla corrugada 3/8" x 12m', 'categoria': 'Acero', 'precio_base': 125.00, 'unidad': 'Pieza'},
+        {'sku': 'AC-002', 'nombre': 'Varilla corrugada 1/2" x 12m', 'categoria': 'Acero', 'precio_base': 195.00, 'unidad': 'Pieza'},
+        {'sku': 'AC-003', 'nombre': 'Varilla corrugada 5/8" x 12m', 'categoria': 'Acero', 'precio_base': 310.00, 'unidad': 'Pieza'},
+        {'sku': 'AC-004', 'nombre': 'Alambre recocido 20kg', 'categoria': 'Acero', 'precio_base': 680.00, 'unidad': 'Rollo'},
+        {'sku': 'AC-005', 'nombre': 'Malla electrosoldada 6x6 10/10', 'categoria': 'Acero', 'precio_base': 850.00, 'unidad': 'Pieza'},
         
-        # Enlatados
-        {'sku': 'EN-001', 'nombre': 'Atún en agua 140g', 'categoria': 'Enlatados', 'precio_base': 22.50, 'unidad': 'Lata'},
-        {'sku': 'EN-002', 'nombre': 'Sardinas en tomate 425g', 'categoria': 'Enlatados', 'precio_base': 28.00, 'unidad': 'Lata'},
-        {'sku': 'EN-003', 'nombre': 'Chiles jalapeños 220g', 'categoria': 'Enlatados', 'precio_base': 18.00, 'unidad': 'Lata'},
-        {'sku': 'EN-004', 'nombre': 'Maíz dulce 340g', 'categoria': 'Enlatados', 'precio_base': 20.00, 'unidad': 'Lata'},
+        # Cemento y Mortero
+        {'sku': 'CE-001', 'nombre': 'Cemento gris Cemex 50kg', 'categoria': 'Cemento', 'precio_base': 198.00, 'unidad': 'Saco'},
+        {'sku': 'CE-002', 'nombre': 'Cemento blanco 20kg', 'categoria': 'Cemento', 'precio_base': 285.00, 'unidad': 'Saco'},
+        {'sku': 'CE-003', 'nombre': 'Mortero Premezclado 50kg', 'categoria': 'Cemento', 'precio_base': 165.00, 'unidad': 'Saco'},
+        {'sku': 'CE-004', 'nombre': 'Pegablock 50kg', 'categoria': 'Cemento', 'precio_base': 145.00, 'unidad': 'Saco'},
         
-        # Bebidas
-        {'sku': 'BE-001', 'nombre': 'Coca-Cola 2L', 'categoria': 'Bebidas', 'precio_base': 32.00, 'unidad': 'Botella'},
-        {'sku': 'BE-002', 'nombre': 'Agua purificada 1L', 'categoria': 'Bebidas', 'precio_base': 8.00, 'unidad': 'Botella'},
-        {'sku': 'BE-003', 'nombre': 'Jugo de naranja 1L', 'categoria': 'Bebidas', 'precio_base': 28.00, 'unidad': 'Botella'},
+        # Block y Tabique
+        {'sku': 'BL-001', 'nombre': 'Block hueco 15x20x40', 'categoria': 'Block', 'precio_base': 12.50, 'unidad': 'Pieza'},
+        {'sku': 'BL-002', 'nombre': 'Block macizo 15x20x40', 'categoria': 'Block', 'precio_base': 15.00, 'unidad': 'Pieza'},
+        {'sku': 'BL-003', 'nombre': 'Tabique rojo 6x12x24', 'categoria': 'Block', 'precio_base': 4.50, 'unidad': 'Pieza'},
+        {'sku': 'BL-004', 'nombre': 'Tabicón 10x14x28', 'categoria': 'Block', 'precio_base': 8.00, 'unidad': 'Pieza'},
         
-        # Limpieza
-        {'sku': 'LI-001', 'nombre': 'Jabón de barra Zote', 'categoria': 'Limpieza', 'precio_base': 15.00, 'unidad': 'Barra'},
-        {'sku': 'LI-002', 'nombre': 'Detergente Roma 500g', 'categoria': 'Limpieza', 'precio_base': 22.00, 'unidad': 'Bolsa'},
-        {'sku': 'LI-003', 'nombre': 'Cloro 1L', 'categoria': 'Limpieza', 'precio_base': 18.00, 'unidad': 'Botella'},
-        {'sku': 'LI-004', 'nombre': 'Papel higiénico 4 rollos', 'categoria': 'Limpieza', 'precio_base': 35.00, 'unidad': 'Paquete'},
+        # Agregados
+        {'sku': 'AG-001', 'nombre': 'Arena m3', 'categoria': 'Agregados', 'precio_base': 450.00, 'unidad': 'm3'},
+        {'sku': 'AG-002', 'nombre': 'Grava m3', 'categoria': 'Agregados', 'precio_base': 480.00, 'unidad': 'm3'},
+        {'sku': 'AG-003', 'nombre': 'Granzón m3', 'categoria': 'Agregados', 'precio_base': 420.00, 'unidad': 'm3'},
         
-        # Snacks
-        {'sku': 'SN-001', 'nombre': 'Sabritas original 45g', 'categoria': 'Snacks', 'precio_base': 18.00, 'unidad': 'Bolsa'},
-        {'sku': 'SN-002', 'nombre': 'Galletas Marías 170g', 'categoria': 'Snacks', 'precio_base': 14.00, 'unidad': 'Paquete'},
-        {'sku': 'SN-003', 'nombre': 'Pan Bimbo blanco 680g', 'categoria': 'Snacks', 'precio_base': 52.00, 'unidad': 'Bolsa'},
+        # Ferretería
+        {'sku': 'FE-001', 'nombre': 'Tornillo para madera 2"', 'categoria': 'Ferretería', 'precio_base': 85.00, 'unidad': 'Caja 100pz'},
+        {'sku': 'FE-002', 'nombre': 'Tornillo tablaroca 1 5/8"', 'categoria': 'Ferretería', 'precio_base': 65.00, 'unidad': 'Caja 100pz'},
+        {'sku': 'FE-003', 'nombre': 'Clavo 3"', 'categoria': 'Ferretería', 'precio_base': 45.00, 'unidad': 'kg'},
+        {'sku': 'FE-004', 'nombre': 'Ancla expansiva 3/8"', 'categoria': 'Ferretería', 'precio_base': 8.50, 'unidad': 'Pieza'},
+        {'sku': 'FE-005', 'nombre': 'Taquete plástico 1/4"', 'categoria': 'Ferretería', 'precio_base': 35.00, 'unidad': 'Bolsa 100pz'},
+        
+        # Tubería
+        {'sku': 'TU-001', 'nombre': 'Tubo PVC hidráulico 2" x 6m', 'categoria': 'Tubería', 'precio_base': 185.00, 'unidad': 'Pieza'},
+        {'sku': 'TU-002', 'nombre': 'Tubo PVC sanitario 4" x 6m', 'categoria': 'Tubería', 'precio_base': 320.00, 'unidad': 'Pieza'},
+        {'sku': 'TU-003', 'nombre': 'Codo PVC 90° 2"', 'categoria': 'Tubería', 'precio_base': 18.00, 'unidad': 'Pieza'},
     ]
     
     import uuid
