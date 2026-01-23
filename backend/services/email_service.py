@@ -197,8 +197,16 @@ class EmailService:
                 ]
             }
             
-            # Enviar email (async)
-            email_result = await asyncio.to_thread(resend.Emails.send, params)
+            # Enviar email con fallback si el dominio no está verificado
+            try:
+                email_result = await asyncio.to_thread(resend.Emails.send, params)
+            except Exception as domain_error:
+                if "domain is not verified" in str(domain_error).lower():
+                    logger.warning(f"Dominio no verificado, usando fallback: {self.fallback_sender}")
+                    params["from"] = f"{empresa_nombre} <{self.fallback_sender}>"
+                    email_result = await asyncio.to_thread(resend.Emails.send, params)
+                else:
+                    raise domain_error
             
             logger.info(f"Email enviado a {destinatario_email} - Cotización {cotizacion['folio']}")
             
