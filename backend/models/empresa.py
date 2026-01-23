@@ -10,7 +10,9 @@ class Empresa(BaseModel):
     rfc: Optional[str] = None
     telefono: Optional[str] = None
     email: Optional[str] = None
-    plan: str = 'demo'  # demo, pagado, cancelado
+    plan: str = 'gratis'  # gratis, completo, cancelado
+    cotizaciones_usadas: int = 0  # Contador de cotizaciones para plan gratis
+    cotizaciones_limite: int = 5  # Límite para plan gratis
     twilio_account_sid: Optional[str] = None
     twilio_auth_token: Optional[str] = None
     twilio_whatsapp_number: Optional[str] = None
