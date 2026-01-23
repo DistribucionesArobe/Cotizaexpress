@@ -118,7 +118,7 @@ async def seed_catalogo():
         productos_insertados.append(doc)
     
     await productos_collection.insert_many(productos_insertados)
-    logger.info(f"Catálogo demo inicializado con {len(productos_insertados)} productos de abarrotes")
+    logger.info(f"Catálogo demo inicializado con {len(productos_insertados)} productos de construcción")
 
 async def shutdown_db_client():
     """Cierra la conexión a MongoDB"""
