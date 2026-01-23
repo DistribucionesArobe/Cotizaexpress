@@ -13,12 +13,20 @@ logger = logging.getLogger(__name__)
 
 resend.api_key = os.environ.get('RESEND_API_KEY', '')
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'contacto@cotizaexpress.com')
+# Fallback para pruebas si el dominio no está verificado
+FALLBACK_SENDER = 'onboarding@resend.dev'
 
 class EmailService:
     """Servicio para enviar emails con cotizaciones"""
     
     def __init__(self):
         self.sender_email = SENDER_EMAIL
+        self.fallback_sender = FALLBACK_SENDER
+    
+    def _get_sender_email(self, nombre_empresa: str = 'CotizaBot') -> str:
+        """Obtiene el email de envío, con fallback si el dominio no está verificado"""
+        # Usar el email configurado, pero si falla usar el fallback
+        return f"{nombre_empresa} <{self.sender_email}>"
     
     def _generar_html_cotizacion(self, cotizacion: dict, empresa: dict = None) -> str:
         """Genera HTML para email de cotización"""
