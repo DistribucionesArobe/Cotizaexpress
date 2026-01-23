@@ -27,6 +27,7 @@ class Cotizacion(BaseModel):
     cliente_id: str
     cliente_nombre: str
     cliente_telefono: str
+    empresa_id: Optional[str] = None
     items: List[ItemCotizacion]
     subtotal: float
     iva: float
