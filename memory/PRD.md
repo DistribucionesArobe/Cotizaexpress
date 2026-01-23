@@ -100,8 +100,8 @@ CotizaBot es un sistema de IA multi-agente para automatizar cotizaciones y venta
 ## Funcionalidades Pendientes (Backlog)
 
 ### P0 - Alta Prioridad
-- [ ] Integración de pagos (Stripe/OpenPay) para activar Plan Completo
 - [ ] Configuración automática de WhatsApp Business para números comprados
+- [ ] Suscripciones recurrentes con Stripe (actualmente es pago único)
 
 ### P1 - Media Prioridad
 - [ ] Generación de PDF de cotizaciones
