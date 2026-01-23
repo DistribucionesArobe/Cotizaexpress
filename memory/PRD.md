@@ -127,12 +127,12 @@ CotizaBot es un sistema de IA multi-agente para automatizar cotizaciones y venta
 - Página de configuración en frontend
 
 ### ✅ Configuración de WhatsApp Business (Completado 2026-01-24)
-- **Flujo simplificado**: Cliente selecciona ciudad → Equipo configura todo
-- Endpoint `/api/twilio/solicitar-numero` - Solicitar número por ciudad
-- Endpoint `/api/twilio/mi-solicitud` - Estado de la solicitud
-- Email automático al equipo con detalles de la solicitud
+- **Flujo 100% automatizado**: Cliente selecciona ciudad → Sistema compra y configura en segundos
+- Endpoint `/api/twilio/solicitar-numero` - Busca, compra y configura automáticamente
+- Endpoint `/api/twilio/mi-solicitud` - Estado de la configuración
+- Sin intervención manual requerida
+- Costo: ~$1.15 USD/mes por número (de cuenta Twilio del SaaS)
 - Sin costo adicional para el cliente (incluido en Plan Completo)
-- Estados: pendiente → procesando → completada
 
 ---
 
