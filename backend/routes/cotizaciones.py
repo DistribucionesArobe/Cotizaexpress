@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import List, Optional
-from database import cotizaciones_collection, clientes_collection
+from database import cotizaciones_collection, clientes_collection, db
 from models.cotizacion import Cotizacion, CotizacionCreate, EstadoCotizacion, ItemCotizacion
 from services.pdf_service import pdf_service
 from services.whatsapp_service import whatsapp_service
+from utils.auth import get_current_user
 from config import settings
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -14,14 +15,54 @@ import os
 router = APIRouter(prefix="/cotizaciones", tags=["cotizaciones"])
 logger = logging.getLogger(__name__)
 
+empresas_collection = db.get_collection('empresas')
+
 class EnviarCotizacionRequest(BaseModel):
     cotizacion_id: str
 
+async def verificar_limite_cotizaciones(empresa_id: str):
+    """Verifica si la empresa puede crear más cotizaciones según su plan"""
+    empresa = await empresas_collection.find_one({'id': empresa_id}, {'_id': 0})
+    
+    if not empresa:
+        raise HTTPException(status_code=404, detail="Empresa no encontrada")
+    
+    plan = empresa.get('plan', 'gratis')
+    
+    # Plan completo: sin límite
+    if plan == 'completo':
+        return True
+    
+    # Plan gratis: verificar límite
+    cotizaciones_usadas = empresa.get('cotizaciones_usadas', 0)
+    cotizaciones_limite = empresa.get('cotizaciones_limite', 5)
+    
+    if cotizaciones_usadas >= cotizaciones_limite:
+        raise HTTPException(
+            status_code=403,
+            detail=f"Has alcanzado el límite de {cotizaciones_limite} cotizaciones del plan gratuito. Actualiza a Plan Completo para cotizaciones ilimitadas."
+        )
+    
+    return True
+
+async def incrementar_cotizaciones(empresa_id: str):
+    """Incrementa el contador de cotizaciones de la empresa"""
+    await empresas_collection.update_one(
+        {'id': empresa_id},
+        {'$inc': {'cotizaciones_usadas': 1}}
+    )
+
 @router.get("", response_model=List[Cotizacion])
-async def listar_cotizaciones(estado: Optional[str] = None, limit: int = 50):
-    """Lista todas las cotizaciones"""
+async def listar_cotizaciones(
+    estado: Optional[str] = None, 
+    limit: int = 50,
+    current_user: dict = Depends(get_current_user)
+):
+    """Lista todas las cotizaciones de la empresa"""
     try:
-        filtro = {}
+        empresa_id = current_user.get('empresa_id')
+        filtro = {'empresa_id': empresa_id} if empresa_id else {}
+        
         if estado:
             filtro['estado'] = estado
         
@@ -45,12 +86,38 @@ async def listar_cotizaciones(estado: Optional[str] = None, limit: int = 50):
         logger.error(f"Error listando cotizaciones: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/estadisticas")
+async def obtener_estadisticas_cotizaciones(current_user: dict = Depends(get_current_user)):
+    """Obtiene estadísticas de cotizaciones para el dashboard"""
+    try:
+        empresa_id = current_user.get('empresa_id')
+        
+        # Obtener info de la empresa
+        empresa = await empresas_collection.find_one({'id': empresa_id}, {'_id': 0})
+        
+        plan = empresa.get('plan', 'gratis') if empresa else 'gratis'
+        cotizaciones_usadas = empresa.get('cotizaciones_usadas', 0) if empresa else 0
+        cotizaciones_limite = empresa.get('cotizaciones_limite', 5) if empresa else 5
+        
+        return {
+            'plan': plan,
+            'cotizaciones_usadas': cotizaciones_usadas,
+            'cotizaciones_limite': cotizaciones_limite if plan == 'gratis' else None,
+            'cotizaciones_restantes': (cotizaciones_limite - cotizaciones_usadas) if plan == 'gratis' else None
+        }
+        
+    except Exception as e:
+        logger.error(f"Error obteniendo estadísticas: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("/{cotizacion_id}", response_model=Cotizacion)
-async def obtener_cotizacion(cotizacion_id: str):
+async def obtener_cotizacion(cotizacion_id: str, current_user: dict = Depends(get_current_user)):
     """Obtiene una cotización por ID"""
     try:
+        empresa_id = current_user.get('empresa_id')
+        
         cotizacion = await cotizaciones_collection.find_one(
-            {'id': cotizacion_id},
+            {'id': cotizacion_id, 'empresa_id': empresa_id},
             {'_id': 0}
         )
         
@@ -74,12 +141,17 @@ async def obtener_cotizacion(cotizacion_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("", response_model=Cotizacion)
-async def crear_cotizacion(cotizacion_data: CotizacionCreate):
+async def crear_cotizacion(cotizacion_data: CotizacionCreate, current_user: dict = Depends(get_current_user)):
     """Crea una nueva cotización"""
     try:
+        empresa_id = current_user.get('empresa_id')
+        
+        # Verificar límite de cotizaciones
+        await verificar_limite_cotizaciones(empresa_id)
+        
         # Buscar o crear cliente
         cliente = await clientes_collection.find_one(
-            {'telefono': cotizacion_data.cliente_telefono}
+            {'telefono': cotizacion_data.cliente_telefono, 'empresa_id': empresa_id}
         )
         
         if not cliente:
@@ -88,6 +160,7 @@ async def crear_cotizacion(cotizacion_data: CotizacionCreate):
                 'id': cliente_id,
                 'telefono': cotizacion_data.cliente_telefono,
                 'nombre': cotizacion_data.cliente_nombre,
+                'empresa_id': empresa_id,
                 'total_cotizaciones': 0,
                 'created_at': datetime.now(timezone.utc).isoformat()
             }
@@ -112,6 +185,7 @@ async def crear_cotizacion(cotizacion_data: CotizacionCreate):
             cliente_id=cliente_id,
             cliente_nombre=cotizacion_data.cliente_nombre,
             cliente_telefono=cotizacion_data.cliente_telefono,
+            empresa_id=empresa_id,
             items=items,
             subtotal=subtotal,
             iva=iva,
@@ -136,21 +210,28 @@ async def crear_cotizacion(cotizacion_data: CotizacionCreate):
             {'$inc': {'total_cotizaciones': 1}}
         )
         
-        logger.info(f"Cotización creada: {folio}")
+        # Incrementar contador de cotizaciones de la empresa
+        await incrementar_cotizaciones(empresa_id)
+        
+        logger.info(f"Cotización creada: {folio} para empresa {empresa_id}")
         
         return cotizacion
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error creando cotización: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/enviar")
-async def enviar_cotizacion(request: EnviarCotizacionRequest):
+async def enviar_cotizacion(request: EnviarCotizacionRequest, current_user: dict = Depends(get_current_user)):
     """Genera PDF y envía cotización por WhatsApp"""
     try:
+        empresa_id = current_user.get('empresa_id')
+        
         # Obtener cotización
         cotizacion = await cotizaciones_collection.find_one(
-            {'id': request.cotizacion_id},
+            {'id': request.cotizacion_id, 'empresa_id': empresa_id},
             {'_id': 0}
         )
         
@@ -196,6 +277,8 @@ async def enviar_cotizacion(request: EnviarCotizacionRequest):
             'whatsapp_result': resultado_envio
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error enviando cotización: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
