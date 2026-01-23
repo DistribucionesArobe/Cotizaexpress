@@ -76,7 +76,7 @@ async def registrar_usuario(usuario_data: UsuarioCreate):
                 'nombre': usuario_data.nombre,
                 'empresa_id': empresa_id,
                 'empresa_nombre': usuario_data.empresa_nombre,
-                'plan': 'demo'
+                'plan': 'gratis'
             }
         )
         
