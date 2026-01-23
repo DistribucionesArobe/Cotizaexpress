@@ -267,6 +267,30 @@ export default function Productos() {
         </div>
       </div>
 
+      {/* Banner de demo */}
+      {esDemo && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-3">
+              <Package className="w-5 h-5 text-amber-600" />
+              <div>
+                <p className="font-medium text-amber-800">
+                  Estos son productos de ejemplo para que pruebes el sistema
+                </p>
+                <p className="text-sm text-amber-700">
+                  Puedes editar los precios para ver cómo funcionan las cotizaciones. Carga tus propios productos cuando estés listo.
+                </p>
+              </div>
+            </div>
+            <Link to="/carga-productos">
+              <Button size="sm" variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-100">
+                Cargar mis productos
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Nota de edición */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-700">
         <Pencil className="w-4 h-4 inline mr-2" />
