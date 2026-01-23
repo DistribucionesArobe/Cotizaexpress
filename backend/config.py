@@ -24,6 +24,11 @@ class Settings(BaseSettings):
     
     # Stripe
     stripe_api_key: str = os.environ.get('STRIPE_API_KEY', '')
+    stripe_publishable_key: str = os.environ.get('STRIPE_PUBLISHABLE_KEY', '')
+    
+    # Email (Resend)
+    resend_api_key: str = os.environ.get('RESEND_API_KEY', '')
+    sender_email: str = os.environ.get('SENDER_EMAIL', 'contacto@cotizaexpress.com')
     
     # CORS
     cors_origins: str = os.environ.get('CORS_ORIGINS', '*')
