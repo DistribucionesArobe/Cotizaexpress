@@ -15,10 +15,8 @@ export default function ConfiguracionWhatsApp() {
   const [loading, setLoading] = useState(true);
   const [ciudades, setCiudades] = useState([]);
   const [ciudadSeleccionada, setCiudadSeleccionada] = useState('');
-  const [notas, setNotas] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [miNumero, setMiNumero] = useState(null);
-  const [miSolicitud, setMiSolicitud] = useState(null);
 
   useEffect(() => {
     cargarDatos();
