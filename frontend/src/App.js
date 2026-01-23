@@ -132,6 +132,18 @@ function AppContent() {
                   >
                     WhatsApp
                   </Link>
+                  <Link
+                    to="/perfil-empresa"
+                    data-testid="nav-perfil"
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      activeTab === 'perfil'
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : 'text-slate-600 hover:bg-slate-100'
+                    }`}
+                    onClick={() => setActiveTab('perfil')}
+                  >
+                    Mi Empresa
+                  </Link>
 
                   <button
                     onClick={logout}
