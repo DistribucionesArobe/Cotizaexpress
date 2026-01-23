@@ -303,13 +303,13 @@ export default function ConfiguracionWhatsApp() {
     );
   }
 
-  // Vista para solicitar número (nuevo flujo simplificado)
+  // Vista para obtener número (flujo automático instantáneo)
   return (
     <div className="space-y-6" data-testid="configuracion-whatsapp-page">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Solicita tu Número de WhatsApp</h1>
-          <p className="text-slate-600">Selecciona tu ciudad y nosotros nos encargamos del resto</p>
+          <h1 className="text-2xl font-bold text-slate-900">Obtén tu Número de WhatsApp</h1>
+          <p className="text-slate-600">Selecciona tu ciudad y obtén tu número en segundos</p>
         </div>
       </div>
 
@@ -318,11 +318,11 @@ export default function ConfiguracionWhatsApp() {
         <CardContent className="pt-6">
           <div className="flex items-center gap-3 mb-2">
             <CheckCircle className="w-6 h-6 text-emerald-600" />
-            <span className="font-semibold text-emerald-800">¡Sin costo adicional!</span>
+            <span className="font-semibold text-emerald-800">¡Activación instantánea!</span>
           </div>
           <p className="text-emerald-700">
-            Tu número de WhatsApp Business está incluido en tu Plan Completo. 
-            No tienes que pagar nada extra.
+            Tu número de WhatsApp Business se activa automáticamente en segundos. 
+            Está incluido en tu Plan Completo sin costo adicional.
           </p>
         </CardContent>
       </Card>
@@ -345,31 +345,17 @@ export default function ConfiguracionWhatsApp() {
               <button
                 key={ciudad.key}
                 onClick={() => setCiudadSeleccionada(ciudad.key)}
+                disabled={enviando}
                 className={`px-4 py-3 rounded-lg border-2 text-sm font-medium transition-all ${
                   ciudadSeleccionada === ciudad.key
                     ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-sm'
                     : 'border-slate-200 hover:border-emerald-300 text-slate-700'
-                }`}
+                } ${enviando ? 'opacity-50 cursor-not-allowed' : ''}`}
                 data-testid={`btn-ciudad-${ciudad.key}`}
               >
                 {ciudad.nombre}
               </button>
             ))}
-          </div>
-          
-          {/* Notas opcionales */}
-          <div className="mt-6">
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Notas adicionales (opcional)
-            </label>
-            <textarea
-              value={notas}
-              onChange={(e) => setNotas(e.target.value)}
-              placeholder="¿Alguna preferencia o comentario? Ej: Prefiero número que termine en 00"
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
-              rows={2}
-              data-testid="input-notas"
-            />
           </div>
           
           <div className="mt-6">
@@ -382,12 +368,12 @@ export default function ConfiguracionWhatsApp() {
               {enviando ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Enviando solicitud...
+                  Activando tu número...
                 </>
               ) : (
                 <>
                   <MessageCircle className="w-5 h-5 mr-2" />
-                  Solicitar mi número de WhatsApp
+                  Obtener mi número de WhatsApp
                 </>
               )}
             </Button>
@@ -416,8 +402,8 @@ export default function ConfiguracionWhatsApp() {
                 <span className="text-emerald-700 font-bold">2</span>
               </div>
               <div>
-                <h4 className="font-semibold text-slate-900">Nosotros lo configuramos</h4>
-                <p className="text-slate-600 text-sm">Nuestro equipo compra y configura tu número de WhatsApp Business en 24-48 horas.</p>
+                <h4 className="font-semibold text-slate-900">Click y listo</h4>
+                <p className="text-slate-600 text-sm">Tu número se activa automáticamente en segundos.</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
@@ -425,8 +411,8 @@ export default function ConfiguracionWhatsApp() {
                 <span className="text-emerald-700 font-bold">3</span>
               </div>
               <div>
-                <h4 className="font-semibold text-slate-900">¡Listo para vender!</h4>
-                <p className="text-slate-600 text-sm">Te notificamos cuando tu bot esté activo y puedas empezar a recibir cotizaciones automáticas.</p>
+                <h4 className="font-semibold text-slate-900">¡A vender!</h4>
+                <p className="text-slate-600 text-sm">Comparte tu número y el bot empezará a generar cotizaciones automáticas.</p>
               </div>
             </div>
           </div>
