@@ -439,5 +439,86 @@ class EmailService:
         except Exception as e:
             logger.error(f"Error enviando notificación de factura: {str(e)}")
             return {"success": False, "error": str(e)}
+    
+    async def enviar_solicitud_whatsapp(
+        self,
+        empresa: dict,
+        ciudad: str,
+        solicitud_id: str,
+        notas: Optional[str] = None
+    ) -> dict:
+        """Envía solicitud de número de WhatsApp al equipo de CotizaBot"""
+        try:
+            if not resend.api_key:
+                logger.warning("RESEND_API_KEY no configurado")
+                return {"success": False, "error": "Servicio de email no configurado"}
+            
+            html = f"""
+            <!DOCTYPE html>
+            <html>
+            <head><meta charset="UTF-8"></head>
+            <body style="font-family: Arial, sans-serif; padding: 20px;">
+                <h2 style="color: #059669;">📱 Nueva Solicitud de Número WhatsApp</h2>
+                
+                <div style="background: #f0fdf4; border-left: 4px solid #059669; padding: 15px; margin: 20px 0;">
+                    <p style="margin: 0; font-size: 18px;"><strong>Ciudad solicitada: {ciudad}</strong></p>
+                </div>
+                
+                <h3>Datos del Cliente</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Empresa:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">{empresa.get('nombre', 'N/A')}</td></tr>
+                    <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Email:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">{empresa.get('email', 'N/A')}</td></tr>
+                    <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Teléfono:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">{empresa.get('telefono', 'N/A')}</td></tr>
+                    <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Plan:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">{empresa.get('plan', 'N/A')}</td></tr>
+                </table>
+                
+                {f'<h3>Notas del cliente</h3><p style="background: #f9fafb; padding: 15px; border-radius: 8px;">{notas}</p>' if notas else ''}
+                
+                <h3>Acciones requeridas</h3>
+                <ol>
+                    <li>Comprar número de {ciudad} en Twilio</li>
+                    <li>Configurar webhook de WhatsApp</li>
+                    <li>Asignar número a la empresa en la BD</li>
+                    <li>Notificar al cliente</li>
+                </ol>
+                
+                <p style="color: #6b7280; font-size: 12px; margin-top: 30px;">
+                    Solicitud ID: {solicitud_id}<br>
+                    Fecha: {datetime.now().strftime('%d/%m/%Y %H:%M')}
+                </p>
+                
+                <hr>
+                <p style="color: #6b7280; font-size: 12px;">CotizaBot - cotizaexpress.com</p>
+            </body>
+            </html>
+            """
+            
+            params = {
+                "from": f"CotizaBot <{self.sender_email}>",
+                "to": ["contacto@arobegroup.com"],
+                "subject": f"📱 Solicitud WhatsApp - {empresa.get('nombre', 'Cliente')} - {ciudad}",
+                "html": html
+            }
+            
+            # Enviar con fallback
+            try:
+                email_result = await asyncio.to_thread(resend.Emails.send, params)
+            except Exception as domain_error:
+                if "domain is not verified" in str(domain_error).lower():
+                    params["from"] = f"CotizaBot <{self.fallback_sender}>"
+                    email_result = await asyncio.to_thread(resend.Emails.send, params)
+                else:
+                    raise domain_error
+            
+            logger.info(f"Solicitud de WhatsApp enviada para {empresa.get('nombre')}")
+            
+            return {
+                "success": True,
+                "email_id": email_result.get("id")
+            }
+            
+        except Exception as e:
+            logger.error(f"Error enviando solicitud de WhatsApp: {str(e)}")
+            return {"success": False, "error": str(e)}
 
 email_service = EmailService()
