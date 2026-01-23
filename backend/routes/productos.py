@@ -98,19 +98,24 @@ async def obtener_producto(producto_id: str, current_user: dict = Depends(get_cu
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("", response_model=Producto)
-async def crear_producto(producto_data: ProductoCreate):
-    """Crea un nuevo producto"""
+async def crear_producto(producto_data: ProductoCreate, current_user: dict = Depends(get_current_user)):
+    """Crea un nuevo producto para la empresa"""
     try:
+        empresa_id = current_user.get('empresa_id')
+        
         # Generar SKU si no se proporciona
         if not producto_data.sku:
             categoria_prefix = producto_data.categoria[:2].upper()
-            count = await productos_collection.count_documents({'categoria': producto_data.categoria})
+            count = await productos_collection.count_documents({
+                'categoria': producto_data.categoria,
+                'empresa_id': empresa_id
+            })
             sku = f"{categoria_prefix}-{count + 1:03d}"
         else:
             sku = producto_data.sku
         
-        # Verificar SKU único
-        existe = await productos_collection.find_one({'sku': sku})
+        # Verificar SKU único en esta empresa
+        existe = await productos_collection.find_one({'sku': sku, 'empresa_id': empresa_id})
         if existe:
             raise HTTPException(status_code=400, detail="SKU ya existe")
         
@@ -121,13 +126,14 @@ async def crear_producto(producto_data: ProductoCreate):
             **producto_data.model_dump(exclude={'sku'})
         )
         
-        # Guardar en BD
+        # Guardar en BD con empresa_id
         doc = producto.model_dump()
         doc['created_at'] = doc['created_at'].isoformat()
+        doc['empresa_id'] = empresa_id
         
         await productos_collection.insert_one(doc)
         
-        logger.info(f"Producto creado: {sku}")
+        logger.info(f"Producto creado: {sku} para empresa {empresa_id}")
         
         return producto
         
