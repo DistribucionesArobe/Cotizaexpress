@@ -118,6 +118,18 @@ function AppContent() {
                   >
                     Conversaciones
                   </Link>
+                  <Link
+                    to="/configuracion-whatsapp"
+                    data-testid="nav-whatsapp"
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      activeTab === 'whatsapp'
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : 'text-slate-600 hover:bg-slate-100'
+                    }`}
+                    onClick={() => setActiveTab('whatsapp')}
+                  >
+                    WhatsApp
+                  </Link>
 
                   <button
                     onClick={logout}
