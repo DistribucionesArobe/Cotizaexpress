@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from typing import List, Optional
 from database import productos_collection
 from models.producto import Producto, ProductoCreate
+from utils.auth import get_current_user
 import uuid
 from datetime import datetime, timezone
 import logging
@@ -10,10 +11,16 @@ router = APIRouter(prefix="/productos", tags=["productos"])
 logger = logging.getLogger(__name__)
 
 @router.get("", response_model=List[Producto])
-async def listar_productos(categoria: Optional[str] = None, activo: bool = True):
-    """Lista productos del catálogo"""
+async def listar_productos(
+    categoria: Optional[str] = None, 
+    activo: bool = True,
+    current_user: dict = Depends(get_current_user)
+):
+    """Lista productos del catálogo de la empresa del usuario"""
     try:
-        filtro = {'activo': activo}
+        empresa_id = current_user.get('empresa_id')
+        
+        filtro = {'activo': activo, 'empresa_id': empresa_id}
         if categoria:
             filtro['categoria'] = categoria
         
@@ -33,22 +40,46 @@ async def listar_productos(categoria: Optional[str] = None, activo: bool = True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/categorias")
-async def listar_categorias():
-    """Lista todas las categorías únicas"""
+async def listar_categorias(current_user: dict = Depends(get_current_user)):
+    """Lista todas las categorías únicas de la empresa"""
     try:
-        categorias = await productos_collection.distinct('categoria')
+        empresa_id = current_user.get('empresa_id')
+        
+        # Obtener categorías solo de productos de esta empresa
+        pipeline = [
+            {'$match': {'empresa_id': empresa_id}},
+            {'$group': {'_id': '$categoria'}},
+            {'$sort': {'_id': 1}}
+        ]
+        
+        result = await productos_collection.aggregate(pipeline).to_list(50)
+        categorias = [r['_id'] for r in result if r['_id']]
+        
         return {'categorias': categorias}
         
     except Exception as e:
         logger.error(f"Error listando categorías: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/count")
+async def contar_productos(current_user: dict = Depends(get_current_user)):
+    """Cuenta productos de la empresa"""
+    try:
+        empresa_id = current_user.get('empresa_id')
+        count = await productos_collection.count_documents({'empresa_id': empresa_id, 'activo': True})
+        return {'count': count, 'empresa_id': empresa_id}
+    except Exception as e:
+        logger.error(f"Error contando productos: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("/{producto_id}", response_model=Producto)
-async def obtener_producto(producto_id: str):
+async def obtener_producto(producto_id: str, current_user: dict = Depends(get_current_user)):
     """Obtiene un producto por ID"""
     try:
+        empresa_id = current_user.get('empresa_id')
+        
         producto = await productos_collection.find_one(
-            {'id': producto_id},
+            {'id': producto_id, 'empresa_id': empresa_id},
             {'_id': 0}
         )
         
