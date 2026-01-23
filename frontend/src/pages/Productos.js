@@ -240,14 +240,16 @@ export default function Productos() {
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h2 className="text-3xl font-bold text-slate-900">Catálogo de Productos</h2>
-          <p className="text-slate-600 mt-1">{productos.length} productos disponibles</p>
+          <p className="text-slate-600 mt-1">
+            {productos.length} productos {esDemo ? 'de ejemplo' : 'disponibles'}
+          </p>
         </div>
         
         <div className="flex items-center gap-3">
           <Link to="/carga-productos">
             <Button variant="outline" data-testid="btn-cargar-mas">
               <Upload className="w-4 h-4 mr-2" />
-              Cargar más
+              {esDemo ? 'Cargar mis productos' : 'Cargar más'}
             </Button>
           </Link>
           
