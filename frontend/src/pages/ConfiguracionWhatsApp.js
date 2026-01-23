@@ -34,10 +34,6 @@ export default function ConfiguracionWhatsApp() {
       const miNumeroRes = await axios.get(`${API}/twilio/mi-numero`);
       setMiNumero(miNumeroRes.data);
       
-      // Verificar si tiene solicitud pendiente
-      const miSolicitudRes = await axios.get(`${API}/twilio/mi-solicitud`);
-      setMiSolicitud(miSolicitudRes.data);
-      
     } catch (error) {
       console.error('Error cargando datos:', error);
       if (error.response?.status === 403) {
