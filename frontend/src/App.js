@@ -10,6 +10,7 @@ import LandingPage from './pages/LandingPage';
 import Registro from './pages/Registro';
 import Login from './pages/Login';
 import Precios from './pages/Precios';
+import PagoExitoso from './pages/PagoExitoso';
 import Dashboard from './pages/Dashboard';
 import Cotizaciones from './pages/Cotizaciones';
 import Productos from './pages/Productos';
