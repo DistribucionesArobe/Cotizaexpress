@@ -228,7 +228,7 @@ async def crear_cotizacion(cotizacion_data: CotizacionCreate, current_user: dict
 
 @router.post("/enviar")
 async def enviar_cotizacion(request: EnviarCotizacionRequest, current_user: dict = Depends(get_current_user)):
-    """Genera PDF y envía cotización por WhatsApp"""
+    """Genera PDF y envía cotización por WhatsApp y/o Email"""
     try:
         empresa_id = current_user.get('empresa_id')
         
@@ -241,16 +241,87 @@ async def enviar_cotizacion(request: EnviarCotizacionRequest, current_user: dict
         if not cotizacion:
             raise HTTPException(status_code=404, detail="Cotización no encontrada")
         
+        # Obtener empresa para el logo
+        empresa = await empresas_collection.find_one({'id': empresa_id}, {'_id': 0})
+        
         # Convertir fechas
         if isinstance(cotizacion.get('valida_hasta'), str):
             cotizacion['valida_hasta'] = datetime.fromisoformat(cotizacion['valida_hasta'])
         
-        # Generar PDF
-        pdf_path = await pdf_service.generar_cotizacion_pdf(cotizacion)
+        # Generar PDF con logo de empresa
+        pdf_path = await pdf_service.generar_cotizacion_pdf(cotizacion, empresa_id)
         
-        # En producción, subir a S3/CloudFront y obtener URL pública
-        # Por ahora, usamos path local
-        pdf_url = f"file://{pdf_path}"
+        resultados = {
+            'pdf_generado': True,
+            'pdf_path': pdf_path
+        }
+        
+        # Enviar por Email si se solicita
+        if request.enviar_email:
+            # Determinar email destinatario
+            email_destino = request.email_destinatario
+            
+            if not email_destino:
+                # Buscar email del cliente
+                cliente = await clientes_collection.find_one(
+                    {'id': cotizacion.get('cliente_id')},
+                    {'_id': 0}
+                )
+                email_destino = cliente.get('email') if cliente else None
+            
+            if email_destino:
+                # Formatear fecha para el email
+                cotizacion_email = dict(cotizacion)
+                if isinstance(cotizacion_email.get('valida_hasta'), datetime):
+                    cotizacion_email['valida_hasta'] = cotizacion_email['valida_hasta'].strftime('%d/%m/%Y')
+                
+                email_result = await email_service.enviar_cotizacion(
+                    cotizacion=cotizacion_email,
+                    pdf_path=pdf_path,
+                    destinatario_email=email_destino,
+                    empresa=empresa
+                )
+                resultados['email'] = email_result
+            else:
+                resultados['email'] = {
+                    'success': False,
+                    'error': 'No se encontró email del cliente'
+                }
+        
+        # Enviar por WhatsApp (mantener funcionalidad existente)
+        mensaje = f"Hola {cotizacion['cliente_nombre']}, aquí está tu cotización {cotizacion['folio']} por un total de ${cotizacion['total']:.2f} MXN."
+        
+        resultado_whatsapp = await whatsapp_service.enviar_mensaje(
+            to_number=cotizacion['cliente_telefono'],
+            body=mensaje,
+            media_url=None  # PDF requiere URL pública
+        )
+        resultados['whatsapp'] = resultado_whatsapp
+        
+        # Actualizar estado de la cotización
+        await cotizaciones_collection.update_one(
+            {'id': request.cotizacion_id},
+            {
+                '$set': {
+                    'estado': EstadoCotizacion.ENVIADA.value,
+                    'pdf_url': pdf_path,
+                    'enviado_email': request.enviar_email and resultados.get('email', {}).get('success', False),
+                    'updated_at': datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        return {
+            'success': True,
+            'mensaje': 'Cotización enviada',
+            **resultados
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error enviando cotización: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
         
         # Enviar por WhatsApp
         mensaje = f"Hola {cotizacion['cliente_nombre']}, aquí está tu cotización {cotizacion['folio']} por un total de ${cotizacion['total']:.2f} MXN. Válida hasta {cotizacion['valida_hasta'].strftime('%d/%m/%Y')}."
