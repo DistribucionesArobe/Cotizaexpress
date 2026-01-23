@@ -277,7 +277,16 @@ class EmailService:
                 "html": html
             }
             
-            email_result = await asyncio.to_thread(resend.Emails.send, params)
+            # Enviar con fallback si el dominio no está verificado
+            try:
+                email_result = await asyncio.to_thread(resend.Emails.send, params)
+            except Exception as domain_error:
+                if "domain is not verified" in str(domain_error).lower():
+                    logger.warning(f"Dominio no verificado, usando fallback")
+                    params["from"] = f"CotizaBot <{self.fallback_sender}>"
+                    email_result = await asyncio.to_thread(resend.Emails.send, params)
+                else:
+                    raise domain_error
             
             logger.info(f"Solicitud de factura enviada para {empresa.get('nombre')}")
             
