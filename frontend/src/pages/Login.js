@@ -41,7 +41,18 @@ export default function Login() {
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">Iniciar Sesión</h1>
+          <Link to="/" className="inline-flex items-center gap-3 mb-6" data-testid="logo-link">
+            <img 
+              src="/logo-cotizaexpress.png" 
+              alt="CotizaBot by CotizaExpress.com" 
+              className="h-12 w-auto"
+            />
+            <div className="text-left">
+              <span className="text-xl font-bold text-slate-900 block">CotizaBot</span>
+              <span className="text-xs text-slate-500">by CotizaExpress.com</span>
+            </div>
+          </Link>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Iniciar Sesión</h1>
           <p className="text-slate-600">Accede a tu cuenta de CotizaBot</p>
         </div>
 
