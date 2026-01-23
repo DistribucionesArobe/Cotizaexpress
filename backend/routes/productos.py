@@ -144,21 +144,74 @@ async def crear_producto(producto_data: ProductoCreate, current_user: dict = Dep
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/{producto_id}")
-async def actualizar_producto(producto_id: str, update_data: dict):
-    """Actualiza un producto"""
+async def actualizar_producto(
+    producto_id: str, 
+    update_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Actualiza un producto de la empresa"""
     try:
+        empresa_id = current_user.get('empresa_id')
+        
+        # Solo permitir actualizar ciertos campos
+        campos_permitidos = ['precio_base', 'stock', 'activo', 'descripcion', 'margen_minimo']
+        update_filtrado = {k: v for k, v in update_data.items() if k in campos_permitidos}
+        
+        if not update_filtrado:
+            raise HTTPException(status_code=400, detail="No hay campos válidos para actualizar")
+        
         resultado = await productos_collection.update_one(
-            {'id': producto_id},
-            {'$set': update_data}
+            {'id': producto_id, 'empresa_id': empresa_id},
+            {'$set': update_filtrado}
         )
         
         if resultado.matched_count == 0:
             raise HTTPException(status_code=404, detail="Producto no encontrado")
         
-        return {'success': True, 'message': 'Producto actualizado'}
+        return {'success': True, 'message': 'Producto actualizado', 'campos': list(update_filtrado.keys())}
         
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error actualizando producto: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+class ActualizarPrecioRequest(BaseModel):
+    precio_base: float
+
+
+@router.patch("/{producto_id}/precio")
+async def actualizar_precio(
+    producto_id: str,
+    request: ActualizarPrecioRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Actualiza solo el precio de un producto"""
+    try:
+        empresa_id = current_user.get('empresa_id')
+        
+        if request.precio_base <= 0:
+            raise HTTPException(status_code=400, detail="El precio debe ser mayor a 0")
+        
+        resultado = await productos_collection.update_one(
+            {'id': producto_id, 'empresa_id': empresa_id},
+            {'$set': {'precio_base': request.precio_base}}
+        )
+        
+        if resultado.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Producto no encontrado")
+        
+        logger.info(f"Precio actualizado para producto {producto_id}: ${request.precio_base}")
+        
+        return {
+            'success': True,
+            'producto_id': producto_id,
+            'nuevo_precio': request.precio_base
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error actualizando precio: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
