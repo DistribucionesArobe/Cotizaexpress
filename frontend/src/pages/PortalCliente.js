@@ -22,16 +22,29 @@ export default function PortalCliente() {
   const [downloadingPdf, setDownloadingPdf] = useState(false);
 
   useEffect(() => {
+    const fetchCotizacion = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await axios.get(`${API}/portal/cotizacion/${token}`);
+        setData(response.data);
+      } catch (err) {
+        console.error('Error:', err);
+        if (err.response?.status === 404) {
+          setError('Este enlace no es válido o ha expirado.');
+        } else if (err.response?.status === 410) {
+          setError('Este enlace ha expirado. Solicita uno nuevo al proveedor.');
+        } else {
+          setError('Error al cargar la cotización. Intenta de nuevo más tarde.');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    
     fetchCotizacion();
   }, [token]);
-
-  const fetchCotizacion = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const response = await axios.get(`${API}/portal/cotizacion/${token}`);
-      setData(response.data);
     } catch (err) {
       console.error('Error:', err);
       if (err.response?.status === 404) {
