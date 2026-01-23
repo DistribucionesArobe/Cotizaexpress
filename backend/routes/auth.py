@@ -32,7 +32,9 @@ async def registrar_usuario(usuario_data: UsuarioCreate):
             'nombre': usuario_data.empresa_nombre,
             'telefono': usuario_data.telefono,
             'email': usuario_data.email,
-            'plan': 'demo',  # Empieza con plan demo
+            'plan': 'gratis',  # Empieza con plan gratis (5 cotizaciones)
+            'cotizaciones_usadas': 0,
+            'cotizaciones_limite': 5,
             'activo': True,
             'monto_mensual': 1000.0,
             'created_at': datetime.now(timezone.utc).isoformat()
