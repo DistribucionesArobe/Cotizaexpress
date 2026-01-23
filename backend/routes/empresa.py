@@ -372,7 +372,7 @@ async def solicitar_factura(
     request: SolicitudFacturaRequest,
     current_user: dict = Depends(get_current_user)
 ):
-    """Envía solicitud de factura CFDI al equipo de CotizaBot"""
+    """Genera factura CFDI automáticamente con Facturama"""
     try:
         empresa_id = current_user.get('empresa_id')
         
@@ -383,15 +383,47 @@ async def solicitar_factura(
         
         datos_fiscales = empresa.get('datos_fiscales', {})
         
-        # Validar que tenga datos fiscales mínimos
-        if not datos_fiscales.get('rfc') or not datos_fiscales.get('razon_social'):
+        # Validar datos fiscales mínimos
+        campos_requeridos = ['rfc', 'razon_social', 'regimen_fiscal', 'codigo_postal']
+        faltantes = [c for c in campos_requeridos if not datos_fiscales.get(c)]
+        
+        if faltantes:
             raise HTTPException(
                 status_code=400,
-                detail="Primero completa tus datos fiscales (RFC y Razón Social son obligatorios)"
+                detail=f"Faltan datos fiscales requeridos: {', '.join(faltantes)}"
             )
         
         # Crear registro de solicitud
         solicitud_id = str(uuid.uuid4())
+        
+        # Preparar concepto de la factura (suscripción CotizaBot)
+        subtotal = 1000.00  # $1,000 MXN base
+        concepto = {
+            "clave_producto": "81112100",  # Servicios de software
+            "clave_unidad": "E48",  # Unidad de servicio
+            "unidad": "Servicio",
+            "descripcion": f"Suscripción mensual CotizaBot - Plan Completo. Ref: {request.pago_referencia or solicitud_id}",
+            "cantidad": 1,
+            "precio_unitario": subtotal,
+            "subtotal": subtotal
+        }
+        
+        # Generar factura CFDI con Facturama
+        resultado_factura = await facturama_service.crear_factura_cfdi(
+            emisor={},  # Facturama usa los datos del emisor configurado en la cuenta
+            receptor={
+                "rfc": datos_fiscales.get('rfc'),
+                "razon_social": datos_fiscales.get('razon_social'),
+                "regimen_fiscal": datos_fiscales.get('regimen_fiscal'),
+                "uso_cfdi": datos_fiscales.get('uso_cfdi', 'G03'),
+                "codigo_postal": datos_fiscales.get('codigo_postal')
+            },
+            conceptos=[concepto],
+            forma_pago="03",  # Transferencia electrónica
+            metodo_pago="PUE"  # Pago en una exhibición
+        )
+        
+        # Crear registro de la solicitud
         solicitud = {
             "id": solicitud_id,
             "empresa_id": empresa_id,
@@ -400,27 +432,56 @@ async def solicitar_factura(
             "cotizacion_folio": request.cotizacion_folio,
             "pago_referencia": request.pago_referencia,
             "notas": request.notas,
-            "estado": "pendiente",  # pendiente, procesando, completada, rechazada
+            "estado": "completada" if resultado_factura.get('success') else "error",
+            "factura_uuid": resultado_factura.get('uuid'),
+            "factura_id": resultado_factura.get('factura_id'),
+            "factura_folio": resultado_factura.get('folio'),
+            "factura_total": resultado_factura.get('total'),
+            "factura_error": resultado_factura.get('error'),
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         
         await solicitudes_factura_collection.insert_one(solicitud)
         
-        # Enviar email al equipo
-        email_result = await email_service.enviar_solicitud_factura(
-            empresa=empresa,
-            datos_fiscales=datos_fiscales,
-            cotizacion_folio=request.cotizacion_folio or request.pago_referencia or solicitud_id
-        )
-        
-        logger.info(f"Solicitud de factura creada: {solicitud_id}")
-        
-        return {
-            "success": True,
-            "solicitud_id": solicitud_id,
-            "mensaje": "Solicitud de factura enviada. Recibirás tu factura en 24-48 horas hábiles.",
-            "email_enviado": email_result.get('success', False)
-        }
+        if resultado_factura.get('success'):
+            # Enviar email con la factura
+            email_result = await email_service.enviar_factura_generada(
+                empresa=empresa,
+                datos_fiscales=datos_fiscales,
+                factura_data=resultado_factura
+            )
+            
+            logger.info(f"Factura CFDI generada: UUID {resultado_factura.get('uuid')}")
+            
+            return {
+                "success": True,
+                "solicitud_id": solicitud_id,
+                "mensaje": "¡Factura CFDI generada exitosamente!",
+                "factura": {
+                    "uuid": resultado_factura.get('uuid'),
+                    "folio": resultado_factura.get('folio'),
+                    "serie": resultado_factura.get('serie'),
+                    "total": resultado_factura.get('total'),
+                    "fecha_timbrado": resultado_factura.get('fecha_timbrado')
+                },
+                "email_enviado": email_result.get('success', False)
+            }
+        else:
+            # Error al generar factura - enviar notificación manual
+            await email_service.enviar_solicitud_factura(
+                empresa=empresa,
+                datos_fiscales=datos_fiscales,
+                cotizacion_folio=request.cotizacion_folio or request.pago_referencia or solicitud_id
+            )
+            
+            logger.error(f"Error generando CFDI: {resultado_factura.get('error')}")
+            
+            return {
+                "success": False,
+                "solicitud_id": solicitud_id,
+                "mensaje": "No pudimos generar la factura automáticamente. Hemos enviado una solicitud a nuestro equipo para procesarla manualmente en 24-48 horas.",
+                "error_detalle": resultado_factura.get('error')
+            }
         
     except HTTPException:
         raise
