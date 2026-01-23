@@ -163,6 +163,13 @@ CotizaBot es un sistema de IA multi-agente para automatizar cotizaciones y venta
 - `POST /api/cotizaciones` - Crear cotización (valida límite de plan)
 - `GET /api/cotizaciones/estadisticas` - Límites del plan
 
+### Pagos (Stripe)
+- `GET /api/pagos/planes` - Lista planes disponibles (público)
+- `POST /api/pagos/crear-checkout` - Crea sesión de Stripe (auth)
+- `GET /api/pagos/checkout-status/{session_id}` - Estado del pago (auth)
+- `GET /api/pagos/mi-suscripcion` - Info de suscripción (auth)
+- `POST /api/webhook/stripe` - Webhook de eventos Stripe
+
 ### Twilio/WhatsApp
 - `GET /api/twilio/ciudades` - Lista ciudades para búsqueda
 - `POST /api/twilio/buscar-numeros` - Buscar números disponibles
