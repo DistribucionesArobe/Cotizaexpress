@@ -77,8 +77,8 @@ async def solicitar_numero_whatsapp(
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Solicita un número de WhatsApp para la empresa.
-    El equipo de CotizaBot se encargará de comprarlo y configurarlo.
+    Compra y configura automáticamente un número de WhatsApp para la empresa.
+    Flujo 100% automatizado: busca, compra y configura en segundos.
     """
     try:
         empresa_id = current_user.get('empresa_id')
@@ -95,26 +95,12 @@ async def solicitar_numero_whatsapp(
                 detail="Necesitas el Plan Completo para obtener un número de WhatsApp"
             )
         
-        # Verificar que no tenga ya un número o solicitud pendiente
+        # Verificar que no tenga ya un número
         if empresa.get('twilio_whatsapp_number'):
             raise HTTPException(
                 status_code=400,
                 detail="Ya tienes un número de WhatsApp asignado"
             )
-        
-        # Verificar solicitud pendiente
-        solicitud_pendiente = await solicitudes_whatsapp_collection.find_one({
-            'empresa_id': empresa_id,
-            'estado': 'pendiente'
-        })
-        
-        if solicitud_pendiente:
-            return {
-                "success": True,
-                "mensaje": "Ya tienes una solicitud pendiente. Te contactaremos pronto.",
-                "solicitud_id": solicitud_pendiente.get('id'),
-                "ciudad_solicitada": solicitud_pendiente.get('ciudad_nombre')
-            }
         
         # Validar ciudad
         if request.ciudad not in CIUDADES_MEXICO:
@@ -124,57 +110,117 @@ async def solicitar_numero_whatsapp(
             )
         
         ciudad_data = CIUDADES_MEXICO[request.ciudad]
+        area_codes = ciudad_data["area_codes"]
         
-        # Crear solicitud
-        solicitud_id = str(uuid.uuid4())
-        solicitud = {
-            "id": solicitud_id,
-            "empresa_id": empresa_id,
-            "empresa_nombre": empresa.get('nombre'),
-            "empresa_email": empresa.get('email'),
-            "empresa_telefono": empresa.get('telefono'),
-            "ciudad_key": request.ciudad,
-            "ciudad_nombre": ciudad_data["nombre"],
-            "notas": request.notas,
-            "estado": "pendiente",  # pendiente, procesando, completada, rechazada
-            "created_at": datetime.now(timezone.utc).isoformat()
-        }
+        # Obtener cliente Twilio
+        client = get_twilio_client()
         
-        await solicitudes_whatsapp_collection.insert_one(solicitud)
+        # PASO 1: Buscar número disponible
+        logger.info(f"Buscando número en {ciudad_data['nombre']} para empresa {empresa_id}")
         
-        # Actualizar empresa con solicitud pendiente
+        numero_encontrado = None
+        for area_code in area_codes:
+            try:
+                numeros = client.available_phone_numbers('MX').local.list(
+                    contains=f'+52{area_code}',
+                    limit=1
+                )
+                if numeros:
+                    numero_encontrado = numeros[0]
+                    break
+            except Exception as e:
+                logger.warning(f"Error buscando con código {area_code}: {e}")
+                continue
+        
+        if not numero_encontrado:
+            # Intentar con números móviles
+            try:
+                numeros = client.available_phone_numbers('MX').mobile.list(limit=1)
+                if numeros:
+                    numero_encontrado = numeros[0]
+            except Exception:
+                pass
+        
+        if not numero_encontrado:
+            raise HTTPException(
+                status_code=404,
+                detail=f"No hay números disponibles en {ciudad_data['nombre']}. Intenta con otra ciudad."
+            )
+        
+        phone_number = numero_encontrado.phone_number
+        logger.info(f"Número encontrado: {phone_number}")
+        
+        # PASO 2: Comprar el número
+        try:
+            # Obtener URL base del webhook
+            webhook_base = os.environ.get('REACT_APP_BACKEND_URL', 'https://cotizaexpress.com')
+            webhook_url = f"{webhook_base}/api/webhook/twilio/whatsapp"
+            
+            incoming_number = client.incoming_phone_numbers.create(
+                phone_number=phone_number,
+                friendly_name=f"CotizaBot - {empresa.get('nombre', 'Empresa')}",
+                sms_url=webhook_url,
+                sms_method='POST'
+            )
+            
+            logger.info(f"Número comprado: {incoming_number.sid}")
+            
+        except TwilioRestException as e:
+            logger.error(f"Error comprando número: {str(e)}")
+            if "insufficient funds" in str(e).lower():
+                raise HTTPException(
+                    status_code=402,
+                    detail="Fondos insuficientes en la cuenta de Twilio. Contacta a soporte."
+                )
+            raise HTTPException(
+                status_code=400,
+                detail=f"Error al comprar el número: {str(e)}"
+            )
+        
+        # PASO 3: Actualizar empresa con el número
         await empresas_collection.update_one(
             {'id': empresa_id},
             {
                 '$set': {
-                    'whatsapp_solicitud_pendiente': True,
-                    'whatsapp_ciudad_solicitada': ciudad_data["nombre"],
+                    'twilio_whatsapp_number': phone_number,
+                    'twilio_phone_sid': incoming_number.sid,
+                    'whatsapp_configured': True,
+                    'whatsapp_webhook_url': webhook_url,
+                    'whatsapp_ciudad': ciudad_data["nombre"],
+                    'whatsapp_activated_at': datetime.now(timezone.utc).isoformat(),
                     'updated_at': datetime.now(timezone.utc).isoformat()
                 }
             }
         )
         
-        # Enviar email al equipo
-        await email_service.enviar_solicitud_whatsapp(
-            empresa=empresa,
-            ciudad=ciudad_data["nombre"],
-            solicitud_id=solicitud_id,
-            notas=request.notas
-        )
+        # PASO 4: Registrar la compra
+        registro_id = str(uuid.uuid4())
+        registro = {
+            "id": registro_id,
+            "empresa_id": empresa_id,
+            "empresa_nombre": empresa.get('nombre'),
+            "phone_number": phone_number,
+            "phone_sid": incoming_number.sid,
+            "ciudad": ciudad_data["nombre"],
+            "estado": "completada",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await solicitudes_whatsapp_collection.insert_one(registro)
         
-        logger.info(f"Solicitud de WhatsApp creada: {solicitud_id} para empresa {empresa_id}")
+        logger.info(f"WhatsApp configurado exitosamente para empresa {empresa_id}: {phone_number}")
         
         return {
             "success": True,
-            "solicitud_id": solicitud_id,
-            "mensaje": f"¡Solicitud enviada! Configuraremos tu número de WhatsApp de {ciudad_data['nombre']} en las próximas 24-48 horas.",
-            "ciudad": ciudad_data["nombre"]
+            "phone_number": phone_number,
+            "ciudad": ciudad_data["nombre"],
+            "mensaje": f"¡Listo! Tu número de WhatsApp {phone_number} está activo.",
+            "whatsapp_configured": True
         }
         
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error solicitando número: {str(e)}")
+        logger.error(f"Error en proceso automático: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/mi-solicitud")
