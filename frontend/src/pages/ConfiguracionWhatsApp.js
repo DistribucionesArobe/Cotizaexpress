@@ -235,8 +235,6 @@ export default function ConfiguracionWhatsApp() {
     );
   }
 
- 
-
   // Vista para obtener número (flujo automático instantáneo)
   return (
     <div className="space-y-6" data-testid="configuracion-whatsapp-page">
