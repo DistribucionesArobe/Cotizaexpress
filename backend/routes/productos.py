@@ -214,10 +214,18 @@ async def actualizar_precio(
         if request.precio_base <= 0:
             raise HTTPException(status_code=400, detail="El precio debe ser mayor a 0")
         
+        # Intentar actualizar producto de la empresa
         resultado = await productos_collection.update_one(
             {'id': producto_id, 'empresa_id': empresa_id},
             {'$set': {'precio_base': request.precio_base}}
         )
+        
+        # Si no encontró, intentar con producto demo (para edición en demo)
+        if resultado.matched_count == 0:
+            resultado = await productos_collection.update_one(
+                {'id': producto_id, 'empresa_id': 'demo'},
+                {'$set': {'precio_base': request.precio_base}}
+            )
         
         if resultado.matched_count == 0:
             raise HTTPException(status_code=404, detail="Producto no encontrado")
