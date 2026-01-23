@@ -225,6 +225,14 @@ function AppContent() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/perfil-empresa"
+              element={
+                <ProtectedRoute>
+                  <PerfilEmpresa />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </main>
       </BrowserRouter>
