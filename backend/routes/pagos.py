@@ -3,8 +3,12 @@ from pydantic import BaseModel
 from typing import Optional
 from utils.auth import get_current_user
 from database import db
+from emergentintegrations.payments.stripe.checkout import (
+    StripeCheckout, 
+    CheckoutSessionResponse, 
+    CheckoutSessionRequest
+)
 from datetime import datetime, timezone
-import stripe
 import os
 import logging
 
@@ -15,9 +19,6 @@ empresas_collection = db.get_collection('empresas')
 payment_transactions_collection = db.get_collection('payment_transactions')
 subscriptions_collection = db.get_collection('subscriptions')
 
-# Configurar Stripe
-stripe.api_key = os.environ.get('STRIPE_API_KEY', '')
-
 # Planes fijos definidos en backend (NUNCA aceptar monto desde frontend)
 PLANES = {
     "completo": {
@@ -25,7 +26,6 @@ PLANES = {
         "precio_base": 1000.0,  # MXN
         "iva_rate": 0.16,
         "precio_total": 1160.0,  # MXN con IVA
-        "precio_centavos": 116000,  # Stripe usa centavos
         "descripcion": "Cotizaciones ilimitadas + WhatsApp Business",
         "interval": "month"
     }
@@ -38,50 +38,16 @@ class CrearSuscripcionRequest(BaseModel):
 class CancelarSuscripcionRequest(BaseModel):
     subscription_id: Optional[str] = None
 
-async def get_or_create_stripe_product():
-    """Obtiene o crea el producto de CotizaBot en Stripe"""
-    try:
-        # Buscar producto existente
-        products = stripe.Product.list(limit=10)
-        for product in products.data:
-            if product.metadata.get('cotizabot_plan') == 'completo':
-                return product.id
-        
-        # Crear producto si no existe
-        product = stripe.Product.create(
-            name="Plan Completo CotizaBot",
-            description="Cotizaciones ilimitadas + WhatsApp Business para tu negocio",
-            metadata={"cotizabot_plan": "completo"}
-        )
-        logger.info(f"Producto Stripe creado: {product.id}")
-        return product.id
-    except Exception as e:
-        logger.error(f"Error con producto Stripe: {str(e)}")
-        raise
-
-async def get_or_create_stripe_price(product_id: str):
-    """Obtiene o crea el precio recurrente en Stripe"""
-    try:
-        # Buscar precio existente
-        prices = stripe.Price.list(product=product_id, limit=10)
-        for price in prices.data:
-            if price.recurring and price.recurring.interval == 'month' and price.currency == 'mxn':
-                if price.unit_amount == PLANES["completo"]["precio_centavos"]:
-                    return price.id
-        
-        # Crear precio si no existe
-        price = stripe.Price.create(
-            product=product_id,
-            unit_amount=PLANES["completo"]["precio_centavos"],
-            currency="mxn",
-            recurring={"interval": "month"},
-            metadata={"cotizabot_plan": "completo"}
-        )
-        logger.info(f"Precio Stripe creado: {price.id}")
-        return price.id
-    except Exception as e:
-        logger.error(f"Error con precio Stripe: {str(e)}")
-        raise
+def get_stripe_checkout(request: Request) -> StripeCheckout:
+    """Obtiene cliente Stripe con configuración"""
+    api_key = os.environ.get('STRIPE_API_KEY')
+    if not api_key:
+        raise HTTPException(status_code=500, detail="Stripe no configurado")
+    
+    host_url = str(request.base_url).rstrip('/')
+    webhook_url = f"{host_url}/api/webhook/stripe"
+    
+    return StripeCheckout(api_key=api_key, webhook_url=webhook_url)
 
 @router.get("/planes")
 async def obtener_planes():
@@ -97,7 +63,7 @@ async def obtener_planes():
                 "currency": "MXN",
                 "descripcion": plan["descripcion"],
                 "interval": plan["interval"],
-                "tipo": "suscripcion_mensual"
+                "tipo": "mensual"
             }
             for plan_id, plan in PLANES.items()
         ]
@@ -109,7 +75,7 @@ async def crear_suscripcion(
     request: Request,
     current_user: dict = Depends(get_current_user)
 ):
-    """Crea una sesión de checkout para suscripción mensual"""
+    """Crea una sesión de checkout para pago mensual"""
     try:
         empresa_id = current_user.get('empresa_id')
         user_id = current_user.get('sub')
@@ -126,47 +92,36 @@ async def crear_suscripcion(
         if empresa and empresa.get('plan') == 'completo' and empresa.get('subscription_status') == 'active':
             raise HTTPException(
                 status_code=400,
-                detail="Ya tienes una suscripción activa al Plan Completo"
+                detail="Ya tienes el Plan Completo activo"
             )
-        
-        # Obtener o crear producto y precio en Stripe
-        product_id = await get_or_create_stripe_product()
-        price_id = await get_or_create_stripe_price(product_id)
         
         # Construir URLs dinámicamente
         origin_url = request_data.origin_url.rstrip('/')
         success_url = f"{origin_url}/pago-exitoso?session_id={{CHECKOUT_SESSION_ID}}"
         cancel_url = f"{origin_url}/precios"
         
-        # Crear sesión de checkout para suscripción
-        checkout_session = stripe.checkout.Session.create(
-            mode='subscription',
-            payment_method_types=['card'],
-            line_items=[{
-                'price': price_id,
-                'quantity': 1,
-            }],
+        # Crear checkout usando emergentintegrations
+        stripe_checkout = get_stripe_checkout(request)
+        
+        checkout_request = CheckoutSessionRequest(
+            amount=float(plan["precio_total"]),
+            currency="mxn",
             success_url=success_url,
             cancel_url=cancel_url,
-            customer_email=email,
             metadata={
                 "plan_id": request_data.plan_id,
                 "empresa_id": empresa_id,
                 "user_id": user_id,
                 "email": email,
                 "tipo": "suscripcion_mensual"
-            },
-            subscription_data={
-                "metadata": {
-                    "empresa_id": empresa_id,
-                    "plan_id": request_data.plan_id
-                }
             }
         )
         
+        session: CheckoutSessionResponse = await stripe_checkout.create_checkout_session(checkout_request)
+        
         # Crear registro de transacción
         transaction = {
-            "session_id": checkout_session.id,
+            "session_id": session.session_id,
             "empresa_id": empresa_id,
             "user_id": user_id,
             "email": email,
@@ -187,16 +142,13 @@ async def crear_suscripcion(
         
         await payment_transactions_collection.insert_one(transaction)
         
-        logger.info(f"Checkout de suscripción creado: {checkout_session.id} para empresa {empresa_id}")
+        logger.info(f"Checkout de suscripción creado: {session.session_id} para empresa {empresa_id}")
         
         return {
-            "checkout_url": checkout_session.url,
-            "session_id": checkout_session.id
+            "checkout_url": session.url,
+            "session_id": session.session_id
         }
         
-    except stripe.error.StripeError as e:
-        logger.error(f"Error de Stripe: {str(e)}")
-        raise HTTPException(status_code=400, detail=f"Error de Stripe: {str(e)}")
     except HTTPException:
         raise
     except Exception as e:
@@ -238,19 +190,20 @@ async def obtener_status_checkout(
                 "status": "complete",
                 "payment_status": "paid",
                 "plan_activado": True,
-                "tipo": transaction.get('tipo', 'pago_unico'),
-                "mensaje": "¡Pago exitoso! Tu suscripción mensual está activa."
+                "tipo": transaction.get('tipo', 'suscripcion_mensual'),
+                "mensaje": "¡Pago exitoso! Tu Plan Completo está activo."
             }
         
         # Consultar estado actual en Stripe
-        checkout_session = stripe.checkout.Session.retrieve(session_id)
+        stripe_checkout = get_stripe_checkout(request)
+        checkout_status = await stripe_checkout.get_checkout_status(session_id)
         
         # Actualizar según estado
         new_status = "pending"
         plan_activado = False
         mensaje = "Procesando pago..."
         
-        if checkout_session.payment_status == "paid":
+        if checkout_status.payment_status == "paid":
             # Verificar que no se haya procesado ya
             existing = await payment_transactions_collection.find_one({
                 'session_id': session_id,
@@ -258,21 +211,15 @@ async def obtener_status_checkout(
             })
             
             if not existing:
-                # Obtener subscription_id si es suscripción
-                subscription_id = checkout_session.subscription
-                
                 # Activar plan completo
                 update_data = {
                     'plan': 'completo',
                     'cotizaciones_limite': None,
                     'fecha_pago': datetime.now(timezone.utc).isoformat(),
                     'stripe_session_id': session_id,
+                    'subscription_status': 'active',
                     'updated_at': datetime.now(timezone.utc).isoformat()
                 }
-                
-                if subscription_id:
-                    update_data['stripe_subscription_id'] = subscription_id
-                    update_data['subscription_status'] = 'active'
                 
                 await empresas_collection.update_one(
                     {'id': empresa_id},
@@ -286,39 +233,19 @@ async def obtener_status_checkout(
                         '$set': {
                             'payment_status': 'paid',
                             'status': 'complete',
-                            'subscription_id': subscription_id,
                             'paid_at': datetime.now(timezone.utc).isoformat(),
                             'updated_at': datetime.now(timezone.utc).isoformat()
                         }
                     }
                 )
                 
-                # Guardar info de suscripción
-                if subscription_id:
-                    subscription = stripe.Subscription.retrieve(subscription_id)
-                    await subscriptions_collection.update_one(
-                        {'empresa_id': empresa_id},
-                        {
-                            '$set': {
-                                'empresa_id': empresa_id,
-                                'subscription_id': subscription_id,
-                                'status': subscription.status,
-                                'current_period_start': datetime.fromtimestamp(subscription.current_period_start, timezone.utc).isoformat(),
-                                'current_period_end': datetime.fromtimestamp(subscription.current_period_end, timezone.utc).isoformat(),
-                                'cancel_at_period_end': subscription.cancel_at_period_end,
-                                'updated_at': datetime.now(timezone.utc).isoformat()
-                            }
-                        },
-                        upsert=True
-                    )
-                
-                logger.info(f"Suscripción activada para empresa {empresa_id}")
+                logger.info(f"Plan Completo activado para empresa {empresa_id}")
             
             new_status = "complete"
             plan_activado = True
-            mensaje = "¡Pago exitoso! Tu suscripción mensual está activa."
+            mensaje = "¡Pago exitoso! Tu Plan Completo está activo."
             
-        elif checkout_session.status == "expired":
+        elif checkout_status.status == "expired":
             await payment_transactions_collection.update_one(
                 {'session_id': session_id},
                 {
@@ -334,88 +261,16 @@ async def obtener_status_checkout(
         
         return {
             "status": new_status,
-            "payment_status": checkout_session.payment_status,
+            "payment_status": checkout_status.payment_status,
             "plan_activado": plan_activado,
             "tipo": transaction.get('tipo', 'suscripcion_mensual'),
             "mensaje": mensaje
         }
         
-    except stripe.error.StripeError as e:
-        logger.error(f"Error de Stripe: {str(e)}")
-        raise HTTPException(status_code=400, detail=str(e))
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error obteniendo status: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@router.post("/cancelar-suscripcion")
-async def cancelar_suscripcion(
-    request_data: CancelarSuscripcionRequest,
-    current_user: dict = Depends(get_current_user)
-):
-    """Cancela la suscripción al final del período actual"""
-    try:
-        empresa_id = current_user.get('empresa_id')
-        
-        empresa = await empresas_collection.find_one({'id': empresa_id}, {'_id': 0})
-        if not empresa:
-            raise HTTPException(status_code=404, detail="Empresa no encontrada")
-        
-        subscription_id = request_data.subscription_id or empresa.get('stripe_subscription_id')
-        
-        if not subscription_id:
-            raise HTTPException(
-                status_code=400,
-                detail="No tienes una suscripción activa para cancelar"
-            )
-        
-        # Cancelar al final del período (no inmediatamente)
-        subscription = stripe.Subscription.modify(
-            subscription_id,
-            cancel_at_period_end=True
-        )
-        
-        # Actualizar BD
-        await empresas_collection.update_one(
-            {'id': empresa_id},
-            {
-                '$set': {
-                    'subscription_status': 'canceling',
-                    'cancel_at_period_end': True,
-                    'updated_at': datetime.now(timezone.utc).isoformat()
-                }
-            }
-        )
-        
-        await subscriptions_collection.update_one(
-            {'empresa_id': empresa_id},
-            {
-                '$set': {
-                    'status': 'canceling',
-                    'cancel_at_period_end': True,
-                    'updated_at': datetime.now(timezone.utc).isoformat()
-                }
-            }
-        )
-        
-        period_end = datetime.fromtimestamp(subscription.current_period_end, timezone.utc)
-        
-        logger.info(f"Suscripción {subscription_id} marcada para cancelar al final del período")
-        
-        return {
-            "success": True,
-            "mensaje": f"Tu suscripción se cancelará el {period_end.strftime('%d/%m/%Y')}. Seguirás teniendo acceso hasta esa fecha.",
-            "cancel_at": period_end.isoformat()
-        }
-        
-    except stripe.error.StripeError as e:
-        logger.error(f"Error de Stripe: {str(e)}")
-        raise HTTPException(status_code=400, detail=str(e))
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error cancelando suscripción: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/mi-suscripcion")
@@ -429,9 +284,15 @@ async def obtener_mi_suscripcion(current_user: dict = Depends(get_current_user))
             raise HTTPException(status_code=404, detail="Empresa no encontrada")
         
         plan = empresa.get('plan', 'gratis')
-        subscription_id = empresa.get('stripe_subscription_id')
         
-        result = {
+        # Obtener última transacción exitosa
+        ultima_transaccion = await payment_transactions_collection.find_one(
+            {'empresa_id': empresa_id, 'payment_status': 'paid'},
+            {'_id': 0},
+            sort=[('paid_at', -1)]
+        )
+        
+        return {
             "plan": plan,
             "plan_nombre": "Plan Completo" if plan == 'completo' else "Plan Gratis",
             "cotizaciones_usadas": empresa.get('cotizaciones_usadas', 0),
@@ -439,23 +300,12 @@ async def obtener_mi_suscripcion(current_user: dict = Depends(get_current_user))
             "fecha_pago": empresa.get('fecha_pago'),
             "activo": empresa.get('activo', True),
             "subscription_status": empresa.get('subscription_status'),
-            "cancel_at_period_end": empresa.get('cancel_at_period_end', False)
+            "ultima_transaccion": {
+                "amount": ultima_transaccion.get('amount'),
+                "paid_at": ultima_transaccion.get('paid_at'),
+                "tipo": ultima_transaccion.get('tipo')
+            } if ultima_transaccion else None
         }
-        
-        # Obtener info detallada de suscripción si existe
-        if subscription_id:
-            subscription_info = await subscriptions_collection.find_one(
-                {'empresa_id': empresa_id},
-                {'_id': 0}
-            )
-            if subscription_info:
-                result['subscription'] = {
-                    'id': subscription_id,
-                    'current_period_end': subscription_info.get('current_period_end'),
-                    'cancel_at_period_end': subscription_info.get('cancel_at_period_end', False)
-                }
-        
-        return result
         
     except HTTPException:
         raise
