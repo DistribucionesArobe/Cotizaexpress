@@ -274,5 +274,136 @@ class EmailService:
         except Exception as e:
             logger.error(f"Error enviando solicitud de factura: {str(e)}")
             return {"success": False, "error": str(e)}
+    
+    async def enviar_factura_generada(
+        self,
+        empresa: dict,
+        datos_fiscales: dict,
+        factura_data: dict
+    ) -> dict:
+        """Envía notificación de factura CFDI generada al cliente"""
+        try:
+            if not resend.api_key:
+                logger.warning("RESEND_API_KEY no configurado")
+                return {"success": False, "error": "Servicio de email no configurado"}
+            
+            # Email del destinatario
+            email_destino = datos_fiscales.get('email_factura') or empresa.get('email')
+            
+            if not email_destino:
+                return {"success": False, "error": "No hay email de destino"}
+            
+            html = f"""
+            <!DOCTYPE html>
+            <html>
+            <head><meta charset="UTF-8"></head>
+            <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f3f4f6;">
+                <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+                    <tr>
+                        <td align="center">
+                            <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden;">
+                                <!-- Header -->
+                                <tr>
+                                    <td style="background: linear-gradient(135deg, #059669 0%, #0d9488 100%); padding: 30px; text-align: center;">
+                                        <h1 style="color: #ffffff; margin: 0; font-size: 24px;">✅ Factura CFDI Generada</h1>
+                                        <p style="color: #d1fae5; margin: 5px 0 0 0; font-size: 14px;">CotizaBot by CotizaExpress.com</p>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Content -->
+                                <tr>
+                                    <td style="padding: 30px;">
+                                        <p style="color: #374151; font-size: 16px; margin: 0 0 20px 0;">
+                                            Hola <strong>{datos_fiscales.get('razon_social', empresa.get('nombre', 'Cliente'))}</strong>,
+                                        </p>
+                                        <p style="color: #6b7280; font-size: 14px; margin: 0 0 30px 0;">
+                                            Tu factura CFDI ha sido generada exitosamente. A continuación encontrarás los detalles:
+                                        </p>
+                                        
+                                        <!-- Datos de la factura -->
+                                        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; border-radius: 8px; margin-bottom: 20px;">
+                                            <tr>
+                                                <td style="padding: 20px;">
+                                                    <table width="100%">
+                                                        <tr>
+                                                            <td style="padding: 8px 0; color: #6b7280;">UUID:</td>
+                                                            <td style="padding: 8px 0; color: #111827; font-family: monospace; font-size: 12px;">{factura_data.get('uuid', 'N/A')}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 8px 0; color: #6b7280;">Folio:</td>
+                                                            <td style="padding: 8px 0; color: #111827;">{factura_data.get('folio', 'N/A')}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 8px 0; color: #6b7280;">Serie:</td>
+                                                            <td style="padding: 8px 0; color: #111827;">{factura_data.get('serie', 'N/A')}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 8px 0; color: #6b7280;">Fecha Timbrado:</td>
+                                                            <td style="padding: 8px 0; color: #111827;">{factura_data.get('fecha_timbrado', 'N/A')}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 8px 0; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 12px;">Subtotal:</td>
+                                                            <td style="padding: 8px 0; color: #111827; border-top: 1px solid #e5e7eb; padding-top: 12px;">${factura_data.get('subtotal', 0):,.2f} MXN</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 8px 0; color: #6b7280;">IVA (16%):</td>
+                                                            <td style="padding: 8px 0; color: #111827;">${factura_data.get('iva', 0):,.2f} MXN</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 8px 0; color: #059669; font-weight: bold;">Total:</td>
+                                                            <td style="padding: 8px 0; color: #059669; font-weight: bold; font-size: 18px;">${factura_data.get('total', 0):,.2f} MXN</td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        
+                                        <p style="color: #6b7280; font-size: 14px; margin: 20px 0;">
+                                            Puedes descargar tu factura (PDF y XML) desde tu panel de control en CotizaBot.
+                                        </p>
+                                        
+                                        <p style="color: #9ca3af; font-size: 12px; margin: 30px 0 0 0;">
+                                            Esta factura es un Comprobante Fiscal Digital por Internet (CFDI) válido ante el SAT.
+                                        </p>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Footer -->
+                                <tr>
+                                    <td style="background-color: #f9fafb; padding: 20px; text-align: center;">
+                                        <p style="color: #6b7280; margin: 0; font-size: 12px;">
+                                            CotizaBot by CotizaExpress.com<br>
+                                            +52 81 3078 3171 | contacto@arobegroup.com
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </body>
+            </html>
+            """
+            
+            params = {
+                "from": f"CotizaBot <{self.sender_email}>",
+                "to": [email_destino],
+                "subject": f"✅ Factura CFDI Generada - UUID: {factura_data.get('uuid', 'N/A')[:8]}...",
+                "html": html
+            }
+            
+            email_result = await asyncio.to_thread(resend.Emails.send, params)
+            
+            logger.info(f"Notificación de factura enviada a {email_destino}")
+            
+            return {
+                "success": True,
+                "email_id": email_result.get("id"),
+                "destinatario": email_destino
+            }
+            
+        except Exception as e:
+            logger.error(f"Error enviando notificación de factura: {str(e)}")
+            return {"success": False, "error": str(e)}
 
 email_service = EmailService()
