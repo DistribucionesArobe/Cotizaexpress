@@ -82,15 +82,26 @@ CotizaBot es un sistema de IA multi-agente para automatizar cotizaciones y venta
 - Formulario de datos fiscales completo (RFC, Razón Social, Régimen Fiscal, Uso CFDI, CP, Domicilio)
 - Catálogos del SAT cargados (19 regímenes fiscales, 24 usos CFDI)
 - Endpoint para guardar datos fiscales de empresa
-- Endpoint para solicitar factura (envía email al equipo)
+- Endpoint para solicitar factura con integración Facturama
 - Historial de solicitudes de factura
-- Preparado para integración futura con PAC de facturación
+- Integración con Facturama API para generación automática de CFDI
+- Fallback a solicitud manual si Facturama falla
 
 ### ✅ Envío de Cotizaciones por Email (Completado 2026-01-23)
 - Servicio de email con Resend API
 - Plantilla HTML profesional para cotizaciones
 - PDF adjunto automáticamente al email
 - Información de empresa personalizada en emails
+- Fallback a dominio de prueba (onboarding@resend.dev) si dominio personalizado no está verificado
+
+### ✅ Portal del Cliente (Completado 2026-01-24)
+- Vista pública de cotizaciones mediante enlaces únicos (token-based)
+- Endpoint `/api/portal/cotizacion/{token}` - Ver cotización sin login
+- Endpoint `/api/portal/cotizacion/{token}/pdf` - Descargar PDF público
+- Endpoint `/api/portal/generar-enlace` - Generar enlace para compartir cotización
+- Página frontend responsive con datos de la cotización
+- Botón para descargar PDF
+- Información de contacto de la empresa emisora
 
 ### ✅ Integración de Pagos Stripe (Actualizado 2026-01-23)
 - Suscripciones mensuales ($1,160 MXN/mes con IVA incluido)
@@ -115,18 +126,21 @@ CotizaBot es un sistema de IA multi-agente para automatizar cotizaciones y venta
 - Endpoint `/api/twilio/mi-numero` - Estado del número
 - Página de configuración en frontend
 
+### ✅ Configuración de WhatsApp Business (Completado 2026-01-24)
+- Endpoint `/api/twilio/configurar-whatsapp` - Configura webhooks automáticamente
+- Endpoint `/api/twilio/estado-configuracion` - Estado completo del flujo
+- Flujo de 4 pasos: Plan Completo → Comprar número → Configurar WhatsApp → Listo
+- Configuración automática de webhooks en Twilio
+- Asociación del número comprado con webhook de CotizaBot
+
 ---
 
 ## Funcionalidades Pendientes (Backlog)
 
-### P0 - Alta Prioridad
-- [ ] Configuración automática de WhatsApp Business para números comprados
-- [ ] Suscripciones recurrentes con Stripe (actualmente es pago único)
-
 ### P1 - Media Prioridad
-- [ ] Generación de PDF de cotizaciones
-- [ ] Envío de cotizaciones por email
-- [ ] Historial de conversaciones mejorado
+- [ ] Verificar dominio cotizaexpress.com en Resend para emails personalizados
+- [ ] Activar credenciales de Facturama en sandbox/producción
+- [ ] Probar flujo completo de compra de número con cuenta Twilio de pago
 
 ### P2 - Baja Prioridad
 - [ ] Agente de aprendizaje (análisis de cotizaciones ganadas/perdidas)
