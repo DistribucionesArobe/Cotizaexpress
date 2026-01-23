@@ -32,7 +32,8 @@ def auth_token(api_client):
         "password": TEST_PASSWORD
     })
     if response.status_code == 200:
-        return response.json().get("token")
+        data = response.json()
+        return data.get("access_token") or data.get("token")
     
     # If test user doesn't exist, create one
     register_response = api_client.post(f"{BASE_URL}/api/auth/registro", json={
@@ -43,7 +44,8 @@ def auth_token(api_client):
         "telefono": "+521234567890"
     })
     if register_response.status_code in [200, 201]:
-        return register_response.json().get("token")
+        data = register_response.json()
+        return data.get("access_token") or data.get("token")
     
     pytest.skip("Could not authenticate - skipping authenticated tests")
 
