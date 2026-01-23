@@ -3,16 +3,19 @@ from pydantic import BaseModel
 from typing import List, Optional
 from utils.auth import get_current_user
 from database import db
+from services.email_service import email_service
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
 from datetime import datetime, timezone
 import os
+import uuid
 import logging
 
 router = APIRouter(prefix="/twilio", tags=["twilio"])
 logger = logging.getLogger(__name__)
 
 empresas_collection = db.get_collection('empresas')
+solicitudes_whatsapp_collection = db.get_collection('solicitudes_whatsapp')
 
 # Ciudades mexicanas con sus códigos de área para búsqueda de números
 CIUDADES_MEXICO = {
@@ -27,6 +30,10 @@ CIUDADES_MEXICO = {
     "cancun": {"nombre": "Cancún", "area_codes": ["998"]},
     "toluca": {"nombre": "Toluca", "area_codes": ["722"]},
 }
+
+class SolicitudNumeroRequest(BaseModel):
+    ciudad: str  # key de CIUDADES_MEXICO
+    notas: Optional[str] = None
 
 class BuscarNumerosRequest(BaseModel):
     ciudad: str  # key de CIUDADES_MEXICO
@@ -56,13 +63,154 @@ def get_twilio_client():
 
 @router.get("/ciudades")
 async def listar_ciudades(current_user: dict = Depends(get_current_user)):
-    """Lista las ciudades disponibles para buscar números"""
+    """Lista las ciudades disponibles para solicitar números"""
     return {
         "ciudades": [
             {"key": key, "nombre": data["nombre"]}
             for key, data in CIUDADES_MEXICO.items()
         ]
     }
+
+@router.post("/solicitar-numero")
+async def solicitar_numero_whatsapp(
+    request: SolicitudNumeroRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Solicita un número de WhatsApp para la empresa.
+    El equipo de CotizaBot se encargará de comprarlo y configurarlo.
+    """
+    try:
+        empresa_id = current_user.get('empresa_id')
+        
+        # Obtener empresa
+        empresa = await empresas_collection.find_one({'id': empresa_id}, {'_id': 0})
+        if not empresa:
+            raise HTTPException(status_code=404, detail="Empresa no encontrada")
+        
+        # Verificar plan completo
+        if empresa.get('plan') != 'completo':
+            raise HTTPException(
+                status_code=403,
+                detail="Necesitas el Plan Completo para obtener un número de WhatsApp"
+            )
+        
+        # Verificar que no tenga ya un número o solicitud pendiente
+        if empresa.get('twilio_whatsapp_number'):
+            raise HTTPException(
+                status_code=400,
+                detail="Ya tienes un número de WhatsApp asignado"
+            )
+        
+        # Verificar solicitud pendiente
+        solicitud_pendiente = await solicitudes_whatsapp_collection.find_one({
+            'empresa_id': empresa_id,
+            'estado': 'pendiente'
+        })
+        
+        if solicitud_pendiente:
+            return {
+                "success": True,
+                "mensaje": "Ya tienes una solicitud pendiente. Te contactaremos pronto.",
+                "solicitud_id": solicitud_pendiente.get('id'),
+                "ciudad_solicitada": solicitud_pendiente.get('ciudad_nombre')
+            }
+        
+        # Validar ciudad
+        if request.ciudad not in CIUDADES_MEXICO:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Ciudad no válida. Opciones: {list(CIUDADES_MEXICO.keys())}"
+            )
+        
+        ciudad_data = CIUDADES_MEXICO[request.ciudad]
+        
+        # Crear solicitud
+        solicitud_id = str(uuid.uuid4())
+        solicitud = {
+            "id": solicitud_id,
+            "empresa_id": empresa_id,
+            "empresa_nombre": empresa.get('nombre'),
+            "empresa_email": empresa.get('email'),
+            "empresa_telefono": empresa.get('telefono'),
+            "ciudad_key": request.ciudad,
+            "ciudad_nombre": ciudad_data["nombre"],
+            "notas": request.notas,
+            "estado": "pendiente",  # pendiente, procesando, completada, rechazada
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await solicitudes_whatsapp_collection.insert_one(solicitud)
+        
+        # Actualizar empresa con solicitud pendiente
+        await empresas_collection.update_one(
+            {'id': empresa_id},
+            {
+                '$set': {
+                    'whatsapp_solicitud_pendiente': True,
+                    'whatsapp_ciudad_solicitada': ciudad_data["nombre"],
+                    'updated_at': datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        # Enviar email al equipo
+        await email_service.enviar_solicitud_whatsapp(
+            empresa=empresa,
+            ciudad=ciudad_data["nombre"],
+            solicitud_id=solicitud_id,
+            notas=request.notas
+        )
+        
+        logger.info(f"Solicitud de WhatsApp creada: {solicitud_id} para empresa {empresa_id}")
+        
+        return {
+            "success": True,
+            "solicitud_id": solicitud_id,
+            "mensaje": f"¡Solicitud enviada! Configuraremos tu número de WhatsApp de {ciudad_data['nombre']} en las próximas 24-48 horas.",
+            "ciudad": ciudad_data["nombre"]
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error solicitando número: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/mi-solicitud")
+async def obtener_mi_solicitud(current_user: dict = Depends(get_current_user)):
+    """Obtiene el estado de la solicitud de WhatsApp de la empresa"""
+    try:
+        empresa_id = current_user.get('empresa_id')
+        
+        # Buscar solicitud más reciente
+        solicitud = await solicitudes_whatsapp_collection.find_one(
+            {'empresa_id': empresa_id},
+            {'_id': 0},
+            sort=[('created_at', -1)]
+        )
+        
+        if not solicitud:
+            return {
+                "tiene_solicitud": False,
+                "mensaje": "No tienes solicitudes de WhatsApp"
+            }
+        
+        return {
+            "tiene_solicitud": True,
+            "solicitud": {
+                "id": solicitud.get('id'),
+                "ciudad": solicitud.get('ciudad_nombre'),
+                "estado": solicitud.get('estado'),
+                "numero_asignado": solicitud.get('numero_asignado'),
+                "created_at": solicitud.get('created_at'),
+                "completada_at": solicitud.get('completada_at')
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error obteniendo solicitud: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/buscar-numeros", response_model=List[NumeroDisponible])
 async def buscar_numeros_disponibles(
