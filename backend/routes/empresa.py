@@ -4,6 +4,7 @@ from typing import Optional
 from utils.auth import get_current_user
 from database import db
 from services.email_service import email_service
+from services.facturama_service import facturama_service
 from datetime import datetime, timezone
 import os
 import uuid

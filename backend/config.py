@@ -30,6 +30,11 @@ class Settings(BaseSettings):
     resend_api_key: str = os.environ.get('RESEND_API_KEY', '')
     sender_email: str = os.environ.get('SENDER_EMAIL', 'contacto@cotizaexpress.com')
     
+    # Facturama (CFDI)
+    facturama_api_url: str = os.environ.get('FACTURAMA_API_URL', 'https://apisandbox.facturama.mx')
+    facturama_username: str = os.environ.get('FACTURAMA_USERNAME', '')
+    facturama_password: str = os.environ.get('FACTURAMA_PASSWORD', '')
+    
     # CORS
     cors_origins: str = os.environ.get('CORS_ORIGINS', '*')
     
