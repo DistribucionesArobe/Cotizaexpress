@@ -18,6 +18,7 @@ import Clientes from './pages/Clientes';
 import Conversaciones from './pages/Conversaciones';
 import CargaProductos from './pages/CargaProductos';
 import ConfiguracionWhatsApp from './pages/ConfiguracionWhatsApp';
+import PerfilEmpresa from './pages/PerfilEmpresa';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
