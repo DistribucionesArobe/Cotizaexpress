@@ -55,7 +55,7 @@ async def listar_categorias(current_user: dict = Depends(get_current_user)):
     try:
         empresa_id = current_user.get('empresa_id')
         
-        # Obtener categorías solo de productos de esta empresa
+        # Obtener categorías de productos de esta empresa
         pipeline = [
             {'$match': {'empresa_id': empresa_id}},
             {'$group': {'_id': '$categoria'}},
@@ -64,6 +64,16 @@ async def listar_categorias(current_user: dict = Depends(get_current_user)):
         
         result = await productos_collection.aggregate(pipeline).to_list(50)
         categorias = [r['_id'] for r in result if r['_id']]
+        
+        # Si no tiene categorías propias, mostrar las del demo
+        if len(categorias) == 0:
+            pipeline_demo = [
+                {'$match': {'empresa_id': 'demo'}},
+                {'$group': {'_id': '$categoria'}},
+                {'$sort': {'_id': 1}}
+            ]
+            result = await productos_collection.aggregate(pipeline_demo).to_list(50)
+            categorias = [r['_id'] for r in result if r['_id']]
         
         return {'categorias': categorias}
         
