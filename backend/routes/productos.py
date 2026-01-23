@@ -21,6 +21,7 @@ async def listar_productos(
     try:
         empresa_id = current_user.get('empresa_id')
         
+        # Primero intentar con productos de la empresa
         filtro = {'activo': activo, 'empresa_id': empresa_id}
         if categoria:
             filtro['categoria'] = categoria
@@ -29,6 +30,14 @@ async def listar_productos(
             filtro,
             {'_id': 0}
         ).sort('categoria', 1).to_list(200)
+        
+        # Si no tiene productos propios, mostrar catálogo demo
+        if len(productos) == 0 and not categoria:
+            filtro_demo = {'activo': activo, 'empresa_id': 'demo'}
+            productos = await productos_collection.find(
+                filtro_demo,
+                {'_id': 0}
+            ).sort('categoria', 1).to_list(200)
         
         for prod in productos:
             if isinstance(prod.get('created_at'), str):
