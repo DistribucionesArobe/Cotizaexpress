@@ -60,24 +60,24 @@ export default function ConfiguracionWhatsApp() {
       setEnviando(true);
       
       const response = await axios.post(`${API}/twilio/solicitar-numero`, {
-        ciudad: ciudadSeleccionada,
-        notas: notas || undefined
+        ciudad: ciudadSeleccionada
       });
       
-      toast.success(response.data.mensaje);
-      
-      // Actualizar estado de solicitud
-      setMiSolicitud({
-        tiene_solicitud: true,
-        solicitud: {
-          ciudad: response.data.ciudad,
-          estado: 'pendiente'
-        }
-      });
+      if (response.data.success) {
+        toast.success(response.data.mensaje);
+        
+        // Actualizar estado con el número obtenido
+        setMiNumero({
+          has_number: true,
+          phone_number: response.data.phone_number,
+          whatsapp_configured: response.data.whatsapp_configured
+        });
+      }
       
     } catch (error) {
-      console.error('Error solicitando número:', error);
-      toast.error(error.response?.data?.detail || 'Error al enviar solicitud');
+      console.error('Error obteniendo número:', error);
+      const errorMsg = error.response?.data?.detail || 'Error al obtener el número';
+      toast.error(errorMsg);
     } finally {
       setEnviando(false);
     }
