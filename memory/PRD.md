@@ -127,11 +127,12 @@ CotizaBot es un sistema de IA multi-agente para automatizar cotizaciones y venta
 - Página de configuración en frontend
 
 ### ✅ Configuración de WhatsApp Business (Completado 2026-01-24)
-- Endpoint `/api/twilio/configurar-whatsapp` - Configura webhooks automáticamente
-- Endpoint `/api/twilio/estado-configuracion` - Estado completo del flujo
-- Flujo de 4 pasos: Plan Completo → Comprar número → Configurar WhatsApp → Listo
-- Configuración automática de webhooks en Twilio
-- Asociación del número comprado con webhook de CotizaBot
+- **Flujo simplificado**: Cliente selecciona ciudad → Equipo configura todo
+- Endpoint `/api/twilio/solicitar-numero` - Solicitar número por ciudad
+- Endpoint `/api/twilio/mi-solicitud` - Estado de la solicitud
+- Email automático al equipo con detalles de la solicitud
+- Sin costo adicional para el cliente (incluido en Plan Completo)
+- Estados: pendiente → procesando → completada
 
 ---
 
