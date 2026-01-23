@@ -224,6 +224,15 @@ CotizaBot es un sistema de IA multi-agente para automatizar cotizaciones y venta
 - `POST /api/twilio/buscar-numeros` - Buscar números disponibles
 - `POST /api/twilio/comprar-numero` - Comprar número
 - `GET /api/twilio/mi-numero` - Estado del número de la empresa
+- `POST /api/twilio/configurar-whatsapp` - Configurar webhooks automáticamente
+- `GET /api/twilio/estado-configuracion` - Estado del flujo de configuración
+
+### Portal del Cliente (Público)
+- `GET /api/portal/cotizacion/{token}` - Ver cotización pública
+- `GET /api/portal/cotizacion/{token}/pdf` - Descargar PDF público
+- `GET /api/portal/cliente/{token}` - Ver todas las cotizaciones de un cliente
+- `POST /api/portal/generar-enlace` - Generar enlace para cotización
+- `POST /api/portal/generar-enlace-cliente` - Generar enlace para cliente
 
 ### Webhook
 - `POST /api/webhook/twilio/whatsapp` - Recibe mensajes de WhatsApp
@@ -233,8 +242,8 @@ CotizaBot es un sistema de IA multi-agente para automatizar cotizaciones y venta
 ## Credenciales de Prueba
 - Email: test@cotizabot.com
 - Password: Test123456
-- Empresa: Ferretería El Martillo
-- Plan: demo/gratis
+- Empresa: Test Empresa
+- Plan: gratis
 
 ---
 
@@ -245,9 +254,14 @@ CotizaBot es un sistema de IA multi-agente para automatizar cotizaciones y venta
 - Requiere configuración de CNAME en modo "DNS Only"
 - Depende de acción del usuario en Cloudflare
 
+### PENDIENTE VERIFICACIÓN
+- Dominio cotizaexpress.com no verificado en Resend (usa fallback a onboarding@resend.dev)
+- Credenciales de Facturama (DistribucionesArobe/Beltran92) pueden requerir activación en sandbox
+
 ### PARCIALMENTE IMPLEMENTADO
 - pdf_service.py - Genera PDF pero almacenamiento es local
-- whatsapp_service.py - Integración Twilio presente pero no completamente probada
+- facturama_service.py - Código listo, requiere credenciales activas
+- whatsapp_service.py - Integración Twilio presente, requiere cuenta de pago para webhooks
 
 ---
 
