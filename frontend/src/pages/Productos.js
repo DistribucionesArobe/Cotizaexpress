@@ -3,10 +3,11 @@ import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
-import { Package, Upload, FileSpreadsheet, Plus, Crown } from 'lucide-react';
+import { Package, Upload, FileSpreadsheet, Plus, Crown, Pencil, Check, X } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -18,6 +19,9 @@ export default function Productos() {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('');
   const [loading, setLoading] = useState(true);
   const [upgradeLoading, setUpgradeLoading] = useState(false);
+  const [editandoPrecio, setEditandoPrecio] = useState(null);
+  const [nuevoPrecio, setNuevoPrecio] = useState('');
+  const [guardandoPrecio, setGuardandoPrecio] = useState(false);
 
   const planActual = user?.empresa?.plan || user?.usuario?.plan || 'gratis';
   const esPlanGratis = planActual === 'gratis';
@@ -36,7 +40,6 @@ export default function Productos() {
     try {
       setLoading(true);
       
-      // Cargar productos y categorías
       const [productosRes, categoriasRes] = await Promise.all([
         axios.get(`${API}/productos`),
         axios.get(`${API}/productos/categorias`)
@@ -83,6 +86,47 @@ export default function Productos() {
     }
   };
 
+  const iniciarEdicionPrecio = (producto) => {
+    setEditandoPrecio(producto.id);
+    setNuevoPrecio(producto.precio_base.toString());
+  };
+
+  const cancelarEdicion = () => {
+    setEditandoPrecio(null);
+    setNuevoPrecio('');
+  };
+
+  const guardarPrecio = async (productoId) => {
+    const precio = parseFloat(nuevoPrecio);
+    
+    if (isNaN(precio) || precio <= 0) {
+      toast.error('Ingresa un precio válido mayor a 0');
+      return;
+    }
+
+    try {
+      setGuardandoPrecio(true);
+      
+      await axios.patch(`${API}/productos/${productoId}/precio`, {
+        precio_base: precio
+      });
+      
+      // Actualizar el producto en el estado local
+      setProductos(prev => prev.map(p => 
+        p.id === productoId ? { ...p, precio_base: precio } : p
+      ));
+      
+      toast.success('Precio actualizado');
+      setEditandoPrecio(null);
+      setNuevoPrecio('');
+    } catch (error) {
+      console.error('Error actualizando precio:', error);
+      toast.error(error.response?.data?.detail || 'Error al actualizar precio');
+    } finally {
+      setGuardandoPrecio(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-12" data-testid="productos-loading">
@@ -91,7 +135,7 @@ export default function Productos() {
     );
   }
 
-  // Vista cuando NO hay productos - Pantalla de onboarding
+  // Vista cuando NO hay productos
   if (productos.length === 0) {
     return (
       <div className="space-y-6" data-testid="productos-empty">
@@ -100,7 +144,6 @@ export default function Productos() {
           <p className="text-slate-600 mt-1">Configura tu catálogo para empezar a cotizar</p>
         </div>
 
-        {/* Card principal de bienvenida */}
         <Card className="border-2 border-dashed border-slate-300 bg-slate-50">
           <CardContent className="py-16">
             <div className="text-center max-w-lg mx-auto">
@@ -117,7 +160,6 @@ export default function Productos() {
                 necesitas cargar tu catálogo de productos.
               </p>
 
-              {/* Opciones de carga */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                 <Link to="/carga-productos">
                   <Card className="border-2 border-emerald-200 hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer h-full">
@@ -142,7 +184,6 @@ export default function Productos() {
                 </Card>
               </div>
 
-              {/* Botón principal */}
               <Link to="/carga-productos">
                 <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700" data-testid="btn-cargar-productos">
                   <Upload className="w-5 h-5 mr-2" />
@@ -157,7 +198,6 @@ export default function Productos() {
           </CardContent>
         </Card>
 
-        {/* Card de upgrade si es plan gratis */}
         {esPlanGratis && (
           <Card className="border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50">
             <CardContent className="py-6">
@@ -220,6 +260,12 @@ export default function Productos() {
         </div>
       </div>
 
+      {/* Nota de edición */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-700">
+        <Pencil className="w-4 h-4 inline mr-2" />
+        Haz clic en el precio de cualquier producto para editarlo
+      </div>
+
       {/* Filtro por Categoría */}
       {categorias.length > 0 && (
         <div className="flex gap-2 flex-wrap">
@@ -262,12 +308,57 @@ export default function Productos() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
+                {/* Precio editable */}
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-slate-600">Precio base:</span>
-                  <span className="text-lg font-bold text-emerald-600">
-                    ${producto.precio_base.toLocaleString('es-MX')}
-                  </span>
+                  
+                  {editandoPrecio === producto.id ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-slate-500">$</span>
+                      <Input
+                        type="number"
+                        value={nuevoPrecio}
+                        onChange={(e) => setNuevoPrecio(e.target.value)}
+                        className="w-24 h-8 text-right"
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') guardarPrecio(producto.id);
+                          if (e.key === 'Escape') cancelarEdicion();
+                        }}
+                        data-testid={`input-precio-${producto.sku}`}
+                      />
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                        onClick={() => guardarPrecio(producto.id)}
+                        disabled={guardandoPrecio}
+                        data-testid={`btn-guardar-${producto.sku}`}
+                      >
+                        <Check className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 w-8 p-0 text-slate-500 hover:text-slate-700"
+                        onClick={cancelarEdicion}
+                        data-testid={`btn-cancelar-${producto.sku}`}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => iniciarEdicionPrecio(producto)}
+                      className="text-lg font-bold text-emerald-600 hover:text-emerald-700 hover:underline cursor-pointer flex items-center gap-1 group"
+                      data-testid={`precio-${producto.sku}`}
+                    >
+                      ${producto.precio_base.toLocaleString('es-MX')}
+                      <Pencil className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </button>
+                  )}
                 </div>
+                
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-slate-600">Unidad:</span>
                   <span className="font-medium">{producto.unidad}</span>
