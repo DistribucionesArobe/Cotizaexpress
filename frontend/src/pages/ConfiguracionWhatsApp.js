@@ -235,67 +235,7 @@ export default function ConfiguracionWhatsApp() {
     );
   }
 
-  // Si tiene solicitud pendiente
-  if (miSolicitud?.tiene_solicitud && miSolicitud.solicitud?.estado === 'pendiente') {
-    return (
-      <div className="space-y-6" data-testid="configuracion-whatsapp-page">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">Solicitud en Proceso</h1>
-            <p className="text-slate-600">Tu número de WhatsApp está siendo configurado</p>
-          </div>
-        </div>
-
-        <Card className="border-blue-200 bg-blue-50">
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-4">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <Clock className="w-8 h-8 text-blue-600 animate-pulse" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-blue-800 mb-2">
-                  Procesando tu solicitud
-                </h3>
-                <p className="text-blue-700 mb-4">
-                  Estamos configurando tu número de WhatsApp de <strong>{miSolicitud.solicitud.ciudad}</strong>.
-                </p>
-                <div className="bg-white rounded-lg p-4 border border-blue-200">
-                  <p className="text-slate-600 text-sm">
-                    <strong>Tiempo estimado:</strong> 24-48 horas hábiles
-                  </p>
-                  <p className="text-slate-600 text-sm mt-1">
-                    Te enviaremos un correo electrónico cuando tu número esté listo.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>¿Qué sigue?</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ol className="space-y-3 text-slate-600">
-              <li className="flex items-center gap-3">
-                <span className="w-6 h-6 bg-emerald-500 text-white rounded-full flex items-center justify-center text-sm">✓</span>
-                <span className="line-through">Solicitud enviada</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm animate-pulse">2</span>
-                <span>Configurando número y WhatsApp Business</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <span className="w-6 h-6 bg-slate-300 text-white rounded-full flex items-center justify-center text-sm">3</span>
-                <span className="text-slate-400">Activación completada</span>
-              </li>
-            </ol>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+ 
 
   // Vista para obtener número (flujo automático instantáneo)
   return (
