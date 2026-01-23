@@ -88,7 +88,8 @@ class FacturamaService:
     
     async def verificar_conexion(self) -> Dict:
         """Verifica que las credenciales y conexión funcionen"""
-        result = await self._make_request("GET", "/api/Catalogs/ProductOrServices?keyword=servicio")
+        # Endpoint correcto para verificar la conexión
+        result = await self._make_request("GET", "/api/TaxEntity")
         return result
     
     async def crear_cliente(self, datos_fiscales: Dict) -> Dict:
@@ -194,8 +195,8 @@ class FacturamaService:
         
         logger.info(f"Creando factura CFDI para RFC: {receptor.get('rfc')}")
         
-        # Crear factura usando API Lite (timbrado inmediato)
-        result = await self._make_request("POST", "/api-lite/3/cfdis", factura_payload)
+        # Crear factura usando API cfdis
+        result = await self._make_request("POST", "/api/cfdis", factura_payload)
         
         if result.get('success'):
             factura_data = result.get('data', {})
