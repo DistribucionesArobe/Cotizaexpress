@@ -322,37 +322,3 @@ async def enviar_cotizacion(request: EnviarCotizacionRequest, current_user: dict
     except Exception as e:
         logger.error(f"Error enviando cotización: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
-        
-        # Enviar por WhatsApp
-        mensaje = f"Hola {cotizacion['cliente_nombre']}, aquí está tu cotización {cotizacion['folio']} por un total de ${cotizacion['total']:.2f} MXN. Válida hasta {cotizacion['valida_hasta'].strftime('%d/%m/%Y')}."
-        
-        resultado_envio = await whatsapp_service.enviar_mensaje(
-            to_number=cotizacion['cliente_telefono'],
-            body=mensaje,
-            media_url=None  # PDF requiere URL pública
-        )
-        
-        # Actualizar estado
-        await cotizaciones_collection.update_one(
-            {'id': request.cotizacion_id},
-            {
-                '$set': {
-                    'estado': EstadoCotizacion.ENVIADA.value,
-                    'pdf_url': pdf_path,
-                    'updated_at': datetime.now(timezone.utc).isoformat()
-                }
-            }
-        )
-        
-        return {
-            'success': True,
-            'mensaje': 'Cotización enviada',
-            'pdf_path': pdf_path,
-            'whatsapp_result': resultado_envio
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error enviando cotización: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
