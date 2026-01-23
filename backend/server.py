@@ -7,7 +7,7 @@ import logging
 
 from config import settings
 from database import client, init_indexes, seed_catalogo
-from routes import webhook, cotizaciones, productos, clientes, conversaciones, dashboard, carga_productos, auth, twilio_numbers
+from routes import webhook, cotizaciones, productos, clientes, conversaciones, dashboard, carga_productos, auth, twilio_numbers, pagos, webhook_stripe
 
 # Configurar logging
 logging.basicConfig(
@@ -64,6 +64,7 @@ async def health_check():
 # Incluir routers
 api_router.include_router(auth.router)
 api_router.include_router(webhook.router)
+api_router.include_router(webhook_stripe.router)
 api_router.include_router(cotizaciones.router)
 api_router.include_router(productos.router)
 api_router.include_router(clientes.router)
@@ -71,6 +72,7 @@ api_router.include_router(conversaciones.router)
 api_router.include_router(dashboard.router)
 api_router.include_router(carga_productos.router)
 api_router.include_router(twilio_numbers.router)
+api_router.include_router(pagos.router)
 
 # Registrar router principal
 app.include_router(api_router)
