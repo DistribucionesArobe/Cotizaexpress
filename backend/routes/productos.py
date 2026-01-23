@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends
+from pydantic import BaseModel
 from typing import List, Optional
 from database import productos_collection
 from models.producto import Producto, ProductoCreate
