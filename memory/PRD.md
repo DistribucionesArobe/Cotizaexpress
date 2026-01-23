@@ -169,6 +169,13 @@ CotizaBot es un sistema de IA multi-agente para automatizar cotizaciones y venta
 - `POST /api/cotizaciones` - Crear cotización (valida límite de plan)
 - `GET /api/cotizaciones/estadisticas` - Límites del plan
 
+### Empresa y Personalización
+- `POST /api/empresa/logo` - Subir logo de empresa
+- `GET /api/empresa/logo/{filename}` - Obtener logo
+- `DELETE /api/empresa/logo` - Eliminar logo
+- `GET /api/empresa/perfil` - Obtener perfil de empresa
+- `PUT /api/empresa/perfil` - Actualizar perfil
+
 ### Pagos (Stripe)
 - `GET /api/pagos/planes` - Lista planes disponibles (público)
 - `POST /api/pagos/crear-checkout` - Crea sesión de Stripe (auth)
