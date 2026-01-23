@@ -78,6 +78,20 @@ CotizaBot es un sistema de IA multi-agente para automatizar cotizaciones y venta
 - Conversaciones
 - Carga masiva de productos (Excel)
 
+### ✅ Sistema de Facturación CFDI (Completado 2026-01-23)
+- Formulario de datos fiscales completo (RFC, Razón Social, Régimen Fiscal, Uso CFDI, CP, Domicilio)
+- Catálogos del SAT cargados (19 regímenes fiscales, 24 usos CFDI)
+- Endpoint para guardar datos fiscales de empresa
+- Endpoint para solicitar factura (envía email al equipo)
+- Historial de solicitudes de factura
+- Preparado para integración futura con PAC de facturación
+
+### ✅ Envío de Cotizaciones por Email (Completado 2026-01-23)
+- Servicio de email con Resend API
+- Plantilla HTML profesional para cotizaciones
+- PDF adjunto automáticamente al email
+- Información de empresa personalizada en emails
+
 ### ✅ Integración de Pagos Stripe (Actualizado 2026-01-23)
 - Suscripciones mensuales ($1,160 MXN/mes con IVA incluido)
 - Endpoint `/api/pagos/crear-suscripcion` - Crea checkout de Stripe
