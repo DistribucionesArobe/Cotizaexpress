@@ -328,6 +328,12 @@ export default function PerfilEmpresa() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Sección de Datos Fiscales */}
+      <div className="pt-6 border-t border-slate-200">
+        <h2 className="text-xl font-bold text-slate-900 mb-4">Facturación</h2>
+        <DatosFiscales onUpdate={cargarPerfil} />
+      </div>
     </div>
   );
 }
