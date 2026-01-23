@@ -497,7 +497,7 @@ async def configurar_whatsapp_business(current_user: dict = Depends(get_current_
         
         try:
             # Actualizar configuración del número para webhooks
-            incoming_number = client.incoming_phone_numbers(phone_sid).update(
+            client.incoming_phone_numbers(phone_sid).update(
                 sms_url=webhook_url,
                 sms_method='POST',
                 voice_url=webhook_url,
