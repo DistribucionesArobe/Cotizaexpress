@@ -153,6 +153,7 @@ function AppContent() {
             <Route path="/registro" element={<Registro />} />
             <Route path="/login" element={<Login />} />
             <Route path="/precios" element={<Precios />} />
+            <Route path="/pago-exitoso" element={<PagoExitoso />} />
 
             {/* Rutas protegidas */}
             <Route
