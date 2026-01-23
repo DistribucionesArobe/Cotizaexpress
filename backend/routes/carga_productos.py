@@ -1,9 +1,10 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from typing import List
 import pandas as pd
 import uuid
 from datetime import datetime, timezone
 from database import productos_collection
+from utils.auth import get_current_user
 import logging
 import io
 
@@ -11,9 +12,14 @@ router = APIRouter(prefix="/carga-productos", tags=["carga_productos"])
 logger = logging.getLogger(__name__)
 
 @router.post("/upload-excel")
-async def cargar_productos_excel(file: UploadFile = File(...)):
-    """Carga productos desde un archivo Excel"""
+async def cargar_productos_excel(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
+    """Carga productos desde un archivo Excel para la empresa del usuario"""
     try:
+        empresa_id = current_user.get('empresa_id')
+        
         # Validar extensión
         if not file.filename.endswith(('.xlsx', '.xls')):
             raise HTTPException(status_code=400, detail="Archivo debe ser Excel (.xlsx o .xls)")
@@ -43,11 +49,17 @@ async def cargar_productos_excel(file: UploadFile = File(...)):
                 sku = row.get('sku', None)
                 if not sku or pd.isna(sku):
                     categoria_prefix = str(row['categoria'])[:2].upper()
-                    count = await productos_collection.count_documents({'categoria': row['categoria']})
+                    count = await productos_collection.count_documents({
+                        'categoria': row['categoria'],
+                        'empresa_id': empresa_id
+                    })
                     sku = f"{categoria_prefix}-{count + 1:03d}"
                 
-                # Verificar si el producto ya existe por SKU
-                producto_existente = await productos_collection.find_one({'sku': sku})
+                # Verificar si el producto ya existe por SKU en esta empresa
+                producto_existente = await productos_collection.find_one({
+                    'sku': sku,
+                    'empresa_id': empresa_id
+                })
                 
                 producto_data = {
                     'sku': sku,
@@ -58,13 +70,14 @@ async def cargar_productos_excel(file: UploadFile = File(...)):
                     'margen_minimo': float(row.get('margen_minimo', 0.15)),
                     'stock': float(row.get('stock', 100)),
                     'activo': bool(row.get('activo', True)),
-                    'descripcion': str(row.get('descripcion', '')) if not pd.isna(row.get('descripcion')) else None
+                    'descripcion': str(row.get('descripcion', '')) if not pd.isna(row.get('descripcion')) else None,
+                    'empresa_id': empresa_id
                 }
                 
                 if producto_existente:
                     # Actualizar producto existente
                     await productos_collection.update_one(
-                        {'sku': sku},
+                        {'sku': sku, 'empresa_id': empresa_id},
                         {'$set': producto_data}
                     )
                     productos_actualizados.append(sku)
