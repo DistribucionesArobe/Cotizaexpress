@@ -159,9 +159,15 @@ CotizaBot es un sistema de IA multi-agente para automatizar cotizaciones y venta
 │   ├── routes/           # Endpoints FastAPI
 │   │   ├── auth.py       # Autenticación (registro, login, me)
 │   │   ├── cotizaciones.py # CRUD cotizaciones con límites
-│   │   ├── twilio_numbers.py # Compra de números Twilio
+│   │   ├── empresa.py    # Perfil, datos fiscales, facturación
+│   │   ├── portal_cliente.py # Portal público de cotizaciones
+│   │   ├── twilio_numbers.py # Compra y config de números Twilio
 │   │   └── webhook.py    # Webhook de WhatsApp
-│   ├── services/         # Servicios externos (PDF, WhatsApp)
+│   ├── services/         # Servicios externos
+│   │   ├── email_service.py  # Envío de emails con Resend
+│   │   ├── facturama_service.py # Integración CFDI
+│   │   ├── pdf_service.py    # Generación de PDFs
+│   │   └── whatsapp_service.py # Mensajes WhatsApp
 │   ├── utils/auth.py     # Utilidades JWT
 │   ├── config.py         # Configuración
 │   ├── database.py       # Conexión MongoDB
@@ -177,6 +183,8 @@ CotizaBot es un sistema de IA multi-agente para automatizar cotizaciones y venta
 │   │   │   ├── Registro.js
 │   │   │   ├── Dashboard.js
 │   │   │   ├── ConfiguracionWhatsApp.js
+│   │   │   ├── PerfilEmpresa.js
+│   │   │   ├── PortalCliente.js  # Portal público (sin auth)
 │   │   │   └── ...
 │   │   └── App.js
 │   └── public/logo-cotizaexpress.png
