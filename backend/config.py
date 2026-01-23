@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     # Redis/Celery
     redis_url: str = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
     
+    # Stripe
+    stripe_api_key: str = os.environ.get('STRIPE_API_KEY', '')
+    
     # CORS
     cors_origins: str = os.environ.get('CORS_ORIGINS', '*')
     
