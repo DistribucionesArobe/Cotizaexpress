@@ -266,3 +266,137 @@ async def obtener_mi_numero(current_user: dict = Depends(get_current_user)):
     except Exception as e:
         logger.error(f"Error obteniendo número: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/configurar-whatsapp")
+async def configurar_whatsapp_business(current_user: dict = Depends(get_current_user)):
+    """
+    Configura el número comprado para WhatsApp Business.
+    Establece el webhook de CotizaBot para recibir mensajes.
+    """
+    try:
+        empresa_id = current_user.get('empresa_id')
+        
+        empresa = await empresas_collection.find_one({'id': empresa_id}, {'_id': 0})
+        if not empresa:
+            raise HTTPException(status_code=404, detail="Empresa no encontrada")
+        
+        if not empresa.get('twilio_phone_sid'):
+            raise HTTPException(
+                status_code=400,
+                detail="Primero debes comprar un número de teléfono"
+            )
+        
+        if empresa.get('whatsapp_configured'):
+            return {
+                "success": True,
+                "mensaje": "Tu número ya está configurado para WhatsApp Business",
+                "phone_number": empresa.get('twilio_whatsapp_number')
+            }
+        
+        client = get_twilio_client()
+        phone_sid = empresa.get('twilio_phone_sid')
+        
+        # Obtener URL base del webhook
+        webhook_base = os.environ.get('REACT_APP_BACKEND_URL', 'https://cotizaexpress.com')
+        webhook_url = f"{webhook_base}/api/webhook/twilio/whatsapp"
+        
+        try:
+            # Actualizar configuración del número para webhooks
+            incoming_number = client.incoming_phone_numbers(phone_sid).update(
+                sms_url=webhook_url,
+                sms_method='POST',
+                voice_url=webhook_url,
+                voice_method='POST'
+            )
+            
+            logger.info(f"Webhooks configurados para número {phone_sid}")
+            
+            # Actualizar estado en la base de datos
+            await empresas_collection.update_one(
+                {'id': empresa_id},
+                {
+                    '$set': {
+                        'whatsapp_configured': True,
+                        'whatsapp_webhook_url': webhook_url,
+                        'whatsapp_configured_at': datetime.now(timezone.utc).isoformat(),
+                        'updated_at': datetime.now(timezone.utc).isoformat()
+                    }
+                }
+            )
+            
+            logger.info(f"WhatsApp configurado exitosamente para empresa {empresa_id}")
+            
+            return {
+                "success": True,
+                "mensaje": "¡WhatsApp Business configurado exitosamente!",
+                "phone_number": empresa.get('twilio_whatsapp_number'),
+                "webhook_url": webhook_url,
+                "nota": "Tu número ahora puede recibir mensajes de WhatsApp. Los mensajes serán procesados automáticamente por CotizaBot."
+            }
+            
+        except TwilioRestException as e:
+            logger.error(f"Error configurando webhooks de Twilio: {str(e)}")
+            
+            # Verificar si es un error de permisos (cuenta trial)
+            if "upgrade" in str(e).lower() or "trial" in str(e).lower():
+                return {
+                    "success": False,
+                    "error": "Tu cuenta de Twilio necesita ser actualizada a una cuenta de pago para configurar webhooks de WhatsApp.",
+                    "accion_requerida": "Actualiza tu cuenta en twilio.com/console para continuar"
+                }
+            
+            raise HTTPException(
+                status_code=400,
+                detail=f"Error configurando WhatsApp: {str(e)}"
+            )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error configurando WhatsApp: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/estado-configuracion")
+async def obtener_estado_configuracion(current_user: dict = Depends(get_current_user)):
+    """Obtiene el estado completo de la configuración de WhatsApp/Twilio"""
+    try:
+        empresa_id = current_user.get('empresa_id')
+        
+        empresa = await empresas_collection.find_one({'id': empresa_id}, {'_id': 0})
+        if not empresa:
+            raise HTTPException(status_code=404, detail="Empresa no encontrada")
+        
+        # Determinar el paso actual del flujo
+        estado = {
+            "plan": empresa.get('plan', 'gratis'),
+            "tiene_plan_completo": empresa.get('plan') == 'completo',
+            "tiene_numero": bool(empresa.get('twilio_whatsapp_number')),
+            "whatsapp_configurado": empresa.get('whatsapp_configured', False),
+            "phone_number": empresa.get('twilio_whatsapp_number'),
+            "webhook_url": empresa.get('whatsapp_webhook_url'),
+            "configurado_at": empresa.get('whatsapp_configured_at')
+        }
+        
+        # Determinar paso actual
+        if not estado['tiene_plan_completo']:
+            estado['paso_actual'] = 1
+            estado['mensaje'] = "Actualiza a Plan Completo para obtener tu número de WhatsApp"
+        elif not estado['tiene_numero']:
+            estado['paso_actual'] = 2
+            estado['mensaje'] = "Selecciona y compra tu número de WhatsApp"
+        elif not estado['whatsapp_configurado']:
+            estado['paso_actual'] = 3
+            estado['mensaje'] = "Configura tu número para WhatsApp Business"
+        else:
+            estado['paso_actual'] = 4
+            estado['mensaje'] = "¡Todo listo! Tu WhatsApp Business está configurado"
+        
+        return estado
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error obteniendo estado: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
