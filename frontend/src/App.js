@@ -202,6 +202,14 @@ function AppContent() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/configuracion-whatsapp"
+              element={
+                <ProtectedRoute>
+                  <ConfiguracionWhatsApp />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </main>
       </BrowserRouter>
