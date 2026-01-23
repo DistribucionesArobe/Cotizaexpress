@@ -5,6 +5,7 @@ import resend
 import base64
 from typing import Optional
 from pathlib import Path
+from datetime import datetime
 from dotenv import load_dotenv
 
 load_dotenv()
