@@ -22,6 +22,7 @@ export default function Productos() {
   const [editandoPrecio, setEditandoPrecio] = useState(null);
   const [nuevoPrecio, setNuevoPrecio] = useState('');
   const [guardandoPrecio, setGuardandoPrecio] = useState(false);
+  const [esDemo, setEsDemo] = useState(false);
 
   const planActual = user?.empresa?.plan || user?.usuario?.plan || 'gratis';
   const esPlanGratis = planActual === 'gratis';
@@ -40,13 +41,17 @@ export default function Productos() {
     try {
       setLoading(true);
       
-      const [productosRes, categoriasRes] = await Promise.all([
+      const [productosRes, categoriasRes, countRes] = await Promise.all([
         axios.get(`${API}/productos`),
-        axios.get(`${API}/productos/categorias`)
+        axios.get(`${API}/productos/categorias`),
+        axios.get(`${API}/productos/count`)
       ]);
       
       setProductos(productosRes.data);
       setCategorias(categoriasRes.data.categorias || []);
+      
+      // Si no tiene productos propios pero hay productos en la lista, son de demo
+      setEsDemo(countRes.data.count === 0 && productosRes.data.length > 0);
     } catch (error) {
       console.error('Error cargando datos:', error);
     } finally {
