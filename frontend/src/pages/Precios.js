@@ -1,8 +1,47 @@
+import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import axios from 'axios';
+import { toast } from 'sonner';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 export default function Precios() {
+  const { isAuthenticated, user } = useAuth();
+  const [loading, setLoading] = useState(false);
+
+  const handleUpgrade = async () => {
+    if (!isAuthenticated) {
+      toast.info('Primero necesitas crear una cuenta');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      const response = await axios.post(`${API}/pagos/crear-checkout`, {
+        plan_id: 'completo',
+        origin_url: window.location.origin
+      });
+
+      // Redirigir a Stripe Checkout
+      if (response.data.checkout_url) {
+        window.location.href = response.data.checkout_url;
+      }
+    } catch (error) {
+      console.error('Error creando checkout:', error);
+      toast.error(error.response?.data?.detail || 'Error al procesar el pago');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const planActual = user?.empresa?.plan || user?.usuario?.plan || 'gratis';
+  const esPlanCompleto = planActual === 'completo';
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Navigation */}
@@ -22,16 +61,26 @@ export default function Precios() {
             </Link>
             
             <div className="flex items-center gap-4">
-              <Link to="/login">
-                <Button variant="ghost" className="text-slate-600">
-                  Iniciar Sesión
-                </Button>
-              </Link>
-              <Link to="/registro">
-                <Button className="bg-emerald-600 hover:bg-emerald-700">
-                  Probar Gratis
-                </Button>
-              </Link>
+              {isAuthenticated ? (
+                <Link to="/dashboard">
+                  <Button className="bg-emerald-600 hover:bg-emerald-700">
+                    Ir al Dashboard
+                  </Button>
+                </Link>
+              ) : (
+                <>
+                  <Link to="/login">
+                    <Button variant="ghost" className="text-slate-600">
+                      Iniciar Sesión
+                    </Button>
+                  </Link>
+                  <Link to="/registro">
+                    <Button className="bg-emerald-600 hover:bg-emerald-700">
+                      Probar Gratis
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -52,7 +101,12 @@ export default function Precios() {
           {/* Pricing Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {/* Plan Gratis */}
-            <Card className="border-2 border-slate-200" data-testid="plan-gratis-card">
+            <Card className={`border-2 ${planActual === 'gratis' ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200'}`} data-testid="plan-gratis-card">
+              {planActual === 'gratis' && (
+                <div className="bg-emerald-500 text-white text-center py-1 text-sm font-medium">
+                  Tu plan actual
+                </div>
+              )}
               <CardContent className="pt-8">
                 <div className="text-center">
                   <h3 className="text-2xl font-bold text-slate-900 mb-2">Plan Gratis</h3>
@@ -81,38 +135,32 @@ export default function Precios() {
                       <span className="text-slate-700">Carga de productos desde Excel</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <svg className="w-6 h-6 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="text-slate-700">Gestión de clientes</span>
-                    </li>
-                    <li className="flex items-start gap-3">
                       <svg className="w-6 h-6 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
                       <span className="text-slate-400">Sin WhatsApp integrado</span>
                     </li>
-                    <li className="flex items-start gap-3">
-                      <svg className="w-6 h-6 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                      <span className="text-slate-400">Sin soporte prioritario</span>
-                    </li>
                   </ul>
 
-                  <Link to="/registro">
-                    <Button variant="outline" className="w-full" size="lg" data-testid="btn-plan-gratis">
-                      Comenzar Gratis
+                  {!isAuthenticated ? (
+                    <Link to="/registro">
+                      <Button variant="outline" className="w-full" size="lg" data-testid="btn-plan-gratis">
+                        Comenzar Gratis
+                      </Button>
+                    </Link>
+                  ) : planActual === 'gratis' ? (
+                    <Button variant="outline" className="w-full" size="lg" disabled>
+                      Plan Actual
                     </Button>
-                  </Link>
+                  ) : null}
                 </div>
               </CardContent>
             </Card>
 
             {/* Plan Completo */}
-            <Card className="border-2 border-emerald-500 relative overflow-hidden shadow-xl" data-testid="plan-completo-card">
-              <div className="absolute top-0 right-0 bg-emerald-500 text-white px-4 py-1 text-sm font-medium">
-                Recomendado
+            <Card className={`border-2 relative overflow-hidden shadow-xl ${esPlanCompleto ? 'border-emerald-500 bg-emerald-50' : 'border-emerald-500'}`} data-testid="plan-completo-card">
+              <div className={`absolute top-0 right-0 ${esPlanCompleto ? 'bg-emerald-600' : 'bg-emerald-500'} text-white px-4 py-1 text-sm font-medium`}>
+                {esPlanCompleto ? 'Tu plan actual' : 'Recomendado'}
               </div>
               <CardContent className="pt-8">
                 <div className="text-center">
@@ -120,7 +168,8 @@ export default function Precios() {
                   <div className="text-5xl font-bold text-emerald-600 mb-2">
                     $1,000
                   </div>
-                  <p className="text-sm text-slate-500 mb-8">MXN/mes + IVA</p>
+                  <p className="text-sm text-slate-500 mb-1">MXN/mes + IVA</p>
+                  <p className="text-xs text-slate-400 mb-8">Total: $1,160 MXN</p>
 
                   <ul className="text-left space-y-4 mb-8">
                     <li className="flex items-start gap-3">
@@ -128,12 +177,6 @@ export default function Precios() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       <span className="text-slate-700"><strong>Cotizaciones ilimitadas</strong></span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <svg className="w-6 h-6 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="text-slate-700">Dashboard completo</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <svg className="w-6 h-6 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,22 +202,64 @@ export default function Precios() {
                       </svg>
                       <span className="text-slate-700">Capacitación incluida</span>
                     </li>
-                    <li className="flex items-start gap-3">
-                      <svg className="w-6 h-6 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="text-slate-700">Actualizaciones automáticas</span>
-                    </li>
                   </ul>
 
-                  <Link to="/registro">
-                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700" size="lg" data-testid="btn-plan-completo">
-                      Empezar Ahora
+                  {esPlanCompleto ? (
+                    <Button className="w-full bg-emerald-600" size="lg" disabled>
+                      Plan Activo
                     </Button>
-                  </Link>
+                  ) : isAuthenticated ? (
+                    <Button 
+                      className="w-full bg-emerald-600 hover:bg-emerald-700" 
+                      size="lg" 
+                      onClick={handleUpgrade}
+                      disabled={loading}
+                      data-testid="btn-upgrade-completo"
+                    >
+                      {loading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Procesando...
+                        </>
+                      ) : (
+                        <>
+                          Actualizar Ahora - $1,160 MXN
+                        </>
+                      )}
+                    </Button>
+                  ) : (
+                    <Link to="/registro">
+                      <Button className="w-full bg-emerald-600 hover:bg-emerald-700" size="lg" data-testid="btn-plan-completo">
+                        Empezar Ahora
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               </CardContent>
             </Card>
+          </div>
+
+          {/* Payment Methods */}
+          <div className="mt-8 text-center">
+            <p className="text-sm text-slate-500 mb-2">Métodos de pago aceptados</p>
+            <div className="flex items-center justify-center gap-4">
+              <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-sm">
+                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none">
+                  <rect width="24" height="24" rx="4" fill="#1A1F71"/>
+                  <text x="4" y="16" fill="white" fontSize="8" fontWeight="bold">VISA</text>
+                </svg>
+                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none">
+                  <rect width="24" height="24" rx="4" fill="#EB001B"/>
+                  <circle cx="9" cy="12" r="5" fill="#EB001B"/>
+                  <circle cx="15" cy="12" r="5" fill="#F79E1B"/>
+                </svg>
+                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none">
+                  <rect width="24" height="24" rx="4" fill="#006FCF"/>
+                  <text x="2" y="15" fill="white" fontSize="6" fontWeight="bold">AMEX</text>
+                </svg>
+              </div>
+            </div>
+            <p className="text-xs text-slate-400 mt-2">Pagos seguros procesados por Stripe</p>
           </div>
 
           {/* Comparison Table */}
@@ -224,40 +309,9 @@ export default function Precios() {
                     </td>
                   </tr>
                   <tr className="bg-slate-50">
-                    <td className="px-6 py-4 text-sm text-slate-700">Carga de productos (Excel)</td>
-                    <td className="px-6 py-4 text-center">
-                      <svg className="w-5 h-5 text-emerald-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <svg className="w-5 h-5 text-emerald-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-sm text-slate-700">Dashboard de métricas</td>
-                    <td className="px-6 py-4 text-center text-sm text-slate-600">Básico</td>
-                    <td className="px-6 py-4 text-center text-sm text-emerald-600 font-medium">Completo</td>
-                  </tr>
-                  <tr className="bg-slate-50">
                     <td className="px-6 py-4 text-sm text-slate-700">Soporte técnico</td>
                     <td className="px-6 py-4 text-center text-sm text-slate-600">Email</td>
                     <td className="px-6 py-4 text-center text-sm text-emerald-600 font-medium">Prioritario</td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-sm text-slate-700">Capacitación</td>
-                    <td className="px-6 py-4 text-center">
-                      <svg className="w-5 h-5 text-slate-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <svg className="w-5 h-5 text-emerald-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -272,29 +326,9 @@ export default function Precios() {
             <div className="space-y-6">
               <Card>
                 <CardContent className="pt-6">
-                  <h3 className="font-bold text-slate-900 mb-2">¿Qué pasa cuando uso las 5 cotizaciones gratis?</h3>
-                  <p className="text-slate-600">
-                    Puedes seguir usando el dashboard para gestionar productos y clientes. Para generar más cotizaciones, 
-                    puedes actualizar al Plan Completo en cualquier momento.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="pt-6">
                   <h3 className="font-bold text-slate-900 mb-2">¿El precio incluye IVA?</h3>
                   <p className="text-slate-600">
                     El precio es $1,000 MXN + 16% IVA = $1,160 MXN/mes total. Te enviamos factura electrónica (CFDI) automáticamente.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="pt-6">
-                  <h3 className="font-bold text-slate-900 mb-2">¿Cómo funciona el número de WhatsApp?</h3>
-                  <p className="text-slate-600">
-                    Con el Plan Completo, te ayudamos a configurar un número de WhatsApp Business exclusivo para tu negocio. 
-                    Puedes elegir un número de la ciudad que prefieras en México.
                   </p>
                 </CardContent>
               </Card>
@@ -310,10 +344,9 @@ export default function Precios() {
 
               <Card>
                 <CardContent className="pt-6">
-                  <h3 className="font-bold text-slate-900 mb-2">¿Necesito tarjeta para el plan gratis?</h3>
+                  <h3 className="font-bold text-slate-900 mb-2">¿Cómo funciona el pago?</h3>
                   <p className="text-slate-600">
-                    No. El Plan Gratis no requiere tarjeta de crédito. Puedes crear tu cuenta y empezar a usar 
-                    CotizaBot inmediatamente.
+                    Aceptamos todas las tarjetas de crédito y débito. El pago se procesa de forma segura a través de Stripe.
                   </p>
                 </CardContent>
               </Card>
@@ -322,14 +355,18 @@ export default function Precios() {
 
           {/* CTA */}
           <div className="mt-20 text-center">
-            <Link to="/registro">
-              <Button size="lg" className="text-lg px-8 py-6 bg-emerald-600 hover:bg-emerald-700" data-testid="final-cta-btn">
-                Comenzar con 5 Cotizaciones Gratis
-              </Button>
-            </Link>
-            <p className="text-sm text-slate-500 mt-4">
-              Sin tarjeta de crédito • Cancela cuando quieras
-            </p>
+            {!isAuthenticated && (
+              <>
+                <Link to="/registro">
+                  <Button size="lg" className="text-lg px-8 py-6 bg-emerald-600 hover:bg-emerald-700" data-testid="final-cta-btn">
+                    Comenzar con 5 Cotizaciones Gratis
+                  </Button>
+                </Link>
+                <p className="text-sm text-slate-500 mt-4">
+                  Sin tarjeta de crédito • Cancela cuando quieras
+                </p>
+              </>
+            )}
           </div>
         </div>
       </div>
