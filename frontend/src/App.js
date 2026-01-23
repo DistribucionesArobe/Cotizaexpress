@@ -19,6 +19,7 @@ import Conversaciones from './pages/Conversaciones';
 import CargaProductos from './pages/CargaProductos';
 import ConfiguracionWhatsApp from './pages/ConfiguracionWhatsApp';
 import PerfilEmpresa from './pages/PerfilEmpresa';
+import PortalCliente from './pages/PortalCliente';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -167,6 +168,7 @@ function AppContent() {
             <Route path="/login" element={<Login />} />
             <Route path="/precios" element={<Precios />} />
             <Route path="/pago-exitoso" element={<PagoExitoso />} />
+            <Route path="/portal/cotizacion/:token" element={<PortalCliente />} />
 
             {/* Rutas protegidas */}
             <Route
