@@ -1,10 +1,11 @@
 from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import List, Optional
 from database import cotizaciones_collection, clientes_collection, db
 from models.cotizacion import Cotizacion, CotizacionCreate, EstadoCotizacion, ItemCotizacion
 from services.pdf_service import pdf_service
 from services.whatsapp_service import whatsapp_service
+from services.email_service import email_service
 from utils.auth import get_current_user
 from config import settings
 import uuid
@@ -19,6 +20,8 @@ empresas_collection = db.get_collection('empresas')
 
 class EnviarCotizacionRequest(BaseModel):
     cotizacion_id: str
+    enviar_email: bool = True
+    email_destinatario: Optional[EmailStr] = None  # Si no se proporciona, usa email del cliente
 
 async def verificar_limite_cotizaciones(empresa_id: str):
     """Verifica si la empresa puede crear más cotizaciones según su plan"""
