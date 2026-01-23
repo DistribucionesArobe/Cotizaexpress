@@ -78,6 +78,16 @@ CotizaBot es un sistema de IA multi-agente para automatizar cotizaciones y venta
 - Conversaciones
 - Carga masiva de productos (Excel)
 
+### ✅ Integración de Pagos Stripe (Completado 2026-01-23)
+- Endpoint `/api/pagos/planes` - Lista planes disponibles
+- Endpoint `/api/pagos/crear-checkout` - Crea sesión de Stripe Checkout
+- Endpoint `/api/pagos/checkout-status/{session_id}` - Verifica estado del pago
+- Endpoint `/api/pagos/mi-suscripcion` - Info de suscripción actual
+- Webhook `/api/webhook/stripe` - Procesa eventos de Stripe
+- Página de pago exitoso con polling de estado
+- Precios en MXN: $1,000 + IVA = $1,160 total
+- Seguridad: montos hardcodeados en backend (no manipulables)
+
 ### ✅ Flujo de Compra de Número Twilio (Completado 2026-01-23)
 - Endpoint `/api/twilio/ciudades` - Lista ciudades mexicanas
 - Endpoint `/api/twilio/buscar-numeros` - Busca números disponibles
