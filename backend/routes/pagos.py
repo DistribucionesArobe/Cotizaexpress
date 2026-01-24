@@ -428,13 +428,6 @@ async def crear_suscripcion(
             "currency": "MXN"
         }
         
-        logger.info(f"Checkout de suscripción creado: {session.session_id} para empresa {empresa_id}")
-        
-        return {
-            "checkout_url": session.url,
-            "session_id": session.session_id
-        }
-        
     except HTTPException:
         raise
     except Exception as e:
