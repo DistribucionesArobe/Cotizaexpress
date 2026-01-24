@@ -236,11 +236,7 @@ export default function Productos() {
         stock: parseFloat(nuevoProducto.stock) || 0,
         descripcion: nuevoProducto.descripcion.trim() || null
       };
-      
-      // Solo agregar SKU si se proporcionó
-      if (nuevoProducto.sku.trim()) {
-        payload.sku = nuevoProducto.sku.trim().toUpperCase();
-      }
+      // SKU se genera automáticamente en el backend
 
       const response = await axios.post(`${API}/productos`, payload);
       
