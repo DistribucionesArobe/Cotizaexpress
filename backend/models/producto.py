@@ -16,6 +16,8 @@ class Producto(BaseModel):
     activo: bool = True
     descripcion: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    es_demo: bool = False
+    empresa_id: Optional[str] = None
 
 class ProductoCreate(BaseModel):
     nombre: str
