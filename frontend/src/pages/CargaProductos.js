@@ -21,37 +21,21 @@ export default function CargaProductos() {
     }
   };
 
-  const descargarTemplate = async () => {
+  const descargarTemplate = () => {
     try {
       // Obtener token del localStorage
       const token = localStorage.getItem('token');
       
-      const response = await axios.get(`${API}/carga-productos/template`, {
-        responseType: 'blob',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      // Crear URL con token como query param (alternativa más confiable para descarga)
+      const downloadUrl = `${API}/carga-productos/template?token=${token}`;
       
-      // Crear blob y descargar
-      const blob = new Blob([response.data], { 
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
-      });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'template_productos_cotizabot.xlsx');
-      document.body.appendChild(link);
-      link.click();
+      // Abrir en nueva ventana para forzar descarga
+      window.open(downloadUrl, '_blank');
       
-      // Limpiar
-      window.URL.revokeObjectURL(url);
-      link.remove();
-      
-      toast.success('Template descargado correctamente');
+      toast.success('Descargando template...');
     } catch (error) {
       console.error('Error descargando template:', error);
-      toast.error('Error descargando template. Intenta de nuevo.');
+      toast.error('Error descargando template');
     }
   };
 
