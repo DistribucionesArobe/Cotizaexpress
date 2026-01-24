@@ -314,12 +314,16 @@ export default function Productos() {
                   </Card>
                 </Link>
 
-                <Card className="border-2 border-slate-200 hover:border-slate-300 hover:shadow-md transition-all cursor-pointer h-full opacity-60">
+                <Card 
+                  className="border-2 border-blue-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer h-full"
+                  onClick={() => setShowAddProductModal(true)}
+                  data-testid="btn-agregar-manual-empty"
+                >
                   <CardContent className="py-6">
-                    <Plus className="w-10 h-10 text-slate-400 mx-auto mb-3" />
+                    <Plus className="w-10 h-10 text-blue-600 mx-auto mb-3" />
                     <h4 className="font-semibold text-slate-900 mb-1">Agregar manualmente</h4>
                     <p className="text-sm text-slate-500">
-                      Próximamente
+                      Crea productos uno por uno
                     </p>
                   </CardContent>
                 </Card>
