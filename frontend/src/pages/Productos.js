@@ -302,13 +302,12 @@ export default function Productos() {
           
           {esPlanGratis && (
             <Button 
-              onClick={handleUpgrade}
-              disabled={upgradeLoading}
+              onClick={openCheckoutModal}
               className="bg-emerald-600 hover:bg-emerald-700"
               data-testid="btn-upgrade-header"
             >
               <Crown className="w-4 h-4 mr-2" />
-              {upgradeLoading ? 'Procesando...' : 'Actualizar Plan'}
+              Actualizar Plan
             </Button>
           )}
         </div>
