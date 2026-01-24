@@ -210,7 +210,7 @@ async def solicitar_numero_whatsapp(
                 continue
         
         if not numero_encontrado:
-            # Intentar con números móviles
+            # Intentar con números móviles de México
             try:
                 numeros = client.available_phone_numbers('MX').mobile.list(limit=1)
                 if numeros:
@@ -218,14 +218,31 @@ async def solicitar_numero_whatsapp(
             except Exception:
                 pass
         
+        # Si no hay números en México, intentar con USA (no requiere bundle)
+        usar_usa = False
+        if not numero_encontrado:
+            logger.info("No hay números MX disponibles, intentando con USA...")
+            try:
+                # Buscar número de USA con código de área común
+                numeros_usa = client.available_phone_numbers('US').local.list(
+                    area_code='512',  # Austin, TX - cercano a México
+                    limit=1
+                )
+                if numeros_usa:
+                    numero_encontrado = numeros_usa[0]
+                    usar_usa = True
+                    logger.info(f"Usando número de USA: {numero_encontrado.phone_number}")
+            except Exception as e:
+                logger.warning(f"Error buscando números USA: {e}")
+        
         if not numero_encontrado:
             raise HTTPException(
                 status_code=404,
-                detail=f"No hay números disponibles en {ciudad_data['nombre']}. Intenta con otra ciudad."
+                detail=f"No hay números disponibles. Los números mexicanos requieren documentación regulatoria en Twilio. Contacta a soporte."
             )
         
         phone_number = numero_encontrado.phone_number
-        logger.info(f"Número encontrado: {phone_number}")
+        logger.info(f"Número encontrado: {phone_number} (USA: {usar_usa})")
         
         # PASO 2: Verificar/crear dirección para cumplir requisitos de Twilio MX
         address_sid = None
