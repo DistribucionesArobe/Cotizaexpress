@@ -766,15 +766,60 @@ export default function Productos() {
                   <span className="text-slate-600">Unidad:</span>
                   <span className="font-medium">{producto.unidad}</span>
                 </div>
+                
+                {/* Stock editable - Solo para productos propios */}
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-slate-600">Stock:</span>
-                  <span className={`font-medium ${
-                    producto.stock > 50 ? 'text-emerald-600' :
-                    producto.stock > 0 ? 'text-amber-600' :
-                    'text-red-600'
-                  }`}>
-                    {producto.stock} {producto.unidad}
-                  </span>
+                  
+                  {editandoStock === producto.id ? (
+                    <div className="flex items-center gap-1">
+                      <Input
+                        type="number"
+                        value={nuevoStock}
+                        onChange={(e) => setNuevoStock(e.target.value)}
+                        className="w-20 h-7 text-right text-sm"
+                        autoFocus
+                        min="0"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') guardarStock(producto.id);
+                          if (e.key === 'Escape') cancelarEdicionStock();
+                        }}
+                        data-testid={`input-stock-${producto.sku}`}
+                      />
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 w-7 p-0 text-emerald-600 hover:text-emerald-700"
+                        onClick={() => guardarStock(producto.id)}
+                        disabled={guardandoStock}
+                      >
+                        <Check className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 w-7 p-0 text-slate-500"
+                        onClick={cancelarEdicionStock}
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => !producto.es_demo && iniciarEdicionStock(producto)}
+                      className={`font-medium flex items-center gap-1 ${
+                        producto.stock > 50 ? 'text-emerald-600' :
+                        producto.stock > 0 ? 'text-amber-600' :
+                        'text-red-600'
+                      } ${!producto.es_demo ? 'hover:underline cursor-pointer group/stock' : ''}`}
+                      disabled={producto.es_demo}
+                    >
+                      {producto.stock} {producto.unidad}
+                      {!producto.es_demo && (
+                        <Pencil className="w-3 h-3 opacity-0 group-hover/stock:opacity-100 transition-opacity" />
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
             </CardContent>
