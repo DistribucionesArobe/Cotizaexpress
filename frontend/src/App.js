@@ -152,14 +152,14 @@ function AppContent() {
                   {/* Enlace de Admin - Solo visible para admins */}
                   {user?.usuario?.rol === 'admin' && (
                     <Link
-                      to="/admin/promo-codes"
-                      data-testid="nav-admin-promo"
+                      to="/admin"
+                      data-testid="nav-admin"
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                        activeTab === 'admin-promo'
+                        activeTab === 'admin'
                           ? 'bg-amber-50 text-amber-700'
                           : 'text-amber-600 hover:bg-amber-50'
                       }`}
-                      onClick={() => setActiveTab('admin-promo')}
+                      onClick={() => setActiveTab('admin')}
                     >
                       🔐 Admin
                     </Link>
