@@ -123,7 +123,8 @@ async def iniciar_sesion(credenciales: UsuarioLogin):
                 'sub': usuario['id'],
                 'email': usuario['email'],
                 'empresa_id': usuario['empresa_id'],
-                'rol': usuario.get('rol', 'admin')
+                'rol': usuario.get('rol', 'admin'),
+                'plan': empresa.get('plan', 'gratis')
             }
         )
         
