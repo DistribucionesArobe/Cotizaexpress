@@ -134,6 +134,27 @@ CotizaBot es un sistema de IA multi-agente para automatizar cotizaciones y venta
 - Costo: ~$1.15 USD/mes por número (de cuenta Twilio del SaaS)
 - Sin costo adicional para el cliente (incluido en Plan Completo)
 
+### ✅ Sistema de Códigos Promocionales (Completado 2026-01-24)
+- Códigos de descuento integrados con Stripe (porcentaje o monto fijo)
+- Modal para aplicar código antes del checkout
+- Validación de uso único por cliente
+- Límite de usos configurables
+- Integración bidireccional: código creado en BD + Stripe Coupon/PromotionCode
+
+### ✅ Panel de Administración de Códigos Promocionales (Completado 2026-01-24)
+- Ruta protegida `/admin/promo-codes` (solo usuarios con rol 'admin')
+- Enlace "🔐 Admin" visible solo para administradores en el header
+- Dashboard con estadísticas: Total códigos, Activos, Usos totales
+- Lista de códigos con: código, descuento, usos, descripción
+- Acciones: Crear, Activar/Desactivar (toggle), Eliminar, Copiar código
+- Modal de creación con campos: código, tipo descuento, valor, máx usos, descripción
+- Endpoints de backend:
+  - `POST /api/pagos/promo/crear` - Crear código (admin)
+  - `GET /api/pagos/promo/listar` - Listar códigos (admin)
+  - `PATCH /api/pagos/promo/{id}/toggle` - Activar/Desactivar (admin)
+  - `DELETE /api/pagos/promo/{id}` - Eliminar código (admin)
+  - `POST /api/pagos/promo/validar` - Validar código (cualquier usuario autenticado)
+
 ---
 
 ## Funcionalidades Pendientes (Backlog)
