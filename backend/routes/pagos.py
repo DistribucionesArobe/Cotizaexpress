@@ -221,15 +221,131 @@ async def validar_promo_code(
 async def listar_promo_codes(current_user: dict = Depends(get_current_user)):
     """Lista todos los códigos promocionales (solo admin)"""
     try:
+        # Verificar que sea admin
+        if current_user.get('rol') != 'admin':
+            raise HTTPException(status_code=403, detail="Acceso denegado. Solo administradores.")
+        
         promos = await promo_codes_collection.find(
             {},
             {'_id': 0}
         ).sort('created_at', -1).to_list(100)
         
+        # Agregar info de uso para cada código
+        for promo in promos:
+            usos = await promo_usage_collection.count_documents({
+                'promo_id': promo['id'],
+                'status': 'used'
+            })
+            promo['usos_completados'] = usos
+        
         return {"promo_codes": promos}
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error listando códigos: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.patch("/promo/{promo_id}/toggle")
+async def toggle_promo_code(
+    promo_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Activa o desactiva un código promocional"""
+    try:
+        # Verificar que sea admin
+        if current_user.get('rol') != 'admin':
+            raise HTTPException(status_code=403, detail="Acceso denegado. Solo administradores.")
+        
+        # Buscar código
+        promo = await promo_codes_collection.find_one({'id': promo_id})
+        if not promo:
+            raise HTTPException(status_code=404, detail="Código no encontrado")
+        
+        # Toggle estado
+        nuevo_estado = not promo.get('activo', True)
+        
+        await promo_codes_collection.update_one(
+            {'id': promo_id},
+            {'$set': {'activo': nuevo_estado, 'updated_at': datetime.now(timezone.utc).isoformat()}}
+        )
+        
+        logger.info(f"Código {promo['code']} {'activado' if nuevo_estado else 'desactivado'}")
+        
+        return {
+            "success": True,
+            "code": promo['code'],
+            "activo": nuevo_estado
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error actualizando código: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/promo/{promo_id}")
+async def eliminar_promo_code(
+    promo_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Elimina un código promocional"""
+    try:
+        # Verificar que sea admin
+        if current_user.get('rol') != 'admin':
+            raise HTTPException(status_code=403, detail="Acceso denegado. Solo administradores.")
+        
+        # Buscar código
+        promo = await promo_codes_collection.find_one({'id': promo_id})
+        if not promo:
+            raise HTTPException(status_code=404, detail="Código no encontrado")
+        
+        # Eliminar de Stripe si existe
+        if promo.get('stripe_promo_id'):
+            try:
+                stripe.api_key = os.environ.get('STRIPE_API_KEY')
+                stripe.PromotionCode.modify(promo['stripe_promo_id'], active=False)
+            except:
+                pass
+        
+        # Eliminar de BD
+        await promo_codes_collection.delete_one({'id': promo_id})
+        
+        logger.info(f"Código {promo['code']} eliminado")
+        
+        return {"success": True, "message": f"Código {promo['code']} eliminado"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error eliminando código: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/promo/{promo_id}/usos")
+async def obtener_usos_promo(
+    promo_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Obtiene el historial de usos de un código"""
+    try:
+        # Verificar que sea admin
+        if current_user.get('rol') != 'admin':
+            raise HTTPException(status_code=403, detail="Acceso denegado. Solo administradores.")
+        
+        usos = await promo_usage_collection.find(
+            {'promo_id': promo_id},
+            {'_id': 0}
+        ).sort('created_at', -1).to_list(100)
+        
+        return {"usos": usos}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error obteniendo usos: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
