@@ -159,20 +159,16 @@ CotizaBot es un sistema de IA multi-agente para automatizar cotizaciones y venta
 
 ## Funcionalidades Pendientes (Backlog)
 
-### P0 - Alta Prioridad
-- [ ] Dashboard de Administrador general (punto de entrada `/admin`)
-- [ ] Dashboard de Twilio (saldo, último número comprado, alertas de saldo bajo)
-
 ### P1 - Media Prioridad
 - [ ] Verificar dominio cotizaexpress.com en Resend para emails personalizados
 - [ ] Activar credenciales de Facturama en sandbox/producción
-- [ ] UI para agregar productos manualmente (formulario individual)
 - [ ] Probar flujo completo de compra de número con cuenta Twilio de pago
 
 ### P2 - Baja Prioridad
 - [ ] Agente de aprendizaje (análisis de cotizaciones ganadas/perdidas)
 - [ ] Precios dinámicos basados en volumen
 - [ ] Sistema de recomendaciones de productos complementarios
+- [ ] Gestión de empresas y usuarios desde el panel de admin
 
 ---
 
@@ -184,6 +180,7 @@ CotizaBot es un sistema de IA multi-agente para automatizar cotizaciones y venta
 │   ├── agents/           # Agentes de IA (clasificador, cotizador, etc.)
 │   ├── models/           # Modelos Pydantic (empresa, usuario, cotización, etc.)
 │   ├── routes/           # Endpoints FastAPI
+│   │   ├── admin.py      # Dashboard y stats de admin (NUEVO)
 │   │   ├── auth.py       # Autenticación (registro, login, me)
 │   │   ├── cotizaciones.py # CRUD cotizaciones con límites
 │   │   ├── empresa.py    # Perfil, datos fiscales, facturación
