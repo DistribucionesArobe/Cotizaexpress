@@ -2,11 +2,15 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
-import { MapPin, MessageCircle, CheckCircle, Clock, Phone, Search } from 'lucide-react';
+import { 
+  MessageCircle, CheckCircle, Clock, Phone, Crown, 
+  Zap, Users, ArrowRight, Copy, ExternalLink, AlertTriangle,
+  Smartphone, Send
+} from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -14,412 +18,404 @@ const API = `${BACKEND_URL}/api`;
 export default function ConfiguracionWhatsApp() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [ciudades, setCiudades] = useState([]);
-  const [ciudadesPorRegion, setCiudadesPorRegion] = useState({});
-  const [ciudadSeleccionada, setCiudadSeleccionada] = useState('');
-  const [enviando, setEnviando] = useState(false);
-  const [miNumero, setMiNumero] = useState(null);
-  const [busqueda, setBusqueda] = useState('');
+  const [activando, setActivando] = useState(false);
+  const [migrando, setMigrando] = useState(false);
+  const [config, setConfig] = useState(null);
+  const [instrucciones, setInstrucciones] = useState(null);
+
+  const planActual = user?.empresa?.plan || user?.usuario?.plan || 'gratis';
+  const esPlanCompleto = planActual === 'completo';
 
   useEffect(() => {
-    cargarDatos();
+    cargarConfig();
   }, []);
 
-  const cargarDatos = async () => {
+  const cargarConfig = async () => {
     try {
       setLoading(true);
-      
-      // Cargar ciudades disponibles
-      const ciudadesRes = await axios.get(`${API}/twilio/ciudades`);
-      setCiudades(ciudadesRes.data.ciudades || []);
-      setCiudadesPorRegion(ciudadesRes.data.por_region || {});
-      
-      // Verificar si ya tiene número
-      const miNumeroRes = await axios.get(`${API}/twilio/mi-numero`);
-      setMiNumero(miNumeroRes.data);
-      
+      const [configRes, instruccionesRes] = await Promise.all([
+        axios.get(`${API}/whatsapp/config`),
+        axios.get(`${API}/whatsapp/instrucciones-sandbox`)
+      ]);
+      setConfig(configRes.data);
+      setInstrucciones(instruccionesRes.data);
     } catch (error) {
-      console.error('Error cargando datos:', error);
-      if (error.response?.status === 403) {
-        toast.error('Necesitas el Plan Completo para acceder a esta función');
-      }
+      console.error('Error cargando config:', error);
+      // Si falla, mostrar estado no configurado
+      setConfig({ configured: false, mode: 'none' });
     } finally {
       setLoading(false);
     }
   };
 
-  const solicitarNumero = async () => {
-    if (!ciudadSeleccionada) {
-      toast.error('Selecciona una ciudad primero');
-      return;
-    }
-
+  const activarWhatsApp = async () => {
     try {
-      setEnviando(true);
+      setActivando(true);
+      const response = await axios.post(`${API}/whatsapp/activar`, {});
       
-      const response = await axios.post(`${API}/twilio/solicitar-numero`, {
-        ciudad: ciudadSeleccionada
-      });
-      
-      if (response.data.success) {
-        toast.success(response.data.mensaje);
-        
-        // Actualizar estado con el número obtenido
-        setMiNumero({
-          has_number: true,
+      toast.success(response.data.mensaje || '¡WhatsApp activado!');
+      setConfig(prev => ({
+        ...prev,
+        configured: true,
+        mode: 'shared',
+        phone_number: response.data.phone_number,
+        numero_info: {
           phone_number: response.data.phone_number,
-          whatsapp_configured: response.data.whatsapp_configured
-        });
-      }
+          type: 'shared',
+          is_sandbox: response.data.is_sandbox,
+          sandbox_code: response.data.sandbox_code
+        }
+      }));
       
     } catch (error) {
-      console.error('Error obteniendo número:', error);
-      const errorMsg = error.response?.data?.detail || 'Error al obtener el número';
-      toast.error(errorMsg);
+      console.error('Error activando WhatsApp:', error);
+      toast.error(error.response?.data?.detail || 'Error al activar WhatsApp');
     } finally {
-      setEnviando(false);
+      setActivando(false);
     }
   };
 
-  // Verificar si el usuario tiene plan completo
-  const planCompleto = user?.empresa?.plan === 'completo' || user?.usuario?.plan === 'completo';
+  const migrarADedicado = async () => {
+    try {
+      setMigrando(true);
+      const response = await axios.post(`${API}/whatsapp/migrar-dedicado`, {});
+      
+      toast.success(response.data.mensaje || '¡Número dedicado activado!');
+      setConfig(prev => ({
+        ...prev,
+        mode: 'dedicated',
+        phone_number: response.data.phone_number,
+        numero_info: {
+          phone_number: response.data.phone_number,
+          type: 'dedicated',
+          is_sandbox: false
+        }
+      }));
+      
+    } catch (error) {
+      console.error('Error migrando:', error);
+      toast.error(error.response?.data?.detail || 'Error al obtener número dedicado');
+    } finally {
+      setMigrando(false);
+    }
+  };
+
+  const copiarTexto = (texto) => {
+    navigator.clipboard.writeText(texto);
+    toast.success('Copiado al portapapeles');
+  };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="flex justify-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
 
-  // Si no tiene plan completo, mostrar mensaje
-  if (!planCompleto) {
-    return (
-      <div className="space-y-6" data-testid="configuracion-whatsapp-page">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">Configuración de WhatsApp</h1>
-            <p className="text-slate-600">Configura tu número de WhatsApp Business</p>
-          </div>
-        </div>
+  const isConfigured = config?.configured;
+  const isShared = config?.mode === 'shared';
+  const isDedicated = config?.mode === 'dedicated';
+  const isSandbox = config?.numero_info?.is_sandbox;
 
-        <Card className="border-amber-200 bg-amber-50">
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <MessageCircle className="w-6 h-6 text-amber-600" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-amber-800 mb-2">
-                  Plan Completo Requerido
-                </h3>
-                <p className="text-amber-700 mb-4">
-                  Para obtener tu propio número de WhatsApp Business necesitas actualizar al Plan Completo.
-                  Con el Plan Completo obtienes:
-                </p>
-                <ul className="text-amber-700 space-y-1 mb-4">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-600" />
-                    Cotizaciones ilimitadas
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-600" />
-                    Tu propio número de WhatsApp Business (¡sin costo adicional!)
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-600" />
-                    Bot de IA respondiendo 24/7
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-600" />
-                    Soporte prioritario
-                  </li>
-                </ul>
-                <Link to="/precios">
-                  <Button className="bg-emerald-600 hover:bg-emerald-700" data-testid="btn-ver-precios">
-                    Ver Plan Completo - $1,000 MXN/mes
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+  return (
+    <div className="space-y-6" data-testid="configuracion-whatsapp-page">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+          <MessageCircle className="w-6 h-6 text-emerald-600" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">WhatsApp Business</h2>
+          <p className="text-slate-600">Recibe cotizaciones automáticas por WhatsApp</p>
+        </div>
       </div>
-    );
-  }
 
-  // Si ya tiene número asignado
-  if (miNumero?.has_number) {
-    return (
-      <div className="space-y-6" data-testid="configuracion-whatsapp-page">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">Tu Número de WhatsApp</h1>
-            <p className="text-slate-600">Configuración de tu línea de WhatsApp Business</p>
-          </div>
-        </div>
-
-        <Card className="border-emerald-200 bg-emerald-50">
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-4">
-              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <Phone className="w-8 h-8 text-emerald-600" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold text-emerald-800 mb-1" data-testid="mi-numero">
-                  {miNumero.phone_number}
-                </h3>
-                <div className="flex items-center gap-2 mb-4">
-                  {miNumero.whatsapp_configured ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-emerald-200 text-emerald-800 rounded-full text-sm">
-                      <CheckCircle className="w-4 h-4" />
-                      WhatsApp Activo
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-200 text-amber-800 rounded-full text-sm">
-                      <Clock className="w-4 h-4" />
-                      Configurando...
-                    </span>
-                  )}
+      {/* Estado actual */}
+      {isConfigured ? (
+        <Card className={`border-2 ${isDedicated ? 'border-emerald-300 bg-emerald-50' : 'border-blue-300 bg-blue-50'}`}>
+          <CardContent className="py-6">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center gap-4">
+                <div className={`w-14 h-14 rounded-full flex items-center justify-center ${isDedicated ? 'bg-emerald-200' : 'bg-blue-200'}`}>
+                  <Phone className={`w-7 h-7 ${isDedicated ? 'text-emerald-700' : 'text-blue-700'}`} />
                 </div>
-                
-                {miNumero.whatsapp_configured ? (
-                  <p className="text-emerald-700">
-                    ¡Tu bot está activo! Los clientes pueden escribir a este número 
-                    y el bot responderá automáticamente con cotizaciones.
-                  </p>
-                ) : (
-                  <p className="text-emerald-700">
-                    Tu número está siendo configurado para WhatsApp Business. 
-                    Te notificaremos cuando esté listo.
-                  </p>
-                )}
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xl font-bold text-slate-900">{config?.phone_number}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0"
+                      onClick={() => copiarTexto(config?.phone_number)}
+                    >
+                      <Copy className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={isDedicated ? 'default' : 'secondary'}>
+                      {isDedicated ? '🔒 Número Dedicado' : '👥 Número Compartido'}
+                    </Badge>
+                    {isSandbox && (
+                      <Badge variant="outline" className="text-amber-600 border-amber-300">
+                        ⚠️ Modo Demo
+                      </Badge>
+                    )}
+                    <Badge variant="outline" className="text-emerald-600">
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                      Activo
+                    </Badge>
+                  </div>
+                </div>
               </div>
+              
+              {isShared && esPlanCompleto && (
+                <Button 
+                  onClick={migrarADedicado}
+                  disabled={migrando}
+                  className="bg-emerald-600 hover:bg-emerald-700"
+                >
+                  {migrando ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Obteniendo número...
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-4 h-4 mr-2" />
+                      Obtener Número Dedicado
+                    </>
+                  )}
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
+      ) : (
+        /* No configurado - Mostrar opciones */
+        <Card className="border-2 border-dashed border-slate-300">
+          <CardContent className="py-8">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="w-8 h-8 text-slate-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                WhatsApp no configurado
+              </h3>
+              <p className="text-slate-600 max-w-md mx-auto">
+                Activa WhatsApp para que tus clientes puedan solicitar cotizaciones 
+                automáticamente las 24 horas.
+              </p>
+            </div>
+            
+            <div className="flex justify-center">
+              <Button 
+                onClick={activarWhatsApp}
+                disabled={activando}
+                size="lg"
+                className="bg-emerald-600 hover:bg-emerald-700"
+              >
+                {activando ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Activando...
+                  </>
+                ) : (
+                  <>
+                    <MessageCircle className="w-5 h-5 mr-2" />
+                    Activar WhatsApp (Demo)
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
-        <Card>
+      {/* Instrucciones de Sandbox (solo si está en modo demo) */}
+      {isConfigured && isSandbox && instrucciones && (
+        <Card className="border-amber-200 bg-amber-50">
           <CardHeader>
-            <CardTitle>¿Cómo funciona?</CardTitle>
+            <CardTitle className="text-base flex items-center gap-2 text-amber-800">
+              <AlertTriangle className="w-5 h-5" />
+              {instrucciones.titulo}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-emerald-700 font-bold">1</span>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-slate-900">Tu cliente escribe</h4>
-                  <p className="text-slate-600 text-sm">El cliente envía un mensaje a tu número de WhatsApp preguntando por precios.</p>
-                </div>
+              <div className="bg-white rounded-lg p-4 border border-amber-200">
+                <p className="text-sm font-medium text-slate-700 mb-3">Para probar, tus clientes deben:</p>
+                <ol className="space-y-2">
+                  {instrucciones.pasos?.map((paso, i) => (
+                    <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
+                      <span className="font-bold text-amber-600">{i + 1}.</span>
+                      <span>{paso.replace(/^\d+\.\s*/, '')}</span>
+                    </li>
+                  ))}
+                </ol>
               </div>
-              <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-emerald-700 font-bold">2</span>
+              
+              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-amber-200">
+                <Smartphone className="w-5 h-5 text-amber-600" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-slate-700">Código para conectarse:</p>
+                  <p className="text-lg font-mono font-bold text-amber-700">{instrucciones.codigo}</p>
                 </div>
-                <div>
-                  <h4 className="font-semibold text-slate-900">CotizaBot responde</h4>
-                  <p className="text-slate-600 text-sm">Nuestro bot de IA interpreta el mensaje y genera una cotización con tus productos y precios.</p>
-                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => copiarTexto(instrucciones.codigo)}
+                >
+                  <Copy className="w-4 h-4" />
+                </Button>
               </div>
-              <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-emerald-700 font-bold">3</span>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-slate-900">Cotización enviada</h4>
-                  <p className="text-slate-600 text-sm">El cliente recibe la cotización con precios, IVA y total en segundos.</p>
-                </div>
+              
+              <div className="text-xs text-amber-700 space-y-1">
+                {instrucciones.notas?.map((nota, i) => (
+                  <p key={i}>• {nota}</p>
+                ))}
               </div>
             </div>
           </CardContent>
         </Card>
-      </div>
-    );
-  }
+      )}
 
-  // Vista para obtener número (flujo automático instantáneo)
-  return (
-    <div className="space-y-6" data-testid="configuracion-whatsapp-page">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Obtén tu Número de WhatsApp</h1>
-          <p className="text-slate-600">Selecciona tu ciudad y obtén tu número en segundos</p>
-        </div>
-      </div>
-
-      {/* Info destacada */}
-      <Card className="border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50">
-        <CardContent className="pt-6">
-          <div className="flex items-center gap-3 mb-2">
-            <CheckCircle className="w-6 h-6 text-emerald-600" />
-            <span className="font-semibold text-emerald-800">¡Activación instantánea!</span>
-          </div>
-          <p className="text-emerald-700">
-            Tu número de WhatsApp Business se activa automáticamente en segundos. 
-            Está incluido en tu Plan Completo sin costo adicional.
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Selector de ciudad */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-emerald-600" />
-            ¿De qué ciudad quieres tu número?
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-slate-600 text-sm mb-4">
-            Tenemos {ciudades.length} ciudades disponibles. Selecciona la que mejor represente a tu negocio.
-          </p>
-          
-          {/* Buscador */}
-          <div className="relative mb-6">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <Input
-              placeholder="Buscar ciudad... ej: Monterrey, Guadalajara, CDMX"
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-              className="pl-10"
-              data-testid="input-buscar-ciudad"
-            />
-          </div>
-
-          {/* Ciudad seleccionada */}
-          {ciudadSeleccionada && (
-            <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-emerald-600" />
-                <span className="font-medium text-emerald-800">
-                  Seleccionada: {ciudades.find(c => c.key === ciudadSeleccionada)?.nombre}
-                </span>
-              </div>
-              <button 
-                onClick={() => setCiudadSeleccionada('')}
-                className="text-emerald-600 hover:text-emerald-800 text-sm"
+      {/* Comparativa de planes */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Número Compartido */}
+        <Card className={`${isShared ? 'border-2 border-blue-300' : ''}`}>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Users className="w-5 h-5 text-blue-600" />
+              Número Compartido
+              {isShared && <Badge className="ml-2">Actual</Badge>}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2 text-sm text-slate-600">
+              <li className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-emerald-500" />
+                Activación inmediata
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-emerald-500" />
+                Ideal para probar el sistema
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-emerald-500" />
+                Sin costo adicional
+              </li>
+              <li className="flex items-center gap-2 text-amber-600">
+                <AlertTriangle className="w-4 h-4" />
+                Máximo 10 empresas por número
+              </li>
+              <li className="flex items-center gap-2 text-amber-600">
+                <AlertTriangle className="w-4 h-4" />
+                Número de CotizaExpress
+              </li>
+            </ul>
+            
+            {!isConfigured && (
+              <Button 
+                variant="outline" 
+                className="w-full mt-4"
+                onClick={activarWhatsApp}
+                disabled={activando}
               >
-                Cambiar
-              </button>
-            </div>
-          )}
-          
-          {/* Ciudades por región o búsqueda */}
-          {busqueda ? (
-            // Resultados de búsqueda
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-              {ciudades
-                .filter(c => c.nombre.toLowerCase().includes(busqueda.toLowerCase()))
-                .map((ciudad) => (
-                  <button
-                    key={ciudad.key}
-                    onClick={() => { setCiudadSeleccionada(ciudad.key); setBusqueda(''); }}
-                    disabled={enviando}
-                    className={`px-3 py-2 rounded-lg border text-sm font-medium transition-all text-left ${
-                      ciudadSeleccionada === ciudad.key
-                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                        : 'border-slate-200 hover:border-emerald-300 text-slate-700'
-                    }`}
-                    data-testid={`btn-ciudad-${ciudad.key}`}
-                  >
-                    {ciudad.nombre}
-                  </button>
-                ))}
-              {ciudades.filter(c => c.nombre.toLowerCase().includes(busqueda.toLowerCase())).length === 0 && (
-                <p className="col-span-full text-center text-slate-500 py-4">
-                  No se encontraron ciudades con "{busqueda}"
-                </p>
-              )}
-            </div>
-          ) : (
-            // Ciudades por región
-            <div className="space-y-6 max-h-96 overflow-y-auto pr-2">
-              {Object.entries(ciudadesPorRegion).map(([region, ciudadesRegion]) => (
-                <div key={region}>
-                  <h4 className="text-sm font-semibold text-slate-500 mb-2 sticky top-0 bg-white">
-                    📍 {region}
-                  </h4>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                    {ciudadesRegion.map((ciudad) => (
-                      <button
-                        key={ciudad.key}
-                        onClick={() => setCiudadSeleccionada(ciudad.key)}
-                        disabled={enviando}
-                        className={`px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium transition-all text-left truncate ${
-                          ciudadSeleccionada === ciudad.key
-                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                            : 'border-slate-200 hover:border-emerald-300 text-slate-700'
-                        } ${enviando ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        data-testid={`btn-ciudad-${ciudad.key}`}
-                        title={ciudad.nombre}
-                      >
-                        {ciudad.nombre.split(',')[0]}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-          
-          <div className="mt-6">
-            <Button
-              onClick={solicitarNumero}
-              disabled={!ciudadSeleccionada || enviando}
-              className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 h-12 px-8 text-base"
-              data-testid="btn-solicitar-numero"
-            >
-              {enviando ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Activando tu número...
-                </>
-              ) : (
-                <>
-                  <MessageCircle className="w-5 h-5 mr-2" />
-                  Obtener mi número de WhatsApp
-                </>
-              )}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+                Usar número compartido
+              </Button>
+            )}
+          </CardContent>
+        </Card>
 
-      {/* Info adicional */}
+        {/* Número Dedicado */}
+        <Card className={`${isDedicated ? 'border-2 border-emerald-300' : ''}`}>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Crown className="w-5 h-5 text-emerald-600" />
+              Número Dedicado
+              {isDedicated && <Badge className="bg-emerald-600 ml-2">Actual</Badge>}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2 text-sm text-slate-600">
+              <li className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-emerald-500" />
+                Número exclusivo para tu empresa
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-emerald-500" />
+                Sin límite de conversaciones
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-emerald-500" />
+                Tu marca en el perfil de WhatsApp
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-emerald-500" />
+                Historial completo y privado
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-emerald-500" />
+                Templates personalizados
+              </li>
+            </ul>
+            
+            {!isDedicated && (
+              esPlanCompleto ? (
+                <Button 
+                  className="w-full mt-4 bg-emerald-600 hover:bg-emerald-700"
+                  onClick={migrarADedicado}
+                  disabled={migrando}
+                >
+                  {migrando ? 'Obteniendo...' : 'Obtener número dedicado'}
+                </Button>
+              ) : (
+                <Link to="/precios">
+                  <Button variant="outline" className="w-full mt-4">
+                    Requiere Plan Completo
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+              )
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Cómo funciona */}
       <Card>
         <CardHeader>
-          <CardTitle>¿Cómo funciona?</CardTitle>
+          <CardTitle className="text-base">¿Cómo funciona?</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-start gap-4">
-              <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-emerald-700 font-bold">1</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Send className="w-6 h-6 text-blue-600" />
               </div>
-              <div>
-                <h4 className="font-semibold text-slate-900">Selecciona tu ciudad</h4>
-                <p className="text-slate-600 text-sm">Elige la ciudad de donde quieres tu número telefónico.</p>
-              </div>
+              <h4 className="font-medium text-slate-900 mb-1">1. Cliente escribe</h4>
+              <p className="text-sm text-slate-600">
+                Tu cliente envía un mensaje pidiendo cotización
+              </p>
             </div>
-            <div className="flex items-start gap-4">
-              <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-emerald-700 font-bold">2</span>
+            <div className="text-center">
+              <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Zap className="w-6 h-6 text-emerald-600" />
               </div>
-              <div>
-                <h4 className="font-semibold text-slate-900">Click y listo</h4>
-                <p className="text-slate-600 text-sm">Tu número se activa automáticamente en segundos.</p>
-              </div>
+              <h4 className="font-medium text-slate-900 mb-1">2. IA procesa</h4>
+              <p className="text-sm text-slate-600">
+                CotizaBot entiende la solicitud y busca productos
+              </p>
             </div>
-            <div className="flex items-start gap-4">
-              <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-emerald-700 font-bold">3</span>
+            <div className="text-center">
+              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <MessageCircle className="w-6 h-6 text-purple-600" />
               </div>
-              <div>
-                <h4 className="font-semibold text-slate-900">¡A vender!</h4>
-                <p className="text-slate-600 text-sm">Comparte tu número y el bot empezará a generar cotizaciones automáticas.</p>
-              </div>
+              <h4 className="font-medium text-slate-900 mb-1">3. Cotización enviada</h4>
+              <p className="text-sm text-slate-600">
+                El cliente recibe su cotización en segundos
+              </p>
             </div>
           </div>
         </CardContent>
