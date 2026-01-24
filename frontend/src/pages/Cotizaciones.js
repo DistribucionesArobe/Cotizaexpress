@@ -12,9 +12,13 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 export default function Cotizaciones() {
+  const { user } = useAuth();
   const [cotizaciones, setCotizaciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filtroEstado, setFiltroEstado] = useState('');
+
+  const planActual = user?.empresa?.plan || user?.usuario?.plan || 'gratis';
+  const esPlanGratis = planActual === 'gratis' || planActual === 'demo';
 
   useEffect(() => {
     cargarCotizaciones();
