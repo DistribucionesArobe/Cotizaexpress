@@ -107,8 +107,8 @@ async def cargar_productos_excel(
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/template")
-async def descargar_template(current_user: dict = Depends(get_current_user)):
-    """Genera y descarga template de Excel para carga de productos"""
+async def descargar_template():
+    """Genera y descarga template de Excel para carga de productos (público)"""
     try:
         from fastapi.responses import StreamingResponse
         
@@ -124,7 +124,6 @@ async def descargar_template(current_user: dict = Depends(get_current_user)):
         
         df = pd.DataFrame(template_data)
         
-        # Guardar en BytesIO
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
             df.to_excel(writer, index=False, sheet_name='Productos')
