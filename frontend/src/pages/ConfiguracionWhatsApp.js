@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
-import { MapPin, MessageCircle, CheckCircle, Clock, Phone } from 'lucide-react';
+import { MapPin, MessageCircle, CheckCircle, Clock, Phone, Search } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -14,9 +15,11 @@ export default function ConfiguracionWhatsApp() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [ciudades, setCiudades] = useState([]);
+  const [ciudadesPorRegion, setCiudadesPorRegion] = useState({});
   const [ciudadSeleccionada, setCiudadSeleccionada] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [miNumero, setMiNumero] = useState(null);
+  const [busqueda, setBusqueda] = useState('');
 
   useEffect(() => {
     cargarDatos();
