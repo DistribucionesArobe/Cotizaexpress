@@ -200,6 +200,74 @@ export default function Productos() {
     }
   };
 
+  const resetNuevoProducto = () => {
+    setNuevoProducto({
+      nombre: '',
+      sku: '',
+      categoria: '',
+      precio_base: '',
+      unidad: 'Pieza',
+      stock: '0',
+      descripcion: ''
+    });
+  };
+
+  const crearProducto = async () => {
+    // Validaciones
+    if (!nuevoProducto.nombre.trim()) {
+      toast.error('Ingresa el nombre del producto');
+      return;
+    }
+    if (!nuevoProducto.categoria.trim()) {
+      toast.error('Ingresa la categoría');
+      return;
+    }
+    if (!nuevoProducto.precio_base || parseFloat(nuevoProducto.precio_base) <= 0) {
+      toast.error('Ingresa un precio válido mayor a 0');
+      return;
+    }
+
+    try {
+      setCreandoProducto(true);
+      
+      const payload = {
+        nombre: nuevoProducto.nombre.trim(),
+        categoria: nuevoProducto.categoria.trim(),
+        precio_base: parseFloat(nuevoProducto.precio_base),
+        unidad: nuevoProducto.unidad,
+        stock: parseFloat(nuevoProducto.stock) || 0,
+        descripcion: nuevoProducto.descripcion.trim() || null
+      };
+      
+      // Solo agregar SKU si se proporcionó
+      if (nuevoProducto.sku.trim()) {
+        payload.sku = nuevoProducto.sku.trim().toUpperCase();
+      }
+
+      const response = await axios.post(`${API}/productos`, payload);
+      
+      // Agregar el producto a la lista
+      setProductos(prev => [...prev, response.data]);
+      
+      // Actualizar categorías si es nueva
+      if (!categorias.includes(payload.categoria)) {
+        setCategorias(prev => [...prev, payload.categoria].sort());
+      }
+      
+      // Si era demo, ya no lo es
+      setEsDemo(false);
+      
+      toast.success(`Producto "${payload.nombre}" creado exitosamente`);
+      setShowAddProductModal(false);
+      resetNuevoProducto();
+    } catch (error) {
+      console.error('Error creando producto:', error);
+      toast.error(error.response?.data?.detail || 'Error al crear producto');
+    } finally {
+      setCreandoProducto(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-12" data-testid="productos-loading">
