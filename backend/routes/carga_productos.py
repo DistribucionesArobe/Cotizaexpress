@@ -107,10 +107,18 @@ async def cargar_productos_excel(
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/template")
-async def descargar_template(current_user: dict = Depends(get_current_user)):
+async def descargar_template(token: str = None, current_user: dict = None):
     """Genera y descarga template de Excel para carga de productos"""
     try:
         from fastapi.responses import StreamingResponse
+        from utils.auth import get_current_user_from_token
+        
+        # Verificar autenticación (por header o query param)
+        if not current_user and token:
+            try:
+                current_user = get_current_user_from_token(token)
+            except:
+                pass
         
         # Crear DataFrame con columnas de ejemplo (productos de construcción)
         template_data = {
