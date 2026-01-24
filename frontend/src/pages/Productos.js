@@ -267,12 +267,11 @@ export default function Productos() {
                   </div>
                 </div>
                 <Button 
-                  onClick={handleUpgrade}
-                  disabled={upgradeLoading}
+                  onClick={openCheckoutModal}
                   className="bg-emerald-600 hover:bg-emerald-700"
                   data-testid="btn-upgrade"
                 >
-                  {upgradeLoading ? 'Procesando...' : 'Actualizar - $1,160 MXN/mes'}
+                  Actualizar - $1,160 MXN/mes
                 </Button>
               </div>
             </CardContent>
