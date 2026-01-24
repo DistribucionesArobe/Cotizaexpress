@@ -155,6 +155,31 @@ CotizaBot es un sistema de IA multi-agente para automatizar cotizaciones y venta
   - `DELETE /api/pagos/promo/{id}` - Eliminar código (admin)
   - `POST /api/pagos/promo/validar` - Validar código (cualquier usuario autenticado)
 
+### ✅ Dashboard de Administración General (Completado 2026-01-24)
+- Ruta `/admin` como punto de entrada para herramientas de administración
+- Estadísticas del sistema: Total empresas, Suscripciones activas, Cotizaciones totales, Códigos promo activos
+- Accesos directos a: Códigos Promocionales, Twilio & WhatsApp, Empresas (próximamente)
+- Estado del sistema: Stripe, Twilio, Facturama
+- Alerta visual cuando el saldo de Twilio es bajo (< $10 USD)
+- Endpoint: `GET /api/admin/stats`
+
+### ✅ Dashboard de Twilio (Completado 2026-01-24)
+- Ruta `/admin/twilio` para monitorear cuenta de Twilio
+- Muestra saldo actual en USD con alertas visuales (amarillo < $10, rojo < $5)
+- Lista de números comprados con fecha, estado y empresa asignada
+- Estado de conexión API y última actualización
+- Información de costos estimados de Twilio
+- Botón de recarga directo a console.twilio.com
+- Endpoint: `GET /api/admin/twilio`
+
+### ✅ UI para Agregar Productos Manualmente (Completado 2026-01-24)
+- Modal en la página de Productos para crear productos uno por uno
+- Campos: Nombre*, Categoría*, SKU (auto-generado), Precio*, Unidad, Stock, Descripción
+- Selector de unidades: Pieza, Kg, Litro, Metro, M2, M3, Caja, Bulto, Rollo, Saco
+- Autocompletado de categorías existentes
+- Validación de SKU único por empresa (índice compuesto empresa_id + sku)
+- Botón "Agregar producto" visible en el header de la página de Productos
+
 ---
 
 ## Funcionalidades Pendientes (Backlog)
