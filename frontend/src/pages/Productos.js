@@ -685,7 +685,7 @@ export default function Productos() {
       {/* Grid de Productos */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {productos.map((producto) => (
-          <Card key={producto.id} data-testid={`producto-${producto.sku}`}>
+          <Card key={producto.id} data-testid={`producto-${producto.sku}`} className="relative group">
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div>
@@ -695,6 +695,18 @@ export default function Productos() {
                   <CardTitle className="text-base">{producto.nombre}</CardTitle>
                   <p className="text-xs text-slate-500 mt-1">SKU: {producto.sku}</p>
                 </div>
+                {/* Botón eliminar - Solo para productos propios (no demo) */}
+                {!producto.es_demo && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 text-slate-400 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => setProductoAEliminar(producto)}
+                    data-testid={`btn-eliminar-${producto.sku}`}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                )}
               </div>
             </CardHeader>
             <CardContent>
