@@ -18,17 +18,71 @@ empresas_collection = db.get_collection('empresas')
 solicitudes_whatsapp_collection = db.get_collection('solicitudes_whatsapp')
 
 # Ciudades mexicanas con sus códigos de área para búsqueda de números
+# Organizado por regiones para facilitar la búsqueda
 CIUDADES_MEXICO = {
-    "ciudad_mexico": {"nombre": "Ciudad de México", "area_codes": ["55", "56"]},
-    "monterrey": {"nombre": "Monterrey", "area_codes": ["81"]},
-    "guadalajara": {"nombre": "Guadalajara", "area_codes": ["33"]},
-    "puebla": {"nombre": "Puebla", "area_codes": ["222"]},
-    "tijuana": {"nombre": "Tijuana", "area_codes": ["664"]},
-    "leon": {"nombre": "León", "area_codes": ["477"]},
-    "queretaro": {"nombre": "Querétaro", "area_codes": ["442"]},
-    "merida": {"nombre": "Mérida", "area_codes": ["999"]},
-    "cancun": {"nombre": "Cancún", "area_codes": ["998"]},
-    "toluca": {"nombre": "Toluca", "area_codes": ["722"]},
+    # ZONA METROPOLITANA / CENTRO
+    "ciudad_mexico": {"nombre": "Ciudad de México (CDMX)", "area_codes": ["55", "56"], "region": "Centro"},
+    "toluca": {"nombre": "Toluca, Estado de México", "area_codes": ["722"], "region": "Centro"},
+    "cuernavaca": {"nombre": "Cuernavaca, Morelos", "area_codes": ["777"], "region": "Centro"},
+    "pachuca": {"nombre": "Pachuca, Hidalgo", "area_codes": ["771"], "region": "Centro"},
+    "puebla": {"nombre": "Puebla, Puebla", "area_codes": ["222"], "region": "Centro"},
+    "tlaxcala": {"nombre": "Tlaxcala, Tlaxcala", "area_codes": ["246"], "region": "Centro"},
+    "queretaro": {"nombre": "Querétaro, Querétaro", "area_codes": ["442"], "region": "Centro"},
+    
+    # BAJÍO / OCCIDENTE
+    "guadalajara": {"nombre": "Guadalajara, Jalisco", "area_codes": ["33"], "region": "Bajío"},
+    "leon": {"nombre": "León, Guanajuato", "area_codes": ["477"], "region": "Bajío"},
+    "aguascalientes": {"nombre": "Aguascalientes, Aguascalientes", "area_codes": ["449"], "region": "Bajío"},
+    "san_luis_potosi": {"nombre": "San Luis Potosí, SLP", "area_codes": ["444"], "region": "Bajío"},
+    "morelia": {"nombre": "Morelia, Michoacán", "area_codes": ["443"], "region": "Bajío"},
+    "irapuato": {"nombre": "Irapuato, Guanajuato", "area_codes": ["462"], "region": "Bajío"},
+    "celaya": {"nombre": "Celaya, Guanajuato", "area_codes": ["461"], "region": "Bajío"},
+    "zacatecas": {"nombre": "Zacatecas, Zacatecas", "area_codes": ["492"], "region": "Bajío"},
+    "colima": {"nombre": "Colima, Colima", "area_codes": ["312"], "region": "Bajío"},
+    "tepic": {"nombre": "Tepic, Nayarit", "area_codes": ["311"], "region": "Bajío"},
+    
+    # NORTE / NORESTE
+    "monterrey": {"nombre": "Monterrey, Nuevo León", "area_codes": ["81"], "region": "Norte"},
+    "saltillo": {"nombre": "Saltillo, Coahuila", "area_codes": ["844"], "region": "Norte"},
+    "torreon": {"nombre": "Torreón, Coahuila", "area_codes": ["871"], "region": "Norte"},
+    "chihuahua": {"nombre": "Chihuahua, Chihuahua", "area_codes": ["614"], "region": "Norte"},
+    "ciudad_juarez": {"nombre": "Ciudad Juárez, Chihuahua", "area_codes": ["656"], "region": "Norte"},
+    "durango": {"nombre": "Durango, Durango", "area_codes": ["618"], "region": "Norte"},
+    "reynosa": {"nombre": "Reynosa, Tamaulipas", "area_codes": ["899"], "region": "Norte"},
+    "tampico": {"nombre": "Tampico, Tamaulipas", "area_codes": ["833"], "region": "Norte"},
+    "matamoros": {"nombre": "Matamoros, Tamaulipas", "area_codes": ["868"], "region": "Norte"},
+    "nuevo_laredo": {"nombre": "Nuevo Laredo, Tamaulipas", "area_codes": ["867"], "region": "Norte"},
+    
+    # NOROESTE / PACÍFICO
+    "tijuana": {"nombre": "Tijuana, Baja California", "area_codes": ["664"], "region": "Noroeste"},
+    "mexicali": {"nombre": "Mexicali, Baja California", "area_codes": ["686"], "region": "Noroeste"},
+    "ensenada": {"nombre": "Ensenada, Baja California", "area_codes": ["646"], "region": "Noroeste"},
+    "la_paz": {"nombre": "La Paz, Baja California Sur", "area_codes": ["612"], "region": "Noroeste"},
+    "los_cabos": {"nombre": "Los Cabos, Baja California Sur", "area_codes": ["624"], "region": "Noroeste"},
+    "hermosillo": {"nombre": "Hermosillo, Sonora", "area_codes": ["662"], "region": "Noroeste"},
+    "culiacan": {"nombre": "Culiacán, Sinaloa", "area_codes": ["667"], "region": "Noroeste"},
+    "mazatlan": {"nombre": "Mazatlán, Sinaloa", "area_codes": ["669"], "region": "Noroeste"},
+    "los_mochis": {"nombre": "Los Mochis, Sinaloa", "area_codes": ["668"], "region": "Noroeste"},
+    
+    # SURESTE / GOLFO
+    "merida": {"nombre": "Mérida, Yucatán", "area_codes": ["999"], "region": "Sureste"},
+    "cancun": {"nombre": "Cancún, Quintana Roo", "area_codes": ["998"], "region": "Sureste"},
+    "playa_del_carmen": {"nombre": "Playa del Carmen, Quintana Roo", "area_codes": ["984"], "region": "Sureste"},
+    "chetumal": {"nombre": "Chetumal, Quintana Roo", "area_codes": ["983"], "region": "Sureste"},
+    "campeche": {"nombre": "Campeche, Campeche", "area_codes": ["981"], "region": "Sureste"},
+    "villahermosa": {"nombre": "Villahermosa, Tabasco", "area_codes": ["993"], "region": "Sureste"},
+    "veracruz": {"nombre": "Veracruz, Veracruz", "area_codes": ["229"], "region": "Sureste"},
+    "xalapa": {"nombre": "Xalapa, Veracruz", "area_codes": ["228"], "region": "Sureste"},
+    "coatzacoalcos": {"nombre": "Coatzacoalcos, Veracruz", "area_codes": ["921"], "region": "Sureste"},
+    
+    # SUR / PACÍFICO SUR
+    "oaxaca": {"nombre": "Oaxaca, Oaxaca", "area_codes": ["951"], "region": "Sur"},
+    "tuxtla_gutierrez": {"nombre": "Tuxtla Gutiérrez, Chiapas", "area_codes": ["961"], "region": "Sur"},
+    "san_cristobal": {"nombre": "San Cristóbal de las Casas, Chiapas", "area_codes": ["967"], "region": "Sur"},
+    "acapulco": {"nombre": "Acapulco, Guerrero", "area_codes": ["744"], "region": "Sur"},
+    "chilpancingo": {"nombre": "Chilpancingo, Guerrero", "area_codes": ["747"], "region": "Sur"},
+    "puerto_vallarta": {"nombre": "Puerto Vallarta, Jalisco", "area_codes": ["322"], "region": "Sur"},
+    "manzanillo": {"nombre": "Manzanillo, Colima", "area_codes": ["314"], "region": "Sur"},
 }
 
 class SolicitudNumeroRequest(BaseModel):
