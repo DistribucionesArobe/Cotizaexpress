@@ -222,18 +222,22 @@ async def solicitar_numero_whatsapp(
         usar_usa = False
         if not numero_encontrado:
             logger.info("No hay números MX disponibles, intentando con USA...")
-            try:
-                # Buscar número de USA con código de área común
-                numeros_usa = client.available_phone_numbers('US').local.list(
-                    area_code='512',  # Austin, TX - cercano a México
-                    limit=1
-                )
-                if numeros_usa:
-                    numero_encontrado = numeros_usa[0]
-                    usar_usa = True
-                    logger.info(f"Usando número de USA: {numero_encontrado.phone_number}")
-            except Exception as e:
-                logger.warning(f"Error buscando números USA: {e}")
+            # Probar varios códigos de área de Texas (cercano a México)
+            codigos_usa = ['713', '832', '281', '346', '210', '512', '956', '915']
+            for area_code in codigos_usa:
+                try:
+                    numeros_usa = client.available_phone_numbers('US').local.list(
+                        area_code=area_code,
+                        limit=1
+                    )
+                    if numeros_usa:
+                        numero_encontrado = numeros_usa[0]
+                        usar_usa = True
+                        logger.info(f"Usando número de USA ({area_code}): {numero_encontrado.phone_number}")
+                        break
+                except Exception as e:
+                    logger.warning(f"Error buscando números USA {area_code}: {e}")
+                    continue
         
         if not numero_encontrado:
             raise HTTPException(
