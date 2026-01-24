@@ -107,20 +107,19 @@ async def cargar_productos_excel(
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/template")
-async def descargar_template():
+async def descargar_template(current_user: dict = Depends(get_current_user)):
     """Genera y descarga template de Excel para carga de productos"""
     try:
-        # Crear DataFrame con columnas de ejemplo
+        from fastapi.responses import StreamingResponse
+        
+        # Crear DataFrame con columnas de ejemplo (productos de construcción)
         template_data = {
-            'sku': ['TB-001', 'FE-001'],
-            'nombre': ['Tablaroca antimoho USG', 'Broca SDS 1/4"'],
-            'categoria': ['Tablaroca', 'Ferreteria'],
-            'precio_base': [340.10, 32.00],
-            'unidad': ['Pieza', 'Pieza'],
-            'margen_minimo': [0.15, 0.15],
-            'stock': [100, 50],
-            'activo': [True, True],
-            'descripcion': ['Placa antimoho para áreas húmedas', 'Broca para rotomartillo']
+            'nombre': ['Cemento Gris 50kg', 'Varilla 3/8" x 12m', 'Block Hueco 15x20x40', 'Arena de Río m³', 'Grava 3/4" m³'],
+            'categoria': ['Cemento', 'Acero', 'Block', 'Agregados', 'Agregados'],
+            'precio_base': [198.00, 125.00, 12.50, 450.00, 520.00],
+            'unidad': ['Saco', 'Pieza', 'Pieza', 'M3', 'M3'],
+            'stock': [500, 200, 1000, 50, 50],
+            'descripcion': ['Cemento Portland gris', 'Varilla corrugada grado 42', 'Block hueco de concreto', 'Arena lavada de río', 'Grava triturada']
         }
         
         df = pd.DataFrame(template_data)
@@ -132,12 +131,13 @@ async def descargar_template():
         
         output.seek(0)
         
-        from fastapi.responses import StreamingResponse
-        
         return StreamingResponse(
             output,
             media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            headers={'Content-Disposition': 'attachment; filename=template_productos.xlsx'}
+            headers={
+                'Content-Disposition': 'attachment; filename=template_productos_cotizabot.xlsx',
+                'Access-Control-Expose-Headers': 'Content-Disposition'
+            }
         )
         
     except Exception as e:
