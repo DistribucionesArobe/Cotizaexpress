@@ -110,7 +110,7 @@ async def cargar_productos_excel(
 async def descargar_template():
     """Genera y descarga template de Excel para carga de productos (público)"""
     try:
-        from fastapi.responses import StreamingResponse
+        from fastapi.responses import Response
         
         # Crear DataFrame con columnas de ejemplo (productos de construcción)
         template_data = {
@@ -129,12 +129,14 @@ async def descargar_template():
             df.to_excel(writer, index=False, sheet_name='Productos')
         
         output.seek(0)
+        content = output.read()
         
-        return StreamingResponse(
-            output,
+        return Response(
+            content=content,
             media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             headers={
-                'Content-Disposition': 'attachment; filename=template_productos_cotizabot.xlsx'
+                'Content-Disposition': 'attachment; filename="template_productos_cotizabot.xlsx"',
+                'Content-Length': str(len(content))
             }
         )
         
