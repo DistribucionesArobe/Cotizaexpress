@@ -282,3 +282,75 @@ async def actualizar_precio(
     except Exception as e:
         logger.error(f"Error actualizando precio: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+class ActualizarStockRequest(BaseModel):
+    stock: float
+
+
+@router.patch("/{producto_id}/stock")
+async def actualizar_stock(
+    producto_id: str,
+    request: ActualizarStockRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Actualiza el stock de un producto"""
+    try:
+        empresa_id = current_user.get('empresa_id')
+        
+        if request.stock < 0:
+            raise HTTPException(status_code=400, detail="El stock no puede ser negativo")
+        
+        resultado = await productos_collection.update_one(
+            {'id': producto_id, 'empresa_id': empresa_id},
+            {'$set': {'stock': request.stock}}
+        )
+        
+        if resultado.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Producto no encontrado")
+        
+        logger.info(f"Stock actualizado para producto {producto_id}: {request.stock}")
+        
+        return {
+            'success': True,
+            'producto_id': producto_id,
+            'nuevo_stock': request.stock
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error actualizando stock: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/{producto_id}")
+async def eliminar_producto(
+    producto_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Elimina un producto del catálogo de la empresa"""
+    try:
+        empresa_id = current_user.get('empresa_id')
+        
+        # Solo eliminar productos de la empresa del usuario (no demos)
+        resultado = await productos_collection.delete_one({
+            'id': producto_id,
+            'empresa_id': empresa_id
+        })
+        
+        if resultado.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Producto no encontrado o no tienes permiso para eliminarlo")
+        
+        logger.info(f"Producto {producto_id} eliminado por empresa {empresa_id}")
+        
+        return {
+            'success': True,
+            'mensaje': 'Producto eliminado correctamente'
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error eliminando producto: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
