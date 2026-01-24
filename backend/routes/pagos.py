@@ -261,7 +261,7 @@ async def crear_suscripcion(
     request: Request,
     current_user: dict = Depends(get_current_user)
 ):
-    """Crea una sesión de checkout para pago mensual"""
+    """Crea una sesión de checkout para pago mensual con soporte para códigos promo"""
     try:
         empresa_id = current_user.get('empresa_id')
         user_id = current_user.get('sub')
@@ -281,42 +281,112 @@ async def crear_suscripcion(
                 detail="Ya tienes el Plan Completo activo"
             )
         
+        # Procesar código promocional si existe
+        promo_data = None
+        stripe_promo_code = None
+        precio_final = plan["precio_total"]
+        
+        if request_data.promo_code:
+            code = request_data.promo_code.upper().strip()
+            
+            # Buscar código
+            promo = await promo_codes_collection.find_one(
+                {'code': code, 'activo': True},
+                {'_id': 0}
+            )
+            
+            if promo:
+                # Validar uso
+                es_valido = True
+                
+                # Verificar expiración
+                if promo.get('fecha_expiracion'):
+                    expira = datetime.fromisoformat(promo['fecha_expiracion'])
+                    if datetime.now(timezone.utc) > expira:
+                        es_valido = False
+                
+                # Verificar usos máximos
+                if promo.get('max_usos') and promo.get('usos_actuales', 0) >= promo['max_usos']:
+                    es_valido = False
+                
+                # Verificar uso único por cliente
+                if promo.get('un_uso_por_cliente'):
+                    uso_previo = await promo_usage_collection.find_one({
+                        'promo_id': promo['id'],
+                        'empresa_id': empresa_id
+                    })
+                    if uso_previo:
+                        es_valido = False
+                
+                if es_valido:
+                    promo_data = promo
+                    stripe_promo_code = promo.get('stripe_promo_id')
+                    
+                    # Calcular descuento
+                    if promo.get('descuento_porcentaje'):
+                        descuento = precio_final * (promo['descuento_porcentaje'] / 100)
+                    else:
+                        descuento = promo.get('descuento_fijo', 0)
+                    
+                    precio_final = max(0, precio_final - descuento)
+        
         # Construir URLs dinámicamente
         origin_url = request_data.origin_url.rstrip('/')
         success_url = f"{origin_url}/pago-exitoso?session_id={{CHECKOUT_SESSION_ID}}"
         cancel_url = f"{origin_url}/precios"
         
-        # Crear checkout usando emergentintegrations
-        stripe_checkout = get_stripe_checkout(request)
+        # Crear checkout - si hay código promo de Stripe, crear sesión directamente con Stripe
+        stripe.api_key = os.environ.get('STRIPE_API_KEY')
         
-        checkout_request = CheckoutSessionRequest(
-            amount=float(plan["precio_total"]),
-            currency="mxn",
-            success_url=success_url,
-            cancel_url=cancel_url,
-            metadata={
+        checkout_params = {
+            "mode": "payment",
+            "success_url": success_url,
+            "cancel_url": cancel_url,
+            "customer_email": email,
+            "line_items": [{
+                "price_data": {
+                    "currency": "mxn",
+                    "unit_amount": int(plan["precio_total"] * 100),  # Stripe usa centavos
+                    "product_data": {
+                        "name": plan["nombre"],
+                        "description": plan["descripcion"]
+                    }
+                },
+                "quantity": 1
+            }],
+            "metadata": {
                 "plan_id": request_data.plan_id,
                 "empresa_id": empresa_id,
                 "user_id": user_id,
                 "email": email,
-                "tipo": "suscripcion_mensual"
-            }
-        )
+                "tipo": "suscripcion_mensual",
+                "promo_code": request_data.promo_code or ""
+            },
+            "allow_promotion_codes": True  # Permitir códigos en el checkout de Stripe
+        }
         
-        session: CheckoutSessionResponse = await stripe_checkout.create_checkout_session(checkout_request)
+        # Si tenemos un código promo de Stripe específico, pre-aplicarlo
+        if stripe_promo_code:
+            checkout_params["discounts"] = [{"promotion_code": stripe_promo_code}]
+            checkout_params["allow_promotion_codes"] = False  # Ya aplicamos uno
+        
+        session = stripe.checkout.Session.create(**checkout_params)
         
         # Crear registro de transacción
         transaction = {
-            "session_id": session.session_id,
+            "session_id": session.id,
             "empresa_id": empresa_id,
             "user_id": user_id,
             "email": email,
             "plan_id": request_data.plan_id,
             "amount": plan["precio_total"],
+            "amount_with_discount": precio_final,
             "currency": "MXN",
             "payment_status": "pending",
             "status": "initiated",
             "tipo": "suscripcion_mensual",
+            "promo_code": request_data.promo_code if promo_data else None,
+            "promo_id": promo_data['id'] if promo_data else None,
             "metadata": {
                 "plan_nombre": plan["nombre"],
                 "precio_base": plan["precio_base"],
@@ -327,6 +397,36 @@ async def crear_suscripcion(
         }
         
         await payment_transactions_collection.insert_one(transaction)
+        
+        # Si se usó código promo, registrar uso
+        if promo_data:
+            uso = {
+                "id": str(uuid.uuid4()),
+                "promo_id": promo_data['id'],
+                "promo_code": promo_data['code'],
+                "empresa_id": empresa_id,
+                "session_id": session.id,
+                "status": "pending",  # Se actualizará a 'used' cuando se complete el pago
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            await promo_usage_collection.insert_one(uso)
+            
+            # Incrementar contador de usos
+            await promo_codes_collection.update_one(
+                {'id': promo_data['id']},
+                {'$inc': {'usos_actuales': 1}}
+            )
+        
+        logger.info(f"Checkout creado para empresa {empresa_id} - Session: {session.id}")
+        
+        return {
+            "checkout_url": session.url,
+            "session_id": session.id,
+            "amount": plan["precio_total"],
+            "amount_with_discount": precio_final if promo_data else None,
+            "promo_applied": promo_data['code'] if promo_data else None,
+            "currency": "MXN"
+        }
         
         logger.info(f"Checkout de suscripción creado: {session.session_id} para empresa {empresa_id}")
         
