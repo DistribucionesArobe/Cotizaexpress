@@ -117,12 +117,35 @@ def get_twilio_client():
 
 @router.get("/ciudades")
 async def listar_ciudades(current_user: dict = Depends(get_current_user)):
-    """Lista las ciudades disponibles para solicitar números"""
+    """Lista las ciudades disponibles para solicitar números, organizadas por región"""
+    
+    # Organizar por región
+    ciudades_por_region = {}
+    for key, data in CIUDADES_MEXICO.items():
+        region = data.get("region", "Otra")
+        if region not in ciudades_por_region:
+            ciudades_por_region[region] = []
+        ciudades_por_region[region].append({
+            "key": key,
+            "nombre": data["nombre"],
+            "area_codes": data["area_codes"]
+        })
+    
+    # Ordenar ciudades dentro de cada región
+    for region in ciudades_por_region:
+        ciudades_por_region[region].sort(key=lambda x: x["nombre"])
+    
+    # Lista plana para compatibilidad
+    todas_ciudades = [
+        {"key": key, "nombre": data["nombre"], "region": data.get("region", "Otra")}
+        for key, data in CIUDADES_MEXICO.items()
+    ]
+    todas_ciudades.sort(key=lambda x: x["nombre"])
+    
     return {
-        "ciudades": [
-            {"key": key, "nombre": data["nombre"]}
-            for key, data in CIUDADES_MEXICO.items()
-        ]
+        "ciudades": todas_ciudades,
+        "por_region": ciudades_por_region,
+        "total": len(CIUDADES_MEXICO)
     }
 
 @router.post("/solicitar-numero")
