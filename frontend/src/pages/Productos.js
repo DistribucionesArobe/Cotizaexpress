@@ -50,7 +50,6 @@ export default function Productos() {
   const [creandoProducto, setCreandoProducto] = useState(false);
   const [nuevoProducto, setNuevoProducto] = useState({
     nombre: '',
-    sku: '',
     categoria: '',
     precio_base: '',
     unidad: 'Pieza',
