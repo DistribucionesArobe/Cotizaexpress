@@ -281,6 +281,68 @@ export default function Productos() {
     }
   };
 
+  // Funciones para editar stock
+  const iniciarEdicionStock = (producto) => {
+    setEditandoStock(producto.id);
+    setNuevoStock(producto.stock.toString());
+  };
+
+  const cancelarEdicionStock = () => {
+    setEditandoStock(null);
+    setNuevoStock('');
+  };
+
+  const guardarStock = async (productoId) => {
+    const stock = parseFloat(nuevoStock);
+    
+    if (isNaN(stock) || stock < 0) {
+      toast.error('Ingresa un stock válido (0 o mayor)');
+      return;
+    }
+
+    try {
+      setGuardandoStock(true);
+      
+      await axios.patch(`${API}/productos/${productoId}/stock`, {
+        stock: stock
+      });
+      
+      setProductos(prev => prev.map(p => 
+        p.id === productoId ? { ...p, stock: stock } : p
+      ));
+      
+      toast.success('Stock actualizado');
+      setEditandoStock(null);
+      setNuevoStock('');
+    } catch (error) {
+      console.error('Error actualizando stock:', error);
+      toast.error(error.response?.data?.detail || 'Error al actualizar stock');
+    } finally {
+      setGuardandoStock(false);
+    }
+  };
+
+  // Función para eliminar producto
+  const eliminarProducto = async () => {
+    if (!productoAEliminar) return;
+    
+    try {
+      setEliminando(true);
+      
+      await axios.delete(`${API}/productos/${productoAEliminar.id}`);
+      
+      setProductos(prev => prev.filter(p => p.id !== productoAEliminar.id));
+      
+      toast.success(`Producto "${productoAEliminar.nombre}" eliminado`);
+      setProductoAEliminar(null);
+    } catch (error) {
+      console.error('Error eliminando producto:', error);
+      toast.error(error.response?.data?.detail || 'Error al eliminar producto');
+    } finally {
+      setEliminando(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-12" data-testid="productos-loading">
