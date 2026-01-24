@@ -5,185 +5,189 @@ PRODUCT REQUIREMENTS:
 1.  **Recepción de Mensajes**: Recibir mensajes de WhatsApp.
 2.  **Intención del Usuario**: Entender si el usuario quiere cotizar, verificar stock, pedir una factura o dar seguimiento.
 3.  **Motor de Cotización**: Construir cotizaciones combinando reglas de negocio fijas con la flexibilidad de un LLM.
-4.  **Consulta de Inventario**: Acceder a precios e inventario (listas, escalas, unidades).
+4.  **Consulta de Inventario**: Acceder a precios e inventario.
 5.  **Generación de Documentos**: Crear un PDF de la cotización y enviarlo por WhatsApp o email.
-6.  **Aprendizaje Continuo**: Aprender de cotizaciones ganadas/perdidas, objeciones y descuentos para mejorar.
+6.  **Aprendizaje Continuo**: Aprender de cotizaciones ganadas/perdidas para mejorar.
 7.  **Dashboard de Administración**: Un panel web para gestionar clientes, cotizaciones, productos, márgenes y logs.
-8.  **Arquitectura Multi-Tenant**: El sistema debe poder ser usado por múltiples negocios, cada uno con su propia configuración.
+8.  **Arquitectura Multi-Tenant**: El sistema debe poder ser usado por múltiples negocios.
 9.  **Landing Page**: Una página de bienvenida para .
-10. **Carga de Productos**: Permitir a los usuarios cargar su catálogo de productos mediante una plantilla de Excel o de forma manual.
-11. **Flujo de Pago y Activación**: Tras el pago, el cliente debe poder comprar un número de Twilio, especificando la ciudad de preferencia.
-12. **Planes y Precios**: Implementar un plan gratuito con 5 cotizaciones y un plan de pago.
-13. **Branding y SEO**: Implementar logo, branding CotizaBot by CotizaExpress.com, información de contacto y contenido SEO.
-14. **Personalización**: Permitir a los usuarios subir su logo para personalizar los PDFs de las cotizaciones.
-15. **Facturación**: Recopilar datos fiscales de los clientes y, eventualmente, automatizar la facturación CFDI.
+10. **Carga de Productos**: Permitir a los usuarios cargar su catálogo de productos (Excel o manual).
+11. **Flujo de Pago y Activación**: Tras el pago, el cliente debe poder comprar un número de Twilio.
+12. **Planes y Precios**: Implementar un plan gratuito y un plan de pago.
+13. **Branding y SEO**: Implementar logo, branding y contenido SEO.
+14. **Personalización**: Permitir a los usuarios subir su logo para los PDFs.
+15. **Facturación**: Recopilar datos fiscales y automatizar la facturación CFDI.
 
 **User's preferred language**: Spanish. The next agent MUST respond in Spanish.
 
 **what currently exists?**
-Se ha construido una aplicación full-stack funcional con un backend FastAPI y un frontend React. La arquitectura es multi-tenant, con un sistema de autenticación JWT completo y probado (registro, login, rutas protegidas). Se ha implementado la integración con Stripe para pagos únicos y suscripciones recurrentes, y el sistema puede manejar un plan gratuito con un límite de 5 cotizaciones. El branding del sitio, el SEO básico y la información de contacto están implementados en el frontend. Los usuarios pueden gestionar el perfil de su empresa, incluyendo la subida de un logo para personalizar los PDFs de las cotizaciones y la introducción de sus datos fiscales para la facturación. Las integraciones de Twilio y Resend (email) están configuradas con las claves proporcionadas por el usuario, aunque el flujo de envío de correo electrónico aún no se ha probado de extremo a extremo.
+Una aplicación full-stack con backend FastAPI y frontend React. La arquitectura es multi-tenant con autenticación JWT. La integración con Stripe (suscripciones) y Resend (emails) está configurada. La integración con Facturama (facturación CFDI) está conectada a la API de producción del usuario. La integración con Twilio está configurada con la cuenta de pago del usuario y permite la compra y configuración automática de números de WhatsApp. El sistema de productos es multi-tenant (cada empresa tiene su catálogo), con un catálogo de demostración de materiales de construcción para nuevos usuarios y la capacidad de editar precios en línea. Se ha implementado un sistema de códigos promocionales de Stripe y se ha creado una base para un panel de administración con roles de usuario.
 
 **Last working item**:
-- Last item agent was working: El agente recibió las credenciales del usuario para Resend, Twilio y la confirmación para usar Facturama. Estaba a punto de comenzar la implementación de cuatro funcionalidades solicitadas por el usuario:
-    1.  Activar el envío de correos electrónicos con Resend.
-    2.  Integrar Facturama para la facturación automática de CFDI.
-    3.  Crear un portal para que los clientes finales vean sus cotizaciones.
-    4.  Implementar la configuración automática de WhatsApp Business con las credenciales de Twilio proporcionadas.
-- Status: NOT STARTED
+- Last item agent was working: Creación de un panel de administración para gestionar códigos promocionales. El agente creó un rol de admin para el usuario , actualizó el backend para incluir roles en el token JWT y creó la página de frontend inicial () y los endpoints necesarios para listar y activar/desactivar códigos.
+- Status: IN PROGRESS
 - Agent Testing Done: N
 - Which testing method agent to use? both
 - User Testing Done: N
 
 **All Pending/In progress Issue list**:
-  - Issue 1: Configuración del dominio personalizado  (P1)
-  - Issue 2: La solicitud de factura de suscripción aún no está conectada a la integración de Facturama (P0)
+  - Issue 1: Finalizar el panel de administración de códigos promocionales (P0)
+  - Issue 2: Configuración del dominio personalizado  (P1)
 
   Issues Detail:
   - Issue 1: 
+     - Attempted fixes: Se crearon los endpoints de backend (, ), se añadió el rol de admin al usuario , y se creó el archivo base de la página de admin ().
+     - Next debug checklist: 
+        1. Agregar la ruta protegida  en , asegurando que solo sea accesible para usuarios con el rol .
+        2. Implementar la UI completa en  para mostrar la lista de códigos promocionales, su estado (activo/inactivo), usos y el botón para cambiar su estado.
+        3. Probar el flujo completo: iniciar sesión como , navegar a la página de administración, ver los códigos y activar/desactivar uno.
+     - Why fix this issue and what will be achieved with the fix?: Permitirá al administrador gestionar las campañas de marketing y los descuentos ofrecidos a los clientes directamente desde la aplicación.
+     - Status:  IN PROGRESS
+     - Is recurring issue? N
+     - Should Test frontend/backend/both after fix?: both
+     - Blocked on other issue: None
+  - Issue 2: 
      - Attempted fixes: Se recomendó al usuario cambiar el estado del proxy en Cloudflare a DNS only y el modo SSL a Full.
      - Next debug checklist: 
         1. Preguntar al usuario si ha completado los pasos para agregar el dominio personalizado en la configuración del proyecto Emergent.
-        2. Solicitar al usuario los valores CNAME proporcionados por Emergent.
-        3. Ayudar al usuario a configurar los registros CNAME en Cloudflare, asegurándose de que el estado del proxy sea DNS only (nube gris).
+        2. Solicitar al usuario los valores CNAME proporcionados por Emergent para verificar su correcta configuración en Cloudflare.
      - Why fix this issue and what will be achieved with the fix?: Para que la aplicación sea accesible a través del dominio profesional , lo cual es crucial para la imagen de marca.
      - Status:  BLOCKED
      - Is recurring issue? Y
      - Should Test frontend/backend/both after fix?: frontend
      - Blocked on other issue: User action required.
-  - Issue 2: 
-     - Attempted fixes: Se creó la interfaz de usuario para recopilar los datos fiscales y un endpoint ().
-     - Next debug checklist:
-        1. Implementar la lógica en el endpoint  para que llame a la API de Facturama y genere el CFDI.
-        2. Utilizar las credenciales de Facturama proporcionadas por el usuario.
-        3. Probar el flujo completo: el usuario hace clic en el botón, se genera la factura en Facturama y se notifica al usuario.
-     - Why fix this issue and what will be achieved with the fix?: Automatizará el proceso de facturación, un requisito clave para la operación del SaaS en México.
-     - Status:  NOT STARTED
-     - Is recurring issue? N
-     - Should Test frontend/backend/both after fix?: backend
-     - Blocked on other issue: No
 
 **In progress Task List**:
-- None
+  - Task 1:  Implementación del Panel de Administración (P0)
+  
+ Task Detail:
+  - Task 1: 
+     - Where to resume: Continuar con la implementación del frontend en  y agregar la ruta protegida en .
+     - What will be achieved with this?: Un panel funcional para que el administrador gestione los códigos promocionales.
+     - Status:  IN PROGRESS
+     - Should Test frontend/backend/both after fix?: both
+     - Blocked on something: None
 
 **Upcoming and Future Tasks**
 Upcoming Tasks:
-- **P0: Integración de Facturama**: Implementar la generación automática de facturas CFDI utilizando la API de Facturama y las credenciales proporcionadas. (Backend: ).
-- **P0: Portal del Cliente**: Diseñar e implementar una vista o portal donde los clientes de los usuarios de CotizaBot (es decir, los que reciben las cotizaciones) puedan ver sus cotizaciones en línea. (Frontend/Backend).
-- **P0: Configuración automática de WhatsApp Business**: Utilizar las credenciales de Twilio (SID y Token de autenticación) proporcionadas por el usuario para automatizar la configuración del número de WhatsApp.
-- **P0: Verificación del envío de correos**: Probar de extremo a extremo la funcionalidad de envío de cotizaciones por correo electrónico a través de Resend para confirmar que funciona con la API key proporcionada.
-- **P1: Flujo de compra de número de Twilio**: Probar el flujo completo de compra de un número de Twilio una vez que una cuenta de prueba pueda ser actualizada al Plan Completo.
+- **P1: Dashboard de Administrador**: Crear una sección  general que sirva como punto de entrada para otras herramientas administrativas.
+- **P1: Dashboard de Twilio**: Agregar una vista en el panel de admin para mostrar el saldo actual de la cuenta de Twilio, el último número comprado y alertas cuando el saldo sea bajo.
+- **P2: UI para agregar productos manualmente**: Implementar el formulario para agregar productos uno por uno en la página de Productos, que actualmente está pendiente (próximamente).
 
 Future Tasks:
 - **Fase 2**: Mejorar el agente de aprendizaje para analizar resultados (cotizaciones ganadas/perdidas) y proponer ajustes.
 - **Fase 3**: Implementar funcionalidades de automatización avanzada como precios dinámicos y un sistema de recomendaciones.
+- **Fase 3**: Implementar un dashboard para que el cliente final (quien recibe la cotización) pueda ver su historial de cotizaciones.
 
 **Completed work in this session**
-- **Sistema de Autenticación y Multi-Tenancy**: Se verificó y probó por completo el flujo de autenticación JWT (registro, inicio de sesión, rutas protegidas) con el .
-- **Branding y SEO**: Se implementó la marca CotizaBot by CotizaExpress.com, el logo en toda la aplicación, la información de contacto y contenido SEO básico en la .
-- **Planes y Límites**: Se implementó la lógica de backend para limitar el plan gratuito a 5 cotizaciones y se actualizó la página de precios ().
-- **Integración de Pagos con Stripe**: Se integró Stripe para pagos únicos y suscripciones mensuales. Se crearon los endpoints de backend (, ) y se actualizó el frontend. La integración fue validada con .
-- **Personalización de Empresa y PDF**: Se creó la página Perfil de Empresa () para que los usuarios suban su logo y se actualizó el  para incluir dicho logo en las cotizaciones.
-- **Recopilación de Datos Fiscales**: Se añadió una sección de Facturación en el perfil de la empresa para recopilar datos fiscales, utilizando catálogos del SAT para los campos desplegables.
-- **Configuración de Integraciones**: Se configuraron las claves de API para Stripe y Resend en el entorno del backend. Se recibieron las claves de Twilio.
-- **UI para Compra de Números de Twilio**: Se crearon la página de frontend y los endpoints de backend iniciales para el flujo de compra de números de Twilio.
+- **Integración de Facturama**: Conectada exitosamente a la cuenta de **producción** del usuario.
+- **Flujo de WhatsApp 100% Automatizado**: Los clientes del plan de pago pueden seleccionar una ciudad y el sistema compra y configura un número de Twilio automáticamente.
+- **Productos por Empresa y Demo Mejorado**: Se aisló el catálogo de productos por empresa. Los nuevos usuarios ahora ven un catálogo de demostración de materiales de construcción y un banner indicativo.
+- **Edición de Precios en Vivo**: Se implementó la capacidad para que los usuarios editen los precios de sus productos directamente en la tabla de la página Productos.
+- **Sistema de Códigos Promocionales**: Se implementó un flujo completo para aplicar códigos promocionales (de Stripe) en un modal antes del checkout.
+- **Flujo de Pago Corregido**: Se solucionó el problema que impedía a los usuarios llegar al checkout de Stripe. Ahora el flujo es completamente funcional desde la página de productos y la de precios.
+- **Envío de Correo con Fallback**: Se implementó un sistema de reintentos en el servicio de email que usa un dominio de prueba de Resend si el dominio personalizado del usuario no está verificado, evitando errores de envío.
+- **Portal del Cliente**: Se creó una página pública donde los clientes finales pueden ver los detalles de una cotización a través de un enlace único y seguro.
 
 **Earlier issues found/mentioned but not fixed**
-- **Issue 1**: El problema del dominio personalizado  (error 525 de Cloudflare) sigue sin resolverse, ya que está bloqueado a la espera de una acción por parte del usuario en su configuración de DNS.
+- **Issue 1**: La base de datos solicitada originalmente era PostgreSQL, pero la implementación se realizó con MongoDB. Esta es una discrepancia técnica conocida que no se ha abordado.
+- **Issue 2**: La interfaz para Agregar manualmente un producto en la página de Productos sigue pendiente de implementación.
 
 **Known issue recurrence from previous fork**
   - **Issue recurrence in previous fork:** Problema con la configuración del dominio personalizado y el error 525 de Cloudflare.
-  - **Recurrence count:** 2
+  - **Recurrence count:** 3
   - **Status:** BLOCKED
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Backend**: FastAPI, Python
--   **Frontend**: React.js
--   **Database**: MongoDB
--   **AI/LLM**: LangGraph, OpenAI (via Emergent LLM Key)
--   **Messaging**: Twilio WhatsApp API
--   **Payments**: Stripe (Subscriptions and Checkout)
--   **Email**: Resend
--   **Invoicing**: Facturama (planificado)
--   **Authentication**: JWT
+- **Backend**: FastAPI, Python
+- **Frontend**: React.js, Shadcn UI
+- **Database**: MongoDB
+- **Authentication**: JWT con roles (admin, user)
+- **Payments**: Stripe (Subscriptions, Checkout, Promo Codes)
+- **Invoicing**: Facturama (API de Producción)
+- **Messaging**: Twilio WhatsApp API
+- **Email**: Resend
 
 **key DB schema**
-- : (nombre, plan, owner_id, **cotizaciones_realizadas**, **logo_url**, **datos_fiscales: {rfc, razon_social, etc.}**)
-- : (email, hashed_password, empresa_id)
-- : (nombre, precio, unidad, stock, sku, empresa_id)
-- : (cliente_id, items, total, estado, empresa_id, **pdf_url**)
+- : (nombre, plan, owner_id, **rol**, **twilio_config: {numero, sid}**)
+- : (email, **hashed_password**, empresa_id, **rol**)
+- : (nombre, precio, sku, empresa_id)
+- : (**code**, **stripe_coupon_id**, **descuento**, **max_usos**, **usos_actuales**, **activo**)
+- : (**code**, **empresa_id**)
 
 **changes in tech stack**
--   None. La discrepancia entre la solicitud del usuario (PostgreSQL) y la implementación (MongoDB) persiste.
+- None.
 
 **All files of reference**
-- : Lógica para crear sesiones de checkout y suscripciones con Stripe.
-- : Maneja los webhooks de Stripe para confirmar el cambio de plan tras un pago exitoso.
-- : Gestiona la actualización del perfil de la empresa, la subida del logo y los datos fiscales.
-- : Archivo de configuración central, actualizado para incluir las claves de Stripe y Resend.
-- : Página de precios rediseñada para integrar el botón de pago de Stripe.
-- : Nueva página que permite a los usuarios gestionar su perfil, subir un logo y añadir datos de facturación.
-- : Actualizado para almacenar las claves , , y .
-- : Documento de Requisitos del Producto, creado y actualizado para seguir el progreso del proyecto.
+- : Contiene toda la lógica de Stripe, incluyendo creación de suscripciones y gestión de códigos promocionales.
+- : Implementa el flujo de compra y configuración automática de números de WhatsApp.
+- : Gestiona los productos por empresa, el catálogo demo y la actualización de precios.
+- : Página principal para la gestión de productos, que ahora incluye la vista de catálogo vacío, edición en línea, y el modal de checkout con código promocional.
+- : Página para la futura administración de códigos promocionales.
+- : Servicio para interactuar con la API de Facturama.
+- : Se modificó para crear un índice compuesto (, ) en la colección de productos.
 
 **Areas that need refactoring**:
--  se ha mantenido modular mediante la adición de nuevos routers, lo cual es positivo. Sin embargo,  ha crecido en complejidad al incorporar la lógica de límites de plan, generación de PDF y envío de correo. Podría beneficiarse de una refactorización para separar estas responsabilidades en funciones de servicio más pequeñas.
+-  y  han crecido significativamente y contienen lógica de negocio compleja. Sería beneficioso extraer parte de esta lógica a archivos de servicio dedicados para mejorar la modularidad.
+-  es ahora un componente muy grande que maneja múltiples estados y lógicas (vista de productos, vista vacía, edición, modal de pago). Podría dividirse en componentes más pequeños.
 
 **key api endpoints**
-- : Crea una sesión de checkout de Stripe para una suscripción.
-- : Endpoint para recibir eventos de Stripe.
-- : Obtiene y actualiza los datos del perfil de la empresa.
-- : Endpoint para la subida del logo de la empresa.
-- : Guarda los datos fiscales de la empresa.
-- : Inicia la solicitud de una factura para la suscripción.
-- : Obtiene catálogos del SAT (regímenes fiscales, usos de CFDI).
-- : Envía una cotización existente por WhatsApp y ahora también por email.
+- : Crea una sesión de checkout de Stripe, ahora acepta un .
+- : Valida un código promocional.
+- : (Admin) Crea un nuevo código promocional.
+- : (Admin) Lista todos los códigos.
+- : (Admin) Activa o desactiva un código.
+- : Compra y configura un número de Twilio automáticamente.
+- : Obtiene los datos de una cotización para el portal del cliente.
+- : Actualiza un producto, ahora usado para cambiar el precio.
+- : Devuelve la información del usuario actual, incluyendo su .
 
 **Critical Info for New Agent**
-- **Credenciales Disponibles**: El usuario ha proporcionado claves funcionales para Stripe (live), Resend y Twilio. Estas están en  o en el historial de chat y deben ser utilizadas para las próximas tareas.
-- **Prioridades del Usuario**: Las cuatro tareas principales son la integración de Facturama, el portal del cliente, la configuración automática de WhatsApp y la prueba del envío de correos. El agente debe comenzar con estas.
-- **Problema de Dominio Bloqueado**: No intentes resolver el problema del dominio  sin la colaboración del usuario. El problema reside en su configuración de Cloudflare/Emergent.
+- **Credenciales de Admin**: Inicia sesión con  /  para acceder a las funcionalidades de administrador.
+- **APIs en Producción**: Ten cuidado, la integración de **Facturama** y **Twilio** está utilizando cuentas de producción reales. Las facturas generadas y los números comprados son reales y tienen un costo.
+- **Problemas Bloqueados**: No intentes solucionar el problema del dominio  (Cloudflare) ni el envío de correos desde ese dominio (Resend) sin la colaboración del usuario, ya que requieren acciones en sus cuentas externas.
 - **Idioma**: Toda la comunicación con el usuario debe ser en español.
 
 **documents and test reports created in this job**
 - 
-- 
-- 
+-  (actualizado extensamente)
 
 **Last 10 User Messages and any pending HUMAN messages** 
-- **1. (PENDING) re_7NJn... facturama... Ambos... tengo twilio...**: El usuario proporciona todas las credenciales y confirmaciones solicitadas: clave de Resend, elección de Facturama para facturación, preferencia por portal de cliente y configuración de WhatsApp, y credenciales de Twilio. **Esta es la solicitud activa y pendiente de implementación.**
-- **2. (PENDING) Configurar RESEND_API_KEY... Integración con PAC... Portal del cliente... Configuración automática de WhatsApp Business**: El agente pregunta al usuario qué funcionalidades implementar a continuación.
-- **3. (ADDRESSED) abajo incluir un apartado de facturacion... implemente el envío de cotizaciones por email... pk_live... sk_test...**: El usuario solicita la sección de facturación, el envío de correos y proporciona las claves de Stripe. Esto fue implementado.
-- **4. (ADDRESSED) si, en pdf permitir los usuarios suban su logo para que sean personalizadas**: El usuario aprueba la sugerencia de suscripciones recurrentes y solicita la funcionalidad de subir un logo para personalizar los PDFs. Esto fue implementado.
-- **5. (ADDRESSED) si**: El usuario aprueba la sugerencia de integrar pagos automáticos con Stripe. Esto fue implementado.
+- **10. (ADDRESSED) puedes agregar opcion de poner promo code...**: El usuario solicitó códigos promocionales. Se implementó completamente.
+- **9. (PENDING) sección para administrar los códigos promocionales... desde el admin...**: El usuario solicitó un panel de administración para los códigos. Esta es la tarea actualmente en progreso.
+- **8. (ADDRESSED) en vez de abarrotes que el demo tenga productos de construccion...**: Solicitud para cambiar el catálogo demo, implementado.
+- **7. (ADDRESSED) en el demo permitirles cambiar precios**: Solicitud para editar precios, implementado.
+- **6. (ADDRESSED) creo usuario y me salen los mismos productos del excel...**: Reporte de bug sobre productos globales. Solucionado al hacer los productos por empresa.
+- **5. (ADDRESSED) al momento de querer pagar no lleva a nada**: Reporte de bug sobre el flujo de pago roto. Solucionado.
+- **4. (ADDRESSED) puede automatizarse esa compra de de numero?**: El usuario preguntó si la compra de números de WhatsApp podía ser automática. Se implementó.
+- **3. (ADDRESSED) puede ser que nosotros preguntemos al cliente de donde quiere el numero?**: Sugerencia inicial del usuario para un flujo manual de WhatsApp. Fue reemplazado por el flujo automático.
+- **2. (ADDRESSED) this is my twillio page, i already pay not free account**: El usuario confirmó que su cuenta de Twilio era de pago. Se utilizó para implementar la compra automática.
+- **1. (ADDRESSED) es necesario acturama: Las credenciales proporcionadas... retornan 401 en sandbox...**: El usuario aclaró que sus credenciales de Facturama eran para producción, no para sandbox. Se corrigió y la conexión fue exitosa.
 
 **Project Health Check:**
-- **Broken**: El dominio personalizado  sigue inaccesible debido a un error SSL 525 de Cloudflare.
-- **Mocked**: 
-    - La integración con Facturama está planeada pero no implementada; el botón de solicitar factura no tiene funcionalidad real.
-    - El envío de correos con Resend está codificado pero no se ha probado de extremo a extremo con la clave proporcionada.
+- **Broken**: El dominio personalizado  sigue inaccesible (error SSL 525 de Cloudflare).
+- **Mocked**: La funcionalidad para Agregar producto manualmente está presente en la UI como un placeholder, pero no ha sido implementada.
 
 **3rd Party Integrations**
-- **Twilio**: Para mensajería de WhatsApp. Credenciales de usuario proporcionadas y configuradas.
-- **OpenAI GPT-4o**: Usado a través de **Emergent LLM Key** para los agentes de IA.
-- **Stripe**: Para pagos únicos y suscripciones. Se utilizan las claves **live** proporcionadas por el usuario.
-- **Resend**: Para el envío de correos electrónicos. Clave de API proporcionada por el usuario y configurada.
-- **Facturama**: Seleccionado por el usuario para la facturación CFDI. La integración está pendiente.
-- **Cloudflare**: Gestiona el DNS del dominio del usuario ().
+- **Twilio**: Para mensajería y compra de números WhatsApp. Conectado a la cuenta **de pago** del usuario.
+- **OpenAI GPT-4o**: Usado a través de **Emergent LLM Key**.
+- **Stripe**: Para suscripciones, checkout y códigos promocionales. Conectado a la cuenta **live** del usuario.
+- **Resend**: Para el envío de correos. Conectado. Requiere verificación de dominio para usar .
+- **Facturama**: Para facturación CFDI. Conectado a la cuenta de **producción** del usuario.
 
 **Testing status**
-  - Testing agent used after significant changes: YES (para autenticación y para Stripe).
+  - Testing agent used after significant changes: YES (para pruebas de backend iniciales).
   - Troubleshoot agent used after agent stuck in loop: NO
-  - Test files created: [, ]
+  - Test files created: []
   - Known regressions: None
 
 **Credentials to test flow:**
-- **Stripe**: Las claves live/test están en .
-- **Resend**: La clave está en .
-- **Twilio**:  y  están en .
-- **Test User**: Se puede crear uno nuevo a través del flujo de registro en .
+- **Admin User**:  / 
+- **Regular User**: Crear uno nuevo a través del flujo de registro en la UI.
+- **Stripe Test Card**: , cualquier fecha futura, cualquier CVC.
 
 **What agent forgot to execute**
-El agente anterior se puso al día con las tareas pendientes del fork anterior. Las tareas actuales pendientes son las que el usuario solicitó en su último mensaje, las cuales el agente se preparó para implementar pero no comenzó.</analysis>
+El agente estaba a mitad de la implementación de la función de administración de códigos promocionales, por lo que no la completó. La funcionalidad para agregar un producto manualmente, aunque visible como una opción en la UI, no se ha implementado todavía.</analysis>
