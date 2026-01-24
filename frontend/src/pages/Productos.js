@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
-import { Package, Upload, FileSpreadsheet, Plus, Crown, Pencil, Check, X, Tag, Loader2 } from 'lucide-react';
+import { Package, Upload, FileSpreadsheet, Plus, Crown, Pencil, Check, X, Tag, Loader2, Save } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
