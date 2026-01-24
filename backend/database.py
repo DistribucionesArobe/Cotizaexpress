@@ -21,8 +21,20 @@ async def init_indexes():
     """Inicializa índices de base de datos para rendimiento óptimo"""
     logger.info("Inicializando índices de MongoDB...")
     
-    # Índices para productos
-    await productos_collection.create_index([('sku', 1)], unique=True)
+    # Eliminar índice antiguo de SKU si existe (era único global, ahora es por empresa)
+    try:
+        await productos_collection.drop_index('sku_1')
+        logger.info("Índice sku_1 antiguo eliminado")
+    except Exception:
+        pass  # El índice puede no existir
+    
+    # Índices para productos - SKU único POR EMPRESA (índice compuesto)
+    await productos_collection.create_index(
+        [('empresa_id', 1), ('sku', 1)], 
+        unique=True,
+        name='empresa_sku_unique'
+    )
+    await productos_collection.create_index([('empresa_id', 1)])
     await productos_collection.create_index([('categoria', 1)])
     await productos_collection.create_index([('activo', 1)])
     
