@@ -180,7 +180,95 @@ function AppContent() {
                     Salir
                   </button>
                 </nav>
+
+                {/* Botón menú móvil */}
+                <button
+                  className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100"
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  data-testid="btn-mobile-menu"
+                >
+                  {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                </button>
               </div>
+
+              {/* Menú móvil desplegable */}
+              {mobileMenuOpen && (
+                <nav className="md:hidden py-4 border-t border-slate-200 space-y-1" data-testid="mobile-nav">
+                  <Link
+                    to="/dashboard"
+                    className={`block px-4 py-3 rounded-lg text-sm font-medium ${
+                      activeTab === 'dashboard' ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600'
+                    }`}
+                    onClick={() => { setActiveTab('dashboard'); setMobileMenuOpen(false); }}
+                  >
+                    📊 Dashboard
+                  </Link>
+                  <Link
+                    to="/cotizaciones"
+                    className={`block px-4 py-3 rounded-lg text-sm font-medium ${
+                      activeTab === 'cotizaciones' ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600'
+                    }`}
+                    onClick={() => { setActiveTab('cotizaciones'); setMobileMenuOpen(false); }}
+                  >
+                    📄 Cotizaciones
+                  </Link>
+                  <Link
+                    to="/productos"
+                    className={`block px-4 py-3 rounded-lg text-sm font-medium ${
+                      activeTab === 'productos' ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600'
+                    }`}
+                    onClick={() => { setActiveTab('productos'); setMobileMenuOpen(false); }}
+                  >
+                    📦 Productos
+                  </Link>
+                  <Link
+                    to="/clientes"
+                    className={`block px-4 py-3 rounded-lg text-sm font-medium ${
+                      activeTab === 'clientes' ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600'
+                    }`}
+                    onClick={() => { setActiveTab('clientes'); setMobileMenuOpen(false); }}
+                  >
+                    👥 Clientes
+                  </Link>
+                  <Link
+                    to="/configuracion-whatsapp"
+                    className={`block px-4 py-3 rounded-lg text-sm font-medium ${
+                      activeTab === 'whatsapp' ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600'
+                    }`}
+                    onClick={() => { setActiveTab('whatsapp'); setMobileMenuOpen(false); }}
+                  >
+                    💬 WhatsApp
+                  </Link>
+                  <Link
+                    to="/perfil-empresa"
+                    className={`block px-4 py-3 rounded-lg text-sm font-medium ${
+                      activeTab === 'perfil' ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600'
+                    }`}
+                    onClick={() => { setActiveTab('perfil'); setMobileMenuOpen(false); }}
+                  >
+                    🏢 Mi Empresa
+                  </Link>
+                  
+                  {user?.usuario?.rol === 'admin' && (
+                    <Link
+                      to="/admin"
+                      className={`block px-4 py-3 rounded-lg text-sm font-medium ${
+                        activeTab === 'admin' ? 'bg-amber-50 text-amber-700' : 'text-amber-600'
+                      }`}
+                      onClick={() => { setActiveTab('admin'); setMobileMenuOpen(false); }}
+                    >
+                      🔐 Admin
+                    </Link>
+                  )}
+                  
+                  <button
+                    onClick={() => { logout(); setMobileMenuOpen(false); }}
+                    className="w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-red-600"
+                  >
+                    🚪 Salir
+                  </button>
+                </nav>
+              )}
             </div>
           </header>
         )}
