@@ -282,8 +282,8 @@ async def solicitar_numero_whatsapp(
                 'sms_method': 'POST'
             }
             
-            # Agregar dirección si está disponible
-            if address_sid:
+            # Solo agregar dirección para números MX (USA no lo requiere)
+            if not usar_usa and address_sid:
                 purchase_params['address_sid'] = address_sid
             
             incoming_number = client.incoming_phone_numbers.create(**purchase_params)
@@ -293,22 +293,49 @@ async def solicitar_numero_whatsapp(
         except TwilioRestException as e:
             logger.error(f"Error comprando número: {str(e)}")
             
-            # Si falla por falta de dirección, dar mensaje más claro
-            if "address" in str(e).lower():
+            # Si falla por bundle/regulación en MX, intentar con USA
+            if ("bundle" in str(e).lower() or "regulatory" in str(e).lower()) and not usar_usa:
+                logger.info("Número MX requiere bundle, intentando con USA...")
+                try:
+                    numeros_usa = client.available_phone_numbers('US').local.list(
+                        area_code='512',
+                        limit=1
+                    )
+                    if numeros_usa:
+                        phone_number = numeros_usa[0].phone_number
+                        incoming_number = client.incoming_phone_numbers.create(
+                            phone_number=phone_number,
+                            friendly_name=f"CotizaBot - {empresa.get('nombre', 'Empresa')}",
+                            sms_url=webhook_url,
+                            sms_method='POST'
+                        )
+                        usar_usa = True
+                        logger.info(f"Número USA comprado como alternativa: {incoming_number.sid}")
+                    else:
+                        raise HTTPException(
+                            status_code=400,
+                            detail="Los números mexicanos requieren documentación regulatoria en Twilio. No hay números USA disponibles como alternativa."
+                        )
+                except TwilioRestException as usa_error:
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Error al obtener número: {str(usa_error)}"
+                    )
+            elif "address" in str(e).lower():
                 raise HTTPException(
                     status_code=400,
-                    detail="Para números en México, se requiere una dirección registrada en Twilio. Por favor contacta a soporte para completar este paso."
+                    detail="Para números en México se requiere documentación regulatoria en Twilio. Contacta a soporte."
                 )
-            
-            if "insufficient funds" in str(e).lower():
+            elif "insufficient funds" in str(e).lower():
                 raise HTTPException(
                     status_code=402,
                     detail="Fondos insuficientes en la cuenta de Twilio. Contacta a soporte."
                 )
-            raise HTTPException(
-                status_code=400,
-                detail=f"Error al comprar el número: {str(e)}"
-            )
+            else:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Error al comprar el número: {str(e)}"
+                )
         
         # PASO 4: Actualizar empresa con el número
         await empresas_collection.update_one(
