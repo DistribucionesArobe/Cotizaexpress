@@ -46,3 +46,15 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         return payload
     except JWTError:
         raise credentials_exception
+
+
+def get_current_user_from_token(token: str) -> dict:
+    """Decodifica un token JWT y retorna el payload del usuario"""
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: str = payload.get('sub')
+        if user_id is None:
+            raise ValueError("Token inválido")
+        return payload
+    except JWTError:
+        raise ValueError("Token inválido")
