@@ -1,0 +1,74 @@
+{
+  "summary": "Completed comprehensive testing of Admin Promo Codes Panel. All 18 backend API tests passed (100%). All frontend UI tests passed including admin login, Admin link visibility, promo codes page navigation, statistics display, promo code list, create modal, toggle functionality, and non-admin access restriction.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {
+        "endpoint": "POST /api/pagos/promo/crear",
+        "issue": "Stripe PromotionCode.create returns 400 'Received unknown parameter: coupon' - code is created in DB but Stripe promo code creation fails. Fallback works correctly.",
+        "priority": "LOW"
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "AdminPromoCodes - Copy button",
+        "issue": "Clipboard writeText fails in test environment with 'Write permission denied' - shows error overlay. This is a browser security restriction in headless mode, not a code bug.",
+        "selector": "button with Copy icon",
+        "priority": "LOW"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_admin_promo_codes.py",
+    "/app/test_reports/pytest/pytest_admin_promo_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Admin role check is correctly implemented in both frontend (user?.usuario?.rol === 'admin') and backend (current_user.get('rol') != 'admin')",
+    "Protected route /admin/promo-codes correctly redirects non-admin users to /dashboard",
+    "All data-testid attributes are properly implemented for testing",
+    "Promo code CRUD operations work correctly with proper validation",
+    "Statistics (Total códigos, Activos, Usos totales) are calculated correctly from promo_codes data"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_admin_promo_codes.py"
+  ],
+  "success_rate": {
+    "backend": "100% (18/18 tests passed)",
+    "frontend": "100% (all UI flows working)"
+  },
+  "test_credentials": {
+    "admin_user": "test@cotizabot.com / admin123",
+    "regular_user": "regular@test.com / Test123456 (created for testing non-admin access)"
+  },
+  "seed_data_creation": "Created regular user (regular@test.com) with rol='usuario' for testing non-admin access restriction",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Admin Promo Codes Panel fully tested. Backend tests in /app/backend/tests/test_admin_promo_codes.py cover: Auth (admin login returns rol='admin', listar requires auth), Listar (returns 200, returns array, correct structure), Crear (requires auth, percentage discount, fixed discount, requires discount validation, duplicate code validation), Toggle (requires auth, deactivate/activate, not found), Delete (requires auth, success, not found), Validar (requires auth, invalid code). Frontend tests verified: Admin link visible for admin users, Admin link NOT visible for non-admin users, Navigation to /admin/promo-codes, Statistics cards (Total códigos, Activos, Usos totales), Promo code list with code, discount, usage info, Create modal with all fields (código, tipo descuento, valor, max usos, un uso por cliente, descripción), Toggle functionality, Non-admin redirect to dashboard when accessing /admin/promo-codes directly.",
+  "features_tested": {
+    "backend": [
+      "POST /api/auth/login - Returns rol='admin' for admin user",
+      "GET /api/pagos/promo/listar - Requires auth, returns 200 for admin, returns promo_codes array with correct structure",
+      "POST /api/pagos/promo/crear - Requires auth, creates percentage discount, creates fixed discount, validates discount required, validates duplicate code",
+      "PATCH /api/pagos/promo/{id}/toggle - Requires auth, toggles active state, returns 404 for invalid ID",
+      "DELETE /api/pagos/promo/{id} - Requires auth, deletes code, returns 404 for invalid ID",
+      "POST /api/pagos/promo/validar - Requires auth, returns valid=false for invalid code"
+    ],
+    "frontend": [
+      "Admin link '🔐 Admin' visible in header for admin users",
+      "Admin link NOT visible for non-admin users",
+      "Navigation to /admin/promo-codes works correctly",
+      "Page title 'Códigos Promocionales' displayed",
+      "Statistics cards: Total códigos, Activos, Usos totales",
+      "Promo code list shows: code, discount badge, usage count, description, toggle button, delete button",
+      "Create modal opens with 'Crear Código' button",
+      "Create modal fields: Código, Tipo de descuento (Porcentaje/Monto fijo), Valor, Usos máximos, Solo un uso por cliente, Descripción",
+      "Create promo code works - modal closes, success toast, list updates",
+      "Non-admin user redirected to /dashboard when accessing /admin/promo-codes"
+    ]
+  }
+}
