@@ -473,17 +473,129 @@ export default function Productos() {
                 </div>
               </div>
               <Button 
-                onClick={handleUpgrade}
-                disabled={upgradeLoading}
+                onClick={openCheckoutModal}
                 className="bg-emerald-600 hover:bg-emerald-700"
                 data-testid="btn-upgrade-footer"
               >
-                {upgradeLoading ? 'Procesando...' : 'Actualizar ahora - $1,160 MXN/mes'}
+                Actualizar ahora - $1,160 MXN/mes
               </Button>
             </div>
           </CardContent>
         </Card>
       )}
+
+      {/* Modal de Checkout con Código Promo */}
+      <Dialog open={showCheckoutModal} onOpenChange={setShowCheckoutModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Crown className="w-5 h-5 text-emerald-600" />
+              Plan Completo CotizaBot
+            </DialogTitle>
+            <DialogDescription>
+              Cotizaciones ilimitadas + Tu número de WhatsApp Business
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {/* Resumen del precio */}
+            <div className="bg-slate-50 rounded-lg p-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-slate-600">Precio mensual:</span>
+                <span className={`font-bold ${promoValidation?.valid ? 'line-through text-slate-400' : 'text-slate-900'}`}>
+                  $1,160 MXN
+                </span>
+              </div>
+              
+              {promoValidation?.valid && (
+                <>
+                  <div className="flex justify-between items-center text-emerald-600 mb-2">
+                    <span className="flex items-center gap-1">
+                      <Tag className="w-4 h-4" />
+                      Descuento ({promoValidation.descuento_texto}):
+                    </span>
+                    <span>-${promoValidation.descuento.toLocaleString('es-MX')}</span>
+                  </div>
+                  <div className="flex justify-between items-center pt-2 border-t border-slate-200">
+                    <span className="font-semibold text-slate-900">Total a pagar:</span>
+                    <span className="text-xl font-bold text-emerald-600">
+                      ${promoValidation.precio_final.toLocaleString('es-MX')} MXN
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Campo de código promocional */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">
+                ¿Tienes un código promocional?
+              </label>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Ingresa tu código"
+                  value={promoCode}
+                  onChange={(e) => {
+                    setPromoCode(e.target.value.toUpperCase());
+                    setPromoValidation(null);
+                  }}
+                  className="flex-1"
+                  data-testid="input-promo-code"
+                />
+                <Button
+                  variant="outline"
+                  onClick={validarPromoCode}
+                  disabled={!promoCode.trim() || validandoPromo}
+                  data-testid="btn-validar-promo"
+                >
+                  {validandoPromo ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    'Aplicar'
+                  )}
+                </Button>
+              </div>
+              
+              {promoValidation && !promoValidation.valid && (
+                <p className="text-sm text-red-500">{promoValidation.error}</p>
+              )}
+              
+              {promoValidation?.valid && (
+                <p className="text-sm text-emerald-600 flex items-center gap-1">
+                  <Check className="w-4 h-4" />
+                  {promoValidation.descripcion || 'Código aplicado correctamente'}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowCheckoutModal(false)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleUpgrade}
+              disabled={upgradeLoading}
+              className="bg-emerald-600 hover:bg-emerald-700"
+              data-testid="btn-confirmar-pago"
+            >
+              {upgradeLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Procesando...
+                </>
+              ) : (
+                <>
+                  Pagar {promoValidation?.valid ? `$${promoValidation.precio_final.toLocaleString('es-MX')}` : '$1,160'} MXN
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
