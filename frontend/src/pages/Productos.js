@@ -44,6 +44,19 @@ export default function Productos() {
   const [promoCode, setPromoCode] = useState('');
   const [promoValidation, setPromoValidation] = useState(null);
   const [validandoPromo, setValidandoPromo] = useState(false);
+  
+  // Estado para modal de agregar producto
+  const [showAddProductModal, setShowAddProductModal] = useState(false);
+  const [creandoProducto, setCreandoProducto] = useState(false);
+  const [nuevoProducto, setNuevoProducto] = useState({
+    nombre: '',
+    sku: '',
+    categoria: '',
+    precio_base: '',
+    unidad: 'Pieza',
+    stock: '0',
+    descripcion: ''
+  });
 
   const planActual = user?.empresa?.plan || user?.usuario?.plan || 'gratis';
   const esPlanGratis = planActual === 'gratis';
