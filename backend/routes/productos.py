@@ -207,36 +207,61 @@ async def actualizar_precio(
     request: ActualizarPrecioRequest,
     current_user: dict = Depends(get_current_user)
 ):
-    """Actualiza solo el precio de un producto"""
+    """Actualiza solo el precio de un producto. Si es demo, crea una copia para la empresa."""
     try:
         empresa_id = current_user.get('empresa_id')
         
         if request.precio_base <= 0:
             raise HTTPException(status_code=400, detail="El precio debe ser mayor a 0")
         
-        # Intentar actualizar producto de la empresa
+        # Primero intentar actualizar producto propio de la empresa
         resultado = await productos_collection.update_one(
             {'id': producto_id, 'empresa_id': empresa_id},
             {'$set': {'precio_base': request.precio_base}}
         )
         
-        # Si no encontró, intentar con producto demo (para edición en demo)
-        if resultado.matched_count == 0:
-            resultado = await productos_collection.update_one(
-                {'id': producto_id, 'empresa_id': 'demo'},
-                {'$set': {'precio_base': request.precio_base}}
-            )
+        if resultado.matched_count > 0:
+            logger.info(f"Precio actualizado para producto propio {producto_id}: ${request.precio_base}")
+            return {
+                'success': True,
+                'producto_id': producto_id,
+                'nuevo_precio': request.precio_base
+            }
         
-        if resultado.matched_count == 0:
-            raise HTTPException(status_code=404, detail="Producto no encontrado")
+        # Si no encontró producto propio, buscar en demo y crear copia
+        producto_demo = await productos_collection.find_one(
+            {'id': producto_id, 'empresa_id': 'demo'},
+            {'_id': 0}
+        )
         
-        logger.info(f"Precio actualizado para producto {producto_id}: ${request.precio_base}")
+        if producto_demo:
+            # Crear copia del producto demo para esta empresa con el nuevo precio
+            nuevo_producto = producto_demo.copy()
+            nuevo_producto['id'] = str(uuid.uuid4())
+            nuevo_producto['empresa_id'] = empresa_id
+            nuevo_producto['precio_base'] = request.precio_base
+            nuevo_producto['created_at'] = datetime.now(timezone.utc).isoformat()
+            nuevo_producto['demo_origin_id'] = producto_id  # Referencia al original
+            
+            # Generar nuevo SKU para la empresa
+            categoria_prefix = str(nuevo_producto.get('categoria', 'PR'))[:2].upper()
+            count = await productos_collection.count_documents({
+                'categoria': nuevo_producto.get('categoria'),
+                'empresa_id': empresa_id
+            })
+            nuevo_producto['sku'] = f"{categoria_prefix}-{count + 1:03d}"
+            
+            await productos_collection.insert_one(nuevo_producto)
+            
+            logger.info(f"Producto demo copiado a empresa {empresa_id} con nuevo precio ${request.precio_base}")
+            return {
+                'success': True,
+                'producto_id': nuevo_producto['id'],
+                'nuevo_precio': request.precio_base,
+                'mensaje': 'Producto personalizado creado'
+            }
         
-        return {
-            'success': True,
-            'producto_id': producto_id,
-            'nuevo_precio': request.precio_base
-        }
+        raise HTTPException(status_code=404, detail="Producto no encontrado")
         
     except HTTPException:
         raise
