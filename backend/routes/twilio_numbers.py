@@ -300,30 +300,35 @@ async def solicitar_numero_whatsapp(
             # Si falla por bundle/regulación en MX, intentar con USA
             if ("bundle" in str(e).lower() or "regulatory" in str(e).lower()) and not usar_usa:
                 logger.info("Número MX requiere bundle, intentando con USA...")
-                try:
-                    numeros_usa = client.available_phone_numbers('US').local.list(
-                        area_code='512',
-                        limit=1
-                    )
-                    if numeros_usa:
-                        phone_number = numeros_usa[0].phone_number
-                        incoming_number = client.incoming_phone_numbers.create(
-                            phone_number=phone_number,
-                            friendly_name=f"CotizaBot - {empresa.get('nombre', 'Empresa')}",
-                            sms_url=webhook_url,
-                            sms_method='POST'
+                codigos_usa = ['713', '832', '281', '346', '210', '512', '956', '915']
+                numero_usa_comprado = False
+                
+                for area_code in codigos_usa:
+                    try:
+                        numeros_usa = client.available_phone_numbers('US').local.list(
+                            area_code=area_code,
+                            limit=1
                         )
-                        usar_usa = True
-                        logger.info(f"Número USA comprado como alternativa: {incoming_number.sid}")
-                    else:
-                        raise HTTPException(
-                            status_code=400,
-                            detail="Los números mexicanos requieren documentación regulatoria en Twilio. No hay números USA disponibles como alternativa."
-                        )
-                except TwilioRestException as usa_error:
+                        if numeros_usa:
+                            phone_number = numeros_usa[0].phone_number
+                            incoming_number = client.incoming_phone_numbers.create(
+                                phone_number=phone_number,
+                                friendly_name=f"CotizaBot - {empresa.get('nombre', 'Empresa')}",
+                                sms_url=webhook_url,
+                                sms_method='POST'
+                            )
+                            usar_usa = True
+                            numero_usa_comprado = True
+                            logger.info(f"Número USA comprado como alternativa: {incoming_number.sid}")
+                            break
+                    except Exception as usa_err:
+                        logger.warning(f"Error con código {area_code}: {usa_err}")
+                        continue
+                
+                if not numero_usa_comprado:
                     raise HTTPException(
                         status_code=400,
-                        detail=f"Error al obtener número: {str(usa_error)}"
+                        detail="Los números mexicanos requieren documentación regulatoria en Twilio. No hay números USA disponibles como alternativa."
                     )
             elif "address" in str(e).lower():
                 raise HTTPException(
