@@ -202,7 +202,6 @@ export default function Productos() {
   const resetNuevoProducto = () => {
     setNuevoProducto({
       nombre: '',
-      sku: '',
       categoria: '',
       precio_base: '',
       unidad: 'Pieza',
