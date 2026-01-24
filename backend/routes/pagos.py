@@ -9,8 +9,10 @@ from emergentintegrations.payments.stripe.checkout import (
     CheckoutSessionRequest
 )
 from datetime import datetime, timezone
+import stripe
 import os
 import logging
+import uuid
 
 router = APIRouter(prefix="/pagos", tags=["pagos"])
 logger = logging.getLogger(__name__)
@@ -18,6 +20,8 @@ logger = logging.getLogger(__name__)
 empresas_collection = db.get_collection('empresas')
 payment_transactions_collection = db.get_collection('payment_transactions')
 subscriptions_collection = db.get_collection('subscriptions')
+promo_codes_collection = db.get_collection('promo_codes')
+promo_usage_collection = db.get_collection('promo_usage')
 
 # Planes fijos definidos en backend (NUNCA aceptar monto desde frontend)
 PLANES = {
@@ -34,9 +38,22 @@ PLANES = {
 class CrearSuscripcionRequest(BaseModel):
     plan_id: str
     origin_url: str
+    promo_code: Optional[str] = None
 
 class CancelarSuscripcionRequest(BaseModel):
     subscription_id: Optional[str] = None
+
+class ValidarPromoCodeRequest(BaseModel):
+    code: str
+
+class CrearPromoCodeRequest(BaseModel):
+    code: str
+    descuento_porcentaje: Optional[int] = None  # 10 = 10%
+    descuento_fijo: Optional[float] = None  # Monto fijo en MXN
+    max_usos: Optional[int] = 1  # Usos totales permitidos
+    un_uso_por_cliente: bool = True
+    fecha_expiracion: Optional[str] = None
+    descripcion: Optional[str] = None
 
 def get_stripe_checkout(request: Request) -> StripeCheckout:
     """Obtiene cliente Stripe con configuración"""
