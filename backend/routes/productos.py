@@ -20,8 +20,9 @@ async def listar_productos(
     """Lista productos del catálogo de la empresa del usuario"""
     try:
         empresa_id = current_user.get('empresa_id')
+        plan = current_user.get('plan', 'gratis')
         
-        # Primero intentar con productos de la empresa
+        # Filtro para productos de la empresa
         filtro = {'activo': activo, 'empresa_id': empresa_id}
         if categoria:
             filtro['categoria'] = categoria
@@ -29,15 +30,28 @@ async def listar_productos(
         productos = await productos_collection.find(
             filtro,
             {'_id': 0}
-        ).sort('categoria', 1).to_list(200)
+        ).sort('categoria', 1).to_list(500)
         
-        # Si no tiene productos propios, mostrar catálogo demo
-        if len(productos) == 0 and not categoria:
+        # Solo mostrar catálogo demo si:
+        # 1. No tiene productos propios
+        # 2. NO tiene plan completo (los de plan completo deben cargar sus propios productos)
+        # 3. No está filtrando por categoría
+        es_demo = False
+        if len(productos) == 0 and not categoria and plan != 'completo':
             filtro_demo = {'activo': activo, 'empresa_id': 'demo'}
             productos = await productos_collection.find(
                 filtro_demo,
                 {'_id': 0}
             ).sort('categoria', 1).to_list(200)
+            es_demo = True
+        
+        for prod in productos:
+            if isinstance(prod.get('created_at'), str):
+                prod['created_at'] = datetime.fromisoformat(prod['created_at'])
+            # Marcar si es producto demo
+            prod['es_demo'] = es_demo or prod.get('empresa_id') == 'demo'
+        
+        return productos
         
         for prod in productos:
             if isinstance(prod.get('created_at'), str):
