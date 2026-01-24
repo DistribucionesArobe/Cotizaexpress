@@ -697,6 +697,162 @@ export default function Productos() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Modal Agregar Producto */}
+      <Dialog open={showAddProductModal} onOpenChange={(open) => {
+        setShowAddProductModal(open);
+        if (!open) resetNuevoProducto();
+      }}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Package className="w-5 h-5 text-blue-600" />
+              Agregar Producto
+            </DialogTitle>
+            <DialogDescription>
+              Crea un nuevo producto para tu catálogo
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {/* Nombre */}
+            <div>
+              <label className="text-sm font-medium text-slate-700">Nombre del producto *</label>
+              <Input
+                placeholder="Ej: Cemento Gris 50kg"
+                value={nuevoProducto.nombre}
+                onChange={(e) => setNuevoProducto(prev => ({ ...prev, nombre: e.target.value }))}
+                className="mt-1"
+                data-testid="input-producto-nombre"
+              />
+            </div>
+
+            {/* Categoría y SKU */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-slate-700">Categoría *</label>
+                <Input
+                  placeholder="Ej: Cemento, Acero, Pintura"
+                  value={nuevoProducto.categoria}
+                  onChange={(e) => setNuevoProducto(prev => ({ ...prev, categoria: e.target.value }))}
+                  className="mt-1"
+                  list="categorias-list"
+                  data-testid="input-producto-categoria"
+                />
+                <datalist id="categorias-list">
+                  {categorias.map(cat => (
+                    <option key={cat} value={cat} />
+                  ))}
+                </datalist>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700">SKU (opcional)</label>
+                <Input
+                  placeholder="Ej: CEM-001"
+                  value={nuevoProducto.sku}
+                  onChange={(e) => setNuevoProducto(prev => ({ ...prev, sku: e.target.value.toUpperCase() }))}
+                  className="mt-1"
+                  data-testid="input-producto-sku"
+                />
+                <p className="text-xs text-slate-500 mt-1">Se genera automáticamente si no lo ingresas</p>
+              </div>
+            </div>
+
+            {/* Precio y Unidad */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-slate-700">Precio base (MXN) *</label>
+                <div className="relative mt-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
+                  <Input
+                    type="number"
+                    placeholder="0.00"
+                    value={nuevoProducto.precio_base}
+                    onChange={(e) => setNuevoProducto(prev => ({ ...prev, precio_base: e.target.value }))}
+                    className="pl-7"
+                    min="0"
+                    step="0.01"
+                    data-testid="input-producto-precio"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700">Unidad</label>
+                <Select
+                  value={nuevoProducto.unidad}
+                  onValueChange={(value) => setNuevoProducto(prev => ({ ...prev, unidad: value }))}
+                >
+                  <SelectTrigger className="mt-1" data-testid="select-producto-unidad">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Pieza">Pieza</SelectItem>
+                    <SelectItem value="Kg">Kilogramo</SelectItem>
+                    <SelectItem value="Litro">Litro</SelectItem>
+                    <SelectItem value="Metro">Metro</SelectItem>
+                    <SelectItem value="M2">Metro cuadrado</SelectItem>
+                    <SelectItem value="M3">Metro cúbico</SelectItem>
+                    <SelectItem value="Caja">Caja</SelectItem>
+                    <SelectItem value="Bulto">Bulto</SelectItem>
+                    <SelectItem value="Rollo">Rollo</SelectItem>
+                    <SelectItem value="Saco">Saco</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Stock */}
+            <div>
+              <label className="text-sm font-medium text-slate-700">Stock inicial</label>
+              <Input
+                type="number"
+                placeholder="0"
+                value={nuevoProducto.stock}
+                onChange={(e) => setNuevoProducto(prev => ({ ...prev, stock: e.target.value }))}
+                className="mt-1"
+                min="0"
+                data-testid="input-producto-stock"
+              />
+            </div>
+
+            {/* Descripción */}
+            <div>
+              <label className="text-sm font-medium text-slate-700">Descripción (opcional)</label>
+              <Input
+                placeholder="Descripción del producto..."
+                value={nuevoProducto.descripcion}
+                onChange={(e) => setNuevoProducto(prev => ({ ...prev, descripcion: e.target.value }))}
+                className="mt-1"
+                data-testid="input-producto-descripcion"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddProductModal(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={crearProducto}
+              disabled={creandoProducto}
+              className="bg-blue-600 hover:bg-blue-700"
+              data-testid="btn-confirmar-producto"
+            >
+              {creandoProducto ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Guardando...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Guardar producto
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
