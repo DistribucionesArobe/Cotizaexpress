@@ -76,6 +76,7 @@ api_router.include_router(pagos.router)
 api_router.include_router(empresa.router)
 api_router.include_router(portal_cliente.router)
 api_router.include_router(admin.router)
+api_router.include_router(whatsapp_config.router)
 
 # Registrar router principal
 app.include_router(api_router)
