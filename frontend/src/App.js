@@ -252,6 +252,16 @@ function AppContent() {
                 </ProtectedRoute>
               }
             />
+            
+            {/* Rutas de Admin */}
+            <Route
+              path="/admin/promo-codes"
+              element={
+                <ProtectedRoute>
+                  <AdminPromoCodes />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </main>
       </BrowserRouter>
