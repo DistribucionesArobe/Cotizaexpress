@@ -745,17 +745,6 @@ export default function Productos() {
                   ))}
                 </datalist>
               </div>
-              <div>
-                <label className="text-sm font-medium text-slate-700">SKU (opcional)</label>
-                <Input
-                  placeholder="Ej: CEM-001"
-                  value={nuevoProducto.sku}
-                  onChange={(e) => setNuevoProducto(prev => ({ ...prev, sku: e.target.value.toUpperCase() }))}
-                  className="mt-1"
-                  data-testid="input-producto-sku"
-                />
-                <p className="text-xs text-slate-500 mt-1">Se genera automáticamente si no lo ingresas</p>
-              </div>
             </div>
 
             {/* Precio y Unidad */}
