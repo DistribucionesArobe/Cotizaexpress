@@ -66,6 +66,175 @@ def get_stripe_checkout(request: Request) -> StripeCheckout:
     
     return StripeCheckout(api_key=api_key, webhook_url=webhook_url)
 
+
+# ==================== CÓDIGOS PROMOCIONALES ====================
+
+@router.post("/promo/crear")
+async def crear_promo_code(
+    request_data: CrearPromoCodeRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Crea un nuevo código promocional (solo admin)"""
+    try:
+        # Verificar que el código no exista
+        existe = await promo_codes_collection.find_one({'code': request_data.code.upper()})
+        if existe:
+            raise HTTPException(status_code=400, detail="El código ya existe")
+        
+        # Validar descuento
+        if not request_data.descuento_porcentaje and not request_data.descuento_fijo:
+            raise HTTPException(status_code=400, detail="Debe especificar descuento_porcentaje o descuento_fijo")
+        
+        # Crear código en BD
+        promo_doc = {
+            "id": str(uuid.uuid4()),
+            "code": request_data.code.upper(),
+            "descuento_porcentaje": request_data.descuento_porcentaje,
+            "descuento_fijo": request_data.descuento_fijo,
+            "max_usos": request_data.max_usos,
+            "usos_actuales": 0,
+            "un_uso_por_cliente": request_data.un_uso_por_cliente,
+            "fecha_expiracion": request_data.fecha_expiracion,
+            "descripcion": request_data.descripcion,
+            "activo": True,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "created_by": current_user.get('empresa_id')
+        }
+        
+        # Crear cupón en Stripe
+        stripe.api_key = os.environ.get('STRIPE_API_KEY')
+        
+        coupon_params = {
+            "id": f"PROMO_{request_data.code.upper()}",
+            "currency": "mxn",
+            "duration": "once",  # Aplicar una sola vez
+            "name": f"Promoción {request_data.code.upper()}"
+        }
+        
+        if request_data.descuento_porcentaje:
+            coupon_params["percent_off"] = request_data.descuento_porcentaje
+        elif request_data.descuento_fijo:
+            coupon_params["amount_off"] = int(request_data.descuento_fijo * 100)  # Stripe usa centavos
+        
+        if request_data.max_usos:
+            coupon_params["max_redemptions"] = request_data.max_usos
+        
+        try:
+            stripe_coupon = stripe.Coupon.create(**coupon_params)
+            promo_doc["stripe_coupon_id"] = stripe_coupon.id
+            
+            # Crear promotion code en Stripe
+            stripe_promo = stripe.PromotionCode.create(
+                coupon=stripe_coupon.id,
+                code=request_data.code.upper(),
+                max_redemptions=request_data.max_usos if request_data.max_usos else None
+            )
+            promo_doc["stripe_promo_id"] = stripe_promo.id
+            
+        except stripe.error.StripeError as e:
+            logger.warning(f"Error creando cupón en Stripe: {e}")
+            # Continuar sin cupón de Stripe (aplicar descuento manualmente)
+        
+        await promo_codes_collection.insert_one(promo_doc)
+        
+        logger.info(f"Código promocional creado: {request_data.code.upper()}")
+        
+        return {
+            "success": True,
+            "code": request_data.code.upper(),
+            "descuento": f"{request_data.descuento_porcentaje}%" if request_data.descuento_porcentaje else f"${request_data.descuento_fijo} MXN",
+            "max_usos": request_data.max_usos
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error creando código promo: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/promo/validar")
+async def validar_promo_code(
+    request_data: ValidarPromoCodeRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Valida un código promocional antes de aplicarlo"""
+    try:
+        empresa_id = current_user.get('empresa_id')
+        code = request_data.code.upper().strip()
+        
+        # Buscar código
+        promo = await promo_codes_collection.find_one(
+            {'code': code, 'activo': True},
+            {'_id': 0}
+        )
+        
+        if not promo:
+            return {"valid": False, "error": "Código no válido o expirado"}
+        
+        # Verificar expiración
+        if promo.get('fecha_expiracion'):
+            expira = datetime.fromisoformat(promo['fecha_expiracion'])
+            if datetime.now(timezone.utc) > expira:
+                return {"valid": False, "error": "Código expirado"}
+        
+        # Verificar usos máximos
+        if promo.get('max_usos') and promo.get('usos_actuales', 0) >= promo['max_usos']:
+            return {"valid": False, "error": "Código agotado"}
+        
+        # Verificar uso único por cliente
+        if promo.get('un_uso_por_cliente'):
+            uso_previo = await promo_usage_collection.find_one({
+                'promo_id': promo['id'],
+                'empresa_id': empresa_id
+            })
+            if uso_previo:
+                return {"valid": False, "error": "Ya has usado este código"}
+        
+        # Calcular descuento
+        plan = PLANES.get('completo')
+        precio_original = plan['precio_total']
+        
+        if promo.get('descuento_porcentaje'):
+            descuento = precio_original * (promo['descuento_porcentaje'] / 100)
+        else:
+            descuento = promo.get('descuento_fijo', 0)
+        
+        precio_final = max(0, precio_original - descuento)
+        
+        return {
+            "valid": True,
+            "code": code,
+            "descuento_texto": f"{promo['descuento_porcentaje']}%" if promo.get('descuento_porcentaje') else f"${promo['descuento_fijo']} MXN",
+            "precio_original": precio_original,
+            "descuento": round(descuento, 2),
+            "precio_final": round(precio_final, 2),
+            "descripcion": promo.get('descripcion', 'Descuento aplicado')
+        }
+        
+    except Exception as e:
+        logger.error(f"Error validando código: {str(e)}")
+        return {"valid": False, "error": "Error validando código"}
+
+
+@router.get("/promo/listar")
+async def listar_promo_codes(current_user: dict = Depends(get_current_user)):
+    """Lista todos los códigos promocionales (solo admin)"""
+    try:
+        promos = await promo_codes_collection.find(
+            {},
+            {'_id': 0}
+        ).sort('created_at', -1).to_list(100)
+        
+        return {"promo_codes": promos}
+        
+    except Exception as e:
+        logger.error(f"Error listando códigos: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ==================== PLANES Y CHECKOUT ====================
+
 @router.get("/planes")
 async def obtener_planes():
     """Obtiene los planes disponibles"""
