@@ -227,23 +227,62 @@ async def solicitar_numero_whatsapp(
         phone_number = numero_encontrado.phone_number
         logger.info(f"Número encontrado: {phone_number}")
         
-        # PASO 2: Comprar el número
+        # PASO 2: Verificar/crear dirección para cumplir requisitos de Twilio MX
+        address_sid = None
+        try:
+            # Buscar si ya existe una dirección
+            addresses = client.addresses.list(limit=1)
+            if addresses:
+                address_sid = addresses[0].sid
+                logger.info(f"Usando dirección existente: {address_sid}")
+            else:
+                # Crear dirección genérica para CotizaBot (requerido por Twilio para MX)
+                new_address = client.addresses.create(
+                    customer_name="CotizaBot by CotizaExpress",
+                    street="Av. Insurgentes Sur 1602",
+                    city="Ciudad de México",
+                    region="CDMX",
+                    postal_code="03940",
+                    iso_country="MX",
+                    friendly_name="CotizaBot Business Address"
+                )
+                address_sid = new_address.sid
+                logger.info(f"Dirección creada: {address_sid}")
+        except Exception as addr_error:
+            logger.warning(f"No se pudo crear/obtener dirección: {addr_error}")
+            # Continuar sin dirección si falla (algunos números no la requieren)
+        
+        # PASO 3: Comprar el número
         try:
             # Obtener URL base del webhook
             webhook_base = os.environ.get('REACT_APP_BACKEND_URL', 'https://cotizaexpress.com')
             webhook_url = f"{webhook_base}/api/webhook/twilio/whatsapp"
             
-            incoming_number = client.incoming_phone_numbers.create(
-                phone_number=phone_number,
-                friendly_name=f"CotizaBot - {empresa.get('nombre', 'Empresa')}",
-                sms_url=webhook_url,
-                sms_method='POST'
-            )
+            purchase_params = {
+                'phone_number': phone_number,
+                'friendly_name': f"CotizaBot - {empresa.get('nombre', 'Empresa')}",
+                'sms_url': webhook_url,
+                'sms_method': 'POST'
+            }
+            
+            # Agregar dirección si está disponible
+            if address_sid:
+                purchase_params['address_sid'] = address_sid
+            
+            incoming_number = client.incoming_phone_numbers.create(**purchase_params)
             
             logger.info(f"Número comprado: {incoming_number.sid}")
             
         except TwilioRestException as e:
             logger.error(f"Error comprando número: {str(e)}")
+            
+            # Si falla por falta de dirección, dar mensaje más claro
+            if "address" in str(e).lower():
+                raise HTTPException(
+                    status_code=400,
+                    detail="Para números en México, se requiere una dirección registrada en Twilio. Por favor contacta a soporte para completar este paso."
+                )
+            
             if "insufficient funds" in str(e).lower():
                 raise HTTPException(
                     status_code=402,
@@ -254,7 +293,7 @@ async def solicitar_numero_whatsapp(
                 detail=f"Error al comprar el número: {str(e)}"
             )
         
-        # PASO 3: Actualizar empresa con el número
+        # PASO 4: Actualizar empresa con el número
         await empresas_collection.update_one(
             {'id': empresa_id},
             {
