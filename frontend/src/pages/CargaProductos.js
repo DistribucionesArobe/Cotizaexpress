@@ -78,24 +78,25 @@ export default function CargaProductos() {
               Descarga la plantilla de Excel con el formato correcto para cargar tus productos.
             </p>
             <div className="bg-slate-50 p-4 rounded-lg mb-4">
-              <p className="text-xs font-semibold text-slate-700 mb-2">Columnas requeridas:</p>
+              <p className="text-xs font-semibold text-slate-700 mb-2">Columnas del template:</p>
               <ul className="text-xs text-slate-600 space-y-1">
-                <li>• <strong>nombre</strong>: Nombre del producto</li>
-                <li>• <strong>categoria</strong>: Categoría (Tablaroca, Ferretería, etc.)</li>
-                <li>• <strong>precio_base</strong>: Precio sin IVA</li>
-                <li>• <strong>unidad</strong>: Pieza, Caja, Metro, etc.</li>
-                <li>• <strong>sku</strong>: Código único (opcional, se genera automático)</li>
-                <li>• <strong>margen_minimo</strong>: Decimal (ej: 0.15 para 15%)</li>
-                <li>• <strong>stock</strong>: Cantidad disponible</li>
+                <li>• <strong>nombre</strong>: Nombre del producto *</li>
+                <li>• <strong>categoria</strong>: Categoría (Cemento, Acero, etc.) *</li>
+                <li>• <strong>precio_base</strong>: Precio sin IVA *</li>
+                <li>• <strong>unidad</strong>: Saco, Pieza, Metro, etc.</li>
+                <li>• <strong>stock</strong>: Cantidad disponible (opcional)</li>
+                <li>• <strong>descripcion</strong>: Descripción del producto (opcional)</li>
               </ul>
             </div>
-            <Button
+            <a
+              href={`${API}/carga-productos/template`}
+              download="template_productos_cotizabot.xlsx"
+              className="flex items-center justify-center w-full px-4 py-2 bg-slate-900 text-white rounded-md hover:bg-slate-800 transition-colors"
               data-testid="btn-descargar-template"
-              onClick={descargarTemplate}
-              className="w-full"
             >
-              📥 Descargar Template Excel
-            </Button>
+              <Download className="w-4 h-4 mr-2" />
+              Descargar Template Excel
+            </a>
           </CardContent>
         </Card>
 
