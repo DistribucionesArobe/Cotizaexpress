@@ -273,26 +273,96 @@ export default function ConfiguracionWhatsApp() {
         </CardHeader>
         <CardContent>
           <p className="text-slate-600 text-sm mb-4">
-            Selecciona la ciudad que mejor represente a tu negocio. Tus clientes verán este código de área.
+            Tenemos {ciudades.length} ciudades disponibles. Selecciona la que mejor represente a tu negocio.
           </p>
           
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-            {ciudades.map((ciudad) => (
-              <button
-                key={ciudad.key}
-                onClick={() => setCiudadSeleccionada(ciudad.key)}
-                disabled={enviando}
-                className={`px-4 py-3 rounded-lg border-2 text-sm font-medium transition-all ${
-                  ciudadSeleccionada === ciudad.key
-                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-sm'
-                    : 'border-slate-200 hover:border-emerald-300 text-slate-700'
-                } ${enviando ? 'opacity-50 cursor-not-allowed' : ''}`}
-                data-testid={`btn-ciudad-${ciudad.key}`}
-              >
-                {ciudad.nombre}
-              </button>
-            ))}
+          {/* Buscador */}
+          <div className="relative mb-6">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Input
+              placeholder="Buscar ciudad... ej: Monterrey, Guadalajara, CDMX"
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              className="pl-10"
+              data-testid="input-buscar-ciudad"
+            />
           </div>
+
+          {/* Ciudad seleccionada */}
+          {ciudadSeleccionada && (
+            <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-emerald-600" />
+                <span className="font-medium text-emerald-800">
+                  Seleccionada: {ciudades.find(c => c.key === ciudadSeleccionada)?.nombre}
+                </span>
+              </div>
+              <button 
+                onClick={() => setCiudadSeleccionada('')}
+                className="text-emerald-600 hover:text-emerald-800 text-sm"
+              >
+                Cambiar
+              </button>
+            </div>
+          )}
+          
+          {/* Ciudades por región o búsqueda */}
+          {busqueda ? (
+            // Resultados de búsqueda
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+              {ciudades
+                .filter(c => c.nombre.toLowerCase().includes(busqueda.toLowerCase()))
+                .map((ciudad) => (
+                  <button
+                    key={ciudad.key}
+                    onClick={() => { setCiudadSeleccionada(ciudad.key); setBusqueda(''); }}
+                    disabled={enviando}
+                    className={`px-3 py-2 rounded-lg border text-sm font-medium transition-all text-left ${
+                      ciudadSeleccionada === ciudad.key
+                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                        : 'border-slate-200 hover:border-emerald-300 text-slate-700'
+                    }`}
+                    data-testid={`btn-ciudad-${ciudad.key}`}
+                  >
+                    {ciudad.nombre}
+                  </button>
+                ))}
+              {ciudades.filter(c => c.nombre.toLowerCase().includes(busqueda.toLowerCase())).length === 0 && (
+                <p className="col-span-full text-center text-slate-500 py-4">
+                  No se encontraron ciudades con "{busqueda}"
+                </p>
+              )}
+            </div>
+          ) : (
+            // Ciudades por región
+            <div className="space-y-6 max-h-96 overflow-y-auto pr-2">
+              {Object.entries(ciudadesPorRegion).map(([region, ciudadesRegion]) => (
+                <div key={region}>
+                  <h4 className="text-sm font-semibold text-slate-500 mb-2 sticky top-0 bg-white">
+                    📍 {region}
+                  </h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                    {ciudadesRegion.map((ciudad) => (
+                      <button
+                        key={ciudad.key}
+                        onClick={() => setCiudadSeleccionada(ciudad.key)}
+                        disabled={enviando}
+                        className={`px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium transition-all text-left truncate ${
+                          ciudadSeleccionada === ciudad.key
+                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                            : 'border-slate-200 hover:border-emerald-300 text-slate-700'
+                        } ${enviando ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        data-testid={`btn-ciudad-${ciudad.key}`}
+                        title={ciudad.nombre}
+                      >
+                        {ciudad.nombre.split(',')[0]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
           
           <div className="mt-6">
             <Button
