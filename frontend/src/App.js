@@ -20,6 +20,7 @@ import CargaProductos from './pages/CargaProductos';
 import ConfiguracionWhatsApp from './pages/ConfiguracionWhatsApp';
 import PerfilEmpresa from './pages/PerfilEmpresa';
 import PortalCliente from './pages/PortalCliente';
+import AdminPromoCodes from './pages/AdminPromoCodes';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
