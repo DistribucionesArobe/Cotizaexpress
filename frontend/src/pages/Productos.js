@@ -49,6 +49,15 @@ export default function Productos() {
   const [guardandoPrecio, setGuardandoPrecio] = useState(false);
   const [esDemo, setEsDemo] = useState(false);
   
+  // Estado para edición de stock
+  const [editandoStock, setEditandoStock] = useState(null);
+  const [nuevoStock, setNuevoStock] = useState('');
+  const [guardandoStock, setGuardandoStock] = useState(false);
+  
+  // Estado para eliminar producto
+  const [productoAEliminar, setProductoAEliminar] = useState(null);
+  const [eliminando, setEliminando] = useState(false);
+  
   // Estado para modal de checkout
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [promoCode, setPromoCode] = useState('');
@@ -63,7 +72,7 @@ export default function Productos() {
     categoria: '',
     precio_base: '',
     unidad: 'Pieza',
-    stock: '0',
+    stock: '',
     descripcion: ''
   });
 
