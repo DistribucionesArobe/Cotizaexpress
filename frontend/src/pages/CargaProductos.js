@@ -88,15 +88,33 @@ export default function CargaProductos() {
                 <li>• <strong>descripcion</strong>: Descripción del producto (opcional)</li>
               </ul>
             </div>
-            <a
-              href={`${API}/carga-productos/template`}
-              download="template_productos_cotizabot.xlsx"
-              className="flex items-center justify-center w-full px-4 py-2 bg-slate-900 text-white rounded-md hover:bg-slate-800 transition-colors"
+            <Button
+              onClick={async () => {
+                try {
+                  toast.info('Descargando template...');
+                  const response = await fetch(`${API}/carga-productos/template`);
+                  if (!response.ok) throw new Error('Error al descargar');
+                  const blob = await response.blob();
+                  const url = window.URL.createObjectURL(blob);
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.download = 'template_productos_cotizabot.xlsx';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  window.URL.revokeObjectURL(url);
+                  toast.success('¡Template descargado!');
+                } catch (error) {
+                  console.error('Error descargando template:', error);
+                  toast.error('Error al descargar. Intenta de nuevo.');
+                }
+              }}
+              className="w-full bg-slate-900 hover:bg-slate-800"
               data-testid="btn-descargar-template"
             >
               <Download className="w-4 h-4 mr-2" />
               Descargar Template Excel
-            </a>
+            </Button>
           </CardContent>
         </Card>
 
