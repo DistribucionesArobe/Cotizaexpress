@@ -257,10 +257,26 @@ function AppContent() {
             
             {/* Rutas de Admin */}
             <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/admin/promo-codes"
               element={
                 <ProtectedRoute>
                   <AdminPromoCodes />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/twilio"
+              element={
+                <ProtectedRoute>
+                  <AdminTwilio />
                 </ProtectedRoute>
               }
             />
