@@ -147,6 +147,22 @@ function AppContent() {
                     Mi Empresa
                   </Link>
 
+                  {/* Enlace de Admin - Solo visible para admins */}
+                  {user?.usuario?.rol === 'admin' && (
+                    <Link
+                      to="/admin/promo-codes"
+                      data-testid="nav-admin-promo"
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                        activeTab === 'admin-promo'
+                          ? 'bg-amber-50 text-amber-700'
+                          : 'text-amber-600 hover:bg-amber-50'
+                      }`}
+                      onClick={() => setActiveTab('admin-promo')}
+                    >
+                      🔐 Admin
+                    </Link>
+                  )}
+
                   <button
                     onClick={logout}
                     className="ml-4 px-4 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-all"
