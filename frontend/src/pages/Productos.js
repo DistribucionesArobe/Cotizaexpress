@@ -31,6 +31,12 @@ export default function Productos() {
   const [nuevoPrecio, setNuevoPrecio] = useState('');
   const [guardandoPrecio, setGuardandoPrecio] = useState(false);
   const [esDemo, setEsDemo] = useState(false);
+  
+  // Estado para modal de checkout
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
+  const [promoValidation, setPromoValidation] = useState(null);
+  const [validandoPromo, setValidandoPromo] = useState(false);
 
   const planActual = user?.empresa?.plan || user?.usuario?.plan || 'gratis';
   const esPlanGratis = planActual === 'gratis';
