@@ -91,7 +91,8 @@ export default function Productos() {
       
       const response = await axios.post(`${API}/pagos/crear-checkout`, {
         plan_id: 'completo',
-        origin_url: window.location.origin
+        origin_url: window.location.origin,
+        promo_code: promoValidation?.valid ? promoCode : undefined
       });
 
       if (response.data.checkout_url) {
@@ -102,6 +103,39 @@ export default function Productos() {
       toast.error(error.response?.data?.detail || 'Error al procesar el pago');
     } finally {
       setUpgradeLoading(false);
+    }
+  };
+
+  const openCheckoutModal = () => {
+    setShowCheckoutModal(true);
+    setPromoCode('');
+    setPromoValidation(null);
+  };
+
+  const validarPromoCode = async () => {
+    if (!promoCode.trim()) {
+      setPromoValidation(null);
+      return;
+    }
+
+    try {
+      setValidandoPromo(true);
+      const response = await axios.post(`${API}/pagos/promo/validar`, {
+        code: promoCode.trim()
+      });
+      
+      setPromoValidation(response.data);
+      
+      if (response.data.valid) {
+        toast.success(`¡Código válido! Descuento: ${response.data.descuento_texto}`);
+      } else {
+        toast.error(response.data.error || 'Código no válido');
+      }
+    } catch (error) {
+      console.error('Error validando código:', error);
+      setPromoValidation({ valid: false, error: 'Error validando código' });
+    } finally {
+      setValidandoPromo(false);
     }
   };
 
