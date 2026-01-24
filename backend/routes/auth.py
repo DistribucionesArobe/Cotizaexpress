@@ -137,7 +137,8 @@ async def iniciar_sesion(credenciales: UsuarioLogin):
                 'nombre': usuario['nombre'],
                 'empresa_id': usuario['empresa_id'],
                 'empresa_nombre': usuario.get('empresa_nombre', ''),
-                'plan': empresa.get('plan', 'demo')
+                'plan': empresa.get('plan', 'demo'),
+                'rol': usuario.get('rol', 'usuario')
             }
         )
         
