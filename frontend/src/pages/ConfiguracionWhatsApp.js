@@ -31,7 +31,8 @@ export default function ConfiguracionWhatsApp() {
       
       // Cargar ciudades disponibles
       const ciudadesRes = await axios.get(`${API}/twilio/ciudades`);
-      setCiudades(ciudadesRes.data.ciudades);
+      setCiudades(ciudadesRes.data.ciudades || []);
+      setCiudadesPorRegion(ciudadesRes.data.por_region || {});
       
       // Verificar si ya tiene número
       const miNumeroRes = await axios.get(`${API}/twilio/mi-numero`);
