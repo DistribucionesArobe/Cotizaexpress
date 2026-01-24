@@ -1112,6 +1112,39 @@ export default function Productos() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Dialog de confirmación para eliminar */}
+      <AlertDialog open={!!productoAEliminar} onOpenChange={(open) => !open && setProductoAEliminar(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar producto?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Se eliminará permanentemente el producto 
+              <strong className="text-slate-900"> "{productoAEliminar?.nombre}"</strong> de tu catálogo.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={eliminando}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={eliminarProducto}
+              disabled={eliminando}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {eliminando ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Eliminando...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Eliminar
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
