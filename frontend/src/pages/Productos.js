@@ -385,6 +385,15 @@ export default function Productos() {
         </div>
         
         <div className="flex items-center gap-3">
+          <Button 
+            variant="outline"
+            onClick={() => setShowAddProductModal(true)}
+            data-testid="btn-agregar-producto"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Agregar producto
+          </Button>
+          
           <Link to="/carga-productos">
             <Button variant="outline" data-testid="btn-cargar-mas">
               <Upload className="w-4 h-4 mr-2" />
