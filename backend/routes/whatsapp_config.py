@@ -36,61 +36,79 @@ wa_conversations_collection = db.get_collection('wa_conversations')
 COTIZABOT_WHATSAPP_NUMBER = os.environ.get('COTIZABOT_WHATSAPP_NUMBER', '+14155238886')
 
 
+# ============================================
+# MODELOS DE REQUEST
+# ============================================
+
 class ActivarWhatsAppRequest(BaseModel):
     """Request para activar WhatsApp"""
-    pass  # No requiere parámetros, usa número compartido
+    codigo_personalizado: Optional[str] = None  # Código personalizado (opcional)
 
 
-class MigrarDedicadoRequest(BaseModel):
-    """Request para migrar a número dedicado"""
-    ciudad: Optional[str] = None  # Opcional, para buscar número en esa ciudad
+class ActualizarConfigRequest(BaseModel):
+    """Request para actualizar configuración de WhatsApp"""
+    welcome_message: Optional[str] = None
+    ai_prompt: Optional[str] = None
+    ai_tone: Optional[str] = None
+    horario_atencion: Optional[dict] = None
+
+
+class RegenerarCodigoRequest(BaseModel):
+    """Request para regenerar código"""
+    nuevo_codigo: Optional[str] = None
 
 
 # ============================================
-# ENDPOINTS
+# ENDPOINTS PRINCIPALES
 # ============================================
 
-@router.get("/config")
+@router.get("/configuracion")
 async def get_whatsapp_config(current_user: dict = Depends(get_current_user)):
-    """Obtiene la configuración de WhatsApp de la empresa"""
+    """
+    Obtiene la configuración completa de WhatsApp de la empresa.
+    Incluye: código, link, QR, instrucciones, estadísticas.
+    """
     empresa_id = current_user.get('empresa_id')
     
     empresa = await empresas_collection.find_one(
         {'id': empresa_id},
-        {'_id': 0, 'whatsapp_config': 1, 'twilio_whatsapp_number': 1, 'nombre': 1, 'plan': 1}
+        {'_id': 0}
     )
     
     if not empresa:
         raise HTTPException(status_code=404, detail="Empresa no encontrada")
     
-    wa_config = empresa.get('whatsapp_config', {})
-    plan = empresa.get('plan', 'gratis')
+    # Verificar si tiene WhatsApp configurado
+    tiene_whatsapp = bool(empresa.get('codigo_whatsapp'))
     
-    # Obtener info del número asignado
-    numero_info = None
-    if wa_config.get('whatsapp_number_id'):
-        numero = await whatsapp_numbers_collection.find_one(
-            {'id': wa_config['whatsapp_number_id']},
-            {'_id': 0}
-        )
-        if numero:
-            numero_info = {
-                'phone_number': numero.get('phone_number'),
-                'type': numero.get('type'),
-                'status': numero.get('status'),
-                'is_sandbox': numero.get('is_sandbox', False),
-                'sandbox_code': SHARED_NUMBER_CONFIG.get('sandbox_code') if numero.get('is_sandbox') else None
-            }
+    # Contar conversaciones activas
+    conversations_count = await wa_conversations_collection.count_documents({
+        'company_id': empresa_id
+    })
     
     return {
-        'configured': bool(wa_config.get('whatsapp_number_id')),
-        'mode': wa_config.get('mode', 'none'),  # none | shared | dedicated
-        'phone_number': empresa.get('twilio_whatsapp_number'),
-        'numero_info': numero_info,
-        'plan': plan,
-        'can_upgrade_to_dedicated': plan == 'completo',
-        'migration_status': wa_config.get('migration_status'),
-        'empresa_nombre': empresa.get('nombre')
+        'configurado': tiene_whatsapp,
+        'numero_cotizabot': COTIZABOT_WHATSAPP_NUMBER,
+        'empresa': {
+            'id': empresa['id'],
+            'nombre': empresa.get('nombre'),
+            'plan': empresa.get('plan', 'gratis')
+        },
+        'whatsapp': {
+            'codigo': empresa.get('codigo_whatsapp'),
+            'link': empresa.get('whatsapp_link'),
+            'qr_url': empresa.get('whatsapp_qr_url'),
+            'instrucciones': empresa.get('whatsapp_instrucciones')
+        },
+        'configuracion': {
+            'welcome_message': empresa.get('whatsapp_welcome_message'),
+            'ai_prompt': empresa.get('ai_prompt'),
+            'ai_tone': empresa.get('ai_tone', 'profesional'),
+            'horario_atencion': empresa.get('horario_atencion')
+        },
+        'estadisticas': {
+            'conversaciones': conversations_count
+        }
     }
 
 
@@ -100,216 +118,322 @@ async def activar_whatsapp(
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Activa WhatsApp para la empresa usando el número compartido (MVP/Demo).
-    No requiere Plan Completo - disponible para todos para demo.
+    Activa WhatsApp para la empresa.
+    Genera automáticamente:
+    - Código único
+    - Link de WhatsApp
+    - QR Code
+    - Instrucciones para clientes
+    
+    NO requiere Plan Completo - disponible para TODOS.
     """
     empresa_id = current_user.get('empresa_id')
     
-    # Verificar si ya tiene WhatsApp configurado
     empresa = await empresas_collection.find_one({'id': empresa_id})
     if not empresa:
         raise HTTPException(status_code=404, detail="Empresa no encontrada")
     
-    wa_config = empresa.get('whatsapp_config', {})
-    if wa_config.get('mode') == 'dedicated':
+    # Verificar si ya está configurado
+    if empresa.get('codigo_whatsapp'):
         return {
             'success': True,
             'already_configured': True,
-            'mode': 'dedicated',
-            'phone_number': empresa.get('twilio_whatsapp_number'),
-            'mensaje': 'Ya tienes un número dedicado configurado.'
+            'mensaje': 'WhatsApp ya está configurado para tu empresa.',
+            'codigo': empresa.get('codigo_whatsapp'),
+            'link': empresa.get('whatsapp_link'),
+            'qr_url': empresa.get('whatsapp_qr_url')
         }
     
-    # Asignar al número compartido
-    result = await assign_to_shared_number(db, empresa_id)
-    
-    if not result.get('success'):
-        raise HTTPException(
-            status_code=400,
-            detail=result.get('mensaje', 'Error al activar WhatsApp')
-        )
-    
-    return {
-        'success': True,
-        'mode': 'shared',
-        'phone_number': result['phone_number'],
-        'is_sandbox': result.get('is_sandbox', True),
-        'sandbox_code': result.get('sandbox_code'),
-        'mensaje': '¡WhatsApp activado!' if not result.get('is_sandbox') else 
-                   f"WhatsApp activado en modo demo. Tus clientes deben enviar '{result.get('sandbox_code')}' primero.",
-        'instrucciones': [
-            f"Tu número de WhatsApp: {result['phone_number']}",
-            f"Modo: {'Sandbox (Demo)' if result.get('is_sandbox') else 'Producción'}",
-        ] + ([f"Los clientes deben enviar '{result.get('sandbox_code')}' para conectarse"] if result.get('is_sandbox') else []),
-        'assigned_count': result.get('assigned_count'),
-        'max_count': result.get('max_count')
-    }
-
-
-@router.post("/migrar-dedicado")
-async def migrar_a_dedicado(
-    request: MigrarDedicadoRequest,
-    current_user: dict = Depends(get_current_user)
-):
-    """
-    Migra la empresa a un número dedicado (requiere Plan Completo).
-    
-    Proceso:
-    1. Verifica plan
-    2. Compra número Twilio
-    3. Migra configuración y historial
-    4. Retorna instrucciones para registro en WhatsApp Business API
-    """
-    from twilio.rest import Client
-    from twilio.base.exceptions import TwilioRestException
-    
-    empresa_id = current_user.get('empresa_id')
-    plan = current_user.get('plan', 'gratis')
-    
-    # Verificar plan
-    if plan != 'completo':
-        raise HTTPException(
-            status_code=403,
-            detail="Necesitas el Plan Completo para tener un número dedicado."
-        )
-    
-    # Verificar si ya tiene número dedicado
-    empresa = await empresas_collection.find_one({'id': empresa_id})
-    wa_config = empresa.get('whatsapp_config', {})
-    
-    if wa_config.get('mode') == 'dedicated':
-        return {
-            'success': True,
-            'already_dedicated': True,
-            'phone_number': empresa.get('twilio_whatsapp_number'),
-            'mensaje': 'Ya tienes un número dedicado.'
-        }
-    
-    # Comprar número Twilio (USA para evitar bundle)
-    try:
-        account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
-        auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
-        client = Client(account_sid, auth_token)
+    # Si se proporcionó código personalizado, verificar disponibilidad
+    if request.codigo_personalizado:
+        codigo_limpio = re.sub(r'[^A-Z0-9]', '', request.codigo_personalizado.upper())[:10]
         
-        # Buscar número disponible
-        codigos_usa = ['713', '832', '281', '346', '210', '512', '956', '915']
-        numero_encontrado = None
+        existente = await empresas_collection.find_one({
+            'codigo_whatsapp': codigo_limpio,
+            'id': {'$ne': empresa_id}
+        })
         
-        for area_code in codigos_usa:
-            try:
-                numeros = client.available_phone_numbers('US').local.list(
-                    area_code=area_code,
-                    limit=1
-                )
-                if numeros:
-                    numero_encontrado = numeros[0]
-                    break
-            except Exception:
-                continue
-        
-        if not numero_encontrado:
+        if existente:
             raise HTTPException(
-                status_code=404,
-                detail="No hay números disponibles. Intenta más tarde."
+                status_code=400,
+                detail=f"El código '{codigo_limpio}' ya está en uso. Elige otro."
             )
         
-        # Comprar número
-        webhook_base = os.environ.get('REACT_APP_BACKEND_URL', 'https://cotizaexpress.com')
-        webhook_url = f"{webhook_base}/api/webhook/whatsapp"
-        
-        incoming_number = client.incoming_phone_numbers.create(
-            phone_number=numero_encontrado.phone_number,
-            friendly_name=f"CotizaBot Dedicado - {empresa.get('nombre', 'Empresa')}",
-            sms_url=webhook_url,
-            sms_method='POST'
-        )
-        
-        # Migrar
-        result = await migrate_to_dedicated(
-            db,
-            empresa_id,
-            numero_encontrado.phone_number,
-            incoming_number.sid
-        )
-        
-        # Actualizar empresa
+        # Guardar código personalizado antes de generar assets
         await empresas_collection.update_one(
             {'id': empresa_id},
-            {'$set': {'twilio_whatsapp_number': numero_encontrado.phone_number}}
+            {'$set': {'codigo_whatsapp': codigo_limpio}}
         )
+    
+    # Generar todos los assets
+    try:
+        assets = await generate_company_whatsapp_assets(
+            db, 
+            empresa_id, 
+            COTIZABOT_WHATSAPP_NUMBER
+        )
+        
+        logger.info(f"WhatsApp activado para empresa {empresa_id}: código={assets['codigo']}")
         
         return {
             'success': True,
-            'phone_number': numero_encontrado.phone_number,
-            'twilio_sid': incoming_number.sid,
-            'mode': 'dedicated',
-            'status': 'pending_wa_registration',
-            'mensaje': f'¡Número {numero_encontrado.phone_number} comprado! Ahora necesitas registrarlo en WhatsApp Business API.',
-            'next_steps': result.get('next_steps', []),
-            'importante': 'El número está activo para SMS. Para WhatsApp, debes completar el registro con Meta (1-7 días).'
+            'mensaje': '¡WhatsApp activado correctamente!',
+            'codigo': assets['codigo'],
+            'link': assets['link'],
+            'qr_url': assets['qr_url'],
+            'instrucciones': assets['instrucciones'],
+            'numero_cotizabot': COTIZABOT_WHATSAPP_NUMBER,
+            'siguiente_paso': 'Comparte el link o QR con tus clientes para que empiecen a cotizar.'
         }
         
-    except TwilioRestException as e:
-        logger.error(f"Error Twilio: {e}")
-        raise HTTPException(status_code=400, detail=f"Error de Twilio: {str(e)}")
     except Exception as e:
-        logger.error(f"Error migrando a dedicado: {e}")
+        logger.error(f"Error activando WhatsApp: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/estado")
-async def get_estado_whatsapp(current_user: dict = Depends(get_current_user)):
-    """Obtiene el estado detallado de WhatsApp"""
+@router.put("/configuracion")
+async def actualizar_configuracion(
+    request: ActualizarConfigRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Actualiza la configuración de WhatsApp de la empresa.
+    Permite personalizar: mensaje de bienvenida, prompt de IA, tono, horarios.
+    """
+    empresa_id = current_user.get('empresa_id')
+    
+    updates = {}
+    
+    if request.welcome_message is not None:
+        updates['whatsapp_welcome_message'] = request.welcome_message
+    
+    if request.ai_prompt is not None:
+        updates['ai_prompt'] = request.ai_prompt
+    
+    if request.ai_tone is not None:
+        if request.ai_tone not in ['profesional', 'amigable', 'formal', 'casual']:
+            raise HTTPException(status_code=400, detail="Tono no válido")
+        updates['ai_tone'] = request.ai_tone
+    
+    if request.horario_atencion is not None:
+        updates['horario_atencion'] = request.horario_atencion
+    
+    if not updates:
+        raise HTTPException(status_code=400, detail="No se proporcionaron campos para actualizar")
+    
+    updates['whatsapp_updated_at'] = datetime.now(timezone.utc).isoformat()
+    
+    await empresas_collection.update_one(
+        {'id': empresa_id},
+        {'$set': updates}
+    )
+    
+    return {
+        'success': True,
+        'mensaje': 'Configuración actualizada',
+        'actualizado': list(updates.keys())
+    }
+
+
+@router.post("/regenerar-codigo")
+async def regenerar_codigo(
+    request: RegenerarCodigoRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Regenera el código de WhatsApp.
+    Útil si el código actual no es memorable o está comprometido.
+    """
     empresa_id = current_user.get('empresa_id')
     
     empresa = await empresas_collection.find_one({'id': empresa_id})
     if not empresa:
         raise HTTPException(status_code=404, detail="Empresa no encontrada")
     
-    wa_config = empresa.get('whatsapp_config', {})
-    plan = empresa.get('plan', 'gratis')
+    # Verificar nuevo código si se proporcionó
+    if request.nuevo_codigo:
+        codigo_limpio = re.sub(r'[^A-Z0-9]', '', request.nuevo_codigo.upper())[:10]
+        
+        if len(codigo_limpio) < 3:
+            raise HTTPException(status_code=400, detail="El código debe tener al menos 3 caracteres")
+        
+        existente = await empresas_collection.find_one({
+            'codigo_whatsapp': codigo_limpio,
+            'id': {'$ne': empresa_id}
+        })
+        
+        if existente:
+            raise HTTPException(
+                status_code=400,
+                detail=f"El código '{codigo_limpio}' ya está en uso."
+            )
+        
+        # Guardar nuevo código
+        await empresas_collection.update_one(
+            {'id': empresa_id},
+            {'$set': {'codigo_whatsapp': codigo_limpio}}
+        )
+    else:
+        # Limpiar código para que se genere uno nuevo
+        await empresas_collection.update_one(
+            {'id': empresa_id},
+            {'$unset': {'codigo_whatsapp': ''}}
+        )
     
-    # Obtener routing info
-    try:
-        routing = await route_outgoing_message(db, empresa_id)
-    except Exception as e:
-        routing = {'error': str(e)}
-    
-    # Contar opt-ins
-    whatsapp_optins_collection = db.get_collection('whatsapp_optins')
-    optins_count = await whatsapp_optins_collection.count_documents({
-        'empresa_id': empresa_id,
-        'opted_in': True
-    })
+    # Regenerar assets
+    assets = await generate_company_whatsapp_assets(
+        db,
+        empresa_id,
+        COTIZABOT_WHATSAPP_NUMBER
+    )
     
     return {
-        'empresa_id': empresa_id,
-        'plan': plan,
-        'whatsapp_config': wa_config,
-        'routing': routing,
-        'optins_count': optins_count,
-        'phone_number': empresa.get('twilio_whatsapp_number'),
-        'status': 'active' if wa_config.get('whatsapp_number_id') else 'not_configured'
+        'success': True,
+        'mensaje': 'Código regenerado exitosamente',
+        'codigo': assets['codigo'],
+        'link': assets['link'],
+        'qr_url': assets['qr_url'],
+        'nota': 'Los links anteriores ya no funcionarán. Actualiza tus materiales de marketing.'
     }
 
 
-@router.get("/instrucciones-sandbox")
-async def get_instrucciones_sandbox(current_user: dict = Depends(get_current_user)):
-    """Obtiene las instrucciones para usar el sandbox de Twilio"""
+@router.get("/assets")
+async def get_whatsapp_assets(current_user: dict = Depends(get_current_user)):
+    """
+    Obtiene los assets de WhatsApp para compartir:
+    - Código
+    - Link
+    - QR
+    - Instrucciones
+    - Texto para redes sociales
+    """
+    empresa_id = current_user.get('empresa_id')
+    
+    empresa = await empresas_collection.find_one({'id': empresa_id})
+    if not empresa:
+        raise HTTPException(status_code=404, detail="Empresa no encontrada")
+    
+    if not empresa.get('codigo_whatsapp'):
+        raise HTTPException(
+            status_code=400,
+            detail="WhatsApp no está activado. Actívalo primero."
+        )
+    
+    nombre = empresa.get('nombre', 'Nuestra empresa')
+    codigo = empresa.get('codigo_whatsapp')
+    link = empresa.get('whatsapp_link')
+    
     return {
-        'titulo': 'Cómo probar WhatsApp (Modo Demo)',
-        'numero': SHARED_NUMBER_CONFIG['phone_number'],
-        'codigo': SHARED_NUMBER_CONFIG['sandbox_code'],
-        'pasos': [
-            f"1. Abre WhatsApp en tu teléfono",
-            f"2. Agrega el número {SHARED_NUMBER_CONFIG['phone_number']} a tus contactos",
-            f"3. Envía el mensaje: {SHARED_NUMBER_CONFIG['sandbox_code']}",
-            f"4. Recibirás una confirmación",
-            f"5. ¡Listo! Ya puedes enviar mensajes de prueba"
-        ],
-        'notas': [
-            "Este es un número de prueba compartido",
-            "Las sesiones expiran después de 72 horas sin actividad",
-            "Para producción, actualiza al Plan Completo y obtén tu número dedicado"
-        ]
+        'codigo': codigo,
+        'link': link,
+        'qr_url': empresa.get('whatsapp_qr_url'),
+        'numero': COTIZABOT_WHATSAPP_NUMBER,
+        'instrucciones': empresa.get('whatsapp_instrucciones'),
+        'textos_marketing': {
+            'corto': f"📱 ¡Cotiza por WhatsApp! {link}",
+            'medio': f"📱 ¿Necesitas una cotización de {nombre}?\n¡Escríbenos por WhatsApp!\n{link}",
+            'largo': (
+                f"📱 *Cotiza fácil y rápido por WhatsApp*\n\n"
+                f"{nombre} ahora tiene atención automatizada 24/7.\n\n"
+                f"👉 Haz clic en el link:\n{link}\n\n"
+                f"O agrega nuestro número {COTIZABOT_WHATSAPP_NUMBER} "
+                f"y envía el código: *{codigo}*\n\n"
+                f"Nuestro asistente te ayudará con:\n"
+                f"✅ Cotizaciones de productos\n"
+                f"✅ Disponibilidad de inventario\n"
+                f"✅ Precios actualizados\n"
+                f"✅ Seguimiento de pedidos"
+            )
+        },
+        'embed_html': f'<a href="{link}" target="_blank"><img src="{empresa.get("whatsapp_qr_url")}" alt="Cotiza por WhatsApp" width="200"></a>'
+    }
+
+
+@router.get("/conversaciones")
+async def get_conversaciones(
+    current_user: dict = Depends(get_current_user),
+    limit: int = 50,
+    skip: int = 0
+):
+    """
+    Obtiene las conversaciones de WhatsApp de la empresa.
+    """
+    empresa_id = current_user.get('empresa_id')
+    
+    conversaciones = await wa_conversations_collection.find(
+        {'company_id': empresa_id},
+        {'_id': 0}
+    ).sort('last_message_at', -1).skip(skip).limit(limit).to_list(limit)
+    
+    total = await wa_conversations_collection.count_documents({
+        'company_id': empresa_id
+    })
+    
+    return {
+        'conversaciones': conversaciones,
+        'total': total,
+        'limit': limit,
+        'skip': skip
+    }
+
+
+@router.get("/estadisticas")
+async def get_estadisticas(current_user: dict = Depends(get_current_user)):
+    """
+    Obtiene estadísticas de uso de WhatsApp.
+    """
+    empresa_id = current_user.get('empresa_id')
+    
+    # Total de conversaciones
+    total_conversaciones = await wa_conversations_collection.count_documents({
+        'company_id': empresa_id
+    })
+    
+    # Conversaciones activas (última semana)
+    from datetime import timedelta
+    hace_una_semana = datetime.now(timezone.utc) - timedelta(days=7)
+    
+    conversaciones_activas = await wa_conversations_collection.count_documents({
+        'company_id': empresa_id,
+        'last_message_at': {'$gte': hace_una_semana}
+    })
+    
+    # Conversaciones por método de routing
+    routing_logs = db.get_collection('wa_routing_logs')
+    pipeline = [
+        {'$match': {'company_id': empresa_id}},
+        {'$group': {'_id': '$routing_method', 'count': {'$sum': 1}}},
+        {'$sort': {'count': -1}}
+    ]
+    routing_stats = await routing_logs.aggregate(pipeline).to_list(10)
+    
+    return {
+        'total_conversaciones': total_conversaciones,
+        'conversaciones_activas_semana': conversaciones_activas,
+        'por_metodo_routing': {stat['_id']: stat['count'] for stat in routing_stats if stat['_id']},
+        'numero_cotizabot': COTIZABOT_WHATSAPP_NUMBER
+    }
+
+
+# ============================================
+# ENDPOINTS DE ADMIN (opcional)
+# ============================================
+
+@router.get("/admin/empresas-activas")
+async def admin_empresas_activas(current_user: dict = Depends(get_current_user)):
+    """
+    [ADMIN] Lista todas las empresas con WhatsApp activo.
+    """
+    if current_user.get('rol') != 'admin':
+        raise HTTPException(status_code=403, detail="Solo administradores")
+    
+    empresas = await empresas_collection.find(
+        {'codigo_whatsapp': {'$exists': True, '$ne': None}},
+        {'_id': 0, 'id': 1, 'nombre': 1, 'codigo_whatsapp': 1, 'plan': 1}
+    ).to_list(100)
+    
+    return {
+        'total': len(empresas),
+        'empresas': empresas,
+        'numero_cotizabot': COTIZABOT_WHATSAPP_NUMBER
     }
