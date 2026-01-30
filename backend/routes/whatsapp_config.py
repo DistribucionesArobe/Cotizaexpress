@@ -1,5 +1,13 @@
 """
 Rutas de WhatsApp Multi-Tenant para CotizaBot
+=============================================
+
+ARQUITECTURA: Un solo número de WhatsApp para TODAS las empresas.
+Cada empresa recibe:
+- Código único (ej: FERRESOL)
+- Link de WhatsApp (wa.me/xxx?text=CODIGO)
+- QR Code para imprimir/compartir
+- Instrucciones para clientes finales
 """
 
 from fastapi import APIRouter, HTTPException, Depends
@@ -7,24 +15,25 @@ from pydantic import BaseModel
 from typing import Optional
 from utils.auth import get_current_user
 from database import db
-from services.whatsapp_multitenant import (
-    assign_to_shared_number,
-    migrate_to_dedicated,
-    route_outgoing_message,
-    SHARED_NUMBER_CONFIG,
-    WhatsAppNumberType,
-    WhatsAppNumberStatus
+from services.whatsapp_router import (
+    WhatsAppRouter,
+    generate_company_whatsapp_assets,
+    get_company_whatsapp_info
 )
 from datetime import datetime, timezone
 import logging
 import os
 import uuid
+import re
 
 router = APIRouter(prefix="/whatsapp", tags=["whatsapp"])
 logger = logging.getLogger(__name__)
 
 empresas_collection = db.get_collection('empresas')
-whatsapp_numbers_collection = db.get_collection('whatsapp_numbers')
+wa_conversations_collection = db.get_collection('wa_conversations')
+
+# Número centralizado de CotizaBot
+COTIZABOT_WHATSAPP_NUMBER = os.environ.get('COTIZABOT_WHATSAPP_NUMBER', '+14155238886')
 
 
 class ActivarWhatsAppRequest(BaseModel):
