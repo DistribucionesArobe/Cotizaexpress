@@ -32,8 +32,8 @@ logger = logging.getLogger(__name__)
 empresas_collection = db.get_collection('empresas')
 wa_conversations_collection = db.get_collection('wa_conversations')
 
-# Número centralizado de CotizaBot
-COTIZABOT_WHATSAPP_NUMBER = os.environ.get('COTIZABOT_WHATSAPP_NUMBER', '+14155238886')
+# Número centralizado de CotizaBot (México)
+COTIZABOT_WHATSAPP_NUMBER = os.environ.get('COTIZABOT_WHATSAPP_NUMBER', '+5218344291628')
 
 
 # ============================================
