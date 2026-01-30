@@ -3,14 +3,24 @@ import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
-import { Link } from 'react-router-dom';
 import { 
-  MessageCircle, CheckCircle, Clock, Phone, Crown, 
-  Zap, Users, ArrowRight, Copy, ExternalLink, AlertTriangle,
-  Smartphone, Send
+  MessageCircle, CheckCircle, Phone, 
+  Zap, Copy, ExternalLink, QrCode,
+  Smartphone, Send, Share2, RefreshCw,
+  Settings, Users, BarChart3, Edit2, X, Check
 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -19,12 +29,19 @@ export default function ConfiguracionWhatsApp() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [activando, setActivando] = useState(false);
-  const [migrando, setMigrando] = useState(false);
   const [config, setConfig] = useState(null);
-  const [instrucciones, setInstrucciones] = useState(null);
-
-  const planActual = user?.empresa?.plan || user?.usuario?.plan || 'gratis';
-  const esPlanCompleto = planActual === 'completo';
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [showConfigModal, setShowConfigModal] = useState(false);
+  const [showRegenerarModal, setShowRegenerarModal] = useState(false);
+  const [nuevoCodigoInput, setNuevoCodigoInput] = useState('');
+  const [regenerando, setRegenerando] = useState(false);
+  
+  // Estados para edición de configuración
+  const [editConfig, setEditConfig] = useState({
+    welcome_message: '',
+    ai_tone: 'profesional'
+  });
+  const [guardandoConfig, setGuardandoConfig] = useState(false);
 
   useEffect(() => {
     cargarConfig();
@@ -33,16 +50,15 @@ export default function ConfiguracionWhatsApp() {
   const cargarConfig = async () => {
     try {
       setLoading(true);
-      const [configRes, instruccionesRes] = await Promise.all([
-        axios.get(`${API}/whatsapp/config`),
-        axios.get(`${API}/whatsapp/instrucciones-sandbox`)
-      ]);
-      setConfig(configRes.data);
-      setInstrucciones(instruccionesRes.data);
+      const response = await axios.get(`${API}/whatsapp/configuracion`);
+      setConfig(response.data);
+      setEditConfig({
+        welcome_message: response.data.configuracion?.welcome_message || '',
+        ai_tone: response.data.configuracion?.ai_tone || 'profesional'
+      });
     } catch (error) {
       console.error('Error cargando config:', error);
-      // Si falla, mostrar estado no configurado
-      setConfig({ configured: false, mode: 'none' });
+      setConfig({ configurado: false });
     } finally {
       setLoading(false);
     }
@@ -54,18 +70,7 @@ export default function ConfiguracionWhatsApp() {
       const response = await axios.post(`${API}/whatsapp/activar`, {});
       
       toast.success(response.data.mensaje || '¡WhatsApp activado!');
-      setConfig(prev => ({
-        ...prev,
-        configured: true,
-        mode: 'shared',
-        phone_number: response.data.phone_number,
-        numero_info: {
-          phone_number: response.data.phone_number,
-          type: 'shared',
-          is_sandbox: response.data.is_sandbox,
-          sandbox_code: response.data.sandbox_code
-        }
-      }));
+      await cargarConfig(); // Recargar configuración
       
     } catch (error) {
       console.error('Error activando WhatsApp:', error);
@@ -75,28 +80,38 @@ export default function ConfiguracionWhatsApp() {
     }
   };
 
-  const migrarADedicado = async () => {
+  const regenerarCodigo = async () => {
     try {
-      setMigrando(true);
-      const response = await axios.post(`${API}/whatsapp/migrar-dedicado`, {});
+      setRegenerando(true);
+      const response = await axios.post(`${API}/whatsapp/regenerar-codigo`, {
+        nuevo_codigo: nuevoCodigoInput || null
+      });
       
-      toast.success(response.data.mensaje || '¡Número dedicado activado!');
-      setConfig(prev => ({
-        ...prev,
-        mode: 'dedicated',
-        phone_number: response.data.phone_number,
-        numero_info: {
-          phone_number: response.data.phone_number,
-          type: 'dedicated',
-          is_sandbox: false
-        }
-      }));
+      toast.success(response.data.mensaje);
+      setShowRegenerarModal(false);
+      setNuevoCodigoInput('');
+      await cargarConfig();
       
     } catch (error) {
-      console.error('Error migrando:', error);
-      toast.error(error.response?.data?.detail || 'Error al obtener número dedicado');
+      console.error('Error regenerando código:', error);
+      toast.error(error.response?.data?.detail || 'Error al regenerar código');
     } finally {
-      setMigrando(false);
+      setRegenerando(false);
+    }
+  };
+
+  const guardarConfiguracion = async () => {
+    try {
+      setGuardandoConfig(true);
+      await axios.put(`${API}/whatsapp/configuracion`, editConfig);
+      toast.success('Configuración guardada');
+      setShowConfigModal(false);
+      await cargarConfig();
+    } catch (error) {
+      console.error('Error guardando config:', error);
+      toast.error(error.response?.data?.detail || 'Error al guardar');
+    } finally {
+      setGuardandoConfig(false);
     }
   };
 
@@ -107,16 +122,15 @@ export default function ConfiguracionWhatsApp() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-12">
+      <div className="flex justify-center py-12" data-testid="whatsapp-loading">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
 
-  const isConfigured = config?.configured;
-  const isShared = config?.mode === 'shared';
-  const isDedicated = config?.mode === 'dedicated';
-  const isSandbox = config?.numero_info?.is_sandbox;
+  const isConfigured = config?.configurado;
+  const whatsapp = config?.whatsapp || {};
+  const empresa = config?.empresa || {};
 
   return (
     <div className="space-y-6" data-testid="configuracion-whatsapp-page">
@@ -131,89 +145,252 @@ export default function ConfiguracionWhatsApp() {
         </div>
       </div>
 
-      {/* Estado actual */}
+      {/* Número único de CotizaBot */}
+      <Card className="border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50">
+        <CardContent className="py-4">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-3">
+              <Phone className="w-5 h-5 text-emerald-600" />
+              <div>
+                <p className="text-sm text-emerald-700">Número de CotizaBot</p>
+                <p className="text-lg font-bold text-emerald-900">{config?.numero_cotizabot}</p>
+              </div>
+            </div>
+            <Badge variant="outline" className="bg-white text-emerald-700 border-emerald-300">
+              <CheckCircle className="w-3 h-3 mr-1" />
+              Un número para todas las empresas
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
+
       {isConfigured ? (
-        <Card className={`border-2 ${isDedicated ? 'border-emerald-300 bg-emerald-50' : 'border-blue-300 bg-blue-50'}`}>
-          <CardContent className="py-6">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div className="flex items-center gap-4">
-                <div className={`w-14 h-14 rounded-full flex items-center justify-center ${isDedicated ? 'bg-emerald-200' : 'bg-blue-200'}`}>
-                  <Phone className={`w-7 h-7 ${isDedicated ? 'text-emerald-700' : 'text-blue-700'}`} />
+        /* WhatsApp Configurado - Mostrar Assets */
+        <>
+          {/* Código y Link */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Código único */}
+            <Card className="border-2 border-blue-200" data-testid="card-codigo">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Badge className="bg-blue-600 text-lg px-3 py-1">{whatsapp.codigo}</Badge>
+                  <span className="text-slate-600 font-normal">Tu código único</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-600 mb-4">
+                  Tus clientes envían este código para conectarse contigo automáticamente.
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => copiarTexto(whatsapp.codigo)}
+                    data-testid="btn-copiar-codigo"
+                  >
+                    <Copy className="w-4 h-4 mr-2" />
+                    Copiar código
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowRegenerarModal(true)}
+                    data-testid="btn-regenerar"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                  </Button>
                 </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xl font-bold text-slate-900">{config?.phone_number}</span>
+              </CardContent>
+            </Card>
+
+            {/* Link de WhatsApp */}
+            <Card className="border-2 border-emerald-200" data-testid="card-link">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Share2 className="w-5 h-5 text-emerald-600" />
+                  Link directo
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-600 mb-4">
+                  Comparte este link en tu sitio web, redes sociales o tarjetas.
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+                    onClick={() => copiarTexto(whatsapp.link)}
+                    data-testid="btn-copiar-link"
+                  >
+                    <Copy className="w-4 h-4 mr-2" />
+                    Copiar link
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => window.open(whatsapp.link, '_blank')}
+                    data-testid="btn-probar-link"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* QR Code */}
+          <Card data-testid="card-qr">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <QrCode className="w-5 h-5 text-slate-700" />
+                Código QR
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col md:flex-row items-center gap-6">
+                <div 
+                  className="cursor-pointer hover:opacity-90 transition-opacity"
+                  onClick={() => setShowQRModal(true)}
+                >
+                  <img 
+                    src={whatsapp.qr_url} 
+                    alt="QR Code WhatsApp" 
+                    className="w-40 h-40 rounded-lg border-2 border-slate-200"
+                  />
+                </div>
+                <div className="flex-1 text-center md:text-left">
+                  <h4 className="font-medium text-slate-900 mb-2">Imprime y comparte</h4>
+                  <p className="text-sm text-slate-600 mb-4">
+                    Coloca este QR en tu local, tarjetas de presentación, facturas o donde tus clientes puedan escanearlo.
+                  </p>
+                  <div className="flex flex-wrap gap-2 justify-center md:justify-start">
                     <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 w-7 p-0"
-                      onClick={() => copiarTexto(config?.phone_number)}
+                      variant="outline"
+                      onClick={() => setShowQRModal(true)}
+                      data-testid="btn-ver-qr-grande"
                     >
-                      <Copy className="w-4 h-4" />
+                      Ver en grande
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        const link = document.createElement('a');
+                        link.href = whatsapp.qr_url;
+                        link.download = `qr-whatsapp-${empresa.nombre?.replace(/\s+/g, '-')}.png`;
+                        link.click();
+                      }}
+                      data-testid="btn-descargar-qr"
+                    >
+                      Descargar QR
                     </Button>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant={isDedicated ? 'default' : 'secondary'}>
-                      {isDedicated ? '🔒 Número Dedicado' : '👥 Número Compartido'}
-                    </Badge>
-                    {isSandbox && (
-                      <Badge variant="outline" className="text-amber-600 border-amber-300">
-                        ⚠️ Modo Demo
-                      </Badge>
-                    )}
-                    <Badge variant="outline" className="text-emerald-600">
-                      <CheckCircle className="w-3 h-3 mr-1" />
-                      Activo
-                    </Badge>
-                  </div>
                 </div>
               </div>
-              
-              {isShared && esPlanCompleto && (
-                <Button 
-                  onClick={migrarADedicado}
-                  disabled={migrando}
-                  className="bg-emerald-600 hover:bg-emerald-700"
-                >
-                  {migrando ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Obteniendo número...
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="w-4 h-4 mr-2" />
-                      Obtener Número Dedicado
-                    </>
-                  )}
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        /* No configurado - Mostrar opciones */
-        <Card className="border-2 border-dashed border-slate-300">
-          <CardContent className="py-8">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MessageCircle className="w-8 h-8 text-slate-400" />
+            </CardContent>
+          </Card>
+
+          {/* Instrucciones para clientes */}
+          <Card className="bg-slate-50">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Users className="w-5 h-5 text-slate-700" />
+                Instrucciones para tus clientes
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-white rounded-lg p-4 border border-slate-200">
+                <pre className="text-sm text-slate-700 whitespace-pre-wrap font-sans">
+                  {whatsapp.instrucciones}
+                </pre>
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                WhatsApp no configurado
-              </h3>
-              <p className="text-slate-600 max-w-md mx-auto">
-                Activa WhatsApp para que tus clientes puedan solicitar cotizaciones 
-                automáticamente las 24 horas.
-              </p>
-            </div>
+              <Button
+                variant="outline"
+                className="mt-3"
+                onClick={() => copiarTexto(whatsapp.instrucciones)}
+                data-testid="btn-copiar-instrucciones"
+              >
+                <Copy className="w-4 h-4 mr-2" />
+                Copiar texto
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Acciones rápidas */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card className="cursor-pointer hover:border-blue-300 transition-colors" onClick={() => setShowConfigModal(true)}>
+              <CardContent className="py-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <Settings className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-slate-900">Personalizar respuestas</h4>
+                    <p className="text-sm text-slate-600">Mensaje de bienvenida y tono de la IA</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
             
-            <div className="flex justify-center">
+            <Card className="cursor-pointer hover:border-emerald-300 transition-colors" onClick={cargarConfig}>
+              <CardContent className="py-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+                    <BarChart3 className="w-5 h-5 text-emerald-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-slate-900">Estadísticas</h4>
+                    <p className="text-sm text-slate-600">
+                      {config?.estadisticas?.conversaciones || 0} conversaciones
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </>
+      ) : (
+        /* WhatsApp No Configurado */
+        <Card className="border-2 border-dashed border-slate-300">
+          <CardContent className="py-12">
+            <div className="text-center max-w-md mx-auto">
+              <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <MessageCircle className="w-10 h-10 text-emerald-600" />
+              </div>
+              
+              <h3 className="text-xl font-bold text-slate-900 mb-3">
+                Activa WhatsApp para tu empresa
+              </h3>
+              
+              <p className="text-slate-600 mb-6">
+                Tus clientes podrán solicitar cotizaciones automáticas 24/7. 
+                Obtendrás un código único, link y QR para compartir.
+              </p>
+
+              <div className="bg-emerald-50 rounded-lg p-4 mb-6 text-left">
+                <h4 className="font-medium text-emerald-800 mb-2">¿Qué obtienes?</h4>
+                <ul className="space-y-2 text-sm text-emerald-700">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" />
+                    Código único para tu empresa (ej: FERRESOL)
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" />
+                    Link directo para compartir en redes
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" />
+                    Código QR para imprimir
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" />
+                    Atención automatizada 24/7
+                  </li>
+                </ul>
+              </div>
+              
               <Button 
                 onClick={activarWhatsApp}
                 disabled={activando}
                 size="lg"
                 className="bg-emerald-600 hover:bg-emerald-700"
+                data-testid="btn-activar-whatsapp"
               >
                 {activando ? (
                   <>
@@ -222,8 +399,8 @@ export default function ConfiguracionWhatsApp() {
                   </>
                 ) : (
                   <>
-                    <MessageCircle className="w-5 h-5 mr-2" />
-                    Activar WhatsApp (Demo)
+                    <Zap className="w-5 h-5 mr-2" />
+                    Activar WhatsApp Gratis
                   </>
                 )}
               </Button>
@@ -232,194 +409,189 @@ export default function ConfiguracionWhatsApp() {
         </Card>
       )}
 
-      {/* Instrucciones de Sandbox (solo si está en modo demo) */}
-      {isConfigured && isSandbox && instrucciones && (
-        <Card className="border-amber-200 bg-amber-50">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2 text-amber-800">
-              <AlertTriangle className="w-5 h-5" />
-              {instrucciones.titulo}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="bg-white rounded-lg p-4 border border-amber-200">
-                <p className="text-sm font-medium text-slate-700 mb-3">Para probar, tus clientes deben:</p>
-                <ol className="space-y-2">
-                  {instrucciones.pasos?.map((paso, i) => (
-                    <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
-                      <span className="font-bold text-amber-600">{i + 1}.</span>
-                      <span>{paso.replace(/^\d+\.\s*/, '')}</span>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-              
-              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-amber-200">
-                <Smartphone className="w-5 h-5 text-amber-600" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-slate-700">Código para conectarse:</p>
-                  <p className="text-lg font-mono font-bold text-amber-700">{instrucciones.codigo}</p>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => copiarTexto(instrucciones.codigo)}
-                >
-                  <Copy className="w-4 h-4" />
-                </Button>
-              </div>
-              
-              <div className="text-xs text-amber-700 space-y-1">
-                {instrucciones.notas?.map((nota, i) => (
-                  <p key={i}>• {nota}</p>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Comparativa de planes */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Número Compartido */}
-        <Card className={`${isShared ? 'border-2 border-blue-300' : ''}`}>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Users className="w-5 h-5 text-blue-600" />
-              Número Compartido
-              {isShared && <Badge className="ml-2">Actual</Badge>}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2 text-sm text-slate-600">
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-emerald-500" />
-                Activación inmediata
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-emerald-500" />
-                Ideal para probar el sistema
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-emerald-500" />
-                Sin costo adicional
-              </li>
-              <li className="flex items-center gap-2 text-amber-600">
-                <AlertTriangle className="w-4 h-4" />
-                Máximo 10 empresas por número
-              </li>
-              <li className="flex items-center gap-2 text-amber-600">
-                <AlertTriangle className="w-4 h-4" />
-                Número de CotizaExpress
-              </li>
-            </ul>
-            
-            {!isConfigured && (
-              <Button 
-                variant="outline" 
-                className="w-full mt-4"
-                onClick={activarWhatsApp}
-                disabled={activando}
-              >
-                Usar número compartido
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Número Dedicado */}
-        <Card className={`${isDedicated ? 'border-2 border-emerald-300' : ''}`}>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Crown className="w-5 h-5 text-emerald-600" />
-              Número Dedicado
-              {isDedicated && <Badge className="bg-emerald-600 ml-2">Actual</Badge>}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2 text-sm text-slate-600">
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-emerald-500" />
-                Número exclusivo para tu empresa
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-emerald-500" />
-                Sin límite de conversaciones
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-emerald-500" />
-                Tu marca en el perfil de WhatsApp
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-emerald-500" />
-                Historial completo y privado
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-emerald-500" />
-                Templates personalizados
-              </li>
-            </ul>
-            
-            {!isDedicated && (
-              esPlanCompleto ? (
-                <Button 
-                  className="w-full mt-4 bg-emerald-600 hover:bg-emerald-700"
-                  onClick={migrarADedicado}
-                  disabled={migrando}
-                >
-                  {migrando ? 'Obteniendo...' : 'Obtener número dedicado'}
-                </Button>
-              ) : (
-                <Link to="/precios">
-                  <Button variant="outline" className="w-full mt-4">
-                    Requiere Plan Completo
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
-              )
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Cómo funciona */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">¿Cómo funciona?</CardTitle>
+          <CardTitle className="text-base">¿Cómo funciona el enrutamiento?</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="text-center p-4">
               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Send className="w-6 h-6 text-blue-600" />
+                <Smartphone className="w-6 h-6 text-blue-600" />
               </div>
-              <h4 className="font-medium text-slate-900 mb-1">1. Cliente escribe</h4>
-              <p className="text-sm text-slate-600">
-                Tu cliente envía un mensaje pidiendo cotización
+              <h4 className="font-medium text-slate-900 mb-1">1. Cliente escanea QR</h4>
+              <p className="text-xs text-slate-600">
+                O usa el link con tu código
               </p>
             </div>
-            <div className="text-center">
+            <div className="text-center p-4">
               <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Zap className="w-6 h-6 text-emerald-600" />
+                <MessageCircle className="w-6 h-6 text-emerald-600" />
               </div>
-              <h4 className="font-medium text-slate-900 mb-1">2. IA procesa</h4>
-              <p className="text-sm text-slate-600">
-                CotizaBot entiende la solicitud y busca productos
+              <h4 className="font-medium text-slate-900 mb-1">2. Envía mensaje</h4>
+              <p className="text-xs text-slate-600">
+                Con tu código automáticamente
               </p>
             </div>
-            <div className="text-center">
+            <div className="text-center p-4">
               <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <MessageCircle className="w-6 h-6 text-purple-600" />
+                <Zap className="w-6 h-6 text-purple-600" />
               </div>
-              <h4 className="font-medium text-slate-900 mb-1">3. Cotización enviada</h4>
-              <p className="text-sm text-slate-600">
-                El cliente recibe su cotización en segundos
+              <h4 className="font-medium text-slate-900 mb-1">3. CotizaBot identifica</h4>
+              <p className="text-xs text-slate-600">
+                Conecta al cliente con tu empresa
+              </p>
+            </div>
+            <div className="text-center p-4">
+              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Send className="w-6 h-6 text-amber-600" />
+              </div>
+              <h4 className="font-medium text-slate-900 mb-1">4. Cotización enviada</h4>
+              <p className="text-xs text-slate-600">
+                Con TU catálogo y precios
               </p>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* Modal QR Grande */}
+      <Dialog open={showQRModal} onOpenChange={setShowQRModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Código QR - {empresa.nombre}</DialogTitle>
+            <DialogDescription>
+              Escanea o descarga este código para compartir
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-center py-4">
+            <img 
+              src={whatsapp.qr_url} 
+              alt="QR Code WhatsApp" 
+              className="w-72 h-72 rounded-lg border-2 border-slate-200"
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowQRModal(false)}
+            >
+              Cerrar
+            </Button>
+            <Button
+              className="bg-emerald-600 hover:bg-emerald-700"
+              onClick={() => {
+                const link = document.createElement('a');
+                link.href = whatsapp.qr_url;
+                link.download = `qr-whatsapp-${empresa.nombre?.replace(/\s+/g, '-')}.png`;
+                link.click();
+              }}
+            >
+              Descargar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal Configuración */}
+      <Dialog open={showConfigModal} onOpenChange={setShowConfigModal}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Personalizar respuestas</DialogTitle>
+            <DialogDescription>
+              Configura cómo responde CotizaBot a tus clientes
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="text-sm font-medium text-slate-700">Mensaje de bienvenida</label>
+              <Textarea
+                placeholder="¡Hola! Soy el asistente de [tu empresa]. ¿En qué puedo ayudarte?"
+                value={editConfig.welcome_message}
+                onChange={(e) => setEditConfig(prev => ({ ...prev, welcome_message: e.target.value }))}
+                className="mt-1"
+                rows={3}
+              />
+              <p className="text-xs text-slate-500 mt-1">
+                Este mensaje se envía cuando un cliente nuevo se conecta.
+              </p>
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium text-slate-700">Tono de la IA</label>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                {['profesional', 'amigable', 'formal', 'casual'].map(tono => (
+                  <Button
+                    key={tono}
+                    type="button"
+                    variant={editConfig.ai_tone === tono ? 'default' : 'outline'}
+                    className="capitalize"
+                    onClick={() => setEditConfig(prev => ({ ...prev, ai_tone: tono }))}
+                  >
+                    {tono}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowConfigModal(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={guardarConfiguracion}
+              disabled={guardandoConfig}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
+              {guardandoConfig ? 'Guardando...' : 'Guardar cambios'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal Regenerar Código */}
+      <Dialog open={showRegenerarModal} onOpenChange={setShowRegenerarModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Regenerar código</DialogTitle>
+            <DialogDescription>
+              ⚠️ El código actual dejará de funcionar. Los links y QR anteriores ya no servirán.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <label className="text-sm font-medium text-slate-700">
+              Nuevo código (opcional)
+            </label>
+            <Input
+              placeholder="Ej: FERRESOL, ACEROMX"
+              value={nuevoCodigoInput}
+              onChange={(e) => setNuevoCodigoInput(e.target.value.toUpperCase())}
+              className="mt-1"
+              maxLength={10}
+            />
+            <p className="text-xs text-slate-500 mt-1">
+              Deja vacío para generar uno automático. Máximo 10 caracteres, sin espacios.
+            </p>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowRegenerarModal(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={regenerarCodigo}
+              disabled={regenerando}
+              className="bg-amber-600 hover:bg-amber-700"
+            >
+              {regenerando ? 'Regenerando...' : 'Regenerar código'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
