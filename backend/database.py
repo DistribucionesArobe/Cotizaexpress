@@ -57,6 +57,25 @@ async def init_indexes():
     await logs_agente_collection.create_index([('timestamp', -1)])
     await logs_agente_collection.create_index([('agente', 1), ('timestamp', -1)])
     
+    # Índices para WhatsApp Router (Multi-tenant)
+    wa_conversations = db.get_collection('wa_conversations')
+    await wa_conversations.create_index([('user_phone', 1)], unique=True)
+    await wa_conversations.create_index([('company_id', 1)])
+    await wa_conversations.create_index([('last_message_at', -1)])
+    
+    wa_routing_logs = db.get_collection('wa_routing_logs')
+    await wa_routing_logs.create_index([('user_phone', 1), ('timestamp', -1)])
+    await wa_routing_logs.create_index([('company_id', 1), ('timestamp', -1)])
+    
+    # Índice para código de WhatsApp único por empresa
+    empresas_collection = db.get_collection('empresas')
+    await empresas_collection.create_index(
+        [('codigo_whatsapp', 1)], 
+        unique=True, 
+        sparse=True,
+        name='codigo_whatsapp_unique'
+    )
+    
     logger.info("Índices creados exitosamente")
 
 async def seed_catalogo():
