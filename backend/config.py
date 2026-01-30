@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     twilio_account_sid: str = os.environ.get('TWILIO_ACCOUNT_SID', '')
     twilio_auth_token: str = os.environ.get('TWILIO_AUTH_TOKEN', '')
     twilio_whatsapp_number: str = os.environ.get('TWILIO_WHATSAPP_NUMBER', '')
+    cotizabot_whatsapp_number: str = os.environ.get('COTIZABOT_WHATSAPP_NUMBER', '+5218344291628')
     
     # OpenAI (via Emergent LLM Key)
     emergent_llm_key: str = os.environ.get('EMERGENT_LLM_KEY', '')
