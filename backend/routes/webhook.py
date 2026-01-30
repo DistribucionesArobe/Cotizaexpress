@@ -17,8 +17,8 @@ logger = logging.getLogger(__name__)
 orquestador = OrquestadorCotizaBot()
 whatsapp_router = WhatsAppRouter(db)
 
-# Número de WhatsApp centralizado de CotizaBot
-COTIZABOT_WHATSAPP_NUMBER = os.environ.get('COTIZABOT_WHATSAPP_NUMBER', '+14155238886')
+# Número de WhatsApp centralizado de CotizaBot (México)
+COTIZABOT_WHATSAPP_NUMBER = os.environ.get('COTIZABOT_WHATSAPP_NUMBER', '+5218344291628')
 
 
 @router.post("/twilio/whatsapp")
