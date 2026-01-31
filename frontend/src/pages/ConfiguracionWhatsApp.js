@@ -168,21 +168,15 @@ export default function ConfiguracionWhatsApp() {
         </div>
       </div>
 
-      {/* Número único de CotizaBot */}
+      {/* Número de CotizaBot */}
       <Card className="border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50">
         <CardContent className="py-4">
-          <div className="flex items-center justify-between flex-wrap gap-3">
-            <div className="flex items-center gap-3">
-              <Phone className="w-5 h-5 text-emerald-600" />
-              <div>
-                <p className="text-sm text-emerald-700">Número de CotizaBot</p>
-                <p className="text-lg font-bold text-emerald-900">{config?.numero_cotizabot}</p>
-              </div>
+          <div className="flex items-center gap-3">
+            <Phone className="w-5 h-5 text-emerald-600" />
+            <div>
+              <p className="text-sm text-emerald-700">Número de atención</p>
+              <p className="text-lg font-bold text-emerald-900">{config?.numero_cotizabot}</p>
             </div>
-            <Badge variant="outline" className="bg-white text-emerald-700 border-emerald-300">
-              <CheckCircle className="w-3 h-3 mr-1" />
-              Un número para todas las empresas
-            </Badge>
           </div>
         </CardContent>
       </Card>
