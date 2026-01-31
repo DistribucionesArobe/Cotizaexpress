@@ -115,9 +115,39 @@ export default function ConfiguracionWhatsApp() {
     }
   };
 
-  const copiarTexto = (texto) => {
-    navigator.clipboard.writeText(texto);
-    toast.success('Copiado al portapapeles');
+  const copiarTexto = async (texto) => {
+    try {
+      // Intentar Clipboard API moderna
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(texto);
+        toast.success('Copiado al portapapeles');
+        return;
+      }
+      
+      // Fallback: crear textarea temporal
+      const textArea = document.createElement('textarea');
+      textArea.value = texto;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      
+      if (successful) {
+        toast.success('Copiado al portapapeles');
+      } else {
+        throw new Error('execCommand failed');
+      }
+    } catch (err) {
+      console.error('Error copiando:', err);
+      // Mostrar el texto en un prompt para copiar manualmente
+      toast.info('Selecciona y copia el texto:');
+      prompt('Copia este texto (Ctrl+C):', texto);
+    }
   };
 
   if (loading) {
