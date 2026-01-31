@@ -115,37 +115,30 @@ export default function ConfiguracionWhatsApp() {
     }
   };
 
-  const copiarTexto = async (texto) => {
+  const copiarTexto = (texto) => {
+    // Usar método fallback directamente (más compatible)
+    const textArea = document.createElement('textarea');
+    textArea.value = texto;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
     try {
-      // Intentar Clipboard API moderna
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(texto);
-        toast.success('Copiado al portapapeles');
-        return;
-      }
-      
-      // Fallback: crear textarea temporal
-      const textArea = document.createElement('textarea');
-      textArea.value = texto;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-999999px';
-      textArea.style.top = '-999999px';
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      
       const successful = document.execCommand('copy');
       document.body.removeChild(textArea);
       
       if (successful) {
         toast.success('Copiado al portapapeles');
       } else {
-        throw new Error('execCommand failed');
+        toast.info('No se pudo copiar automáticamente');
+        prompt('Copia este texto (Ctrl+C):', texto);
       }
     } catch (err) {
-      console.error('Error copiando:', err);
-      // Mostrar el texto en un prompt para copiar manualmente
-      toast.info('Selecciona y copia el texto:');
+      document.body.removeChild(textArea);
+      toast.info('Copia manual:');
       prompt('Copia este texto (Ctrl+C):', texto);
     }
   };
