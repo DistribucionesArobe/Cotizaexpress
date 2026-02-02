@@ -17,6 +17,10 @@ class AgentState(TypedDict):
     cliente_nombre: Optional[str]
     historial_cliente: List[Dict[str, Any]]
     
+    # Contexto multi-tenant (empresa)
+    empresa_id: Optional[str]
+    empresa_context: Optional[Dict[str, Any]]
+    
     # Contexto de cotización
     cotizacion_actual: Optional[Dict[str, Any]]
     productos_solicitados: List[Dict[str, Any]]
