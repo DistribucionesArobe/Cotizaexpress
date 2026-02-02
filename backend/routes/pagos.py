@@ -41,9 +41,9 @@ PLANES = {
     },
     "pro": {
         "nombre": "Plan Pro CotizaBot",
-        "precio_base": 1724.14,  # MXN (2000 / 1.16)
+        "precio_base": 2000.0,  # MXN
         "iva_rate": 0.16,
-        "precio_total": 2000.0,  # MXN con IVA
+        "precio_total": 2320.0,  # MXN con IVA ($2,000 + 16% IVA)
         "descripcion": "Todo Completo + Cobros automáticos (Mercado Pago + SPEI)",
         "interval": "month",
         "features": [
