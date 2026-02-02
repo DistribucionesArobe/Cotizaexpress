@@ -222,10 +222,12 @@ class WhatsAppRouter:
         PASO 2: Verificar si el usuario ya tiene una conversación activa.
         
         REGLA: Si ya habló con una empresa, siempre continúa con esa.
+        Busca en: wa_conversations Y en clientes (por empresa_id asignada)
         """
+        # Buscar en wa_conversations primero
         conversation = await self.conversations_collection.find_one({
             'user_phone': user_phone,
-            'state': {'$in': [ConversationState.ACTIVE, ConversationState.NEW]}
+            'state': {'$in': [ConversationState.ACTIVE, ConversationState.NEW, 'active', 'new']}
         }, sort=[('last_message_at', -1)])
         
         if conversation and conversation.get('company_id'):
@@ -242,6 +244,44 @@ class WhatsAppRouter:
                         'last_message_at': datetime.now(timezone.utc),
                         'messages_count': conversation.get('messages_count', 0) + 1
                     }}
+                )
+                
+                return RoutingResult(
+                    success=True,
+                    company_id=empresa['id'],
+                    company_name=empresa.get('nombre'),
+                    routing_method=RoutingMethod.MEMORY
+                )
+        
+        # Buscar también en clientes por si tiene empresa asignada
+        clientes_collection = self.db.get_collection('clientes')
+        cliente = await clientes_collection.find_one({'telefono': user_phone})
+        
+        if cliente and cliente.get('empresa_id'):
+            empresa = await self.companies_collection.find_one({
+                'id': cliente['empresa_id'],
+                'activo': True
+            })
+            
+            if empresa:
+                # Crear/actualizar conversación en wa_conversations
+                await self.conversations_collection.update_one(
+                    {'user_phone': user_phone},
+                    {
+                        '$set': {
+                            'company_id': empresa['id'],
+                            'company_name': empresa.get('nombre'),
+                            'state': ConversationState.ACTIVE,
+                            'last_message_at': datetime.now(timezone.utc)
+                        },
+                        '$setOnInsert': {
+                            'id': str(uuid.uuid4()),
+                            'user_phone': user_phone,
+                            'created_at': datetime.now(timezone.utc)
+                        },
+                        '$inc': {'messages_count': 1}
+                    },
+                    upsert=True
                 )
                 
                 return RoutingResult(
