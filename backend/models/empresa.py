@@ -29,10 +29,13 @@ class Empresa(BaseModel):
     cotizaciones_limite: int = 5
     subscription_status: Optional[str] = None
     stripe_subscription_id: Optional[str] = None
-    # Twilio/WhatsApp
-    twilio_account_sid: Optional[str] = None
-    twilio_auth_token: Optional[str] = None
-    twilio_whatsapp_number: Optional[str] = None
+    # WhatsApp (360dialog)
+    codigo_whatsapp: Optional[str] = None
+    whatsapp_link: Optional[str] = None
+    whatsapp_qr_url: Optional[str] = None
+    whatsapp_welcome_message: Optional[str] = None
+    ai_prompt: Optional[str] = None
+    ai_tone: Optional[str] = 'profesional'
     # Logo
     logo_path: Optional[str] = None
     logo_url: Optional[str] = None
