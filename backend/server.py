@@ -71,11 +71,9 @@ api_router.include_router(clientes.router)
 api_router.include_router(conversaciones.router)
 api_router.include_router(dashboard.router)
 api_router.include_router(carga_productos.router)
-api_router.include_router(twilio_numbers.router)
 api_router.include_router(pagos.router)
 api_router.include_router(empresa.router)
 api_router.include_router(portal_cliente.router)
-api_router.include_router(admin.router)
 api_router.include_router(whatsapp_config.router)
 
 # Registrar router principal
