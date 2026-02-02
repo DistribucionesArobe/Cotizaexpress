@@ -27,6 +27,75 @@ class CobroService:
         self.mp_access_token = MERCADOPAGO_ACCESS_TOKEN
         self.mp_base_url = "https://api.mercadopago.com"
     
+    async def generar_link_mercadopago_empresa(
+        self,
+        mp_token: str,
+        titulo: str,
+        monto: float,
+        referencia: str,
+        email_comprador: Optional[str] = None,
+        descripcion: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Genera un link de pago usando el token de Mercado Pago de la EMPRESA.
+        Cada empresa tiene su propio Access Token.
+        """
+        if not mp_token:
+            return {
+                "success": False,
+                "error": "Token de Mercado Pago no proporcionado."
+            }
+        
+        payload = {
+            "items": [{
+                "title": titulo,
+                "quantity": 1,
+                "unit_price": float(monto),
+                "currency_id": "MXN"
+            }],
+            "external_reference": referencia,
+            "auto_return": "approved",
+            "expires": True
+        }
+        
+        if email_comprador:
+            payload["payer"] = {"email": email_comprador}
+        
+        if descripcion:
+            payload["items"][0]["description"] = descripcion
+        
+        try:
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                response = await client.post(
+                    f"{self.mp_base_url}/checkout/preferences",
+                    headers={
+                        "Authorization": f"Bearer {mp_token}",
+                        "Content-Type": "application/json"
+                    },
+                    json=payload
+                )
+                
+                if response.status_code in [200, 201]:
+                    data = response.json()
+                    return {
+                        "success": True,
+                        "link": data.get("init_point"),
+                        "sandbox_link": data.get("sandbox_init_point"),
+                        "preference_id": data.get("id"),
+                        "referencia": referencia
+                    }
+                else:
+                    logger.error(f"Error Mercado Pago: {response.text}")
+                    return {
+                        "success": False,
+                        "error": response.text
+                    }
+                    
+        except Exception as e:
+            logger.error(f"Error generando link MP empresa: {e}")
+            return {"success": False, "error": str(e)}
+    
+    
     async def generar_link_mercadopago(
         self,
         titulo: str,
