@@ -119,10 +119,13 @@ class OrquestadorCotizaBot:
         # Consolidar respuesta final
         respuesta_final = ""
         
-        if state.get('respuesta_cotizador'):
+        # Prioridad: cobros > cotizador > operativo > compliance
+        if state.get('respuesta_cobros'):
+            respuesta_final = state['respuesta_cobros']
+        elif state.get('respuesta_cotizador'):
             respuesta_final += state['respuesta_cotizador']
         
-        if state.get('respuesta_compliance'):
+        if state.get('respuesta_compliance') and not state.get('respuesta_cobros'):
             respuesta_final += state['respuesta_compliance']
         
         if state.get('respuesta_operativo'):
