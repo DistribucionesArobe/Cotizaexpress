@@ -18,6 +18,7 @@ import Clientes from './pages/Clientes';
 import Conversaciones from './pages/Conversaciones';
 import CargaProductos from './pages/CargaProductos';
 import ConfiguracionWhatsApp from './pages/ConfiguracionWhatsApp';
+import ConfigCobros from './pages/ConfigCobros';
 import PerfilEmpresa from './pages/PerfilEmpresa';
 import PortalCliente from './pages/PortalCliente';
 import AdminPromoCodes from './pages/AdminPromoCodes';
