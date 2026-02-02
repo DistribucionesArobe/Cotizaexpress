@@ -100,6 +100,18 @@ class OrquestadorCotizaBot:
         resultado = await self.compliance.validar(state)
         return {**state, **resultado}
     
+    async def _nodo_confirmar_cotizacion(self, state: AgentState) -> AgentState:
+        """Nodo que maneja la confirmación de cotización y ofrece métodos de pago"""
+        logger.info("Ejecutando nodo: confirmar_cotizacion")
+        resultado = await self.cobros.ofrecer_metodos_pago(state)
+        return {**state, **resultado}
+    
+    async def _nodo_metodo_pago(self, state: AgentState) -> AgentState:
+        """Nodo que procesa la selección del método de pago"""
+        logger.info("Ejecutando nodo: metodo_pago")
+        resultado = await self.cobros.procesar_metodo_pago(state)
+        return {**state, **resultado}
+    
     async def _nodo_finalizar(self, state: AgentState) -> AgentState:
         """Nodo que consolida la respuesta final"""
         logger.info("Ejecutando nodo: finalizar")
