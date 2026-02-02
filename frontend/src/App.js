@@ -253,6 +253,15 @@ function AppContent() {
                     💬 WhatsApp
                   </Link>
                   <Link
+                    to="/config-cobros"
+                    className={`block px-4 py-3 rounded-lg text-sm font-medium ${
+                      activeTab === 'cobros' ? 'bg-amber-50 text-amber-700' : 'text-slate-600'
+                    }`}
+                    onClick={() => { setActiveTab('cobros'); setMobileMenuOpen(false); }}
+                  >
+                    💰 Cobros
+                  </Link>
+                  <Link
                     to="/perfil-empresa"
                     className={`block px-4 py-3 rounded-lg text-sm font-medium ${
                       activeTab === 'perfil' ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600'
