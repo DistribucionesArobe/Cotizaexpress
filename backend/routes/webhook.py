@@ -5,8 +5,8 @@ CotizaBot - Webhook de WhatsApp (360dialog)
 Recibe mensajes de WhatsApp via 360dialog y los procesa con el bot.
 """
 
-from fastapi import APIRouter, Request, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Request, HTTPException, Response
+from fastapi.responses import JSONResponse, PlainTextResponse
 from agents.orquestador import OrquestadorCotizaBot
 from services.dialog360_service import dialog360_service
 from services.whatsapp_router import WhatsAppRouter
