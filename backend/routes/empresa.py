@@ -505,3 +505,172 @@ async def listar_solicitudes_factura(current_user: dict = Depends(get_current_us
     except Exception as e:
         logger.error(f"Error listando solicitudes: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+
+# ==================== CONFIGURACIÓN DE COBROS (Plan Pro) ====================
+
+class DatosBancariosUpdate(BaseModel):
+    banco: str
+    beneficiario: str
+    clabe: str
+    cuenta: Optional[str] = None
+
+class ConfigMercadoPagoUpdate(BaseModel):
+    access_token: str
+
+@router.get("/config-cobros")
+async def obtener_config_cobros(current_user: dict = Depends(get_current_user)):
+    """Obtiene la configuración de cobros de la empresa"""
+    try:
+        empresa_id = current_user.get('empresa_id')
+        
+        empresa = await empresas_collection.find_one({'id': empresa_id}, {'_id': 0})
+        if not empresa:
+            raise HTTPException(status_code=404, detail="Empresa no encontrada")
+        
+        plan = empresa.get('plan', 'gratis')
+        tiene_plan_pro = plan == 'pro'
+        
+        datos_bancarios = empresa.get('datos_bancarios', {})
+        config_cobros = empresa.get('config_cobros', {})
+        
+        return {
+            "plan": plan,
+            "tiene_plan_pro": tiene_plan_pro,
+            "cobros_habilitados": tiene_plan_pro,
+            "spei": {
+                "configurado": bool(datos_bancarios.get('clabe')),
+                "banco": datos_bancarios.get('banco'),
+                "beneficiario": datos_bancarios.get('beneficiario'),
+                "clabe_oculta": datos_bancarios.get('clabe', '')[-4:].rjust(18, '*') if datos_bancarios.get('clabe') else None
+            },
+            "mercadopago": {
+                "configurado": bool(config_cobros.get('mercadopago_access_token')),
+                "enabled": config_cobros.get('mercadopago_enabled', False)
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error obteniendo config cobros: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.put("/datos-bancarios")
+async def actualizar_datos_bancarios(
+    datos: DatosBancariosUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Actualiza los datos bancarios para cobros SPEI (requiere Plan Pro)"""
+    try:
+        empresa_id = current_user.get('empresa_id')
+        
+        empresa = await empresas_collection.find_one({'id': empresa_id}, {'_id': 0})
+        if not empresa:
+            raise HTTPException(status_code=404, detail="Empresa no encontrada")
+        
+        # Verificar plan Pro
+        if empresa.get('plan') != 'pro':
+            raise HTTPException(
+                status_code=403,
+                detail="Esta función requiere el Plan Pro ($2,000/mes)"
+            )
+        
+        # Validar CLABE (18 dígitos)
+        clabe = datos.clabe.replace(' ', '')
+        if len(clabe) != 18 or not clabe.isdigit():
+            raise HTTPException(status_code=400, detail="La CLABE debe tener 18 dígitos")
+        
+        datos_bancarios = {
+            "banco": datos.banco,
+            "beneficiario": datos.beneficiario,
+            "clabe": clabe,
+            "cuenta": datos.cuenta,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await empresas_collection.update_one(
+            {'id': empresa_id},
+            {'$set': {'datos_bancarios': datos_bancarios}}
+        )
+        
+        logger.info(f"Datos bancarios actualizados para empresa {empresa_id}")
+        
+        return {
+            "success": True,
+            "mensaje": "Datos bancarios guardados correctamente"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error actualizando datos bancarios: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.put("/config-mercadopago")
+async def configurar_mercadopago(
+    config: ConfigMercadoPagoUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Configura Mercado Pago para la empresa (requiere Plan Pro)"""
+    try:
+        empresa_id = current_user.get('empresa_id')
+        
+        empresa = await empresas_collection.find_one({'id': empresa_id}, {'_id': 0})
+        if not empresa:
+            raise HTTPException(status_code=404, detail="Empresa no encontrada")
+        
+        # Verificar plan Pro
+        if empresa.get('plan') != 'pro':
+            raise HTTPException(
+                status_code=403,
+                detail="Esta función requiere el Plan Pro ($2,000/mes)"
+            )
+        
+        # Validar access token probando la API
+        import httpx
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(
+                "https://api.mercadopago.com/users/me",
+                headers={"Authorization": f"Bearer {config.access_token}"}
+            )
+            
+            if response.status_code != 200:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Access token de Mercado Pago inválido"
+                )
+            
+            mp_data = response.json()
+        
+        # Guardar configuración
+        config_cobros = empresa.get('config_cobros', {})
+        config_cobros.update({
+            "mercadopago_enabled": True,
+            "mercadopago_access_token": config.access_token,
+            "mercadopago_user_id": mp_data.get('id'),
+            "mercadopago_email": mp_data.get('email'),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        })
+        
+        await empresas_collection.update_one(
+            {'id': empresa_id},
+            {'$set': {'config_cobros': config_cobros}}
+        )
+        
+        logger.info(f"Mercado Pago configurado para empresa {empresa_id}")
+        
+        return {
+            "success": True,
+            "mensaje": "Mercado Pago configurado correctamente",
+            "mercadopago_email": mp_data.get('email')
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error configurando Mercado Pago: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
