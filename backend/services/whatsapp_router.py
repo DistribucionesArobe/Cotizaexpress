@@ -110,6 +110,7 @@ class WhatsAppRouter:
         PROCESO PRINCIPAL DE ENRUTAMIENTO
         
         Orden de prioridad:
+        0. Comando CAMBIAR (reinicia conversación)
         1. Link único (código en mensaje)
         2. Memoria (historial)
         3. Menú de selección
@@ -123,6 +124,22 @@ class WhatsAppRouter:
         Returns:
             RoutingResult con la empresa identificada o solicitud de selección
         """
+        
+        # 0. PASO 0: Verificar comando CAMBIAR para reiniciar conversación
+        mensaje_upper = message_text.strip().upper()
+        if mensaje_upper in ['CAMBIAR', 'CAMBIAR EMPRESA', 'OTRA EMPRESA', 'REINICIAR', 'MENU', 'MENÚ']:
+            await self.reset_conversation(user_phone)
+            menu_message, companies = await self._build_selection_menu(user_phone)
+            return RoutingResult(
+                success=False,
+                requires_selection=True,
+                message_to_send=(
+                    "🔄 *Conversación reiniciada*\n\n"
+                    f"{menu_message}\n\n"
+                    "💡 _Tip: También puedes enviar el código de la empresa directamente (ej: FERRETER)_"
+                ),
+                available_companies=companies
+            )
         
         # 1. PASO 1: Verificar si el mensaje contiene código de empresa
         code_result = await self._check_company_code(message_text)
