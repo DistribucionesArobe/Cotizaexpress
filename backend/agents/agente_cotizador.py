@@ -42,22 +42,40 @@ Siempre responde en español mexicano profesional.
         """Procesa solicitud de cotización"""
         try:
             mensaje = state['mensaje']
+            empresa_id = state.get('empresa_id')
+            empresa_context = state.get('empresa_context', {})
+            empresa_nombre = empresa_context.get('company_name', 'la empresa')
             
-            # Obtener catálogo de productos
+            # Filtrar productos por empresa (multi-tenant)
+            filtro_productos = {'activo': True}
+            if empresa_id:
+                # Buscar productos de la empresa O productos demo si no tiene propios
+                filtro_productos['$or'] = [
+                    {'empresa_id': empresa_id},
+                    {'es_demo': True}  # Fallback a productos demo
+                ]
+            
             productos_db = await productos_collection.find(
-                {'activo': True},
-                {'_id': 0, 'sku': 1, 'nombre': 1, 'categoria': 1, 'precio_base': 1, 'unidad': 1}
+                filtro_productos,
+                {'_id': 0, 'sku': 1, 'nombre': 1, 'categoria': 1, 'precio_base': 1, 'unidad': 1, 'id': 1, 'stock': 1}
             ).to_list(100)
             
+            if not productos_db:
+                return {
+                    'respuesta_cotizador': f"🤖 CotizaBot – {empresa_nombre}\n\nAún no hay productos configurados en el catálogo. Contacta al administrador.",
+                    'accion': 'enviar_mensaje',
+                    'agentes_ejecutados': state['agentes_ejecutados'] + ['cotizador']
+                }
+            
             catalogo_str = "\n".join([
-                f"- {p['sku']}: {p['nombre']} - ${p['precio_base']:.2f} MXN por {p['unidad']} (Categoría: {p['categoria']})"
+                f"- {p.get('sku', 'N/A')}: {p['nombre']} - ${p.get('precio_base', 0):.2f} MXN por {p.get('unidad', 'pieza')} (Stock: {p.get('stock', 'N/A')})"
                 for p in productos_db
             ])
             
             user_message = UserMessage(
                 text=f"""Mensaje del cliente: {mensaje}
 
-CATÁLOGO DISPONIBLE:
+CATÁLOGO DE {empresa_nombre.upper()}:
 {catalogo_str}
 
 Analiza qué productos solicita el cliente."""
@@ -78,29 +96,40 @@ Analiza qué productos solicita el cliente."""
             productos_solicitados = []
             for prod_id in resultado.get('productos_identificados', []):
                 sku = prod_id.get('sku_probable', '')
-                producto_db = await productos_collection.find_one({'sku': sku}, {'_id': 0})
+                nombre_buscar = prod_id.get('nombre', '')
+                
+                # Buscar por SKU o por nombre similar
+                producto_db = await productos_collection.find_one(
+                    {'$or': [
+                        {'sku': sku},
+                        {'nombre': {'$regex': nombre_buscar, '$options': 'i'}}
+                    ]},
+                    {'_id': 0}
+                )
                 
                 if producto_db:
                     cantidad = prod_id.get('cantidad', 1)
-                    subtotal = producto_db['precio_base'] * cantidad
+                    precio = producto_db.get('precio_base', 0)
+                    subtotal = precio * cantidad
                     
                     productos_solicitados.append({
-                        'producto_id': producto_db['id'],
+                        'producto_id': producto_db.get('id'),
                         'producto_nombre': producto_db['nombre'],
-                        'sku': producto_db['sku'],
+                        'sku': producto_db.get('sku', 'N/A'),
                         'cantidad': cantidad,
-                        'unidad': producto_db['unidad'],
-                        'precio_unitario': producto_db['precio_base'],
+                        'unidad': producto_db.get('unidad', 'pieza'),
+                        'precio_unitario': precio,
                         'descuento_pct': 0.0,
                         'subtotal': subtotal
                     })
             
             # Construir respuesta
             if resultado.get('necesita_aclaracion', False):
-                respuesta = resultado.get('pregunta_aclaracion', 'Por favor especifica qué productos necesitas.')
+                respuesta = f"🤖 CotizaBot – {empresa_nombre}\n\n{resultado.get('pregunta_aclaracion', 'Por favor especifica qué productos necesitas.')}"
                 accion = 'esperar_info'
             elif len(productos_solicitados) == 0:
-                respuesta = f"No encontré los productos mencionados en nuestro catálogo. \u00bfPodrías especificar más? Tenemos: {', '.join([p['categoria'] for p in productos_db[:5]])}"
+                categorias = list(set([p.get('categoria', 'General') for p in productos_db[:5]]))
+                respuesta = f"🤖 CotizaBot – {empresa_nombre}\n\nNo encontré los productos mencionados. Tenemos: {', '.join(categorias)}.\n\n¿Qué te gustaría cotizar?"
                 accion = 'esperar_info'
             else:
                 # Calcular totales
@@ -108,22 +137,24 @@ Analiza qué productos solicita el cliente."""
                 iva = subtotal * settings.iva_rate
                 total = subtotal + iva
                 
-                respuesta = f"""Cotización para {state.get('cliente_nombre', 'Cliente')}:
-
-"""
-                for p in productos_solicitados:
-                    respuesta += f"\u2022 {p['producto_nombre']}: {p['cantidad']} {p['unidad']} x ${p['precio_unitario']:.2f} = ${p['subtotal']:.2f} MXN\n"
+                respuesta = f"🤖 CotizaBot – {empresa_nombre}\n\n📋 *Cotización*\n\n"
                 
-                respuesta += f"\nSubtotal: ${subtotal:.2f} MXN"
-                respuesta += f"\nIVA (16%): ${iva:.2f} MXN"
-                respuesta += f"\n*Total: ${total:.2f} MXN*"
+                for p in productos_solicitados:
+                    respuesta += f"• {p['producto_nombre']}\n  {p['cantidad']} {p['unidad']} x ${p['precio_unitario']:.2f} = *${p['subtotal']:.2f}*\n"
+                
+                respuesta += f"\n─────────────────"
+                respuesta += f"\nSubtotal: ${subtotal:.2f}"
+                respuesta += f"\nIVA (16%): ${iva:.2f}"
+                respuesta += f"\n*TOTAL: ${total:.2f} MXN*"
                 
                 if resultado.get('productos_complementarios'):
-                    respuesta += f"\n\n\ud83d\udca1 También te recomiendo: {', '.join(resultado['productos_complementarios'])}"
+                    respuesta += f"\n\n💡 También podría interesarte: {', '.join(resultado['productos_complementarios'][:3])}"
+                
+                respuesta += "\n\n¿Deseas confirmar esta cotización o hacer cambios?"
                 
                 accion = 'enviar_cotizacion'
             
-            logger.info(f"Cotizador procesó {len(productos_solicitados)} productos")
+            logger.info(f"Cotizador procesó {len(productos_solicitados)} productos para empresa {empresa_id}")
             
             return {
                 'productos_solicitados': productos_solicitados,
@@ -134,8 +165,9 @@ Analiza qué productos solicita el cliente."""
             
         except Exception as e:
             logger.error(f"Error en cotizador: {str(e)}")
+            empresa_nombre = state.get('empresa_context', {}).get('company_name', 'la empresa')
             return {
-                'respuesta_cotizador': 'Ocurrió un error procesando tu solicitud. ¿Podrías reformular?',
+                'respuesta_cotizador': f'🤖 CotizaBot – {empresa_nombre}\n\nOcurrió un error procesando tu solicitud. ¿Podrías reformular?',
                 'errores': state['errores'] + [f"Error cotizador: {str(e)}"],
                 'agentes_ejecutados': state['agentes_ejecutados'] + ['cotizador']
             }
