@@ -162,7 +162,30 @@ Analiza qué productos solicita. Si hay ambigüedad (ej: "tablaroca" sin especif
                 iva = subtotal * settings.iva_rate
                 total = subtotal + iva
                 
-                respuesta = f"🤖 CotizaBot – {empresa_nombre}\n\n📋 *Cotización*\n\n"
+                # Guardar cotización en BD para recuperarla cuando confirme
+                import uuid
+                from datetime import datetime, timezone
+                from database import cotizaciones_collection
+                
+                folio = f"COT-{datetime.now().strftime('%Y%m%d')}-{str(uuid.uuid4())[:6].upper()}"
+                cotizacion_doc = {
+                    'id': str(uuid.uuid4()),
+                    'folio': folio,
+                    'empresa_id': empresa_id,
+                    'cliente_telefono': state['cliente_telefono'],
+                    'conversacion_id': state['conversacion_id'],
+                    'productos': productos_solicitados,
+                    'subtotal': subtotal,
+                    'iva': iva,
+                    'total': total,
+                    'estado': 'pendiente',  # pendiente, confirmada, pagada, cancelada
+                    'created_at': datetime.now(timezone.utc).isoformat()
+                }
+                
+                await cotizaciones_collection.insert_one(cotizacion_doc)
+                logger.info(f"Cotización guardada: {folio} - Total: ${total:.2f}")
+                
+                respuesta = f"🤖 CotizaBot – {empresa_nombre}\n\n📋 *Cotización #{folio}*\n\n"
                 
                 for p in productos_solicitados:
                     respuesta += f"• {p['producto_nombre']}\n  {p['cantidad']} {p['unidad']} x ${p['precio_unitario']:.2f} = *${p['subtotal']:.2f}*\n"
