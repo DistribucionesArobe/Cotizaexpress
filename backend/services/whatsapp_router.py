@@ -533,6 +533,23 @@ class WhatsAppRouter:
         if not empresa:
             return None
         
+        # Verificar si tiene Plan Pro y cobros configurados
+        plan = empresa.get('plan', 'gratis')
+        tiene_plan_pro = plan == 'pro'
+        
+        # Verificar métodos de cobro disponibles
+        metodos_cobro = []
+        if tiene_plan_pro:
+            # Verificar Mercado Pago
+            config_cobros = empresa.get('config_cobros', {})
+            if config_cobros.get('mercadopago_access_token'):
+                metodos_cobro.append('mercadopago')
+            
+            # Verificar SPEI/Transferencia
+            datos_bancarios = empresa.get('datos_bancarios', {})
+            if datos_bancarios.get('clabe'):
+                metodos_cobro.append('spei')
+        
         return {
             'company_id': empresa['id'],
             'company_name': empresa.get('nombre'),
@@ -546,7 +563,13 @@ class WhatsAppRouter:
                 'direccion': empresa.get('direccion')
             },
             'price_rules': empresa.get('reglas_precios', {}),
-            'welcome_message': empresa.get('whatsapp_welcome_message')
+            'welcome_message': empresa.get('whatsapp_welcome_message'),
+            # Datos para flujo de cobros (Plan Pro)
+            'plan': plan,
+            'tiene_plan_pro': tiene_plan_pro,
+            'metodos_cobro': metodos_cobro,
+            'config_cobros': empresa.get('config_cobros', {}) if tiene_plan_pro else {},
+            'datos_bancarios': empresa.get('datos_bancarios', {}) if tiene_plan_pro else {}
         }
 
 
