@@ -19,12 +19,19 @@ class AgenteClasificador:
 Tu tarea es analizar el mensaje del cliente y clasificarlo en UNA de estas intenciones:
 
 1. COTIZAR: El cliente quiere una cotización de productos (precio, presupuesto, cuánto cuesta)
-2. STOCK: Pregunta sobre disponibilidad o inventario
-3. SEGUIMIENTO: Da seguimiento a una cotización previa
-4. FACTURA: Solicita factura o información fiscal
-5. INFORMACION: Pregunta general sobre productos, características, usos
-6. SALUDO: Saludo inicial o conversación casual
-7. OTRO: Cualquier otra intención
+2. CONFIRMAR: El cliente confirma una cotización ("sí", "si", "acepto", "confirmo", "va", "dale", "ok")
+3. METODO_PAGO: El cliente selecciona método de pago ("1", "2", "mercado pago", "transferencia", "spei")
+4. STOCK: Pregunta sobre disponibilidad o inventario
+5. SEGUIMIENTO: Da seguimiento a una cotización previa
+6. FACTURA: Solicita factura o información fiscal
+7. INFORMACION: Pregunta general sobre productos, características, usos
+8. SALUDO: Saludo inicial o conversación casual
+9. OTRO: Cualquier otra intención
+
+REGLAS IMPORTANTES:
+- Si el historial muestra que se acabó de enviar una cotización y el cliente responde "sí", "si", "ok", "va", etc. → CONFIRMAR
+- Si el historial pregunta por método de pago y el cliente responde "1", "2", "mercado pago", "transferencia" → METODO_PAGO
+- Si el cliente dice "quiero pagar" o similar después de una cotización → CONFIRMAR
 
 Responde SOLO en formato JSON:
 {
