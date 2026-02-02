@@ -66,6 +66,7 @@ async def webhook_whatsapp_entrante(request: Request):
     4. Procesa con el orquestador
     5. Responde via 360dialog API
     """
+    # Responder 200 inmediatamente para evitar reintentos de 360dialog
     try:
         # Obtener payload JSON
         payload = await request.json()
@@ -86,6 +87,16 @@ async def webhook_whatsapp_entrante(request: Request):
         if not from_number or not message_text:
             logger.debug(f"Mensaje incompleto: from={from_number}, text={message_text}")
             return JSONResponse(content={"status": "ok"})
+        
+        # ============================================
+        # DEDUPLICACIÓN: Evitar procesar el mismo mensaje múltiples veces
+        # ============================================
+        if message_id:
+            # Verificar si ya procesamos este mensaje
+            mensaje_existente = await mensajes_collection.find_one({'wa_message_id': message_id})
+            if mensaje_existente:
+                logger.info(f"⚠️ Mensaje duplicado ignorado: {message_id}")
+                return JSONResponse(content={"status": "ok"})
         
         # Formatear número (agregar + si no lo tiene)
         if not from_number.startswith('+'):
