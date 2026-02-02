@@ -119,9 +119,13 @@ class AgenteCobros:
             if mensaje in ['1', 'mercado pago', 'mercadopago', 'tarjeta', 'oxxo']:
                 if 'mercadopago' in metodos_cobro:
                     metodo_seleccionado = 'mercadopago'
+                elif len(metodos_cobro) == 1:
+                    metodo_seleccionado = metodos_cobro[0]
             elif mensaje in ['2', 'transferencia', 'spei', 'banco', 'bancaria']:
                 if 'spei' in metodos_cobro:
                     metodo_seleccionado = 'spei'
+                elif len(metodos_cobro) == 1:
+                    metodo_seleccionado = metodos_cobro[0]
             
             # Si solo hay un método, y el mensaje es "1"
             if mensaje == '1' and len(metodos_cobro) == 1:
@@ -141,27 +145,36 @@ class AgenteCobros:
                     'agentes_ejecutados': state['agentes_ejecutados'] + ['cobros']
                 }
             
-            # Obtener la última cotización del cliente
-            productos = state.get('productos_solicitados', [])
+            # Buscar última cotización pendiente del cliente
+            ultima_cotizacion = await cotizaciones_collection.find_one(
+                {
+                    'cliente_telefono': cliente_telefono, 
+                    'empresa_id': empresa_id,
+                    'estado': 'pendiente'
+                },
+                sort=[('created_at', -1)]
+            )
             
-            # Calcular total (o obtener de cotización guardada)
-            if productos:
-                subtotal = sum(p.get('subtotal', 0) for p in productos)
-                iva = subtotal * 0.16
-                total = subtotal + iva
-            else:
-                # Buscar última cotización en BD
-                ultima_cotizacion = await cotizaciones_collection.find_one(
-                    {'cliente_telefono': cliente_telefono, 'empresa_id': empresa_id},
-                    sort=[('created_at', -1)]
+            if ultima_cotizacion:
+                total = ultima_cotizacion.get('total', 0)
+                folio = ultima_cotizacion.get('folio', f"COT-{datetime.now().strftime('%Y%m%d')}-{str(uuid.uuid4())[:6].upper()}")
+                productos = ultima_cotizacion.get('productos', [])
+                
+                # Actualizar estado de la cotización a "confirmada"
+                await cotizaciones_collection.update_one(
+                    {'id': ultima_cotizacion['id']},
+                    {'$set': {'estado': 'confirmada', 'metodo_pago': metodo_seleccionado}}
                 )
-                if ultima_cotizacion:
-                    total = ultima_cotizacion.get('total', 0)
+            else:
+                # Calcular desde productos en estado (fallback)
+                productos = state.get('productos_solicitados', [])
+                if productos:
+                    subtotal = sum(p.get('subtotal', 0) for p in productos)
+                    iva = subtotal * 0.16
+                    total = subtotal + iva
                 else:
                     total = 0
-            
-            # Generar referencia única
-            folio = f"COT-{datetime.now().strftime('%Y%m%d')}-{str(uuid.uuid4())[:6].upper()}"
+                folio = f"COT-{datetime.now().strftime('%Y%m%d')}-{str(uuid.uuid4())[:6].upper()}"
             
             # Procesar según método
             if metodo_seleccionado == 'mercadopago':
