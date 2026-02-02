@@ -288,13 +288,12 @@ async def enviar_cotizacion(request: EnviarCotizacionRequest, current_user: dict
                     'error': 'No se encontró email del cliente'
                 }
         
-        # Enviar por WhatsApp (mantener funcionalidad existente)
+        # Enviar por WhatsApp via 360dialog
         mensaje = f"Hola {cotizacion['cliente_nombre']}, aquí está tu cotización {cotizacion['folio']} por un total de ${cotizacion['total']:.2f} MXN."
         
-        resultado_whatsapp = await whatsapp_service.enviar_mensaje(
-            to_number=cotizacion['cliente_telefono'],
-            body=mensaje,
-            media_url=None  # PDF requiere URL pública
+        resultado_whatsapp = await dialog360_service.enviar_mensaje_texto(
+            destinatario=cotizacion['cliente_telefono'],
+            mensaje=mensaje
         )
         resultados['whatsapp'] = resultado_whatsapp
         
