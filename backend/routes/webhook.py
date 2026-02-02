@@ -1,7 +1,14 @@
-from fastapi import APIRouter, Request, HTTPException, Form
-from fastapi.responses import Response
+"""
+CotizaBot - Webhook de WhatsApp (360dialog)
+===========================================
+
+Recibe mensajes de WhatsApp via 360dialog y los procesa con el bot.
+"""
+
+from fastapi import APIRouter, Request, HTTPException
+from fastapi.responses import JSONResponse
 from agents.orquestador import OrquestadorCotizaBot
-from services.whatsapp_service import whatsapp_service
+from services.dialog360_service import dialog360_service
 from services.whatsapp_router import WhatsAppRouter
 from database import db, conversaciones_collection, mensajes_collection, clientes_collection
 from models.mensaje import DireccionMensaje, TipoMensaje
@@ -17,40 +24,83 @@ logger = logging.getLogger(__name__)
 orquestador = OrquestadorCotizaBot()
 whatsapp_router = WhatsAppRouter(db)
 
-# Número de WhatsApp centralizado de CotizaBot (México)
+# Número de WhatsApp de CotizaBot
 COTIZABOT_WHATSAPP_NUMBER = os.environ.get('COTIZABOT_WHATSAPP_NUMBER', '+5218344291628')
 
+# Token de verificación para el webhook (opcional, para configuración inicial)
+WEBHOOK_VERIFY_TOKEN = os.environ.get('WEBHOOK_VERIFY_TOKEN', 'cotizabot_verify_2024')
 
-@router.post("/twilio/whatsapp")
+
+@router.get("/whatsapp")
+async def verificar_webhook(request: Request):
+    """
+    Verificación del webhook de 360dialog/Meta.
+    Responde al challenge para registrar el webhook.
+    """
+    params = request.query_params
+    
+    mode = params.get('hub.mode')
+    token = params.get('hub.verify_token')
+    challenge = params.get('hub.challenge')
+    
+    if mode == 'subscribe' and token == WEBHOOK_VERIFY_TOKEN:
+        logger.info("✅ Webhook verificado correctamente")
+        return int(challenge) if challenge else "OK"
+    
+    logger.warning(f"⚠️ Verificación de webhook fallida: mode={mode}, token={token}")
+    raise HTTPException(status_code=403, detail="Verificación fallida")
+
+
+@router.post("/whatsapp")
 async def webhook_whatsapp_entrante(request: Request):
     """
-    Webhook para mensajes entrantes de WhatsApp vía Twilio.
+    Webhook principal para mensajes entrantes de WhatsApp via 360dialog.
     
-    ARQUITECTURA MULTI-TENANT:
-    1. Recibe mensaje del número único de CotizaBot
-    2. Identifica a qué empresa corresponde (código, memoria, menú)
-    3. Procesa con el orquestador usando contexto de esa empresa
-    4. Responde siempre con prefijo "🤖 CotizaBot – [Empresa]"
+    Flujo:
+    1. Recibe payload de 360dialog
+    2. Parsea el mensaje
+    3. Identifica la empresa (router multi-tenant)
+    4. Procesa con el orquestador
+    5. Responde via 360dialog API
     """
     try:
-        # Obtener datos del formulario de Twilio
-        form_data = await request.form()
+        # Obtener payload JSON
+        payload = await request.json()
+        logger.info(f"📥 Webhook recibido: {str(payload)[:200]}...")
         
-        from_number = form_data.get('From', '').replace('whatsapp:', '')
-        to_number = form_data.get('To', '').replace('whatsapp:', '')
-        body = form_data.get('Body', '').strip()
-        message_sid = form_data.get('MessageSid', '')
-        num_media = int(form_data.get('NumMedia', 0))
+        # Parsear mensaje
+        mensaje_data = dialog360_service.parse_webhook_message(payload)
         
-        logger.info(f"📥 Mensaje recibido de {from_number}: {body[:50]}...")
+        if not mensaje_data:
+            # Puede ser una notificación de estado (delivered, read), no un mensaje
+            logger.debug("Webhook sin mensaje de texto (posible notificación de estado)")
+            return JSONResponse(content={"status": "ok"})
+        
+        from_number = mensaje_data['from_number']
+        message_text = mensaje_data['message_text']
+        message_id = mensaje_data['message_id']
+        
+        if not from_number or not message_text:
+            logger.debug(f"Mensaje incompleto: from={from_number}, text={message_text}")
+            return JSONResponse(content={"status": "ok"})
+        
+        # Formatear número (agregar + si no lo tiene)
+        if not from_number.startswith('+'):
+            from_number = f"+{from_number}"
+        
+        logger.info(f"📱 Mensaje de {from_number}: {message_text[:50]}...")
+        
+        # Marcar como leído
+        if message_id:
+            await dialog360_service.marcar_como_leido(message_id)
         
         # ============================================
         # PASO 1: ENRUTAMIENTO MULTI-TENANT
         # ============================================
         routing_result = await whatsapp_router.route_incoming_message(
             user_phone=from_number,
-            message_text=body,
-            whatsapp_number=to_number
+            message_text=message_text,
+            whatsapp_number=COTIZABOT_WHATSAPP_NUMBER
         )
         
         # Si no se identificó empresa, enviar menú/mensaje de selección
@@ -60,8 +110,8 @@ async def webhook_whatsapp_entrante(request: Request):
                 "No pude identificar con qué empresa deseas hablar.\n"
                 "Por favor, usa el link proporcionado por tu proveedor."
             )
-            respuesta_twiml = whatsapp_service.generar_respuesta_twiml(respuesta_texto)
-            return Response(content=respuesta_twiml, media_type="application/xml")
+            await dialog360_service.enviar_mensaje_texto(from_number, respuesta_texto)
+            return JSONResponse(content={"status": "ok"})
         
         # Empresa identificada
         empresa_id = routing_result.company_id
@@ -71,8 +121,8 @@ async def webhook_whatsapp_entrante(request: Request):
         
         # Si es mensaje inicial con código, enviar bienvenida
         if routing_result.routing_method == "code_link" and routing_result.message_to_send:
-            respuesta_twiml = whatsapp_service.generar_respuesta_twiml(routing_result.message_to_send)
-            return Response(content=respuesta_twiml, media_type="application/xml")
+            await dialog360_service.enviar_mensaje_texto(from_number, routing_result.message_to_send)
+            return JSONResponse(content={"status": "ok"})
         
         # ============================================
         # PASO 2: BUSCAR/CREAR CLIENTE Y CONVERSACIÓN
@@ -85,7 +135,7 @@ async def webhook_whatsapp_entrante(request: Request):
                 'id': cliente_id,
                 'telefono': from_number,
                 'nombre': None,
-                'empresa_id': empresa_id,  # Asociar cliente a empresa
+                'empresa_id': empresa_id,
                 'total_cotizaciones': 0,
                 'created_at': datetime.now(timezone.utc).isoformat()
             }
@@ -93,7 +143,7 @@ async def webhook_whatsapp_entrante(request: Request):
         else:
             cliente_id = cliente['id']
         
-        # Buscar o crear conversación activa CON EMPRESA
+        # Buscar o crear conversación activa
         conversacion = await conversaciones_collection.find_one({
             'cliente_telefono': from_number,
             'empresa_id': empresa_id,
@@ -124,9 +174,9 @@ async def webhook_whatsapp_entrante(request: Request):
             'cliente_telefono': from_number,
             'empresa_id': empresa_id,
             'direccion': DireccionMensaje.ENTRANTE.value,
-            'contenido': body,
+            'contenido': message_text,
             'tipo': TipoMensaje.TEXTO.value,
-            'twilio_sid': message_sid,
+            'wa_message_id': message_id,
             'timestamp': datetime.now(timezone.utc).isoformat()
         }
         await mensajes_collection.insert_one(mensaje_entrante)
@@ -136,7 +186,7 @@ async def webhook_whatsapp_entrante(request: Request):
         # ============================================
         empresa_context = await whatsapp_router.get_company_context(empresa_id)
         
-        # Obtener historial reciente de la conversación (últimos 5 mensajes)
+        # Obtener historial reciente
         historial_mensajes = await mensajes_collection.find(
             {'conversacion_id': conversacion_id},
             {'_id': 0, 'direccion': 1, 'contenido': 1, 'timestamp': 1}
@@ -146,13 +196,13 @@ async def webhook_whatsapp_entrante(request: Request):
         # PASO 5: PROCESAR CON ORQUESTADOR
         # ============================================
         resultado = await orquestador.procesar_mensaje(
-            mensaje=body,
+            mensaje=message_text,
             cliente_telefono=from_number,
             conversacion_id=conversacion_id,
             cliente_nombre=cliente.get('nombre', 'Cliente'),
             historial=historial_mensajes,
-            empresa_id=empresa_id,           # NUEVO: Contexto de empresa
-            empresa_context=empresa_context  # NUEVO: Datos de empresa
+            empresa_id=empresa_id,
+            empresa_context=empresa_context
         )
         
         respuesta_texto = resultado['respuesta']
@@ -160,9 +210,6 @@ async def webhook_whatsapp_entrante(request: Request):
         # Agregar prefijo de marca si no lo tiene
         if not respuesta_texto.startswith("🤖"):
             respuesta_texto = f"🤖 CotizaBot – {empresa_nombre}\n\n{respuesta_texto}"
-        
-        # Limpiar caracteres problemáticos para encoding
-        respuesta_texto = respuesta_texto.encode('utf-8', errors='ignore').decode('utf-8')
         
         # ============================================
         # PASO 6: GUARDAR Y ENVIAR RESPUESTA
@@ -180,42 +227,41 @@ async def webhook_whatsapp_entrante(request: Request):
         }
         await mensajes_collection.insert_one(mensaje_saliente)
         
-        # Enviar respuesta vía Twilio
-        respuesta_twiml = whatsapp_service.generar_respuesta_twiml(respuesta_texto)
+        # Enviar respuesta via 360dialog
+        envio_result = await dialog360_service.enviar_mensaje_texto(from_number, respuesta_texto)
         
-        return Response(content=respuesta_twiml, media_type="application/xml")
+        if not envio_result.get('success'):
+            logger.error(f"❌ Error enviando respuesta: {envio_result.get('error')}")
+        
+        return JSONResponse(content={"status": "ok"})
         
     except Exception as e:
         logger.error(f"❌ Error en webhook WhatsApp: {str(e)}", exc_info=True)
-        # Devolver respuesta de error
-        respuesta_error = whatsapp_service.generar_respuesta_twiml(
-            "🤖 CotizaBot\n\nDisculpa, ocurrió un error procesando tu mensaje. Inténtalo de nuevo."
-        )
-        return Response(content=respuesta_error, media_type="application/xml")
+        # Siempre responder 200 para evitar reintentos
+        return JSONResponse(content={"status": "error", "message": str(e)})
 
 
-@router.post("/whatsapp/reset")
-async def reset_conversation(request: Request):
+@router.post("/whatsapp/test")
+async def test_enviar_mensaje(request: Request):
     """
-    Permite a un usuario reiniciar su conversación para cambiar de empresa.
-    Se activa cuando el usuario envía "CAMBIAR" o "RESET".
+    Endpoint de prueba para enviar un mensaje manualmente.
+    Solo para desarrollo/testing.
     """
     try:
-        form_data = await request.form()
-        from_number = form_data.get('From', '').replace('whatsapp:', '')
+        data = await request.json()
+        destinatario = data.get('to')
+        mensaje = data.get('message', 'Hola, este es un mensaje de prueba de CotizaBot 🤖')
         
-        await whatsapp_router.reset_conversation(from_number)
+        if not destinatario:
+            raise HTTPException(status_code=400, detail="Falta el campo 'to'")
         
-        respuesta = (
-            "🤖 CotizaBot\n\n"
-            "Tu conversación ha sido reiniciada.\n"
-            "Envía el código de la empresa con la que deseas hablar."
-        )
+        result = await dialog360_service.enviar_mensaje_texto(destinatario, mensaje)
         
-        return Response(
-            content=whatsapp_service.generar_respuesta_twiml(respuesta),
-            media_type="application/xml"
-        )
+        return {
+            "success": result.get('success'),
+            "destinatario": destinatario,
+            "mensaje": mensaje,
+            "response": result
+        }
     except Exception as e:
-        logger.error(f"Error reiniciando conversación: {e}")
         raise HTTPException(status_code=500, detail=str(e))
