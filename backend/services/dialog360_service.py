@@ -41,35 +41,38 @@ class Dialog360Service:
         Envía un mensaje de texto a un número de WhatsApp.
         
         Args:
-            destinatario: Número de teléfono del destinatario (formato: 5218341234567)
+            destinatario: Número de teléfono del destinatario (formato: 528341234567)
             mensaje: Texto del mensaje a enviar
             
         Returns:
             Respuesta de la API de 360dialog
         """
-        # Limpiar número (quitar + y espacios)
-        numero_limpio = destinatario.replace('+', '').replace(' ', '').replace('-', '')
+        # Limpiar número (quitar + y espacios, mantener solo dígitos)
+        numero_limpio = ''.join(filter(str.isdigit, destinatario))
+        
+        # Para México: si empieza con 521, quitar el 1 (ej: 5218344291628 -> 528344291628)
+        if numero_limpio.startswith('521') and len(numero_limpio) == 13:
+            numero_limpio = '52' + numero_limpio[3:]
         
         payload = {
             "messaging_product": "whatsapp",
             "recipient_type": "individual",
             "to": numero_limpio,
             "type": "text",
-            "text": {
-                "preview_url": False,
-                "body": mensaje
-            }
+            "text": {"body": mensaje}
         }
         
         try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
+            async with httpx.AsyncClient(timeout=15.0) as client:
                 response = await client.post(
                     f"{self.base_url}/messages",
                     headers=self.headers,
                     json=payload
                 )
                 
-                if response.status_code == 200 or response.status_code == 201:
+                logger.info(f"360dialog response: {response.status_code} - {response.text[:200]}")
+                
+                if response.status_code in [200, 201]:
                     logger.info(f"✅ Mensaje enviado a {numero_limpio}")
                     return {"success": True, "data": response.json()}
                 else:
