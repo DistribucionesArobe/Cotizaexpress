@@ -27,15 +27,15 @@ whatsapp_router = WhatsAppRouter(db)
 # Número de WhatsApp de CotizaBot
 COTIZABOT_WHATSAPP_NUMBER = os.environ.get('COTIZABOT_WHATSAPP_NUMBER', '+5218344291628')
 
-# Token de verificación para el webhook (opcional, para configuración inicial)
-WEBHOOK_VERIFY_TOKEN = os.environ.get('WEBHOOK_VERIFY_TOKEN', 'cotizabot_verify_2024')
+# Token de verificación para el webhook
+WHATSAPP_VERIFY_TOKEN = os.environ.get('WHATSAPP_VERIFY_TOKEN', 'cotizabot_verify_2026')
 
 
 @router.get("/whatsapp")
 async def verificar_webhook(request: Request):
     """
-    Verificación del webhook de 360dialog/Meta.
-    Responde al challenge para registrar el webhook.
+    Verificación del webhook de WhatsApp (Cloud API / 360dialog).
+    Responde el challenge como texto plano.
     """
     params = request.query_params
     
@@ -43,12 +43,15 @@ async def verificar_webhook(request: Request):
     token = params.get('hub.verify_token')
     challenge = params.get('hub.challenge')
     
-    if mode == 'subscribe' and token == WEBHOOK_VERIFY_TOKEN:
-        logger.info("✅ Webhook verificado correctamente")
-        return int(challenge) if challenge else "OK"
+    logger.info(f"Verificación webhook: mode={mode}, token={token}, challenge={challenge}")
     
-    logger.warning(f"⚠️ Verificación de webhook fallida: mode={mode}, token={token}")
-    raise HTTPException(status_code=403, detail="Verificación fallida")
+    if mode == 'subscribe' and token == WHATSAPP_VERIFY_TOKEN:
+        logger.info("✅ Webhook verificado correctamente")
+        # Devolver SOLO el challenge como texto plano
+        return Response(content=challenge, media_type="text/plain", status_code=200)
+    
+    logger.warning(f"⚠️ Verificación fallida: token recibido={token}, esperado={WHATSAPP_VERIFY_TOKEN}")
+    return Response(content="Forbidden", media_type="text/plain", status_code=403)
 
 
 @router.post("/whatsapp")
