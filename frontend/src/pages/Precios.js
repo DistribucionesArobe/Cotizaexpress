@@ -74,7 +74,7 @@ export default function Precios() {
         { texto: 'Cobros automáticos', incluido: false, nota: 'Disponible en Plan Pro' },
       ],
       popular: true,
-      btnTexto: 'Actualizar Ahora',
+      btnTexto: 'Empezar Ahora',
     },
     {
       id: 'pro',
