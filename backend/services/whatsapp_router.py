@@ -197,14 +197,18 @@ class WhatsAppRouter:
             await self._save_routing(user_phone, result)
             return result
         
-        # 6. PASO 6: Mostrar menú de selección (solo si hay múltiples empresas)
-        menu_message, companies = await self._build_selection_menu(user_phone)
-        
+        # 6. PASO 6: Pedir código de empresa (no mostrar lista)
         return RoutingResult(
             success=False,
             requires_selection=True,
-            message_to_send=menu_message,
-            available_companies=companies
+            message_to_send=(
+                "🤖 *CotizaBot*\n\n"
+                "¡Hola! Para atenderte, necesito saber con qué empresa deseas hablar.\n\n"
+                "📌 Envía el *código* de la empresa.\n"
+                "_El código lo encuentras en el link o QR que te compartió tu proveedor._\n\n"
+                "_Ejemplo: FERRETER, ACEROMX, etc._"
+            ),
+            available_companies=[]
         )
     
     
