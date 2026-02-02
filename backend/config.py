@@ -15,7 +15,8 @@ class Settings(BaseSettings):
     dialog360_base_url: str = os.environ.get('DIALOG360_BASE_URL', 'https://waba-v2.360dialog.io')
     dialog360_api_key: str = os.environ.get('DIALOG360_API_KEY', '')
     cotizabot_whatsapp_number: str = os.environ.get('COTIZABOT_WHATSAPP_NUMBER', '+5218344291628')
-    webhook_verify_token: str = os.environ.get('WEBHOOK_VERIFY_TOKEN', 'cotizabot_verify_2024')
+    webhook_verify_token: str = os.environ.get('WEBHOOK_VERIFY_TOKEN', 'cotizabot_verify_2026')
+    whatsapp_verify_token: str = os.environ.get('WHATSAPP_VERIFY_TOKEN', 'cotizabot_verify_2026')
     
     # OpenAI (via Emergent LLM Key)
     emergent_llm_key: str = os.environ.get('EMERGENT_LLM_KEY', '')
