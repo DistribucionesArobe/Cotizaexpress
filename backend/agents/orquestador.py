@@ -5,6 +5,7 @@ from agents.clasificador import AgenteClasificador
 from agents.agente_cotizador import AgenteCotizador
 from agents.agente_operativo import AgenteOperativo
 from agents.agente_compliance import AgenteCompliance
+from agents.agente_cobros import AgenteCobros
 from datetime import datetime
 import logging
 
@@ -18,6 +19,7 @@ class OrquestadorCotizaBot:
         self.cotizador = AgenteCotizador()
         self.operativo = AgenteOperativo()
         self.compliance = AgenteCompliance()
+        self.cobros = AgenteCobros()
         
         self.graph = self._build_graph()
     
@@ -30,6 +32,8 @@ class OrquestadorCotizaBot:
         workflow.add_node("cotizar", self._nodo_cotizar)
         workflow.add_node("stock", self._nodo_stock)
         workflow.add_node("compliance", self._nodo_compliance)
+        workflow.add_node("confirmar", self._nodo_confirmar_cotizacion)
+        workflow.add_node("metodo_pago", self._nodo_metodo_pago)
         workflow.add_node("finalizar", self._nodo_finalizar)
         
         # Punto de entrada
@@ -42,6 +46,8 @@ class OrquestadorCotizaBot:
             {
                 "cotizar": "cotizar",
                 "stock": "stock",
+                "confirmar": "confirmar",
+                "metodo_pago": "metodo_pago",
                 "otro": "finalizar"
             }
         )
@@ -49,11 +55,13 @@ class OrquestadorCotizaBot:
         workflow.add_edge("cotizar", "compliance")
         workflow.add_edge("compliance", "finalizar")
         workflow.add_edge("stock", "finalizar")
+        workflow.add_edge("confirmar", "finalizar")
+        workflow.add_edge("metodo_pago", "finalizar")
         workflow.add_edge("finalizar", END)
         
         return workflow.compile()
     
-    def _decidir_ruta_intencion(self, state: AgentState) -> Literal["cotizar", "stock", "otro"]:
+    def _decidir_ruta_intencion(self, state: AgentState) -> Literal["cotizar", "stock", "confirmar", "metodo_pago", "otro"]:
         """Decide qué agente ejecutar según la intención"""
         intencion = state.get('intencion', 'OTRO')
         
@@ -61,6 +69,10 @@ class OrquestadorCotizaBot:
             return "cotizar"
         elif intencion == 'STOCK':
             return "stock"
+        elif intencion == 'CONFIRMAR':
+            return "confirmar"
+        elif intencion == 'METODO_PAGO':
+            return "metodo_pago"
         else:
             return "otro"
     
