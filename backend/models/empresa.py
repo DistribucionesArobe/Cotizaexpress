@@ -12,6 +12,20 @@ class DatosFiscales(BaseModel):
     domicilio_fiscal: Optional[str] = None
     email_factura: Optional[str] = None
 
+class DatosBancarios(BaseModel):
+    """Datos bancarios para pagos SPEI"""
+    banco: Optional[str] = None
+    beneficiario: Optional[str] = None
+    clabe: Optional[str] = None
+    cuenta: Optional[str] = None
+
+class ConfigCobros(BaseModel):
+    """Configuración de métodos de cobro"""
+    mercadopago_enabled: bool = False
+    mercadopago_access_token: Optional[str] = None
+    spei_enabled: bool = False
+    datos_bancarios: Optional[DatosBancarios] = None
+
 class Empresa(BaseModel):
     model_config = ConfigDict(extra="ignore")
     
@@ -24,11 +38,15 @@ class Empresa(BaseModel):
     # Datos fiscales para CFDI
     datos_fiscales: Optional[DatosFiscales] = None
     # Plan y suscripción
-    plan: str = 'gratis'  # gratis, completo, cancelado
+    # Planes: gratis (5 cotizaciones), completo ($1,160), pro ($2,000 con cobros)
+    plan: str = 'gratis'
     cotizaciones_usadas: int = 0
     cotizaciones_limite: int = 5
     subscription_status: Optional[str] = None
     stripe_subscription_id: Optional[str] = None
+    # Configuración de cobros (Plan Pro)
+    config_cobros: Optional[ConfigCobros] = None
+    datos_bancarios: Optional[DatosBancarios] = None
     # WhatsApp (360dialog)
     codigo_whatsapp: Optional[str] = None
     whatsapp_link: Optional[str] = None
