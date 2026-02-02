@@ -399,8 +399,10 @@ class WhatsAppRouter:
         nombre = empresa.get('nombre', 'la empresa')
         mensaje_bienvenida = empresa.get('whatsapp_welcome_message')
         
+        tip_cambiar = "\n\n💡 _Escribe *CAMBIAR* en cualquier momento si deseas hablar con otra empresa._"
+        
         if mensaje_bienvenida:
-            return f"🤖 CotizaBot – {nombre}\n\n{mensaje_bienvenida}"
+            return f"🤖 CotizaBot – {nombre}\n\n{mensaje_bienvenida}{tip_cambiar}"
         
         return (
             f"🤖 CotizaBot – {nombre}\n\n"
@@ -411,6 +413,7 @@ class WhatsAppRouter:
             f"• Consulta de precios\n"
             f"• Disponibilidad de inventario\n"
             f"• Seguimiento de pedidos"
+            f"{tip_cambiar}"
         )
     
     
