@@ -343,6 +343,14 @@ function AppContent() {
               }
             />
             <Route
+              path="/config-cobros"
+              element={
+                <ProtectedRoute>
+                  <ConfigCobros />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/perfil-empresa"
               element={
                 <ProtectedRoute>
