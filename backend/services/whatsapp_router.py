@@ -160,7 +160,27 @@ class WhatsAppRouter:
                 }]
             )
         
-        # 5. PASO 5: Mostrar menú de selección
+        # 5. PASO 5: Si solo hay UNA empresa, asignar automáticamente
+        empresas_activas = await self.companies_collection.find(
+            {'activo': True, 'codigo_whatsapp': {'$exists': True}},
+            {'_id': 0, 'id': 1, 'nombre': 1}
+        ).to_list(10)
+        
+        if len(empresas_activas) == 1:
+            empresa = empresas_activas[0]
+            full_empresa = await self.companies_collection.find_one({'id': empresa['id']})
+            
+            result = RoutingResult(
+                success=True,
+                company_id=empresa['id'],
+                company_name=empresa.get('nombre'),
+                routing_method=RoutingMethod.MENU_SELECTION,
+                message_to_send=self._build_welcome_message(full_empresa)
+            )
+            await self._save_routing(user_phone, result)
+            return result
+        
+        # 6. PASO 6: Mostrar menú de selección (solo si hay múltiples empresas)
         menu_message, companies = await self._build_selection_menu(user_phone)
         
         return RoutingResult(
