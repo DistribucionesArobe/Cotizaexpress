@@ -116,7 +116,8 @@ class OrquestadorCotizaBot:
     
     async def procesar_mensaje(self, mensaje: str, cliente_telefono: str, 
                               conversacion_id: str, cliente_nombre: str = None,
-                              historial: list = None) -> dict:
+                              historial: list = None, empresa_id: str = None,
+                              empresa_context: dict = None) -> dict:
         """Procesa un mensaje entrante y devuelve la respuesta"""
         
         # Estado inicial
@@ -129,6 +130,8 @@ class OrquestadorCotizaBot:
             'cliente_id': None,
             'cliente_nombre': cliente_nombre,
             'historial_cliente': historial if historial else [],
+            'empresa_id': empresa_id,  # ID de la empresa multi-tenant
+            'empresa_context': empresa_context,  # Contexto completo de la empresa
             'cotizacion_actual': None,
             'productos_solicitados': [],
             'respuesta_cotizador': None,
