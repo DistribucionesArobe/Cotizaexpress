@@ -18,23 +18,27 @@ class AgenteCotizador:
             system_message="""Eres un agente experto en crear cotizaciones para materiales de construcción en México.
 
 Tu trabajo es:
-1. Identificar qué productos solicita el cliente
-2. Extraer cantidades mencionadas
-3. Buscar productos en el catálogo
-4. Calcular precios con IVA (16%)
-5. Sugerir productos complementarios cuando sea apropiado
+1. Identificar EXACTAMENTE qué productos solicita el cliente
+2. Si hay productos similares (ej: "tablaroca" puede ser "antimoho" o "ultralight"), DEBES preguntar cuál quiere
+3. Extraer cantidades mencionadas
+4. NO asumir productos - si no está claro, pregunta
 
 Responde en formato JSON:
 {
   "productos_identificados": [
-    {"nombre": "Tablaroca antimoho", "cantidad": 10, "sku_probable": "TB-001"}
+    {"nombre_exacto": "Tablaroca antimoho USG", "cantidad": 10, "sku": "TB-001"}
   ],
-  "necesita_aclaracion": false,
-  "pregunta_aclaracion": "",
-  "productos_complementarios": ["Redimix", "Canal"]
+  "productos_ambiguos": [
+    {"termino_buscado": "tablaroca", "opciones": ["Tablaroca antimoho USG", "Tablaroca ultralight USG"]}
+  ],
+  "necesita_aclaracion": true,
+  "pregunta_aclaracion": "¿Cuál tablaroca necesitas?\n1. Antimoho ($340.10)\n2. Ultralight ($210.00)"
 }
 
-Siempre responde en español mexicano profesional.
+REGLAS:
+- Si el cliente dice "tablaroca" y hay varias, pon necesita_aclaracion=true
+- Si dice "tablaroca antimoho", identifica el producto exacto
+- Siempre responde en español mexicano profesional
 """
         ).with_model("openai", "gpt-4o")
     
@@ -49,10 +53,9 @@ Siempre responde en español mexicano profesional.
             # Filtrar productos por empresa (multi-tenant)
             filtro_productos = {'activo': True}
             if empresa_id:
-                # Buscar productos de la empresa O productos demo si no tiene propios
                 filtro_productos['$or'] = [
                     {'empresa_id': empresa_id},
-                    {'es_demo': True}  # Fallback a productos demo
+                    {'es_demo': True}
                 ]
             
             productos_db = await productos_collection.find(
@@ -67,18 +70,19 @@ Siempre responde en español mexicano profesional.
                     'agentes_ejecutados': state['agentes_ejecutados'] + ['cotizador']
                 }
             
+            # Crear catálogo detallado para el LLM
             catalogo_str = "\n".join([
-                f"- {p.get('sku', 'N/A')}: {p['nombre']} - ${p.get('precio_base', 0):.2f} MXN por {p.get('unidad', 'pieza')} (Stock: {p.get('stock', 'N/A')})"
+                f"- SKU: {p.get('sku', 'N/A')} | {p['nombre']} | ${p.get('precio_base', 0):.2f} MXN/{p.get('unidad', 'pza')}"
                 for p in productos_db
             ])
             
             user_message = UserMessage(
                 text=f"""Mensaje del cliente: {mensaje}
 
-CATÁLOGO DE {empresa_nombre.upper()}:
+CATÁLOGO COMPLETO DE {empresa_nombre.upper()}:
 {catalogo_str}
 
-Analiza qué productos solicita el cliente."""
+Analiza qué productos solicita. Si hay ambigüedad (ej: "tablaroca" sin especificar tipo), indica que necesita aclaración."""
             )
             
             response = await self.chat.send_message(user_message)
@@ -92,17 +96,38 @@ Analiza qué productos solicita el cliente."""
             
             resultado = json.loads(response_text)
             
-            # Buscar productos en DB
+            # Si necesita aclaración por productos ambiguos
+            if resultado.get('necesita_aclaracion', False) and resultado.get('productos_ambiguos'):
+                pregunta = resultado.get('pregunta_aclaracion', '')
+                if not pregunta:
+                    # Construir pregunta automáticamente
+                    ambiguos = resultado['productos_ambiguos']
+                    for amb in ambiguos:
+                        pregunta += f"¿Cuál {amb['termino_buscado']} necesitas?\n"
+                        for i, opcion in enumerate(amb['opciones'], 1):
+                            # Buscar precio
+                            prod_info = next((p for p in productos_db if p['nombre'] == opcion), None)
+                            precio = f"${prod_info['precio_base']:.2f}" if prod_info else ""
+                            pregunta += f"  {i}. {opcion} {precio}\n"
+                
+                return {
+                    'respuesta_cotizador': f"🤖 CotizaBot – {empresa_nombre}\n\n{pregunta}",
+                    'accion': 'esperar_info',
+                    'agentes_ejecutados': state['agentes_ejecutados'] + ['cotizador']
+                }
+            
+            # Buscar productos identificados en DB
             productos_solicitados = []
             for prod_id in resultado.get('productos_identificados', []):
-                sku = prod_id.get('sku_probable', '')
-                nombre_buscar = prod_id.get('nombre', '')
+                nombre_exacto = prod_id.get('nombre_exacto', prod_id.get('nombre', ''))
+                sku = prod_id.get('sku', '')
                 
-                # Buscar por SKU o por nombre similar
+                # Buscar por nombre exacto o SKU
                 producto_db = await productos_collection.find_one(
                     {'$or': [
+                        {'nombre': nombre_exacto},
                         {'sku': sku},
-                        {'nombre': {'$regex': nombre_buscar, '$options': 'i'}}
+                        {'nombre': {'$regex': f'^{nombre_exacto}$', '$options': 'i'}}
                     ]},
                     {'_id': 0}
                 )
@@ -129,7 +154,7 @@ Analiza qué productos solicita el cliente."""
                 accion = 'esperar_info'
             elif len(productos_solicitados) == 0:
                 categorias = list(set([p.get('categoria', 'General') for p in productos_db[:5]]))
-                respuesta = f"🤖 CotizaBot – {empresa_nombre}\n\nNo encontré los productos mencionados. Tenemos: {', '.join(categorias)}.\n\n¿Qué te gustaría cotizar?"
+                respuesta = f"🤖 CotizaBot – {empresa_nombre}\n\nNo encontré ese producto. Tenemos: {', '.join(categorias)}.\n\n¿Qué te gustaría cotizar?"
                 accion = 'esperar_info'
             else:
                 # Calcular totales
@@ -147,12 +172,9 @@ Analiza qué productos solicita el cliente."""
                 respuesta += f"\nIVA (16%): ${iva:.2f}"
                 respuesta += f"\n*TOTAL: ${total:.2f} MXN*"
                 
-                if resultado.get('productos_complementarios'):
-                    respuesta += f"\n\n💡 También podría interesarte: {', '.join(resultado['productos_complementarios'][:3])}"
+                respuesta += "\n\n¿Confirmas esta cotización? Responde *SÍ* para continuar o indica cambios."
                 
-                respuesta += "\n\n¿Deseas confirmar esta cotización o hacer cambios?"
-                
-                accion = 'enviar_cotizacion'
+                accion = 'confirmar_cotizacion'
             
             logger.info(f"Cotizador procesó {len(productos_solicitados)} productos para empresa {empresa_id}")
             
