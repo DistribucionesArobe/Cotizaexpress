@@ -129,16 +129,16 @@ class WhatsAppRouter:
         mensaje_upper = message_text.strip().upper()
         if mensaje_upper in ['CAMBIAR', 'CAMBIAR EMPRESA', 'OTRA EMPRESA', 'REINICIAR', 'MENU', 'MENÚ']:
             await self.reset_conversation(user_phone)
-            menu_message, companies = await self._build_selection_menu(user_phone)
             return RoutingResult(
                 success=False,
                 requires_selection=True,
                 message_to_send=(
                     "🔄 *Conversación reiniciada*\n\n"
-                    f"{menu_message}\n\n"
-                    "💡 _Tip: También puedes enviar el código de la empresa directamente (ej: FERRETER)_"
+                    "Por favor, envía el *código* de la empresa con la que deseas hablar.\n\n"
+                    "📌 El código lo encuentras en el link o QR que te compartió tu proveedor.\n\n"
+                    "_Ejemplo: FERRETER, ACEROMX, etc._"
                 ),
-                available_companies=companies
+                available_companies=[]
             )
         
         # 1. PASO 1: Verificar si el mensaje contiene código de empresa
