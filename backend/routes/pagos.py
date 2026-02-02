@@ -31,7 +31,28 @@ PLANES = {
         "iva_rate": 0.16,
         "precio_total": 1160.0,  # MXN con IVA
         "descripcion": "Cotizaciones ilimitadas + WhatsApp Business",
-        "interval": "month"
+        "interval": "month",
+        "features": [
+            "Cotizaciones ilimitadas",
+            "WhatsApp Business",
+            "Catálogo de productos",
+            "Dashboard de métricas"
+        ]
+    },
+    "pro": {
+        "nombre": "Plan Pro CotizaBot",
+        "precio_base": 1724.14,  # MXN (2000 / 1.16)
+        "iva_rate": 0.16,
+        "precio_total": 2000.0,  # MXN con IVA
+        "descripcion": "Todo Completo + Cobros automáticos (Mercado Pago + SPEI)",
+        "interval": "month",
+        "features": [
+            "Todo del Plan Completo",
+            "Link de pago Mercado Pago",
+            "Datos bancarios SPEI automáticos",
+            "Cobros desde WhatsApp",
+            "Notificaciones de pago"
+        ]
     }
 }
 
