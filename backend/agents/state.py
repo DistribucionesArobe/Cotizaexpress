@@ -9,7 +9,7 @@ class AgentState(TypedDict):
     conversacion_id: str
     
     # Clasificación de intención
-    intencion: Optional[str]  # cotizar, stock, seguimiento, factura, otro
+    intencion: Optional[str]  # cotizar, stock, seguimiento, factura, confirmar, metodo_pago, otro
     confianza_intencion: float
     
     # Contexto del cliente
@@ -30,10 +30,16 @@ class AgentState(TypedDict):
     respuesta_comercial: Optional[str]
     respuesta_operativo: Optional[str]
     respuesta_compliance: Optional[str]
+    respuesta_cobros: Optional[str]  # Nueva: respuesta del agente de cobros
+    
+    # Contexto de cobros/pagos
+    metodos_disponibles: Optional[List[str]]  # métodos de pago disponibles
+    link_pago: Optional[str]  # link de Mercado Pago generado
+    folio: Optional[str]  # folio de la cotización/pago
     
     # Decisión final
     respuesta_final: str
-    accion: Optional[str]  # enviar_cotizacion, enviar_mensaje, esperar_info
+    accion: Optional[str]  # enviar_cotizacion, enviar_mensaje, esperar_info, esperando_metodo_pago, link_pago_enviado
     
     # Metadatos
     agentes_ejecutados: List[str]
