@@ -22,7 +22,7 @@ class Mensaje(BaseModel):
     contenido: str
     tipo: TipoMensaje = TipoMensaje.TEXTO
     media_url: Optional[str] = None
-    twilio_sid: Optional[str] = None
+    wa_message_id: Optional[str] = None  # ID de mensaje de WhatsApp (360dialog)
     agente_procesador: Optional[str] = None
     context: Dict[str, Any] = Field(default_factory=dict)
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
