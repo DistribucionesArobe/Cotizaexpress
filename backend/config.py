@@ -11,11 +11,11 @@ class Settings(BaseSettings):
     mongo_url: str = os.environ['MONGO_URL']
     db_name: str = os.environ['DB_NAME']
     
-    # Twilio WhatsApp
-    twilio_account_sid: str = os.environ.get('TWILIO_ACCOUNT_SID', '')
-    twilio_auth_token: str = os.environ.get('TWILIO_AUTH_TOKEN', '')
-    twilio_whatsapp_number: str = os.environ.get('TWILIO_WHATSAPP_NUMBER', '')
+    # 360dialog WhatsApp
+    dialog360_base_url: str = os.environ.get('DIALOG360_BASE_URL', 'https://waba-v2.360dialog.io')
+    dialog360_api_key: str = os.environ.get('DIALOG360_API_KEY', '')
     cotizabot_whatsapp_number: str = os.environ.get('COTIZABOT_WHATSAPP_NUMBER', '+5218344291628')
+    webhook_verify_token: str = os.environ.get('WEBHOOK_VERIFY_TOKEN', 'cotizabot_verify_2024')
     
     # OpenAI (via Emergent LLM Key)
     emergent_llm_key: str = os.environ.get('EMERGENT_LLM_KEY', '')
