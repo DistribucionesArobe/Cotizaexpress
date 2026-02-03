@@ -93,10 +93,16 @@ REGLAS:
             user_message = UserMessage(
                 text=f"""Mensaje del cliente: {mensaje}
 
-CATÁLOGO COMPLETO DE {empresa_nombre.upper()}:
+CATÁLOGO DE {empresa_nombre.upper()}:
 {catalogo_str}
 
-Analiza qué productos solicita. Si hay ambigüedad (ej: "tablaroca" sin especificar tipo), indica que necesita aclaración."""
+INSTRUCCIONES:
+1. Identifica qué producto(s) quiere el cliente
+2. Si NO menciona cantidad, ESTIMA una cantidad razonable basada en uso típico
+3. Si hay varios productos similares, pregunta cuál prefiere CON PRECIOS
+4. Interpreta sinónimos y errores de escritura
+
+Responde en JSON."""
             )
             
             response = await self.chat.send_message(user_message)
