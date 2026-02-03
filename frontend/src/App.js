@@ -3,6 +3,7 @@ import '@/App.css';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import axios from 'axios';
 import { Toaster } from 'sonner';
+import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -24,6 +25,13 @@ import PortalCliente from './pages/PortalCliente';
 import AdminPromoCodes from './pages/AdminPromoCodes';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminTwilio from './pages/AdminTwilio';
+// Páginas SEO
+import DemoPage from './pages/DemoPage';
+import FerreteriasSEO from './pages/FerreteriasSEO';
+import RefaccionariasSEO from './pages/RefaccionariasSEO';
+import ServiciosTecnicosSEO from './pages/ServiciosTecnicosSEO';
+import PrivacidadPage from './pages/PrivacidadPage';
+import TerminosPage from './pages/TerminosPage';
 import { Menu, X } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
