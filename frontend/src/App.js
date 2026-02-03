@@ -313,6 +313,13 @@ function AppContent() {
             <Route path="/precios" element={<Precios />} />
             <Route path="/pago-exitoso" element={<PagoExitoso />} />
             <Route path="/portal/cotizacion/:token" element={<PortalCliente />} />
+            {/* Rutas SEO */}
+            <Route path="/demo" element={<DemoPage />} />
+            <Route path="/ferreterias" element={<FerreteriasSEO />} />
+            <Route path="/refaccionarias" element={<RefaccionariasSEO />} />
+            <Route path="/servicios-tecnicos" element={<ServiciosTecnicosSEO />} />
+            <Route path="/privacidad" element={<PrivacidadPage />} />
+            <Route path="/terminos" element={<TerminosPage />} />
 
             {/* Rutas protegidas */}
             <Route
