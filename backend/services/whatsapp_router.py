@@ -134,12 +134,40 @@ class WhatsAppRouter:
                 requires_selection=True,
                 message_to_send=(
                     "🔄 *Conversación reiniciada*\n\n"
-                    "Por favor, envía el *código* de la empresa con la que deseas hablar.\n\n"
-                    "📌 El código lo encuentras en el link o QR que te compartió tu proveedor.\n\n"
-                    "_Ejemplo: FERRETER, ACEROMX, etc._"
+                    "Envía el *código* de la empresa con la que deseas hablar.\n\n"
+                    "📌 _El código está en el link o QR que te compartió tu proveedor._"
                 ),
                 available_companies=[]
             )
+        
+        # 0.5 PASO DEMO: Si escribe DEMO, activar contexto demo
+        if mensaje_upper == 'DEMO':
+            # Buscar o crear empresa demo
+            empresa_demo = await self.companies_collection.find_one({'id': 'demo'})
+            if not empresa_demo:
+                empresa_demo = {
+                    'id': 'demo',
+                    'nombre': 'Demo CotizaBot',
+                    'codigo_whatsapp': 'DEMO',
+                    'activo': True,
+                    'plan': 'demo'
+                }
+            
+            result = RoutingResult(
+                success=True,
+                company_id='demo',
+                company_name='Demo CotizaBot',
+                routing_method=RoutingMethod.CODE_LINK,
+                message_to_send=(
+                    "👋 ¡Hola!\n\n"
+                    "Estás en *CotizaBot Demo*.\n"
+                    "Prueba cómo cotizo aunque escribas mal o no sepas qué pedir.\n\n"
+                    "🔹 _Demo limitada_\n\n"
+                    "💡 _Escribe CAMBIAR para salir del demo._"
+                )
+            )
+            await self._save_routing(user_phone, result)
+            return result
         
         # 1. PASO 1: Verificar si el mensaje contiene código de empresa
         code_result = await self._check_company_code(message_text)
