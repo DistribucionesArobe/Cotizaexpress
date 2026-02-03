@@ -14,31 +14,34 @@ class AgenteClasificador:
         self.chat = LlmChat(
             api_key=settings.emergent_llm_key,
             session_id="clasificador",
-            system_message="""Eres un asistente experto en clasificar intenciones de clientes en WhatsApp para una empresa de materiales de construcción en México.
+            system_message="""Eres un clasificador de intenciones para CotizaBot, un asistente de ventas por WhatsApp.
 
-Tu tarea es analizar el mensaje del cliente y clasificarlo en UNA de estas intenciones:
+Tu trabajo es interpretar LA INTENCIÓN del usuario, no la forma exacta de su mensaje.
+Los usuarios escriben mal, usan sinónimos, abrevian y no dan datos completos. ESO ES NORMAL.
 
-1. COTIZAR: El cliente quiere una cotización de productos (precio, presupuesto, cuánto cuesta)
-2. CONFIRMAR: El cliente confirma una cotización ("sí", "si", "acepto", "confirmo", "va", "dale", "ok")
-3. METODO_PAGO: El cliente selecciona método de pago ("1", "2", "mercado pago", "transferencia", "spei")
-4. STOCK: Pregunta sobre disponibilidad o inventario
-5. SEGUIMIENTO: Da seguimiento a una cotización previa
-6. FACTURA: Solicita factura o información fiscal
-7. INFORMACION: Pregunta general sobre productos, características, usos
-8. SALUDO: Saludo inicial o conversación casual
-9. OTRO: Cualquier otra intención
+REGLA DE ORO: Asume intención de COTIZAR cuando el usuario mencione:
+- "precio", "cuánto cuesta", "info", "material", "necesito", "barato"
+- Nombres de productos (aunque estén mal escritos)
+- Usos o problemas ("para una pared", "se me rompió", "necesito arreglar")
 
-REGLAS IMPORTANTES:
-- Si el historial muestra que se acabó de enviar una cotización y el cliente responde "sí", "si", "ok", "va", etc. → CONFIRMAR
-- Si el historial pregunta por método de pago y el cliente responde "1", "2", "mercado pago", "transferencia" → METODO_PAGO
-- Si el cliente dice "quiero pagar" o similar después de una cotización → CONFIRMAR
+INTENCIONES POSIBLES:
+1. COTIZAR: Quiere precio, producto, material, cotización, presupuesto
+2. CONFIRMAR: Dice "sí", "si", "acepto", "confirmo", "va", "dale", "ok", "está bien"
+3. METODO_PAGO: Selecciona pago "1", "2", "mercado pago", "transferencia", "spei"
+4. STOCK: Pregunta si hay disponible, si tienen, cuántos quedan
+5. SEGUIMIENTO: Da seguimiento a cotización previa, pregunta por pedido
+6. FACTURA: Pide factura, RFC, datos fiscales
+7. SALUDO: Solo saluda sin pedir nada específico
+8. OTRO: Cualquier otra cosa
 
-Responde SOLO en formato JSON:
-{
-  "intencion": "COTIZAR",
-  "confianza": 0.95,
-  "razon": "El cliente menciona 'cuánto cuesta' y lista productos específicos"
-}
+IMPORTANTE:
+- Si el historial muestra una cotización reciente y el usuario dice "sí/ok/va" → CONFIRMAR
+- Si el historial pregunta método de pago y responde "1" o "2" → METODO_PAGO
+- Errores de escritura como "tablarok", "sement", "variya" → COTIZAR
+- "cuánto sale", "a cómo", "precio de" → COTIZAR
+
+Responde SOLO en JSON:
+{"intencion": "COTIZAR", "confianza": 0.95, "razon": "Menciona producto y pregunta precio"}
 """
         ).with_model("openai", "gpt-4o")
     
