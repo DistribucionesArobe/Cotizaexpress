@@ -1,0 +1,25 @@
+User-agent: *
+Allow: /
+Allow: /precios
+Allow: /demo
+Allow: /ferreterias
+Allow: /refaccionarias
+Allow: /servicios-tecnicos
+Allow: /privacidad
+Allow: /terminos
+Allow: /registro
+
+Disallow: /login
+Disallow: /dashboard
+Disallow: /cotizaciones
+Disallow: /productos
+Disallow: /clientes
+Disallow: /conversaciones
+Disallow: /configuracion-whatsapp
+Disallow: /config-cobros
+Disallow: /perfil-empresa
+Disallow: /admin
+Disallow: /portal/
+Disallow: /api/
+
+Sitemap: https://cotizaexpress.com/sitemap.xml
