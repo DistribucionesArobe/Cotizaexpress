@@ -152,6 +152,21 @@ Bot: 💳 Datos para transferencia SPEI
 
 ## Changelog
 
+### 2026-02-03
+- **IMPLEMENTADO**: SEO Completo
+  - Landing Page optimizada con H1, H2, meta tags, FAQ, casos de uso
+  - Nuevas páginas SEO: /demo, /ferreterias, /refaccionarias, /servicios-tecnicos, /privacidad, /terminos
+  - sitemap.xml y robots.txt generados
+  - Plan Pro destacado en lugar de Plan Gratis en landing
+  - CTAs directos a WhatsApp Demo
+- **IMPLEMENTADO**: Nuevo prompt del bot como vendedor humano
+  - Clasificador mejorado para entender intención (no forma)
+  - Cotizador estima cantidades si no se dan
+  - Nunca dice "no entendí"
+  - Modo DEMO disponible escribiendo "DEMO"
+- **MEJORADO**: Comando CAMBIAR simplificado (pide código, no lista empresas)
+- **CREADO**: Código promocional ROBLEDO92 (100% descuento)
+
 ### 2026-02-02
 - **IMPLEMENTADO**: Flujo completo de cobros para Plan Pro
 - Nuevo agente de cobros (agente_cobros.py)
