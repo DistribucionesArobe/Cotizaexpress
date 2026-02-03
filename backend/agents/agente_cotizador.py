@@ -169,18 +169,25 @@ Responde en JSON."""
                     })
             
             # Construir respuesta
-            if resultado.get('necesita_aclaracion', False):
-                respuesta = f"🤖 CotizaBot – {empresa_nombre}\n\n{resultado.get('pregunta_aclaracion', 'Por favor especifica qué productos necesitas.')}"
+            if resultado.get('necesita_aclaracion', False) and resultado.get('productos_ambiguos'):
+                # Solo preguntar si hay ambigüedad real en productos
+                pregunta = resultado.get('pregunta_aclaracion', '')
+                respuesta = f"{pregunta}"
                 accion = 'esperar_info'
             elif len(productos_solicitados) == 0:
+                # No encontró productos - dar opciones en vez de bloquear
                 categorias = list(set([p.get('categoria', 'General') for p in productos_db[:5]]))
-                respuesta = f"🤖 CotizaBot – {empresa_nombre}\n\nNo encontré ese producto. Tenemos: {', '.join(categorias)}.\n\n¿Qué te gustaría cotizar?"
+                respuesta = f"No ubico ese producto exacto 🤔\nManejamos: {', '.join(categorias)}.\n\n¿Me puedes dar más detalles?"
                 accion = 'esperar_info'
             else:
                 # Calcular totales
                 subtotal = sum(p['subtotal'] for p in productos_solicitados)
                 iva = subtotal * settings.iva_rate
                 total = subtotal + iva
+                
+                # Verificar si la cantidad fue estimada
+                cantidad_estimada = resultado.get('cantidad_estimada', False)
+                nota_vendedor = resultado.get('nota_vendedor', '')
                 
                 # Guardar cotización en BD para recuperarla cuando confirme
                 import uuid
@@ -198,24 +205,27 @@ Responde en JSON."""
                     'subtotal': subtotal,
                     'iva': iva,
                     'total': total,
-                    'estado': 'pendiente',  # pendiente, confirmada, pagada, cancelada
+                    'cantidad_estimada': cantidad_estimada,
+                    'estado': 'pendiente',
                     'created_at': datetime.now(timezone.utc).isoformat()
                 }
                 
                 await cotizaciones_collection.insert_one(cotizacion_doc)
                 logger.info(f"Cotización guardada: {folio} - Total: ${total:.2f}")
                 
-                respuesta = f"🤖 CotizaBot – {empresa_nombre}\n\n📋 *Cotización #{folio}*\n\n"
+                # Construir respuesta más corta y vendedora
+                respuesta = f"📋 *Cotización #{folio}*\n\n"
                 
                 for p in productos_solicitados:
-                    respuesta += f"• {p['producto_nombre']}\n  {p['cantidad']} {p['unidad']} x ${p['precio_unitario']:.2f} = *${p['subtotal']:.2f}*\n"
+                    respuesta += f"• {p['producto_nombre']}\n  {p['cantidad']} {p['unidad']} × ${p['precio_unitario']:.2f} = ${p['subtotal']:.2f}\n"
                 
-                respuesta += f"\n─────────────────"
-                respuesta += f"\nSubtotal: ${subtotal:.2f}"
-                respuesta += f"\nIVA (16%): ${iva:.2f}"
-                respuesta += f"\n*TOTAL: ${total:.2f} MXN*"
+                respuesta += f"\n*Total: ${total:.2f} MXN* (IVA incluido)"
                 
-                respuesta += "\n\n¿Confirmas esta cotización? Responde *SÍ* para continuar o indica cambios."
+                # Si fue cantidad estimada, mencionarlo
+                if cantidad_estimada and nota_vendedor:
+                    respuesta += f"\n\n💡 _{nota_vendedor}_"
+                
+                respuesta += "\n\n¿Lo confirmas? Responde *SÍ* o ajustamos cantidad."
                 
                 accion = 'confirmar_cotizacion'
             
