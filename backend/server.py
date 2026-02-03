@@ -79,6 +79,9 @@ api_router.include_router(whatsapp_config.router)
 # Registrar router principal
 app.include_router(api_router)
 
+# Rutas SEO en root (sin prefijo /api)
+app.include_router(seo.router)
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
