@@ -4,7 +4,7 @@ from typing import List, Optional
 from database import cotizaciones_collection, clientes_collection, db
 from models.cotizacion import Cotizacion, CotizacionCreate, EstadoCotizacion, ItemCotizacion
 from services.pdf_service import pdf_service
-from services.dialog360_service import dialog360_service
+from services.meta_whatsapp_service import meta_whatsapp
 from services.email_service import email_service
 from utils.auth import get_current_user
 from config import settings
