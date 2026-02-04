@@ -156,3 +156,82 @@ async def eliminar_todos_productos():
     except Exception as e:
         logger.error(f"Error eliminando productos: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+from pydantic import BaseModel
+
+class ProductoRapido(BaseModel):
+    nombre: str
+    precio_base: float
+    categoria: str = "General"
+    unidad: str = "Pieza"
+
+class CargaRapidaRequest(BaseModel):
+    productos: List[ProductoRapido]
+
+@router.post("/rapida")
+async def carga_rapida(
+    request: CargaRapidaRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Carga rápida de productos solo con nombre y precio"""
+    try:
+        empresa_id = current_user.get('empresa_id')
+        
+        productos_insertados = 0
+        productos_actualizados = 0
+        errores = []
+        
+        for producto in request.productos:
+            try:
+                # Generar SKU automático
+                sku = f"PROD-{str(uuid.uuid4())[:8].upper()}"
+                
+                producto_doc = {
+                    'id': str(uuid.uuid4()),
+                    'empresa_id': empresa_id,
+                    'sku': sku,
+                    'nombre': producto.nombre,
+                    'categoria': producto.categoria,
+                    'precio_base': producto.precio_base,
+                    'unidad': producto.unidad,
+                    'stock': 999,  # Stock alto por defecto
+                    'descripcion': '',
+                    'activo': True,
+                    'created_at': datetime.now(timezone.utc).isoformat()
+                }
+                
+                # Verificar si ya existe un producto con el mismo nombre
+                existente = await productos_collection.find_one({
+                    'empresa_id': empresa_id,
+                    'nombre': producto.nombre
+                })
+                
+                if existente:
+                    await productos_collection.update_one(
+                        {'id': existente['id']},
+                        {'$set': {
+                            'precio_base': producto.precio_base,
+                            'updated_at': datetime.now(timezone.utc).isoformat()
+                        }}
+                    )
+                    productos_actualizados += 1
+                else:
+                    await productos_collection.insert_one(producto_doc)
+                    productos_insertados += 1
+                    
+            except Exception as e:
+                errores.append(f"Error en '{producto.nombre}': {str(e)}")
+        
+        logger.info(f"Carga rápida: {productos_insertados} insertados, {productos_actualizados} actualizados")
+        
+        return {
+            'success': True,
+            'productos_insertados': productos_insertados,
+            'productos_actualizados': productos_actualizados,
+            'errores': errores
+        }
+        
+    except Exception as e:
+        logger.error(f"Error en carga rápida: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
