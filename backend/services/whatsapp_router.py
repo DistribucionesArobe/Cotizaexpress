@@ -715,3 +715,9 @@ async def get_company_whatsapp_info(db, company_id: str) -> Optional[Dict]:
     )
     
     return empresa
+
+
+# Instancia global del router
+from database import db
+whatsapp_router = WhatsAppRouter(db)
+
