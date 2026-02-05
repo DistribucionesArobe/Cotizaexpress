@@ -40,6 +40,11 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Health check en raíz (requerido por Kubernetes)
+@app.get("/health")
+async def root_health_check():
+    return {"status": "healthy", "service": "CotizaBot", "version": "1.0.0"}
+
 # Configurar CORS
 app.add_middleware(
     CORSMiddleware,
