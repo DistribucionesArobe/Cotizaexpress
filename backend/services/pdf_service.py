@@ -20,7 +20,7 @@ class PDFService:
     """Servicio para generar PDFs de cotizaciones personalizados"""
     
     def __init__(self):
-        self.pdf_dir = '/app/backend/pdfs'
+        self.pdf_dir = str((Path(__file__).resolve().parent.parent / "pdfs").resolve())
         os.makedirs(self.pdf_dir, exist_ok=True)
     
     async def obtener_empresa_info(self, empresa_id: str) -> dict:

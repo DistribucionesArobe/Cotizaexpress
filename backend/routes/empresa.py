@@ -18,7 +18,7 @@ empresas_collection = db.get_collection('empresas')
 solicitudes_factura_collection = db.get_collection('solicitudes_factura')
 
 # Directorio para almacenar logos
-LOGOS_DIR = Path("/app/backend/static/logos")
+LOGOS_DIR = (Path(__file__).resolve().parent.parent / "static" / "logos")
 LOGOS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Formatos permitidos
