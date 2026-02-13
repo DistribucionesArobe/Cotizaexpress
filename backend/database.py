@@ -100,8 +100,12 @@ async def init_indexes():
     
     logger.info("Índices creados exitosamente")
 
+
 async def seed_catalogo():
     """Carga el catálogo inicial de productos de demo (abarrotes)"""
+    if productos_collection is None:
+        logger.warning("Saltando seed_catalogo: MongoDB no está configurado.")
+        return
     logger.info("Verificando catálogo de productos de demo...")
     
     # Ya no cargamos productos demo globales
