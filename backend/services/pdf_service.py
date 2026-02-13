@@ -14,7 +14,7 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-empresas_collection = db.get_collection('empresas')
+empresas_collection = db.get_collection('empresas') if db is not None else None
 
 class PDFService:
     """Servicio para generar PDFs de cotizaciones personalizados"""

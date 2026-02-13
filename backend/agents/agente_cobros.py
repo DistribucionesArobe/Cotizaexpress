@@ -337,7 +337,7 @@ class AgenteCobros:
     ):
         """Registra el intento de pago en la base de datos"""
         try:
-            pagos_collection = db.get_collection('pagos_pendientes')
+            pagos_collection = db.get_collection('pagos_pendientes')if db is not None else None
             
             await pagos_collection.insert_one({
                 'id': str(uuid.uuid4()),

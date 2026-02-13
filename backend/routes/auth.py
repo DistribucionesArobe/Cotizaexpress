@@ -10,8 +10,8 @@ import logging
 router = APIRouter(prefix="/auth", tags=["autenticacion"])
 logger = logging.getLogger(__name__)
 
-usuarios_collection = db.get_collection('usuarios')
-empresas_collection = db.get_collection('empresas')
+usuarios_collection = db.get_collection('usuarios')if db is not None else None
+empresas_collection = db.get_collection('empresas')if db is not None else None
 
 @router.post("/registro", response_model=Token, status_code=status.HTTP_201_CREATED)
 async def registrar_usuario(usuario_data: UsuarioCreate):

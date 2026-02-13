@@ -29,8 +29,8 @@ import re
 router = APIRouter(prefix="/whatsapp", tags=["whatsapp"])
 logger = logging.getLogger(__name__)
 
-empresas_collection = db.get_collection('empresas')
-wa_conversations_collection = db.get_collection('wa_conversations')
+empresas_collection = db.get_collection('empresas')if db is not None else None
+wa_conversations_collection = db.get_collection('wa_conversations')if db is not None else None
 
 # Número centralizado de CotizaBot (México)
 COTIZABOT_WHATSAPP_NUMBER = os.environ.get('COTIZABOT_WHATSAPP_NUMBER', '+5218344291628')

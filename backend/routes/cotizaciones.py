@@ -16,7 +16,7 @@ import os
 router = APIRouter(prefix="/cotizaciones", tags=["cotizaciones"])
 logger = logging.getLogger(__name__)
 
-empresas_collection = db.get_collection('empresas')
+empresas_collection = db.get_collection('empresas')if db is not None else None
 
 class EnviarCotizacionRequest(BaseModel):
     cotizacion_id: str

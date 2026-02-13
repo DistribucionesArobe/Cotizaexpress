@@ -17,11 +17,11 @@ import uuid
 router = APIRouter(prefix="/pagos", tags=["pagos"])
 logger = logging.getLogger(__name__)
 
-empresas_collection = db.get_collection('empresas')
-payment_transactions_collection = db.get_collection('payment_transactions')
-subscriptions_collection = db.get_collection('subscriptions')
-promo_codes_collection = db.get_collection('promo_codes')
-promo_usage_collection = db.get_collection('promo_usage')
+empresas_collection = db.get_collection('empresas')if db is not None else None
+payment_transactions_collection = db.get_collection('payment_transactions')if db is not None else None
+subscriptions_collection = db.get_collection('subscriptions')if db is not None else None
+promo_codes_collection = db.get_collection('promo_codes')if db is not None else None
+promo_usage_collection = db.get_collection('promo_usage')if db is not None else None
 
 # Planes fijos definidos en backend (NUNCA aceptar monto desde frontend)
 PLANES = {

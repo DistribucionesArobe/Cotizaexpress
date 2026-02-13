@@ -10,9 +10,9 @@ logger = logging.getLogger(__name__)
 
 stripe.api_key = os.environ.get('STRIPE_API_KEY', '')
 
-empresas_collection = db.get_collection('empresas')
-payment_transactions_collection = db.get_collection('payment_transactions')
-subscriptions_collection = db.get_collection('subscriptions')
+empresas_collection = db.get_collection('empresas')if db is not None else None
+payment_transactions_collection = db.get_collection('payment_transactions')if db is not None else None
+subscriptions_collection = db.get_collection('subscriptions')if db is not None else None
 
 @router.post("/stripe")
 async def stripe_webhook(request: Request):

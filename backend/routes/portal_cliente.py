@@ -17,10 +17,10 @@ import os
 router = APIRouter(prefix="/portal", tags=["portal-cliente"])
 logger = logging.getLogger(__name__)
 
-cotizaciones_collection = db.get_collection('cotizaciones')
-clientes_collection = db.get_collection('clientes')
-empresas_collection = db.get_collection('empresas')
-portal_tokens_collection = db.get_collection('portal_tokens')
+cotizaciones_collection = db.get_collection('cotizaciones')if db is not None else None
+clientes_collection = db.get_collection('clientes')if db is not None else None
+empresas_collection = db.get_collection('empresas')if db is not None else None
+portal_tokens_collection = db.get_collection('portal_tokens')if db is not None else None
 
 
 def generar_token_portal(cotizacion_id: str, cliente_id: str) -> str:

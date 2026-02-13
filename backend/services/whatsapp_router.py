@@ -101,9 +101,9 @@ class WhatsAppRouter:
         self.companies_collection = None
         
         if db is not None:
-            self.conversations_collection = db.get_collection('wa_conversations')
-            self.routing_logs_collection = db.get_collection('wa_routing_logs')
-            self.companies_collection = db.get_collection('empresas')
+            self.conversations_collection = db.get_collection('wa_conversations')if db is not None else None
+            self.routing_logs_collection = db.get_collection('wa_routing_logs')if db is not None else None
+            self.companies_collection = db.get_collection('empresas')if db is not None else None
         else:
             print("⚠️ WhatsAppRouter iniciado sin MongoDB. El modo Multi-tenant está en pausa.")
 
@@ -312,7 +312,7 @@ class WhatsAppRouter:
                 )
         
         # Buscar también en clientes por si tiene empresa asignada
-        clientes_collection = self.db.get_collection('clientes')
+        clientes_collection = self.db.get_collection('clientes')if db is not None else None
         cliente = await clientes_collection.find_one({'telefono': user_phone})
         
         if cliente and cliente.get('empresa_id'):
@@ -626,7 +626,7 @@ async def generate_company_whatsapp_assets(db, company_id: str, whatsapp_number:
     - QR Code (URL)
     - Texto de instrucciones
     """
-    empresas_collection = db.get_collection('empresas')
+    empresas_collection = db.get_collection('empresas')if db is not None else None
     
     empresa = await empresas_collection.find_one({'id': company_id})
     if not empresa:
@@ -688,7 +688,7 @@ async def generate_company_whatsapp_assets(db, company_id: str, whatsapp_number:
 
 async def get_company_whatsapp_info(db, company_id: str) -> Optional[Dict]:
     """Obtiene la información de WhatsApp de una empresa"""
-    empresas_collection = db.get_collection('empresas')
+    empresas_collection = db.get_collection('empresas')if db is not None else None
     
     empresa = await empresas_collection.find_one(
         {'id': company_id},

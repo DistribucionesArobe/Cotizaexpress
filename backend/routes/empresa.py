@@ -14,8 +14,8 @@ from pathlib import Path
 router = APIRouter(prefix="/empresa", tags=["empresa"])
 logger = logging.getLogger(__name__)
 
-empresas_collection = db.get_collection('empresas')
-solicitudes_factura_collection = db.get_collection('solicitudes_factura')
+empresas_collection = db.get_collection('empresas')if db is not None else None
+solicitudes_factura_collection = db.get_collection('solicitudes_factura')if db is not None else None
 
 # Directorio para almacenar logos
 LOGOS_DIR = (Path(__file__).resolve().parent.parent / "static" / "logos")
