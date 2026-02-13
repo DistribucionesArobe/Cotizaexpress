@@ -22,8 +22,8 @@ logger = logging.getLogger(__name__)
 # Orquestador de agentes (instancia única)
 orquestador = OrquestadorCotizaBot()
 
-# Colección para deduplicación de mensajes
-wa_processed = db.get_collection('wa_processed_messages')
+# Usamos un condicional para que no explote
+wa_processed = db.get_collection('wa_processed_messages') if db is not None else None
 
 
 def verify_webhook_signature(request_body: bytes, signature: str) -> bool:
@@ -103,16 +103,18 @@ async def recibir_webhook(request: Request, background_tasks: BackgroundTasks):
         
         # Deduplicación: verificar si ya procesamos este mensaje
         existing = await wa_processed.find_one({"message_id": message_id})
-        if existing:
-            logger.info(f"⏭️ Mensaje ya procesado: {message_id}")
-            return {"status": "ok", "message": "Already processed"}
+        if wa_processed:
+            existing = await wa_processed.find_one({"message_id": message_id})
+            if existing:
+                logger.info(f"⏭️ Mensaje ya procesado: {message_id}")
+                return {"status": "ok", "message": "Already processed"}
         
-        # Registrar mensaje como procesado
-        await wa_processed.insert_one({
-            "message_id": message_id,
-            "timestamp": parsed.get("timestamp"),
-            "processed": True
-        })
+            # Registrar mensaje como procesado
+            await wa_processed.insert_one({
+                "message_id": message_id,
+                "timestamp": parsed.get("timestamp"),
+                "processed": True
+            })
         
         # Procesar en background para responder rápido a Meta
         background_tasks.add_task(
@@ -258,7 +260,11 @@ async def guardar_conversacion(
     try:
         from datetime import datetime, timezone
         
-        conversaciones = db.get_collection('conversaciones')
+        conversaciones = db.get_collection('conversaciones') if db is not None else None
+        
+        if conversaciones is None:
+            logger.warning("⚠️ No se pudo guardar la conversación: MongoDB desactivado.")
+            return
         
         await conversaciones.update_one(
             {
