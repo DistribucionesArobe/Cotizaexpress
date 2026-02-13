@@ -93,50 +93,39 @@ class WhatsAppRouter:
     Maneja el enrutamiento de mensajes entrantes a la empresa correcta.
     """
     
-    def __init__(self, db):
+    def __init__(self, db=None):
         self.db = db
-        self.conversations_collection = db.get_collection('wa_conversations')
-        self.companies_collection = db.get_collection('empresas')
-        self.routing_logs_collection = db.get_collection('wa_routing_logs')
-    
-    
-    async def route_incoming_message(
-        self,
-        user_phone: str,
-        message_text: str,
-        whatsapp_number: str
-    ) -> RoutingResult:
-        """
-        PROCESO PRINCIPAL DE ENRUTAMIENTO
+        # Inicializamos siempre como None para evitar errores de referencia
+        self.conversations_collection = None
+        self.routing_logs_collection = None
+        self.companies_collection = None
         
-        Orden de prioridad:
-        0. Comando CAMBIAR (reinicia conversación)
-        1. Link único (código en mensaje)
-        2. Memoria (historial)
-        3. Menú de selección
-        4. Detección por IA
-        
-        Args:
-            user_phone: Teléfono del usuario final
-            message_text: Texto del mensaje recibido
-            whatsapp_number: Número de WhatsApp de CotizaBot
-            
-        Returns:
-            RoutingResult con la empresa identificada o solicitud de selección
-        """
-        
-        # 0. PASO 0: Verificar comando CAMBIAR para reiniciar conversación
+        if db is not None:
+            self.conversations_collection = db.get_collection('wa_conversations')
+            self.routing_logs_collection = db.get_collection('wa_routing_logs')
+            self.companies_collection = db.get_collection('empresas')
+        else:
+            print("⚠️ WhatsAppRouter iniciado sin MongoDB. El modo Multi-tenant está en pausa.")
+
+    async def route_incoming_message(self, user_phone, message_text, whatsapp_number):
+        # 0. Comando CAMBIAR (Esto funciona sin DB porque no la usa)
         mensaje_upper = message_text.strip().upper()
-        if mensaje_upper in ['CAMBIAR', 'CAMBIAR EMPRESA', 'OTRA EMPRESA', 'REINICIAR', 'MENU', 'MENÚ']:
-            await self.reset_conversation(user_phone)
+        if mensaje_upper in ['CAMBIAR', 'REINICIAR', 'MENU', 'MENÚ']:
+            if self.conversations_collection: # Solo si hay DB
+                await self.reset_conversation(user_phone)
             return RoutingResult(
                 success=False,
                 requires_selection=True,
-                message_to_send=(
-                    "🔄 *Conversación reiniciada*\n\n"
-                    "Envía el *código* de la empresa con la que deseas hablar.\n\n"
-                    "📌 _El código está en el link o QR que te compartió tu proveedor._"
-                ),
+                message_to_send="🔄 *Conversación reiniciada*\nEnvía el código de la empresa.",
+                available_companies=[]
+            )
+
+        # PROTECCIÓN: Si no hay base de datos, no intentamos buscar empresas
+        if not self.companies_collection:
+            return RoutingResult(
+                success=False,
+                requires_selection=True,
+                message_to_send="🤖 *Servidor en mantenimiento*\nLa base de datos no está disponible actualmente.",
                 available_companies=[]
             )
         
