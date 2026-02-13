@@ -7,9 +7,12 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 class Settings(BaseSettings):
-    # MongoDB
-    mongo_url: str = os.environ['MONGO_URL']
-    db_name: str = os.environ['DB_NAME']
+    # Base de Datos (Priorizamos Postgres como pide el cliente)
+    database_url: str = os.environ.get('DATABASE_URL', '') 
+    
+    # MongoDB (Lo hacemos opcional para que no bloquee el inicio)
+    mongo_url: str = os.environ.get('MONGO_URL', '')
+    db_name: str = os.environ.get('DB_NAME', 'cotizabot_db')
     
     # Meta WhatsApp Cloud API
     meta_access_token: str = os.environ.get('META_ACCESS_TOKEN', '')
