@@ -4,21 +4,43 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# MongoDB connection
-client = AsyncIOMotorClient(settings.mongo_url)
-db = client[settings.db_name]
+# MongoDB connection - Modificado para ser opcional
+client = None
+db = None
 
-# Collections
-productos_collection = db.get_collection('productos')
-clientes_collection = db.get_collection('clientes')
-cotizaciones_collection = db.get_collection('cotizaciones')
-conversaciones_collection = db.get_collection('conversaciones')
-mensajes_collection = db.get_collection('mensajes')
-logs_agente_collection = db.get_collection('logs_agente')
-metricas_collection = db.get_collection('metricas')
+if settings.mongo_url:
+    try:
+        client = AsyncIOMotorClient(settings.mongo_url)
+        db = client[settings.db_name]
+        logger.info("✅ Conexión a MongoDB establecida")
+    except Exception as e:
+        logger.error(f"❌ Error al conectar a MongoDB: {e}")
+else:
+    logger.warning("⚠️ MONGO_URL no detectada. MongoDB estará desactivado.")
+
+# Helper para obtener colecciones de forma segura
+def get_safe_collection(name):
+    if db is not None:
+        return db.get_collection(name)
+    return None
+
+
+# Collections - Ahora son seguras (serán None si no hay Mongo)
+productos_collection = get_safe_collection('productos')
+clientes_collection = get_safe_collection('clientes')
+cotizaciones_collection = get_safe_collection('cotizaciones')
+conversaciones_collection = get_safe_collection('conversaciones')
+mensajes_collection = get_safe_collection('mensajes')
+logs_agente_collection = get_safe_collection('logs_agente')
+metricas_collection = get_safe_collection('metricas')
+
 
 async def init_indexes():
-    """Inicializa índices de base de datos para rendimiento óptimo"""
+    """Inicializa índices de base de datos solo si MongoDB está activo"""
+    if db is None:
+        logger.info("Saltando inicialización de índices: MongoDB no está configurado.")
+        return
+        
     logger.info("Inicializando índices de MongoDB...")
     
     # Eliminar índice antiguo de SKU si existe (era único global, ahora es por empresa)
