@@ -30,7 +30,10 @@ async def lifespan(app: FastAPI):
     yield
     
     logger.info("Cerrando CotizaBot...")
-    client.close()
+    if client is not None:
+        client.close()
+    else:
+        logger.info("No hay cliente de MongoDB que cerrar.")
 
 # Crear aplicación FastAPI
 app = FastAPI(
