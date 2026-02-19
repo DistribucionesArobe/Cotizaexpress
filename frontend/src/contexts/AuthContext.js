@@ -1,86 +1,115 @@
-import { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
+import { createContext, useState, useContext, useEffect } from "react";
+import axios from "axios";
 
 const AuthContext = createContext(null);
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+// ✅ 1) BASE URL correcto (y fallback seguro)
+const BACKEND_URL =
+  process.env.REACT_APP_BACKEND_URL?.trim() || "https://api.cotizaexpress.com";
+
 const API = `${BACKEND_URL}/api`;
+
+// ✅ 2) Axios global: SIEMPRE mandar cookies
+axios.defaults.withCredentials = true;
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(localStorage.getItem('token'));
 
+  // ✅ Al cargar la app: intenta recuperar sesión por cookie
   useEffect(() => {
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      cargarUsuario();
-    } else {
-      setLoading(false);
-    }
-  }, [token]);
+    cargarUsuario();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const cargarUsuario = async () => {
     try {
-      const response = await axios.get(`${API}/auth/me`);
-      setUser(response.data);
+      const response = await axios.get(`${API}/auth/me`, {
+        withCredentials: true,
+      });
+
+      // backend: { ok: true, user: { id, email } }
+      const u = response.data?.user || null;
+      setUser(u);
     } catch (error) {
-      console.error('Error cargando usuario:', error);
-      logout();
+      // 401 es normal si no hay sesión
+      setUser(null);
     } finally {
       setLoading(false);
     }
   };
 
-  const registro = async (userData) => {
+  // ✅ Registro (backend: /api/auth/register)
+  const registro = async ({ email, password }) => {
     try {
-      const response = await axios.post(`${API}/auth/registro`, userData);
-      const { access_token, usuario } = response.data;
-      
-      localStorage.setItem('token', access_token);
-      setToken(access_token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      
-      setUser({ usuario, empresa: { plan: 'demo' } });
+      await axios.post(
+        `${API}/auth/register`,
+        { email, password },
+        { withCredentials: true }
+      );
+
+      // tu backend register no loguea automáticamente;
+      // si quieres auto-login, hacemos login aquí:
+      await login(email, password);
+
       return { success: true };
     } catch (error) {
-      console.error('Error en registro:', error);
       return {
         success: false,
-        error: error.response?.data?.detail || 'Error al registrar usuario'
+        error:
+          error.response?.data?.detail ||
+          error.response?.data?.message ||
+          "Error al registrar usuario",
       };
     }
   };
 
+  // ✅ Login (backend: /api/auth/login -> set-cookie session)
   const login = async (email, password) => {
     try {
-      const response = await axios.post(`${API}/auth/login`, { email, password });
-      const { access_token, usuario } = response.data;
-      
-      localStorage.setItem('token', access_token);
-      setToken(access_token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      
+      await axios.post(
+        `${API}/auth/login`,
+        { email, password },
+        { withCredentials: true }
+      );
+
+      // ✅ Ahora trae el usuario usando cookie
       await cargarUsuario();
+
       return { success: true };
     } catch (error) {
-      console.error('Error en login:', error);
       return {
         success: false,
-        error: error.response?.data?.detail || 'Error al iniciar sesión'
+        error:
+          error.response?.data?.detail ||
+          error.response?.data?.message ||
+          "Error al iniciar sesión",
       };
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    setToken(null);
-    setUser(null);
-    delete axios.defaults.headers.common['Authorization'];
+  // ✅ Logout (backend: /api/auth/logout)
+  const logout = async () => {
+    try {
+      await axios.post(`${API}/auth/logout`, {}, { withCredentials: true });
+    } catch (_) {
+      // aunque falle, limpiamos estado local
+    } finally {
+      setUser(null);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, registro, isAuthenticated: !!user }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        logout,
+        registro,
+        isAuthenticated: !!user,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -89,7 +118,7 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth debe usarse dentro de AuthProvider');
+    throw new Error("useAuth debe usarse dentro de AuthProvider");
   }
   return context;
 };
