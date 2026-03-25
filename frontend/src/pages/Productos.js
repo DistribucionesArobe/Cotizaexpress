@@ -374,4 +374,4 @@ export default function Productos() {
       </AlertDialog>
     </div>
   );
-}
+}// force update Wed Mar 25 16:04:00 CST 2026
