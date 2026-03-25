@@ -1,6 +1,3 @@
-cat /home/claude/fixes/PerfilEmpresa.js
-Output
-
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
