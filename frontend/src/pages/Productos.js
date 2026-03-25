@@ -1,3 +1,6 @@
+cat /home/claude/fixes/Productos.js
+Output
+
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,22 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
-import { Package, Upload, FileSpreadsheet, Plus, Crown, Pencil, Check, X, Tag, Loader2, Save, Trash2 } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Package, Upload, Plus, Pencil, Check, X, Trash2, LayoutGrid, LayoutList, Loader2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,146 +28,98 @@ const API = `${BACKEND_URL}/api`;
 export default function Productos() {
   const { user } = useAuth();
   const [productos, setProductos] = useState([]);
-  const [categorias, setCategorias] = useState([]);
-  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('');
   const [loading, setLoading] = useState(true);
-  const [upgradeLoading, setUpgradeLoading] = useState(false);
+  const [viewMode, setViewMode] = useState('grid');
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [searchQ, setSearchQ] = useState('');
+
+  // Estado para edición inline de precio
   const [editandoPrecio, setEditandoPrecio] = useState(null);
   const [nuevoPrecio, setNuevoPrecio] = useState('');
   const [guardandoPrecio, setGuardandoPrecio] = useState(false);
-  const [esDemo, setEsDemo] = useState(false);
-  
-  // Estado para edición de stock
-  const [editandoStock, setEditandoStock] = useState(null);
-  const [nuevoStock, setNuevoStock] = useState('');
-  const [guardandoStock, setGuardandoStock] = useState(false);
-  
-  // Estado para eliminar producto
+
+  // Estado para eliminar
   const [productoAEliminar, setProductoAEliminar] = useState(null);
   const [eliminando, setEliminando] = useState(false);
-  
-  // Estado para modal de checkout
-  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
-  const [promoCode, setPromoCode] = useState('');
-  const [promoValidation, setPromoValidation] = useState(null);
-  const [validandoPromo, setValidandoPromo] = useState(false);
-  
-  // Estado para modal de agregar producto
-  const [showAddProductModal, setShowAddProductModal] = useState(false);
-  const [creandoProducto, setCreandoProducto] = useState(false);
-  const [nuevoProducto, setNuevoProducto] = useState({
-    nombre: '',
-    categoria: '',
-    precio_base: '',
-    unidad: 'Pieza',
-    stock: '',
-    descripcion: ''
-  });
-
-  const planActual = user?.empresa?.plan || user?.usuario?.plan || 'gratis';
-  const esPlanGratis = planActual === 'gratis';
 
   useEffect(() => {
-    cargarDatos();
+    cargarProductos();
   }, []);
 
-  useEffect(() => {
-    if (!loading) {
-      cargarProductos();
-    }
-  }, [categoriaSeleccionada]);
-
-  const cargarDatos = async () => {
+  const cargarProductos = async () => {
     try {
       setLoading(true);
-      
-      const [productosRes, categoriasRes, countRes] = await Promise.all([
-        axios.get(`${API}/productos`),
-        axios.get(`${API}/productos/categorias`),
-        axios.get(`${API}/productos/count`)
-      ]);
-      
-      setProductos(productosRes.data);
-      setCategorias(categoriasRes.data.categorias || []);
-      
-      // Si no tiene productos propios pero hay productos en la lista, son de demo
-      setEsDemo(countRes.data.count === 0 && productosRes.data.length > 0);
+      const url = searchQ
+        ? `${API}/pricebook/items?limit=1000&q=${encodeURIComponent(searchQ)}`
+        : `${API}/pricebook/items?limit=1000`;
+      const res = await axios.get(url);
+      setProductos(res.data.items || []);
     } catch (error) {
-      console.error('Error cargando datos:', error);
+      console.error('Error cargando productos:', error);
+      toast.error('Error al cargar productos');
     } finally {
       setLoading(false);
     }
   };
 
-  const cargarProductos = async () => {
-    try {
-      const url = categoriaSeleccionada
-        ? `${API}/productos?categoria=${categoriaSeleccionada}`
-        : `${API}/productos`;
-      const response = await axios.get(url);
-      setProductos(response.data);
-    } catch (error) {
-      console.error('Error cargando productos:', error);
-    }
+  const handleSearch = (e) => {
+    e.preventDefault();
+    cargarProductos();
   };
 
-  const handleUpgrade = async () => {
-    try {
-      setUpgradeLoading(true);
-      
-      const response = await axios.post(`${API}/pagos/crear-checkout`, {
-        plan_id: 'completo',
-        origin_url: window.location.origin,
-        promo_code: promoValidation?.valid ? promoCode : undefined
-      });
+  // Selección múltiple
+  const toggleSelect = (id) =>
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  const selectAll = () => setSelectedIds(productos.map(p => p.id));
+  const clearSelection = () => setSelectedIds([]);
 
-      if (response.data.checkout_url) {
-        window.location.href = response.data.checkout_url;
+  const eliminarSeleccionados = async () => {
+    if (!window.confirm(`¿Eliminar ${selectedIds.length} productos?`)) return;
+    try {
+      for (const id of selectedIds) {
+        await axios.delete(`${API}/pricebook/items/${id}`);
       }
-    } catch (error) {
-      console.error('Error creando checkout:', error);
-      toast.error(error.response?.data?.detail || 'Error al procesar el pago');
-    } finally {
-      setUpgradeLoading(false);
+      toast.success(`${selectedIds.length} productos eliminados`);
+      setSelectedIds([]);
+      cargarProductos();
+    } catch (e) {
+      toast.error('Error al eliminar');
     }
   };
 
-  const openCheckoutModal = () => {
-    setShowCheckoutModal(true);
-    setPromoCode('');
-    setPromoValidation(null);
+  const limpiarDuplicados = async () => {
+    try {
+      const res = await axios.post(`${API}/pricebook/deduplicate`);
+      toast.success(`${res.data.deleted || 0} duplicados eliminados`);
+      cargarProductos();
+    } catch (e) {
+      toast.error('Error al limpiar duplicados');
+    }
   };
 
-  const validarPromoCode = async () => {
-    if (!promoCode.trim()) {
-      setPromoValidation(null);
+  // Editar precio inline
+  const iniciarEditarPrecio = (producto) => {
+    setEditandoPrecio(producto.id);
+    setNuevoPrecio(producto.price?.toString() || '');
+  };
+
+  const guardarPrecio = async (productoId) => {
+    const precio = parseFloat(nuevoPrecio);
+    if (isNaN(precio) || precio < 0) {
+      toast.error('Precio inválido');
       return;
     }
-
     try {
-      setValidandoPromo(true);
-      const response = await axios.post(`${API}/pagos/promo/validar`, {
-        code: promoCode.trim()
-      });
-      
-      setPromoValidation(response.data);
-      
-      if (response.data.valid) {
-        toast.success(`¡Código válido! Descuento: ${response.data.descuento_texto}`);
-      } else {
-        toast.error(response.data.error || 'Código no válido');
-      }
-    } catch (error) {
-      console.error('Error validando código:', error);
-      setPromoValidation({ valid: false, error: 'Error validando código' });
+      setGuardandoPrecio(true);
+      await axios.patch(`${API}/pricebook/items/${productoId}`, { price: precio });
+      toast.success('Precio actualizado');
+      setEditandoPrecio(null);
+      cargarProductos();
+    } catch (e) {
+      toast.error('Error al actualizar precio');
     } finally {
-      setValidandoPromo(false);
+      setGuardandoPrecio(false);
     }
-  };
-
-  const iniciarEdicionPrecio = (producto) => {
-    setEditandoPrecio(producto.id);
-    setNuevoPrecio(producto.precio_base.toString());
   };
 
   const cancelarEdicion = () => {
@@ -187,157 +127,17 @@ export default function Productos() {
     setNuevoPrecio('');
   };
 
-  const guardarPrecio = async (productoId) => {
-    const precio = parseFloat(nuevoPrecio);
-    
-    if (isNaN(precio) || precio <= 0) {
-      toast.error('Ingresa un precio válido mayor a 0');
-      return;
-    }
-
-    try {
-      setGuardandoPrecio(true);
-      
-      await axios.patch(`${API}/productos/${productoId}/precio`, {
-        precio_base: precio
-      });
-      
-      // Actualizar el producto en el estado local
-      setProductos(prev => prev.map(p => 
-        p.id === productoId ? { ...p, precio_base: precio } : p
-      ));
-      
-      toast.success('Precio actualizado');
-      setEditandoPrecio(null);
-      setNuevoPrecio('');
-    } catch (error) {
-      console.error('Error actualizando precio:', error);
-      toast.error(error.response?.data?.detail || 'Error al actualizar precio');
-    } finally {
-      setGuardandoPrecio(false);
-    }
-  };
-
-  const resetNuevoProducto = () => {
-    setNuevoProducto({
-      nombre: '',
-      categoria: '',
-      precio_base: '',
-      unidad: 'Pieza',
-      stock: '0',
-      descripcion: ''
-    });
-  };
-
-  const crearProducto = async () => {
-    // Validaciones
-    if (!nuevoProducto.nombre.trim()) {
-      toast.error('Ingresa el nombre del producto');
-      return;
-    }
-    if (!nuevoProducto.categoria.trim()) {
-      toast.error('Ingresa la categoría');
-      return;
-    }
-    if (!nuevoProducto.precio_base || parseFloat(nuevoProducto.precio_base) <= 0) {
-      toast.error('Ingresa un precio válido mayor a 0');
-      return;
-    }
-
-    try {
-      setCreandoProducto(true);
-      
-      const payload = {
-        nombre: nuevoProducto.nombre.trim(),
-        categoria: nuevoProducto.categoria.trim(),
-        precio_base: parseFloat(nuevoProducto.precio_base),
-        unidad: nuevoProducto.unidad,
-        stock: parseFloat(nuevoProducto.stock) || 0,
-        descripcion: nuevoProducto.descripcion.trim() || null
-      };
-      // SKU se genera automáticamente en el backend
-
-      const response = await axios.post(`${API}/productos`, payload);
-      
-      // Agregar el producto a la lista
-      setProductos(prev => [...prev, response.data]);
-      
-      // Actualizar categorías si es nueva
-      if (!categorias.includes(payload.categoria)) {
-        setCategorias(prev => [...prev, payload.categoria].sort());
-      }
-      
-      // Si era demo, ya no lo es
-      setEsDemo(false);
-      
-      toast.success(`Producto "${payload.nombre}" creado exitosamente`);
-      setShowAddProductModal(false);
-      resetNuevoProducto();
-    } catch (error) {
-      console.error('Error creando producto:', error);
-      toast.error(error.response?.data?.detail || 'Error al crear producto');
-    } finally {
-      setCreandoProducto(false);
-    }
-  };
-
-  // Funciones para editar stock
-  const iniciarEdicionStock = (producto) => {
-    setEditandoStock(producto.id);
-    setNuevoStock(producto.stock.toString());
-  };
-
-  const cancelarEdicionStock = () => {
-    setEditandoStock(null);
-    setNuevoStock('');
-  };
-
-  const guardarStock = async (productoId) => {
-    const stock = parseFloat(nuevoStock);
-    
-    if (isNaN(stock) || stock < 0) {
-      toast.error('Ingresa un stock válido (0 o mayor)');
-      return;
-    }
-
-    try {
-      setGuardandoStock(true);
-      
-      await axios.patch(`${API}/productos/${productoId}/stock`, {
-        stock: stock
-      });
-      
-      setProductos(prev => prev.map(p => 
-        p.id === productoId ? { ...p, stock: stock } : p
-      ));
-      
-      toast.success('Stock actualizado');
-      setEditandoStock(null);
-      setNuevoStock('');
-    } catch (error) {
-      console.error('Error actualizando stock:', error);
-      toast.error(error.response?.data?.detail || 'Error al actualizar stock');
-    } finally {
-      setGuardandoStock(false);
-    }
-  };
-
-  // Función para eliminar producto
-  const eliminarProducto = async () => {
+  // Eliminar producto individual
+  const confirmarEliminar = async () => {
     if (!productoAEliminar) return;
-    
     try {
       setEliminando(true);
-      
-      await axios.delete(`${API}/productos/${productoAEliminar.id}`);
-      
-      setProductos(prev => prev.filter(p => p.id !== productoAEliminar.id));
-      
-      toast.success(`Producto "${productoAEliminar.nombre}" eliminado`);
+      await axios.delete(`${API}/pricebook/items/${productoAEliminar.id}`);
+      toast.success('Producto eliminado');
       setProductoAEliminar(null);
-    } catch (error) {
-      console.error('Error eliminando producto:', error);
-      toast.error(error.response?.data?.detail || 'Error al eliminar producto');
+      cargarProductos();
+    } catch (e) {
+      toast.error('Error al eliminar');
     } finally {
       setEliminando(false);
     }
@@ -345,802 +145,229 @@ export default function Productos() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-12" data-testid="productos-loading">
+      <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
 
-  // Vista cuando NO hay productos
-  if (productos.length === 0) {
-    return (
-      <div className="space-y-6" data-testid="productos-empty">
-        <div>
-          <h2 className="text-3xl font-bold text-slate-900">Catálogo de Productos</h2>
-          <p className="text-slate-600 mt-1">Configura tu catálogo para empezar a cotizar</p>
-        </div>
-
-        <Card className="border-2 border-dashed border-slate-300 bg-slate-50">
-          <CardContent className="py-16">
-            <div className="text-center max-w-lg mx-auto">
-              <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Package className="w-10 h-10 text-emerald-600" />
-              </div>
-              
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">
-                ¡Carga tus productos!
-              </h3>
-              
-              <p className="text-slate-600 mb-8">
-                Para que CotizaBot pueda generar cotizaciones automáticas, 
-                necesitas cargar tu catálogo de productos.
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                <Link to="/carga-productos">
-                  <Card className="border-2 border-emerald-200 hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer h-full">
-                    <CardContent className="py-6">
-                      <FileSpreadsheet className="w-10 h-10 text-emerald-600 mx-auto mb-3" />
-                      <h4 className="font-semibold text-slate-900 mb-1">Desde Excel</h4>
-                      <p className="text-sm text-slate-500">
-                        Sube tu archivo con la plantilla
-                      </p>
-                    </CardContent>
-                  </Card>
-                </Link>
-
-                <Card 
-                  className="border-2 border-blue-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer h-full"
-                  onClick={() => setShowAddProductModal(true)}
-                  data-testid="btn-agregar-manual-empty"
-                >
-                  <CardContent className="py-6">
-                    <Plus className="w-10 h-10 text-blue-600 mx-auto mb-3" />
-                    <h4 className="font-semibold text-slate-900 mb-1">Agregar manualmente</h4>
-                    <p className="text-sm text-slate-500">
-                      Crea productos uno por uno
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <Link to="/carga-productos">
-                <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700" data-testid="btn-cargar-productos">
-                  <Upload className="w-5 h-5 mr-2" />
-                  Cargar productos desde Excel
-                </Button>
-              </Link>
-
-              <p className="text-xs text-slate-400 mt-4">
-                Descarga la plantilla de ejemplo en la página de carga
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {esPlanGratis && (
-          <Card className="border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50">
-            <CardContent className="py-6">
-              <div className="flex items-center justify-between flex-wrap gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
-                    <Crown className="w-6 h-6 text-emerald-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-slate-900">Plan Gratis: 5 cotizaciones</h4>
-                    <p className="text-sm text-slate-600">
-                      Actualiza al Plan Completo para cotizaciones ilimitadas + WhatsApp
-                    </p>
-                  </div>
-                </div>
-                <Button 
-                  onClick={openCheckoutModal}
-                  className="bg-emerald-600 hover:bg-emerald-700"
-                  data-testid="btn-upgrade"
-                >
-                  Actualizar - $1,160 MXN/mes
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Modal Agregar Producto - También en vista vacía */}
-        <Dialog open={showAddProductModal} onOpenChange={(open) => {
-          setShowAddProductModal(open);
-          if (!open) resetNuevoProducto();
-        }}>
-          <DialogContent className="sm:max-w-lg">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Package className="w-5 h-5 text-blue-600" />
-                Agregar Producto
-              </DialogTitle>
-              <DialogDescription>
-                Crea un nuevo producto para tu catálogo
-              </DialogDescription>
-            </DialogHeader>
-            
-            <div className="space-y-4 py-4">
-              <div>
-                <label className="text-sm font-medium text-slate-700">Nombre del producto *</label>
-                <Input
-                  placeholder="Ej: Cemento Gris 50kg"
-                  value={nuevoProducto.nombre}
-                  onChange={(e) => setNuevoProducto(prev => ({ ...prev, nombre: e.target.value }))}
-                  className="mt-1"
-                  data-testid="input-producto-nombre"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-slate-700">Categoría *</label>
-                <Input
-                  placeholder="Ej: Cemento, Acero, Pintura"
-                  value={nuevoProducto.categoria}
-                  onChange={(e) => setNuevoProducto(prev => ({ ...prev, categoria: e.target.value }))}
-                  className="mt-1"
-                  list="categorias-list-empty"
-                  data-testid="input-producto-categoria"
-                />
-                <datalist id="categorias-list-empty">
-                  {categorias.map(cat => (
-                    <option key={cat} value={cat} />
-                  ))}
-                </datalist>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-slate-700">Precio base (MXN) *</label>
-                  <div className="relative mt-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
-                    <Input
-                      type="number"
-                      placeholder="0.00"
-                      value={nuevoProducto.precio_base}
-                      onChange={(e) => setNuevoProducto(prev => ({ ...prev, precio_base: e.target.value }))}
-                      className="pl-7"
-                      min="0"
-                      step="0.01"
-                      data-testid="input-producto-precio"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-slate-700">Unidad</label>
-                  <Select
-                    value={nuevoProducto.unidad}
-                    onValueChange={(value) => setNuevoProducto(prev => ({ ...prev, unidad: value }))}
-                  >
-                    <SelectTrigger className="mt-1" data-testid="select-producto-unidad">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Pieza">Pieza</SelectItem>
-                      <SelectItem value="Kg">Kilogramo</SelectItem>
-                      <SelectItem value="Litro">Litro</SelectItem>
-                      <SelectItem value="Metro">Metro</SelectItem>
-                      <SelectItem value="M2">Metro cuadrado</SelectItem>
-                      <SelectItem value="M3">Metro cúbico</SelectItem>
-                      <SelectItem value="Caja">Caja</SelectItem>
-                      <SelectItem value="Bulto">Bulto</SelectItem>
-                      <SelectItem value="Rollo">Rollo</SelectItem>
-                      <SelectItem value="Saco">Saco</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-slate-700">Stock inicial</label>
-                <Input
-                  type="number"
-                  placeholder="0"
-                  value={nuevoProducto.stock}
-                  onChange={(e) => setNuevoProducto(prev => ({ ...prev, stock: e.target.value }))}
-                  className="mt-1"
-                  min="0"
-                  data-testid="input-producto-stock"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-slate-700">Descripción (opcional)</label>
-                <Input
-                  placeholder="Descripción del producto..."
-                  value={nuevoProducto.descripcion}
-                  onChange={(e) => setNuevoProducto(prev => ({ ...prev, descripcion: e.target.value }))}
-                  className="mt-1"
-                  data-testid="input-producto-descripcion"
-                />
-              </div>
-            </div>
-
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowAddProductModal(false)}>
-                Cancelar
-              </Button>
-              <Button
-                onClick={crearProducto}
-                disabled={creandoProducto}
-                className="bg-blue-600 hover:bg-blue-700"
-                data-testid="btn-confirmar-producto"
-              >
-                {creandoProducto ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Guardando...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4 mr-2" />
-                    Guardar producto
-                  </>
-                )}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
-    );
-  }
-
-  // Vista normal con productos
   return (
-    <div className="space-y-6" data-testid="productos-container">
-      <div className="flex items-center justify-between flex-wrap gap-4">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold text-slate-900">Catálogo de Productos</h2>
-          <p className="text-slate-600 mt-1">
-            {productos.length} productos {esDemo ? 'de ejemplo' : 'disponibles'}
-          </p>
+          <p className="text-slate-600 mt-1">{productos.length} productos disponibles</p>
         </div>
-        
-        <div className="flex items-center gap-3">
-          <Button 
-            variant="outline"
-            onClick={() => setShowAddProductModal(true)}
-            data-testid="btn-agregar-producto"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Agregar producto
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={limpiarDuplicados}>
+            Limpiar duplicados
           </Button>
-          
+          <Button variant={viewMode === 'grid' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('grid')}>
+            <LayoutGrid className="w-4 h-4" />
+          </Button>
+          <Button variant={viewMode === 'list' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('list')}>
+            <LayoutList className="w-4 h-4" />
+          </Button>
           <Link to="/carga-productos">
-            <Button variant="outline" data-testid="btn-cargar-mas">
+            <Button className="bg-emerald-600 hover:bg-emerald-700">
               <Upload className="w-4 h-4 mr-2" />
-              {esDemo ? 'Cargar mis productos' : 'Cargar más'}
+              Carga Masiva
             </Button>
           </Link>
-          
-          {esPlanGratis && (
-            <Button 
-              onClick={openCheckoutModal}
-              className="bg-emerald-600 hover:bg-emerald-700"
-              data-testid="btn-upgrade-header"
-            >
-              <Crown className="w-4 h-4 mr-2" />
-              Actualizar Plan
-            </Button>
-          )}
         </div>
       </div>
 
-      {/* Banner de demo */}
-      {esDemo && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-          <div className="flex items-center justify-between flex-wrap gap-3">
-            <div className="flex items-center gap-3">
-              <Package className="w-5 h-5 text-amber-600" />
-              <div>
-                <p className="font-medium text-amber-800">
-                  Estos son productos de ejemplo para que pruebes el sistema
-                </p>
-                <p className="text-sm text-amber-700">
-                  Puedes editar los precios para ver cómo funcionan las cotizaciones. Carga tus propios productos cuando estés listo.
-                </p>
-              </div>
-            </div>
-            <Link to="/carga-productos">
-              <Button size="sm" variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-100">
-                Cargar mis productos
-              </Button>
-            </Link>
-          </div>
+      {/* Búsqueda */}
+      <form onSubmit={handleSearch} className="flex gap-2">
+        <Input
+          placeholder="Buscar producto..."
+          value={searchQ}
+          onChange={e => setSearchQ(e.target.value)}
+          className="max-w-sm"
+        />
+        <Button type="submit" variant="outline">Buscar</Button>
+        {searchQ && <Button type="button" variant="ghost" onClick={() => { setSearchQ(''); cargarProductos(); }}>Limpiar</Button>}
+      </form>
+
+      {/* Barra de selección múltiple */}
+      {selectedIds.length > 0 && (
+        <div className="flex items-center gap-3 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+          <span className="text-sm font-medium text-emerald-700">{selectedIds.length} productos seleccionados</span>
+          <Button size="sm" variant="destructive" onClick={eliminarSeleccionados}>Eliminar seleccionados</Button>
+          <Button size="sm" variant="ghost" onClick={clearSelection}>Cancelar</Button>
         </div>
       )}
 
-      {/* Nota de edición */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-700">
-        <Pencil className="w-4 h-4 inline mr-2" />
-        Haz clic en el precio de cualquier producto para editarlo
-      </div>
+      {/* Vista Lista */}
+      {viewMode === 'list' && (
+        <div className="border rounded-lg overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-slate-50">
+              <tr className="border-b text-slate-500">
+                <th className="text-left p-3">
+                  <input
+                    type="checkbox"
+                    onChange={e => e.target.checked ? selectAll() : clearSelection()}
+                    checked={selectedIds.length === productos.length && productos.length > 0}
+                  />
+                </th>
+                <th className="text-left p-3">Nombre</th>
+                <th className="text-left p-3">SKU</th>
+                <th className="text-right p-3">Precio</th>
+                <th className="text-left p-3">Unidad</th>
+                <th className="text-left p-3">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {productos.map(p => (
+                <tr key={p.id} className="border-b hover:bg-slate-50">
+                  <td className="p-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(p.id)}
+                      onChange={() => toggleSelect(p.id)}
+                    />
+                  </td>
+                  <td className="p-3 font-medium">{p.name}</td>
+                  <td className="p-3 text-slate-500">{p.sku || '-'}</td>
+                  <td className="p-3 text-right">
+                    {editandoPrecio === p.id ? (
+                      <div className="flex items-center gap-1 justify-end">
+                        <Input
+                          type="number"
+                          value={nuevoPrecio}
+                          onChange={e => setNuevoPrecio(e.target.value)}
+                          className="w-24 h-7 text-right"
+                          autoFocus
+                        />
+                        <Button size="sm" className="h-7 w-7 p-0 bg-emerald-600" onClick={() => guardarPrecio(p.id)} disabled={guardandoPrecio}>
+                          <Check className="w-3 h-3" />
+                        </Button>
+                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={cancelarEdicion}>
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <span
+                        className="text-emerald-600 font-semibold cursor-pointer hover:underline"
+                        onClick={() => iniciarEditarPrecio(p)}
+                      >
+                        ${p.price?.toLocaleString('es-MX')}
+                      </span>
+                    )}
+                  </td>
+                  <td className="p-3 text-slate-500">{p.unit || '-'}</td>
+                  <td className="p-3">
+                    <div className="flex gap-1">
+                      <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => iniciarEditarPrecio(p)}>
+                        <Pencil className="w-3 h-3" />
+                      </Button>
+                      <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-red-500 hover:text-red-700" onClick={() => setProductoAEliminar(p)}>
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-      {/* Filtro por Categoría */}
-      {categorias.length > 0 && (
-        <div className="flex gap-2 flex-wrap">
-          <Badge
-            data-testid="categoria-todas"
-            variant={categoriaSeleccionada === '' ? 'default' : 'outline'}
-            className="cursor-pointer px-4 py-2"
-            onClick={() => setCategoriaSeleccionada('')}
-          >
-            Todas
-          </Badge>
-          {categorias.map((cat) => (
-            <Badge
-              key={cat}
-              data-testid={`categoria-${cat}`}
-              variant={categoriaSeleccionada === cat ? 'default' : 'outline'}
-              className="cursor-pointer px-4 py-2"
-              onClick={() => setCategoriaSeleccionada(cat)}
-            >
-              {cat}
-            </Badge>
+      {/* Vista Grid */}
+      {viewMode === 'grid' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {productos.map(producto => (
+            <Card key={producto.id} className={`relative ${selectedIds.includes(producto.id) ? 'border-emerald-500 bg-emerald-50' : ''}`}>
+              <input
+                type="checkbox"
+                checked={selectedIds.includes(producto.id)}
+                onChange={() => toggleSelect(producto.id)}
+                className="absolute top-3 left-3 w-4 h-4 accent-emerald-600"
+              />
+              <CardContent className="pt-6">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1 pl-5">
+                    <h3 className="font-semibold text-slate-900 text-sm leading-tight">{producto.name}</h3>
+                    {producto.sku && <p className="text-xs text-slate-500 mt-0.5">SKU: {producto.sku}</p>}
+                  </div>
+                  <div className="flex gap-1 ml-2">
+                    <button onClick={() => iniciarEditarPrecio(producto)} className="text-slate-400 hover:text-emerald-600 p-1">
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+                    <button onClick={() => setProductoAEliminar(producto)} className="text-slate-400 hover:text-red-500 p-1">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-slate-500">Precio:</p>
+                    {editandoPrecio === producto.id ? (
+                      <div className="flex items-center gap-1 mt-1">
+                        <Input
+                          type="number"
+                          value={nuevoPrecio}
+                          onChange={e => setNuevoPrecio(e.target.value)}
+                          className="w-24 h-7 text-right text-sm"
+                          autoFocus
+                        />
+                        <button onClick={() => guardarPrecio(producto.id)} disabled={guardandoPrecio} className="text-emerald-600 hover:text-emerald-700">
+                          <Check className="w-4 h-4" />
+                        </button>
+                        <button onClick={cancelarEdicion} className="text-slate-400 hover:text-slate-600">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <p
+                        className="text-emerald-600 font-bold text-base cursor-pointer hover:underline"
+                        onClick={() => iniciarEditarPrecio(producto)}
+                      >
+                        ${producto.price?.toLocaleString('es-MX')}
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-slate-500">Unidad:</p>
+                    <p className="text-slate-700 font-medium text-sm">{producto.unit || 'Pieza'}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}
 
-      {/* Grid de Productos */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {productos.map((producto) => (
-          <Card key={producto.id} data-testid={`producto-${producto.sku}`} className="relative group">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div>
-                  <Badge variant="secondary" className="mb-2">
-                    {producto.categoria}
-                  </Badge>
-                  <CardTitle className="text-base">{producto.nombre}</CardTitle>
-                  <p className="text-xs text-slate-500 mt-1">SKU: {producto.sku}</p>
-                </div>
-                {/* Botón eliminar - Solo para productos propios (no demo) */}
-                {!producto.es_demo && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0 text-slate-400 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={() => setProductoAEliminar(producto)}
-                    data-testid={`btn-eliminar-${producto.sku}`}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {/* Precio editable */}
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-slate-600">Precio base:</span>
-                  
-                  {editandoPrecio === producto.id ? (
-                    <div className="flex items-center gap-2">
-                      <span className="text-slate-500">$</span>
-                      <Input
-                        type="number"
-                        value={nuevoPrecio}
-                        onChange={(e) => setNuevoPrecio(e.target.value)}
-                        className="w-24 h-8 text-right"
-                        autoFocus
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') guardarPrecio(producto.id);
-                          if (e.key === 'Escape') cancelarEdicion();
-                        }}
-                        data-testid={`input-precio-${producto.sku}`}
-                      />
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                        onClick={() => guardarPrecio(producto.id)}
-                        disabled={guardandoPrecio}
-                        data-testid={`btn-guardar-${producto.sku}`}
-                      >
-                        <Check className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-8 w-8 p-0 text-slate-500 hover:text-slate-700"
-                        onClick={cancelarEdicion}
-                        data-testid={`btn-cancelar-${producto.sku}`}
-                      >
-                        <X className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => iniciarEdicionPrecio(producto)}
-                      className="text-lg font-bold text-emerald-600 hover:text-emerald-700 hover:underline cursor-pointer flex items-center gap-1 group"
-                      data-testid={`precio-${producto.sku}`}
-                    >
-                      ${producto.precio_base.toLocaleString('es-MX')}
-                      <Pencil className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </button>
-                  )}
-                </div>
-                
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-slate-600">Unidad:</span>
-                  <span className="font-medium">{producto.unidad}</span>
-                </div>
-                
-                {/* Stock editable - Solo para productos propios */}
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-slate-600">Stock:</span>
-                  
-                  {editandoStock === producto.id ? (
-                    <div className="flex items-center gap-1">
-                      <Input
-                        type="number"
-                        value={nuevoStock}
-                        onChange={(e) => setNuevoStock(e.target.value)}
-                        className="w-20 h-7 text-right text-sm"
-                        autoFocus
-                        min="0"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') guardarStock(producto.id);
-                          if (e.key === 'Escape') cancelarEdicionStock();
-                        }}
-                        data-testid={`input-stock-${producto.sku}`}
-                      />
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-7 w-7 p-0 text-emerald-600 hover:text-emerald-700"
-                        onClick={() => guardarStock(producto.id)}
-                        disabled={guardandoStock}
-                      >
-                        <Check className="w-3 h-3" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-7 w-7 p-0 text-slate-500"
-                        onClick={cancelarEdicionStock}
-                      >
-                        <X className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => !producto.es_demo && iniciarEdicionStock(producto)}
-                      className={`font-medium flex items-center gap-1 ${
-                        producto.stock > 50 ? 'text-emerald-600' :
-                        producto.stock > 0 ? 'text-amber-600' :
-                        'text-red-600'
-                      } ${!producto.es_demo ? 'hover:underline cursor-pointer group/stock' : ''}`}
-                      disabled={producto.es_demo}
-                    >
-                      {producto.stock} {producto.unidad}
-                      {!producto.es_demo && (
-                        <Pencil className="w-3 h-3 opacity-0 group-hover/stock:opacity-100 transition-opacity" />
-                      )}
-                    </button>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Card de upgrade al final si es plan gratis */}
-      {esPlanGratis && (
-        <Card className="border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 mt-8">
-          <CardContent className="py-6">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
-                  <Crown className="w-6 h-6 text-emerald-600" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-slate-900">¿Listo para crecer?</h4>
-                  <p className="text-sm text-slate-600">
-                    Plan Completo: Cotizaciones ilimitadas + Tu número de WhatsApp
-                  </p>
-                </div>
-              </div>
-              <Button 
-                onClick={openCheckoutModal}
-                className="bg-emerald-600 hover:bg-emerald-700"
-                data-testid="btn-upgrade-footer"
-              >
-                Actualizar ahora - $1,160 MXN/mes
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+      {productos.length === 0 && (
+        <div className="text-center py-16">
+          <Package className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-slate-600 mb-2">No hay productos</h3>
+          <p className="text-slate-500 mb-4">Sube tu catálogo desde Excel para empezar</p>
+          <Link to="/carga-productos">
+            <Button className="bg-emerald-600 hover:bg-emerald-700">
+              <Upload className="w-4 h-4 mr-2" />
+              Subir Catálogo
+            </Button>
+          </Link>
+        </div>
       )}
 
-      {/* Modal de Checkout con Código Promo */}
-      <Dialog open={showCheckoutModal} onOpenChange={setShowCheckoutModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Crown className="w-5 h-5 text-emerald-600" />
-              Plan Completo CotizaBot
-            </DialogTitle>
-            <DialogDescription>
-              Cotizaciones ilimitadas + Tu número de WhatsApp Business
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4 py-4">
-            {/* Resumen del precio */}
-            <div className="bg-slate-50 rounded-lg p-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-slate-600">Precio mensual:</span>
-                <span className={`font-bold ${promoValidation?.valid ? 'line-through text-slate-400' : 'text-slate-900'}`}>
-                  $1,160 MXN
-                </span>
-              </div>
-              
-              {promoValidation?.valid && (
-                <>
-                  <div className="flex justify-between items-center text-emerald-600 mb-2">
-                    <span className="flex items-center gap-1">
-                      <Tag className="w-4 h-4" />
-                      Descuento ({promoValidation.descuento_texto}):
-                    </span>
-                    <span>-${promoValidation.descuento.toLocaleString('es-MX')}</span>
-                  </div>
-                  <div className="flex justify-between items-center pt-2 border-t border-slate-200">
-                    <span className="font-semibold text-slate-900">Total a pagar:</span>
-                    <span className="text-xl font-bold text-emerald-600">
-                      ${promoValidation.precio_final.toLocaleString('es-MX')} MXN
-                    </span>
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Campo de código promocional */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700">
-                ¿Tienes un código promocional?
-              </label>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Ingresa tu código"
-                  value={promoCode}
-                  onChange={(e) => {
-                    setPromoCode(e.target.value.toUpperCase());
-                    setPromoValidation(null);
-                  }}
-                  className="flex-1"
-                  data-testid="input-promo-code"
-                />
-                <Button
-                  variant="outline"
-                  onClick={validarPromoCode}
-                  disabled={!promoCode.trim() || validandoPromo}
-                  data-testid="btn-validar-promo"
-                >
-                  {validandoPromo ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    'Aplicar'
-                  )}
-                </Button>
-              </div>
-              
-              {promoValidation && !promoValidation.valid && (
-                <p className="text-sm text-red-500">{promoValidation.error}</p>
-              )}
-              
-              {promoValidation?.valid && (
-                <p className="text-sm text-emerald-600 flex items-center gap-1">
-                  <Check className="w-4 h-4" />
-                  {promoValidation.descripcion || 'Código aplicado correctamente'}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowCheckoutModal(false)}
-            >
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleUpgrade}
-              disabled={upgradeLoading}
-              className="bg-emerald-600 hover:bg-emerald-700"
-              data-testid="btn-confirmar-pago"
-            >
-              {upgradeLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Procesando...
-                </>
-              ) : (
-                <>
-                  Pagar {promoValidation?.valid ? `$${promoValidation.precio_final.toLocaleString('es-MX')}` : '$1,160'} MXN
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Modal Agregar Producto */}
-      <Dialog open={showAddProductModal} onOpenChange={(open) => {
-        setShowAddProductModal(open);
-        if (!open) resetNuevoProducto();
-      }}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Package className="w-5 h-5 text-blue-600" />
-              Agregar Producto
-            </DialogTitle>
-            <DialogDescription>
-              Crea un nuevo producto para tu catálogo
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4 py-4">
-            {/* Nombre */}
-            <div>
-              <label className="text-sm font-medium text-slate-700">Nombre del producto *</label>
-              <Input
-                placeholder="Ej: Cemento Gris 50kg"
-                value={nuevoProducto.nombre}
-                onChange={(e) => setNuevoProducto(prev => ({ ...prev, nombre: e.target.value }))}
-                className="mt-1"
-                data-testid="input-producto-nombre"
-              />
-            </div>
-
-            {/* Categoría y SKU */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-slate-700">Categoría *</label>
-                <Input
-                  placeholder="Ej: Cemento, Acero, Pintura"
-                  value={nuevoProducto.categoria}
-                  onChange={(e) => setNuevoProducto(prev => ({ ...prev, categoria: e.target.value }))}
-                  className="mt-1"
-                  list="categorias-list"
-                  data-testid="input-producto-categoria"
-                />
-                <datalist id="categorias-list">
-                  {categorias.map(cat => (
-                    <option key={cat} value={cat} />
-                  ))}
-                </datalist>
-              </div>
-            </div>
-
-            {/* Precio y Unidad */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-slate-700">Precio base (MXN) *</label>
-                <div className="relative mt-1">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
-                  <Input
-                    type="number"
-                    placeholder="0.00"
-                    value={nuevoProducto.precio_base}
-                    onChange={(e) => setNuevoProducto(prev => ({ ...prev, precio_base: e.target.value }))}
-                    className="pl-7"
-                    min="0"
-                    step="0.01"
-                    data-testid="input-producto-precio"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-slate-700">Unidad</label>
-                <Select
-                  value={nuevoProducto.unidad}
-                  onValueChange={(value) => setNuevoProducto(prev => ({ ...prev, unidad: value }))}
-                >
-                  <SelectTrigger className="mt-1" data-testid="select-producto-unidad">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Pieza">Pieza</SelectItem>
-                    <SelectItem value="Kg">Kilogramo</SelectItem>
-                    <SelectItem value="Litro">Litro</SelectItem>
-                    <SelectItem value="Metro">Metro</SelectItem>
-                    <SelectItem value="M2">Metro cuadrado</SelectItem>
-                    <SelectItem value="M3">Metro cúbico</SelectItem>
-                    <SelectItem value="Caja">Caja</SelectItem>
-                    <SelectItem value="Bulto">Bulto</SelectItem>
-                    <SelectItem value="Rollo">Rollo</SelectItem>
-                    <SelectItem value="Saco">Saco</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {/* Stock */}
-            <div>
-              <label className="text-sm font-medium text-slate-700">Stock inicial</label>
-              <Input
-                type="number"
-                placeholder="0"
-                value={nuevoProducto.stock}
-                onChange={(e) => setNuevoProducto(prev => ({ ...prev, stock: e.target.value }))}
-                className="mt-1"
-                min="0"
-                data-testid="input-producto-stock"
-              />
-            </div>
-
-            {/* Descripción */}
-            <div>
-              <label className="text-sm font-medium text-slate-700">Descripción (opcional)</label>
-              <Input
-                placeholder="Descripción del producto..."
-                value={nuevoProducto.descripcion}
-                onChange={(e) => setNuevoProducto(prev => ({ ...prev, descripcion: e.target.value }))}
-                className="mt-1"
-                data-testid="input-producto-descripcion"
-              />
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddProductModal(false)}>
-              Cancelar
-            </Button>
-            <Button
-              onClick={crearProducto}
-              disabled={creandoProducto}
-              className="bg-blue-600 hover:bg-blue-700"
-              data-testid="btn-confirmar-producto"
-            >
-              {creandoProducto ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Guardando...
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4 mr-2" />
-                  Guardar producto
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Dialog de confirmación para eliminar */}
-      <AlertDialog open={!!productoAEliminar} onOpenChange={(open) => !open && setProductoAEliminar(null)}>
+      {/* Dialog confirmar eliminar */}
+      <AlertDialog open={!!productoAEliminar} onOpenChange={() => setProductoAEliminar(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar producto?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. Se eliminará permanentemente el producto 
-              <strong className="text-slate-900"> "{productoAEliminar?.nombre}"</strong> de tu catálogo.
+              Se eliminará <strong>{productoAEliminar?.name}</strong>. Esta acción no se puede deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={eliminando}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={eliminarProducto}
-              disabled={eliminando}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              {eliminando ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Eliminando...
-                </>
-              ) : (
-                <>
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Eliminar
-                </>
-              )}
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmarEliminar} disabled={eliminando} className="bg-red-600 hover:bg-red-700">
+              {eliminando ? 'Eliminando...' : 'Eliminar'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

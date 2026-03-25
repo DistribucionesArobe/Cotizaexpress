@@ -1,116 +1,171 @@
+cat /home/claude/fixes/PerfilEmpresa.js
+Output
+
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
-import DatosFiscales from '../components/DatosFiscales';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 export default function PerfilEmpresa() {
-  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [empresa, setEmpresa] = useState(null);
-  const [formData, setFormData] = useState({
-    nombre: '',
-    rfc: '',
-    telefono: '',
-    email: '',
-    direccion: ''
-  });
+  const [settings, setSettings] = useState(null);
+  const [company, setCompany] = useState(null);
   const fileInputRef = useRef(null);
 
+  const [formData, setFormData] = useState({
+    email: '',
+    rfc: '',
+    owner_phone: '',
+    address_text: '',
+    hours_text: '',
+    google_maps_url: '',
+    mercadopago_url: '',
+    bank_name: '',
+    bank_account_name: '',
+    bank_clabe: '',
+    bank_account_number: '',
+    discount_threshold: '',
+    discount_percent: '',
+  });
+
+  const [horario, setHorario] = useState({
+    lunes_viernes: '08:00-18:00',
+    sabado: '08:00-14:00',
+    domingo: 'cerrado',
+  });
+
+  const [modulos, setModulos] = useState({ construccion_ligera: false });
+  const [guardandoModulo, setGuardandoModulo] = useState(false);
+
   useEffect(() => {
-    cargarPerfil();
+    cargarDatos();
   }, []);
 
-  const cargarPerfil = async () => {
+  const cargarDatos = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API}/empresa/perfil`);
-      setEmpresa(response.data);
+      const [settingsRes, companyRes] = await Promise.all([
+        axios.get(`${API}/company/settings`),
+        axios.get(`${API}/company/me`),
+      ]);
+
+      const s = settingsRes.data?.settings || {};
+      const c = companyRes.data?.company || {};
+      setSettings(s);
+      setCompany(c);
+
       setFormData({
-        nombre: response.data.nombre || '',
-        rfc: response.data.rfc || '',
-        telefono: response.data.telefono || '',
-        email: response.data.email || '',
-        direccion: response.data.direccion || ''
+        email: s.email || '',
+        rfc: s.rfc || '',
+        owner_phone: s.owner_phone || '',
+        address_text: s.address_text || '',
+        hours_text: s.hours_text || '',
+        google_maps_url: s.google_maps_url || '',
+        mercadopago_url: s.mercadopago_url || '',
+        bank_name: s.bank_name || '',
+        bank_account_name: s.bank_account_name || '',
+        bank_clabe: s.bank_clabe || '',
+        bank_account_number: s.bank_account_number || '',
+        discount_threshold: s.discount_threshold || '',
+        discount_percent: s.discount_percent || '',
       });
+
+      // Parsear horario desde hours_text si existe
+      if (s.hours_text) {
+        const lines = s.hours_text.split('\n');
+        const h = { lunes_viernes: '08:00-18:00', sabado: '08:00-14:00', domingo: 'cerrado' };
+        lines.forEach(line => {
+          if (line.toLowerCase().includes('lunes')) h.lunes_viernes = line.split(':').slice(1).join(':').trim();
+          if (line.toLowerCase().includes('sábado') || line.toLowerCase().includes('sabado')) h.sabado = line.split(':').slice(1).join(':').trim();
+          if (line.toLowerCase().includes('domingo')) h.domingo = line.split(':').slice(1).join(':').trim();
+        });
+        setHorario(h);
+      }
+
+      // Construccion ligera
+      try {
+        const conn = await axios.get(`${API}/company/me`);
+        setModulos({ construccion_ligera: conn.data?.company?.construccion_ligera_enabled || false });
+      } catch (_) {}
+
     } catch (error) {
-      console.error('Error cargando perfil:', error);
-      toast.error('Error al cargar perfil de empresa');
+      console.error('Error cargando datos:', error);
+      toast.error('Error al cargar configuración');
     } finally {
       setLoading(false);
     }
   };
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setSaving(true);
-      await axios.put(`${API}/empresa/perfil`, formData);
-      toast.success('Perfil actualizado');
-      cargarPerfil();
+
+      // Construir hours_text desde el horario
+      const hours_text = `Lunes a Viernes: ${horario.lunes_viernes}\nSábado: ${horario.sabado}\nDomingo: ${horario.domingo}`;
+
+      await axios.post(`${API}/company/settings`, {
+        ...formData,
+        hours_text,
+        discount_threshold: formData.discount_threshold ? parseFloat(formData.discount_threshold) : null,
+        discount_percent: formData.discount_percent ? parseFloat(formData.discount_percent) : null,
+      });
+      toast.success('Configuración guardada');
+      cargarDatos();
     } catch (error) {
-      console.error('Error guardando perfil:', error);
+      console.error('Error guardando:', error);
       toast.error(error.response?.data?.detail || 'Error al guardar');
     } finally {
       setSaving(false);
     }
   };
 
-  const handleLogoClick = () => {
-    fileInputRef.current?.click();
+  const toggleModulo = async (modulo, valor) => {
+    try {
+      setGuardandoModulo(true);
+      // Guardamos en company settings como campo extra
+      await axios.post(`${API}/company/settings`, { [modulo === 'construccion_ligera' ? 'construccion_ligera_enabled' : modulo]: valor });
+      setModulos(prev => ({ ...prev, [modulo]: valor }));
+      toast.success('Módulo actualizado');
+    } catch (e) {
+      toast.error('Error al actualizar módulo');
+    } finally {
+      setGuardandoModulo(false);
+    }
   };
 
   const handleLogoChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    // Validar tipo
-    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/svg+xml'];
+    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
     if (!validTypes.includes(file.type)) {
-      toast.error('Formato no válido. Usa PNG, JPG, WEBP o SVG');
+      toast.error('Formato no válido. Usa PNG, JPG o WEBP');
       return;
     }
-
-    // Validar tamaño (5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('El archivo es muy grande. Máximo 5MB');
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('El archivo es muy grande. Máximo 2MB');
       return;
     }
-
     try {
       setUploading(true);
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await axios.post(`${API}/empresa/logo`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-
+      const fd = new FormData();
+      fd.append('file', file);
+      await axios.post(`${API}/company/logo`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       toast.success('Logo actualizado');
-      setEmpresa({
-        ...empresa,
-        logo_url: response.data.logo_url
-      });
+      cargarDatos();
     } catch (error) {
-      console.error('Error subiendo logo:', error);
       toast.error(error.response?.data?.detail || 'Error al subir logo');
     } finally {
       setUploading(false);
@@ -118,18 +173,13 @@ export default function PerfilEmpresa() {
   };
 
   const handleDeleteLogo = async () => {
-    if (!confirm('¿Eliminar el logo de tu empresa?')) return;
-
+    if (!window.confirm('¿Eliminar el logo?')) return;
     try {
       setUploading(true);
-      await axios.delete(`${API}/empresa/logo`);
+      await axios.delete(`${API}/company/logo`);
       toast.success('Logo eliminado');
-      setEmpresa({
-        ...empresa,
-        logo_url: null
-      });
+      cargarDatos();
     } catch (error) {
-      console.error('Error eliminando logo:', error);
       toast.error('Error al eliminar logo');
     } finally {
       setUploading(false);
@@ -145,195 +195,161 @@ export default function PerfilEmpresa() {
   }
 
   return (
-    <div className="space-y-6" data-testid="perfil-empresa-page">
+    <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Perfil de Empresa</h1>
-        <p className="text-slate-600">Configura la información de tu empresa para las cotizaciones</p>
+        <h1 className="text-2xl font-bold text-slate-900">Mi Empresa</h1>
+        <p className="text-slate-600">Configura la información de tu empresa</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Logo Section */}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Logo */}
         <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Logo de la Empresa</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Logo de la Empresa</CardTitle></CardHeader>
           <CardContent>
-            <div className="flex flex-col items-center">
-              {/* Logo Preview */}
-              <div 
-                className="w-40 h-40 border-2 border-dashed border-slate-300 rounded-lg flex items-center justify-center mb-4 overflow-hidden cursor-pointer hover:border-emerald-500 transition-colors relative group"
-                onClick={handleLogoClick}
+            <div className="flex items-center gap-6">
+              <div
+                className="w-24 h-24 border-2 border-dashed border-slate-300 rounded-lg flex items-center justify-center overflow-hidden cursor-pointer hover:border-emerald-500 transition-colors"
+                onClick={() => fileInputRef.current?.click()}
               >
-                {empresa?.logo_url ? (
-                  <>
-                    <img 
-                      src={`${BACKEND_URL}${empresa.logo_url}`}
-                      alt="Logo de empresa"
-                      className="max-w-full max-h-full object-contain"
-                    />
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <span className="text-white text-sm">Cambiar logo</span>
-                    </div>
-                  </>
+                {settings?.logo_url ? (
+                  <img src={settings.logo_url} alt="Logo" className="max-w-full max-h-full object-contain" />
                 ) : (
-                  <div className="text-center text-slate-400">
-                    <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span className="text-sm">Click para subir logo</span>
-                  </div>
+                  <span className="text-slate-400 text-xs text-center">Click para subir</span>
                 )}
               </div>
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
-                className="hidden"
-                onChange={handleLogoChange}
-              />
-
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={handleLogoClick}
-                  disabled={uploading}
-                  data-testid="btn-subir-logo"
-                >
+              <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/jpg,image/webp" className="hidden" onChange={handleLogoChange} />
+              <div className="space-y-2">
+                <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
                   {uploading ? 'Subiendo...' : 'Subir Logo'}
                 </Button>
-                {empresa?.logo_url && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={handleDeleteLogo}
-                    disabled={uploading}
-                    className="text-red-600 hover:text-red-700"
-                  >
+                {settings?.logo_url && (
+                  <Button type="button" variant="ghost" size="sm" onClick={handleDeleteLogo} disabled={uploading} className="text-red-600 block">
                     Eliminar
                   </Button>
                 )}
+                <p className="text-xs text-slate-500">PNG, JPG o WEBP. Máx 2MB</p>
               </div>
-
-              <p className="text-xs text-slate-500 mt-3 text-center">
-                PNG, JPG, WEBP o SVG<br/>
-                Máximo 5MB • Recomendado: 400x400px
-              </p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Company Info Form */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="text-lg">Información de la Empresa</CardTitle>
-          </CardHeader>
+        {/* Datos de empresa */}
+        <Card>
+          <CardHeader><CardTitle>Datos de la Empresa</CardTitle></CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Email</Label>
+              <Input name="email" value={formData.email} onChange={handleChange} placeholder="contacto@empresa.com" />
+            </div>
+            <div className="space-y-2">
+              <Label>RFC</Label>
+              <Input name="rfc" value={formData.rfc} onChange={handleChange} placeholder="XAXX010101000" />
+            </div>
+            <div className="space-y-2">
+              <Label>Teléfono del Dueño (WhatsApp)</Label>
+              <Input name="owner_phone" value={formData.owner_phone} onChange={handleChange} placeholder="+5281XXXXXXXX" />
+            </div>
+            <div className="space-y-2">
+              <Label>Dirección</Label>
+              <Input name="address_text" value={formData.address_text} onChange={handleChange} placeholder="Calle Principal #123, Monterrey" />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label>URL Google Maps</Label>
+              <Input name="google_maps_url" value={formData.google_maps_url} onChange={handleChange} placeholder="https://maps.google.com/..." />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Horario de Atención */}
+        <Card>
+          <CardHeader><CardTitle>⏰ Horario de Atención</CardTitle></CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="nombre">Nombre de la Empresa</Label>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[['lunes_viernes', 'Lunes a Viernes'], ['sabado', 'Sábado'], ['domingo', 'Domingo']].map(([key, label]) => (
+                <div key={key} className="space-y-1">
+                  <Label>{label}</Label>
                   <Input
-                    id="nombre"
-                    name="nombre"
-                    value={formData.nombre}
-                    onChange={handleChange}
-                    placeholder="Mi Empresa S.A. de C.V."
-                    data-testid="input-nombre"
+                    value={horario[key] || ''}
+                    onChange={e => setHorario(prev => ({ ...prev, [key]: e.target.value }))}
+                    placeholder='08:00-18:00 o "cerrado"'
                   />
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="rfc">RFC</Label>
-                  <Input
-                    id="rfc"
-                    name="rfc"
-                    value={formData.rfc}
-                    onChange={handleChange}
-                    placeholder="XAXX010101000"
-                    data-testid="input-rfc"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="telefono">Teléfono</Label>
-                  <Input
-                    id="telefono"
-                    name="telefono"
-                    value={formData.telefono}
-                    onChange={handleChange}
-                    placeholder="81 1234 5678"
-                    data-testid="input-telefono"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="contacto@miempresa.com"
-                    data-testid="input-email"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="direccion">Dirección</Label>
-                <Input
-                  id="direccion"
-                  name="direccion"
-                  value={formData.direccion}
-                  onChange={handleChange}
-                  placeholder="Calle Principal #123, Col. Centro, Monterrey, N.L."
-                  data-testid="input-direccion"
-                />
-              </div>
-
-              <div className="flex justify-end pt-4">
-                <Button 
-                  type="submit"
-                  className="bg-emerald-600 hover:bg-emerald-700"
-                  disabled={saving}
-                  data-testid="btn-guardar"
-                >
-                  {saving ? 'Guardando...' : 'Guardar Cambios'}
-                </Button>
-              </div>
-            </form>
+              ))}
+            </div>
+            <p className="text-xs text-slate-500 mt-2">Formato: 08:00-18:00 o "cerrado"</p>
           </CardContent>
         </Card>
-      </div>
 
-      {/* Info Card */}
-      <Card className="border-emerald-200 bg-emerald-50">
-        <CardContent className="pt-6">
-          <div className="flex items-start gap-4">
-            <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+        {/* Módulos */}
+        <Card>
+          <CardHeader><CardTitle>🔧 Módulos</CardTitle></CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div>
+                <p className="font-medium text-slate-800">Construccion Ligera</p>
+                <p className="text-sm text-slate-500">Activa para habilitar el módulo de materiales de construcción ligera (tablaroca, plafón, perfiles, etc.)</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => toggleModulo('construccion_ligera', !modulos.construccion_ligera)}
+                disabled={guardandoModulo}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${modulos.construccion_ligera ? 'bg-emerald-600' : 'bg-slate-200'}`}
+              >
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow ${modulos.construccion_ligera ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
             </div>
-            <div>
-              <h3 className="font-semibold text-emerald-800 mb-1">¿Para qué sirve el logo?</h3>
-              <p className="text-emerald-700 text-sm">
-                Tu logo aparecerá en todas las cotizaciones PDF que generes con CotizaBot.
-                Esto le da un aspecto profesional a tus cotizaciones y refuerza tu marca con tus clientes.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Sección de Datos Fiscales */}
-      <div className="pt-6 border-t border-slate-200">
-        <h2 className="text-xl font-bold text-slate-900 mb-4">Facturación</h2>
-        <DatosFiscales onUpdate={cargarPerfil} />
-      </div>
+        {/* Cobros */}
+        <Card>
+          <CardHeader><CardTitle>💳 Cobros</CardTitle></CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>URL de MercadoPago</Label>
+              <Input name="mercadopago_url" value={formData.mercadopago_url} onChange={handleChange} placeholder="https://www.mercadopago.com.mx/checkout/..." />
+            </div>
+            <div className="space-y-2">
+              <Label>Banco</Label>
+              <Input name="bank_name" value={formData.bank_name} onChange={handleChange} placeholder="BBVA, Banorte, etc." />
+            </div>
+            <div className="space-y-2">
+              <Label>Nombre del Titular</Label>
+              <Input name="bank_account_name" value={formData.bank_account_name} onChange={handleChange} placeholder="Empresa SA de CV" />
+            </div>
+            <div className="space-y-2">
+              <Label>CLABE (18 dígitos)</Label>
+              <Input name="bank_clabe" value={formData.bank_clabe} onChange={handleChange} placeholder="012345678901234567" maxLength={18} />
+            </div>
+            <div className="space-y-2">
+              <Label>Número de Cuenta</Label>
+              <Input name="bank_account_number" value={formData.bank_account_number} onChange={handleChange} placeholder="1234567890" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Descuentos por volumen */}
+        <Card>
+          <CardHeader><CardTitle>🏷️ Descuento por Volumen</CardTitle></CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Monto mínimo para descuento ($)</Label>
+              <Input name="discount_threshold" type="number" value={formData.discount_threshold} onChange={handleChange} placeholder="5000" />
+            </div>
+            <div className="space-y-2">
+              <Label>Porcentaje de descuento (%)</Label>
+              <Input name="discount_percent" type="number" value={formData.discount_percent} onChange={handleChange} placeholder="5" min="0" max="100" />
+            </div>
+            <p className="text-xs text-slate-500 md:col-span-2">Cuando el total supere el monto mínimo, se aplica el descuento automáticamente en el bot.</p>
+          </CardContent>
+        </Card>
+
+        <div className="flex justify-end">
+          <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700" disabled={saving}>
+            {saving ? 'Guardando...' : 'Guardar Cambios'}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }
