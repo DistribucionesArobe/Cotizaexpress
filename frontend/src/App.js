@@ -57,7 +57,7 @@ function AppContent() {
                   onClick={() => setActiveTab('dashboard')}
                 >
                   <img 
-                    src="/logo-cotizaexpress.png" 
+                    src="/logo-cotizabot.png" 
                     alt="CotizaBot by CotizaExpress.com" 
                     className="h-10 w-auto pointer-events-none"
                   />
