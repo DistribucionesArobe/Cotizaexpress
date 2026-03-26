@@ -158,7 +158,7 @@ export default function Conversaciones() {
           )}
         </div>
 
-        <Card className="lg:col-span-2 flex flex-col">
+        <Card className="lg:col-span-2">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base">
@@ -191,7 +191,7 @@ export default function Conversaciones() {
             )}
           </CardHeader>
 
-          <CardContent className="flex-1 flex flex-col">
+          <CardContent className="flex flex-col">
             {!conversacionSeleccionada ? (
               <div className="py-12 text-center text-slate-500">
                 Selecciona una conversación para ver los mensajes
