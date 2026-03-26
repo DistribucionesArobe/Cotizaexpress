@@ -198,7 +198,7 @@ export default function Conversaciones() {
               </div>
             ) : (
               <>
-                <div className="space-y-3 max-h-[500px] overflow-y-auto mb-4 bg-slate-50 rounded-lg p-2" ref={scrollContainerRef}>
+                <div className="space-y-3 overflow-y-auto mb-4 bg-slate-50 rounded-lg p-2" style={{maxHeight: "500px"}} ref={scrollContainerRef}>
                   {mensajes.length === 0 ? (
                     <div className="py-12 text-center text-slate-500">No hay mensajes</div>
                   ) : (
