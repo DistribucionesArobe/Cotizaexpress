@@ -25,7 +25,7 @@ export default function Conversaciones() {
   }, []);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'instant' }); }, 50);
   }, [mensajes]);
 
   const cargarConversaciones = async () => {
