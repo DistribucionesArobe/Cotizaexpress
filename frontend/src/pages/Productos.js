@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
-import { Package, Upload, Plus, Pencil, Check, X, Trash2, LayoutGrid, LayoutList, Loader2 } from 'lucide-react';
+import { Package, Upload, Pencil, Trash2, LayoutGrid, LayoutList, X, Check, Plus } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,6 +18,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -29,13 +36,10 @@ export default function Productos() {
   const [viewMode, setViewMode] = useState('grid');
   const [selectedIds, setSelectedIds] = useState([]);
   const [searchQ, setSearchQ] = useState('');
-
-  // Estado para edición inline de precio
-  const [editandoPrecio, setEditandoPrecio] = useState(null);
-  const [nuevoPrecio, setNuevoPrecio] = useState('');
-  const [guardandoPrecio, setGuardandoPrecio] = useState(false);
-
-  // Estado para eliminar
+  const [productoEditando, setProductoEditando] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [guardando, setGuardando] = useState(false);
+  const [sugerencias, setSugerencias] = useState([]);
   const [productoAEliminar, setProductoAEliminar] = useState(null);
   const [eliminando, setEliminando] = useState(false);
 
@@ -64,7 +68,6 @@ export default function Productos() {
     cargarProductos();
   };
 
-  // Selección múltiple
   const toggleSelect = (id) =>
     setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   const selectAll = () => setSelectedIds(productos.map(p => p.id));
@@ -94,37 +97,56 @@ export default function Productos() {
     }
   };
 
-  // Editar precio inline
-  const iniciarEditarPrecio = (producto) => {
-    setEditandoPrecio(producto.id);
-    setNuevoPrecio(producto.price?.toString() || '');
+  const abrirEdicion = async (producto) => {
+    setProductoEditando(producto);
+    setEditForm({
+      name: producto.name || '',
+      price: producto.price || '',
+      unit: producto.unit || '',
+      sku: producto.sku || '',
+      synonyms: '',
+    });
+    setSugerencias([]);
+    try {
+      const res = await axios.get(`${API}/pricebook/items/${producto.id}/synonyms-suggestions`);
+      setEditForm(prev => ({ ...prev, synonyms: (res.data.existing || []).join(', ') }));
+      setSugerencias(res.data.suggestions || []);
+    } catch (e) {
+      console.error('Error cargando sinónimos:', e);
+    }
   };
 
-  const guardarPrecio = async (productoId) => {
-    const precio = parseFloat(nuevoPrecio);
-    if (isNaN(precio) || precio < 0) {
-      toast.error('Precio inválido');
-      return;
-    }
+  const agregarSugerencia = (sug) => {
+    setEditForm(prev => {
+      const existing = prev.synonyms ? prev.synonyms.split(',').map(s => s.trim()).filter(Boolean) : [];
+      if (!existing.includes(sug)) {
+        return { ...prev, synonyms: [...existing, sug].join(', ') };
+      }
+      return prev;
+    });
+    setSugerencias(prev => prev.filter(s => s !== sug));
+  };
+
+  const guardarEdicion = async () => {
     try {
-      setGuardandoPrecio(true);
-      await axios.patch(`${API}/pricebook/items/${productoId}`, { price: precio });
-      toast.success('Precio actualizado');
-      setEditandoPrecio(null);
+      setGuardando(true);
+      await axios.patch(`${API}/pricebook/items/${productoEditando.id}`, {
+        name: editForm.name,
+        price: parseFloat(editForm.price),
+        unit: editForm.unit,
+        sku: editForm.sku,
+        synonyms: editForm.synonyms,
+      });
+      toast.success('Producto actualizado');
+      setProductoEditando(null);
       cargarProductos();
     } catch (e) {
-      toast.error('Error al actualizar precio');
+      toast.error('Error al guardar');
     } finally {
-      setGuardandoPrecio(false);
+      setGuardando(false);
     }
   };
 
-  const cancelarEdicion = () => {
-    setEditandoPrecio(null);
-    setNuevoPrecio('');
-  };
-
-  // Eliminar producto individual
   const confirmarEliminar = async () => {
     if (!productoAEliminar) return;
     try {
@@ -150,16 +172,13 @@ export default function Productos() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold text-slate-900">Catálogo de Productos</h2>
           <p className="text-slate-600 mt-1">{productos.length} productos disponibles</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={limpiarDuplicados}>
-            Limpiar duplicados
-          </Button>
+          <Button variant="outline" size="sm" onClick={limpiarDuplicados}>Limpiar duplicados</Button>
           <Button variant={viewMode === 'grid' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('grid')}>
             <LayoutGrid className="w-4 h-4" />
           </Button>
@@ -168,26 +187,18 @@ export default function Productos() {
           </Button>
           <Link to="/carga-productos">
             <Button className="bg-emerald-600 hover:bg-emerald-700">
-              <Upload className="w-4 h-4 mr-2" />
-              Carga Masiva
+              <Upload className="w-4 h-4 mr-2" />Carga Masiva
             </Button>
           </Link>
         </div>
       </div>
 
-      {/* Búsqueda */}
       <form onSubmit={handleSearch} className="flex gap-2">
-        <Input
-          placeholder="Buscar producto..."
-          value={searchQ}
-          onChange={e => setSearchQ(e.target.value)}
-          className="max-w-sm"
-        />
+        <Input placeholder="Buscar producto..." value={searchQ} onChange={e => setSearchQ(e.target.value)} className="max-w-sm" />
         <Button type="submit" variant="outline">Buscar</Button>
         {searchQ && <Button type="button" variant="ghost" onClick={() => { setSearchQ(''); cargarProductos(); }}>Limpiar</Button>}
       </form>
 
-      {/* Barra de selección múltiple */}
       {selectedIds.length > 0 && (
         <div className="flex items-center gap-3 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
           <span className="text-sm font-medium text-emerald-700">{selectedIds.length} productos seleccionados</span>
@@ -196,18 +207,13 @@ export default function Productos() {
         </div>
       )}
 
-      {/* Vista Lista */}
       {viewMode === 'list' && (
         <div className="border rounded-lg overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-slate-50">
               <tr className="border-b text-slate-500">
                 <th className="text-left p-3">
-                  <input
-                    type="checkbox"
-                    onChange={e => e.target.checked ? selectAll() : clearSelection()}
-                    checked={selectedIds.length === productos.length && productos.length > 0}
-                  />
+                  <input type="checkbox" onChange={e => e.target.checked ? selectAll() : clearSelection()} checked={selectedIds.length === productos.length && productos.length > 0} />
                 </th>
                 <th className="text-left p-3">Nombre</th>
                 <th className="text-left p-3">SKU</th>
@@ -219,45 +225,14 @@ export default function Productos() {
             <tbody>
               {productos.map(p => (
                 <tr key={p.id} className="border-b hover:bg-slate-50">
-                  <td className="p-3">
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.includes(p.id)}
-                      onChange={() => toggleSelect(p.id)}
-                    />
-                  </td>
+                  <td className="p-3"><input type="checkbox" checked={selectedIds.includes(p.id)} onChange={() => toggleSelect(p.id)} /></td>
                   <td className="p-3 font-medium">{p.name}</td>
                   <td className="p-3 text-slate-500">{p.sku || '-'}</td>
-                  <td className="p-3 text-right">
-                    {editandoPrecio === p.id ? (
-                      <div className="flex items-center gap-1 justify-end">
-                        <Input
-                          type="number"
-                          value={nuevoPrecio}
-                          onChange={e => setNuevoPrecio(e.target.value)}
-                          className="w-24 h-7 text-right"
-                          autoFocus
-                        />
-                        <Button size="sm" className="h-7 w-7 p-0 bg-emerald-600" onClick={() => guardarPrecio(p.id)} disabled={guardandoPrecio}>
-                          <Check className="w-3 h-3" />
-                        </Button>
-                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={cancelarEdicion}>
-                          <X className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <span
-                        className="text-emerald-600 font-semibold cursor-pointer hover:underline"
-                        onClick={() => iniciarEditarPrecio(p)}
-                      >
-                        ${p.price?.toLocaleString('es-MX')}
-                      </span>
-                    )}
-                  </td>
+                  <td className="p-3 text-right text-emerald-600 font-semibold">${p.price?.toLocaleString('es-MX')}</td>
                   <td className="p-3 text-slate-500">{p.unit || '-'}</td>
                   <td className="p-3">
                     <div className="flex gap-1">
-                      <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => iniciarEditarPrecio(p)}>
+                      <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => abrirEdicion(p)}>
                         <Pencil className="w-3 h-3" />
                       </Button>
                       <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-red-500 hover:text-red-700" onClick={() => setProductoAEliminar(p)}>
@@ -272,17 +247,11 @@ export default function Productos() {
         </div>
       )}
 
-      {/* Vista Grid */}
       {viewMode === 'grid' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {productos.map(producto => (
             <Card key={producto.id} className={`relative ${selectedIds.includes(producto.id) ? 'border-emerald-500 bg-emerald-50' : ''}`}>
-              <input
-                type="checkbox"
-                checked={selectedIds.includes(producto.id)}
-                onChange={() => toggleSelect(producto.id)}
-                className="absolute top-3 left-3 w-4 h-4 accent-emerald-600"
-              />
+              <input type="checkbox" checked={selectedIds.includes(producto.id)} onChange={() => toggleSelect(producto.id)} className="absolute top-3 left-3 w-4 h-4 accent-emerald-600" />
               <CardContent className="pt-6">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1 pl-5">
@@ -290,7 +259,7 @@ export default function Productos() {
                     {producto.sku && <p className="text-xs text-slate-500 mt-0.5">SKU: {producto.sku}</p>}
                   </div>
                   <div className="flex gap-1 ml-2">
-                    <button onClick={() => iniciarEditarPrecio(producto)} className="text-slate-400 hover:text-emerald-600 p-1">
+                    <button onClick={() => abrirEdicion(producto)} className="text-slate-400 hover:text-emerald-600 p-1">
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
                     <button onClick={() => setProductoAEliminar(producto)} className="text-slate-400 hover:text-red-500 p-1">
@@ -298,34 +267,10 @@ export default function Productos() {
                     </button>
                   </div>
                 </div>
-
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs text-slate-500">Precio:</p>
-                    {editandoPrecio === producto.id ? (
-                      <div className="flex items-center gap-1 mt-1">
-                        <Input
-                          type="number"
-                          value={nuevoPrecio}
-                          onChange={e => setNuevoPrecio(e.target.value)}
-                          className="w-24 h-7 text-right text-sm"
-                          autoFocus
-                        />
-                        <button onClick={() => guardarPrecio(producto.id)} disabled={guardandoPrecio} className="text-emerald-600 hover:text-emerald-700">
-                          <Check className="w-4 h-4" />
-                        </button>
-                        <button onClick={cancelarEdicion} className="text-slate-400 hover:text-slate-600">
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ) : (
-                      <p
-                        className="text-emerald-600 font-bold text-base cursor-pointer hover:underline"
-                        onClick={() => iniciarEditarPrecio(producto)}
-                      >
-                        ${producto.price?.toLocaleString('es-MX')}
-                      </p>
-                    )}
+                    <p className="text-emerald-600 font-bold text-base">${producto.price?.toLocaleString('es-MX')}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-slate-500">Unidad:</p>
@@ -344,15 +289,70 @@ export default function Productos() {
           <h3 className="text-lg font-semibold text-slate-600 mb-2">No hay productos</h3>
           <p className="text-slate-500 mb-4">Sube tu catálogo desde Excel para empezar</p>
           <Link to="/carga-productos">
-            <Button className="bg-emerald-600 hover:bg-emerald-700">
-              <Upload className="w-4 h-4 mr-2" />
-              Subir Catálogo
-            </Button>
+            <Button className="bg-emerald-600 hover:bg-emerald-700"><Upload className="w-4 h-4 mr-2" />Subir Catálogo</Button>
           </Link>
         </div>
       )}
 
-      {/* Dialog confirmar eliminar */}
+      <Dialog open={!!productoEditando} onOpenChange={() => setProductoEditando(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Editar Producto</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-1">
+              <Label>Nombre</Label>
+              <Input value={editForm.name || ''} onChange={e => setEditForm(prev => ({ ...prev, name: e.target.value }))} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label>Precio ($)</Label>
+                <Input type="number" value={editForm.price || ''} onChange={e => setEditForm(prev => ({ ...prev, price: e.target.value }))} />
+              </div>
+              <div className="space-y-1">
+                <Label>Unidad</Label>
+                <Input value={editForm.unit || ''} onChange={e => setEditForm(prev => ({ ...prev, unit: e.target.value }))} placeholder="Pieza, Rollo, Kg..." />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <Label>SKU</Label>
+              <Input value={editForm.sku || ''} onChange={e => setEditForm(prev => ({ ...prev, sku: e.target.value }))} placeholder="Código interno" />
+            </div>
+            <div className="space-y-1">
+              <Label>Sinónimos</Label>
+              <Input
+                value={editForm.synonyms || ''}
+                onChange={e => setEditForm(prev => ({ ...prev, synonyms: e.target.value }))}
+                placeholder="clavo, clavito, nail... (separados por coma)"
+              />
+              <p className="text-xs text-slate-500">Palabras alternativas que usan tus clientes para pedir este producto</p>
+            </div>
+            {sugerencias.length > 0 && (
+              <div className="space-y-1">
+                <Label className="text-xs text-slate-500">Sugerencias de IA</Label>
+                <div className="flex flex-wrap gap-1">
+                  {sugerencias.map(sug => (
+                    <button
+                      key={sug}
+                      onClick={() => agregarSugerencia(sug)}
+                      className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-2 py-0.5 hover:bg-emerald-100 flex items-center gap-1"
+                    >
+                      <Plus className="w-3 h-3" /> {sug}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setProductoEditando(null)}>Cancelar</Button>
+            <Button onClick={guardarEdicion} disabled={guardando} className="bg-emerald-600 hover:bg-emerald-700">
+              {guardando ? 'Guardando...' : 'Guardar'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <AlertDialog open={!!productoAEliminar} onOpenChange={() => setProductoAEliminar(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -371,4 +371,4 @@ export default function Productos() {
       </AlertDialog>
     </div>
   );
-}// force update Wed Mar 25 16:04:00 CST 2026
+}
