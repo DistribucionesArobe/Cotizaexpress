@@ -193,7 +193,7 @@ export default function Conversaciones() {
               </div>
             ) : (
               <>
-                <div className="space-y-3 max-h-[calc(100vh-320px)] overflow-y-auto mb-4">
+                <div className="space-y-3 max-h-[calc(100vh-420px)] overflow-y-auto mb-4">
                   {mensajes.length === 0 ? (
                     <div className="py-12 text-center text-slate-500">No hay mensajes</div>
                   ) : (
