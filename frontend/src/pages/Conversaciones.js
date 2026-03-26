@@ -19,13 +19,18 @@ export default function Conversaciones() {
   const [mensaje, setMensaje] = useState('');
   const [enviando, setEnviando] = useState(false);
   const messagesEndRef = useRef(null);
+  const scrollContainerRef = useRef(null);
 
   useEffect(() => {
     cargarConversaciones();
   }, []);
 
   useEffect(() => {
-    setTimeout(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'instant' }); }, 50);
+    setTimeout(() => {
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+      }
+    }, 50);
   }, [mensajes]);
 
   const cargarConversaciones = async () => {
@@ -193,7 +198,7 @@ export default function Conversaciones() {
               </div>
             ) : (
               <>
-                <div className="space-y-3 max-h-[500px] overflow-y-auto mb-4">
+                <div className="space-y-3 max-h-[500px] overflow-y-auto mb-4" ref={scrollContainerRef}>
                   {mensajes.length === 0 ? (
                     <div className="py-12 text-center text-slate-500">No hay mensajes</div>
                   ) : (
