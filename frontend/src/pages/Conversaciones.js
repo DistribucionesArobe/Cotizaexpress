@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -18,10 +18,15 @@ export default function Conversaciones() {
   const [botStates, setBotStates] = useState({});
   const [mensaje, setMensaje] = useState('');
   const [enviando, setEnviando] = useState(false);
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     cargarConversaciones();
   }, []);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [mensajes]);
 
   const cargarConversaciones = async () => {
     try {
@@ -188,7 +193,7 @@ export default function Conversaciones() {
               </div>
             ) : (
               <>
-                <div className="space-y-3 max-h-[400px] overflow-y-auto mb-4">
+                <div className="space-y-3 max-h-[calc(100vh-320px)] overflow-y-auto mb-4">
                   {mensajes.length === 0 ? (
                     <div className="py-12 text-center text-slate-500">No hay mensajes</div>
                   ) : (
@@ -215,6 +220,7 @@ export default function Conversaciones() {
                       </div>
                     ))
                   )}
+                  <div ref={messagesEndRef} />
                 </div>
 
                 {!botActivo && (
