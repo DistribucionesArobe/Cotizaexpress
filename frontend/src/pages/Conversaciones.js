@@ -191,7 +191,7 @@ export default function Conversaciones() {
             )}
           </CardHeader>
 
-          <CardContent className="flex flex-col">
+          <CardContent className="flex flex-col bg-slate-50">
             {!conversacionSeleccionada ? (
               <div className="py-12 text-center text-slate-500">
                 Selecciona una conversación para ver los mensajes
