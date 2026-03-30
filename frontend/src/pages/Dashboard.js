@@ -6,14 +6,19 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
-import { Check, X, Package, UserCircle, MessageSquare, CreditCard, ArrowRight, Sparkles } from 'lucide-react';
+import {
+  Check, X, Package, UserCircle, MessageSquare, CreditCard,
+  ArrowRight, TrendingUp, ShoppingCart, Users, Clock
+} from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const [stats, setStats] = useState({ productos: 0, conversaciones: 0, perfilCompleto: false });
+  const [stats, setStats] = useState({
+    productos: 0, conversaciones: 0, perfilCompleto: false, loading: true
+  });
   const [loadingPlan, setLoadingPlan] = useState(null);
 
   useEffect(() => {
@@ -28,14 +33,18 @@ export default function Dashboard() {
         axios.get(`${API}/company/settings`),
       ]);
 
-      const productos = prodRes.status === 'fulfilled' ? (prodRes.value.data.total || prodRes.value.data.items?.length || 0) : 0;
-      const conversaciones = convRes.status === 'fulfilled' ? (convRes.value.data.conversations?.length || 0) : 0;
-      const settings = settingsRes.status === 'fulfilled' ? settingsRes.value.data.settings : {};
+      const productos = prodRes.status === 'fulfilled'
+        ? (prodRes.value.data.total || prodRes.value.data.items?.length || 0) : 0;
+      const conversaciones = convRes.status === 'fulfilled'
+        ? (convRes.value.data.conversations?.length || 0) : 0;
+      const settings = settingsRes.status === 'fulfilled'
+        ? settingsRes.value.data.settings : {};
       const perfilCompleto = !!(settings?.hours_text && settings?.owner_phone);
 
-      setStats({ productos, conversaciones, perfilCompleto });
+      setStats({ productos, conversaciones, perfilCompleto, loading: false });
     } catch (err) {
       console.warn('Stats load error:', err);
+      setStats(s => ({ ...s, loading: false }));
     }
   };
 
@@ -57,12 +66,15 @@ export default function Dashboard() {
     }
   };
 
+  // Determine if this is an active company (has conversations = WhatsApp connected)
+  const esEmpresaActiva = stats.conversaciones > 0;
+
   // Setup steps
   const pasos = [
     {
       titulo: 'Carga tus productos',
       descripcion: stats.productos > 0
-        ? `${stats.productos} producto${stats.productos !== 1 ? 's' : ''} cargado${stats.productos !== 1 ? 's' : ''}`
+        ? `${stats.productos} producto${stats.productos !== 1 ? 's' : ''} en tu catálogo`
         : 'Sube tu catálogo por Excel o agrégalos uno por uno',
       completado: stats.productos > 0,
       link: '/carga-masiva',
@@ -81,74 +93,183 @@ export default function Dashboard() {
     },
     {
       titulo: 'Conecta WhatsApp',
-      descripcion: 'Nuestro equipo conectará tu número. Te contactaremos por correo.',
-      completado: false,
+      descripcion: esEmpresaActiva
+        ? 'WhatsApp conectado y funcionando'
+        : 'Nuestro equipo conectará tu número. Te contactaremos por correo.',
+      completado: esEmpresaActiva,
       link: '/whatsapp',
-      linkTexto: 'Ver estado',
+      linkTexto: esEmpresaActiva ? 'Configuración' : 'Ver estado',
       icon: MessageSquare,
     },
   ];
 
   const pasosCompletados = pasos.filter(p => p.completado).length;
+  const todoCompleto = pasosCompletados === pasos.length;
+
+  if (stats.loading) {
+    return (
+      <div className="flex justify-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
       {/* Header */}
       <div>
         <h2 className="text-3xl font-bold text-slate-900">
-          ¡Bienvenido{user?.empresa_nombre && user.empresa_nombre !== user.email ? `, ${user.empresa_nombre}` : ''}!
+          {esEmpresaActiva
+            ? `¡Hola${user?.empresa_nombre && user.empresa_nombre !== user.email ? `, ${user.empresa_nombre}` : ''}!`
+            : `¡Bienvenido${user?.empresa_nombre && user.empresa_nombre !== user.email ? `, ${user.empresa_nombre}` : ''}!`
+          }
         </h2>
-        <p className="text-slate-600 mt-1">Configura tu CotizaBot y empieza a recibir cotizaciones automáticas</p>
+        <p className="text-slate-600 mt-1">
+          {esEmpresaActiva
+            ? 'Aquí tienes el resumen de tu CotizaBot'
+            : 'Configura tu CotizaBot y empieza a recibir cotizaciones automáticas'
+          }
+        </p>
       </div>
 
-      {/* Setup Checklist */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-slate-800">Pasos para activar tu bot</h3>
-          <span className="text-sm text-slate-500">{pasosCompletados} de {pasos.length} completados</span>
-        </div>
-
-        {/* Progress bar */}
-        <div className="w-full bg-slate-200 rounded-full h-2 mb-5">
-          <div
-            className="bg-emerald-500 h-2 rounded-full transition-all duration-500"
-            style={{ width: `${(pasosCompletados / pasos.length) * 100}%` }}
+      {/* ─── ACTIVE COMPANY: Metrics cards ─── */}
+      {esEmpresaActiva && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <MetricCard
+            icon={MessageSquare}
+            label="Conversaciones"
+            value={stats.conversaciones}
+            color="emerald"
+            link="/conversaciones"
+          />
+          <MetricCard
+            icon={Package}
+            label="Productos"
+            value={stats.productos}
+            color="blue"
+            link="/productos"
+          />
+          <MetricCard
+            icon={Users}
+            label="Clientes"
+            value={stats.conversaciones}
+            subtitle="únicos"
+            color="violet"
+            link="/clientes"
+          />
+          <MetricCard
+            icon={TrendingUp}
+            label="Estado del bot"
+            value="Activo"
+            isText
+            color="emerald"
+            link="/whatsapp"
           />
         </div>
+      )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {pasos.map((paso, idx) => {
-            const Icon = paso.icon;
-            return (
-              <Card key={idx} className={`transition-all ${paso.completado ? 'border-emerald-200 bg-emerald-50/50' : 'hover:shadow-md'}`}>
-                <CardContent className="pt-5 pb-4">
-                  <div className="flex items-start gap-3">
-                    <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                      paso.completado ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-500'
-                    }`}>
-                      {paso.completado ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
+      {/* ─── SETUP CHECKLIST (show if not all steps done) ─── */}
+      {!todoCompleto && (
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-slate-800">
+              {esEmpresaActiva ? 'Pendientes' : 'Pasos para activar tu bot'}
+            </h3>
+            <span className="text-sm text-slate-500">{pasosCompletados} de {pasos.length} completados</span>
+          </div>
+
+          {/* Progress bar */}
+          <div className="w-full bg-slate-200 rounded-full h-2 mb-5">
+            <div
+              className="bg-emerald-500 h-2 rounded-full transition-all duration-500"
+              style={{ width: `${(pasosCompletados / pasos.length) * 100}%` }}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {pasos.map((paso, idx) => {
+              const Icon = paso.icon;
+              return (
+                <Card key={idx} className={`transition-all ${paso.completado ? 'border-emerald-200 bg-emerald-50/50' : 'hover:shadow-md'}`}>
+                  <CardContent className="pt-5 pb-4">
+                    <div className="flex items-start gap-3">
+                      <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                        paso.completado ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-500'
+                      }`}>
+                        {paso.completado ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`font-medium text-sm ${paso.completado ? 'text-emerald-700' : 'text-slate-900'}`}>
+                          {paso.titulo}
+                        </p>
+                        <p className="text-xs text-slate-500 mt-0.5">{paso.descripcion}</p>
+                        <Link to={paso.link} className="inline-flex items-center gap-1 text-xs text-emerald-600 hover:text-emerald-700 font-medium mt-2">
+                          {paso.linkTexto} <ArrowRight className="w-3 h-3" />
+                        </Link>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className={`font-medium text-sm ${paso.completado ? 'text-emerald-700' : 'text-slate-900'}`}>
-                        {paso.titulo}
-                      </p>
-                      <p className="text-xs text-slate-500 mt-0.5">{paso.descripcion}</p>
-                      <Link to={paso.link} className="inline-flex items-center gap-1 text-xs text-emerald-600 hover:text-emerald-700 font-medium mt-2">
-                        {paso.linkTexto} <ArrowRight className="w-3 h-3" />
-                      </Link>
-                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ─── QUICK ACTIONS (active companies) ─── */}
+      {esEmpresaActiva && (
+        <div>
+          <h3 className="text-lg font-semibold text-slate-800 mb-4">Acciones rápidas</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Link to="/conversaciones">
+              <Card className="hover:shadow-md transition-all cursor-pointer group">
+                <CardContent className="pt-5 pb-4 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
+                    <MessageSquare className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-sm text-slate-900">Ver conversaciones</p>
+                    <p className="text-xs text-slate-500">{stats.conversaciones} chats activos</p>
                   </div>
                 </CardContent>
               </Card>
-            );
-          })}
+            </Link>
+            <Link to="/productos">
+              <Card className="hover:shadow-md transition-all cursor-pointer group">
+                <CardContent className="pt-5 pb-4 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                    <Package className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-sm text-slate-900">Administrar productos</p>
+                    <p className="text-xs text-slate-500">{stats.productos} en catálogo</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+            <Link to="/mi-empresa">
+              <Card className="hover:shadow-md transition-all cursor-pointer group">
+                <CardContent className="pt-5 pb-4 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-violet-100 text-violet-600 flex items-center justify-center group-hover:bg-violet-200 transition-colors">
+                    <UserCircle className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-sm text-slate-900">Mi empresa</p>
+                    <p className="text-xs text-slate-500">Perfil y configuración</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Pricing Plans */}
+      {/* ─── PRICING PLANS ─── */}
       <div>
         <div className="text-center mb-6">
-          <h3 className="text-2xl font-bold text-slate-900">Elige tu plan</h3>
+          <h3 className="text-2xl font-bold text-slate-900">
+            {esEmpresaActiva ? 'Mejora tu plan' : 'Elige tu plan'}
+          </h3>
           <p className="text-slate-600 mt-1">Comienza gratis y escala cuando lo necesites</p>
         </div>
 
@@ -254,6 +375,38 @@ export default function Dashboard() {
   );
 }
 
+/* ─── Metric Card component ─── */
+function MetricCard({ icon: Icon, label, value, subtitle, color, link, isText }) {
+  const colorMap = {
+    emerald: { bg: 'bg-emerald-100', text: 'text-emerald-600', accent: 'text-emerald-700' },
+    blue:    { bg: 'bg-blue-100',    text: 'text-blue-600',    accent: 'text-blue-700' },
+    violet:  { bg: 'bg-violet-100',  text: 'text-violet-600',  accent: 'text-violet-700' },
+    amber:   { bg: 'bg-amber-100',   text: 'text-amber-600',   accent: 'text-amber-700' },
+  };
+  const c = colorMap[color] || colorMap.emerald;
+
+  return (
+    <Link to={link}>
+      <Card className="hover:shadow-md transition-all cursor-pointer">
+        <CardContent className="pt-5 pb-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className={`w-10 h-10 rounded-lg ${c.bg} ${c.text} flex items-center justify-center`}>
+              <Icon className="w-5 h-5" />
+            </div>
+          </div>
+          <p className={`text-2xl font-bold ${isText ? c.accent : 'text-slate-900'}`}>
+            {isText ? value : value.toLocaleString('es-MX')}
+          </p>
+          <p className="text-xs text-slate-500 mt-0.5">
+            {label}{subtitle ? ` ${subtitle}` : ''}
+          </p>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+}
+
+/* ─── Plan Feature line ─── */
 function PlanFeature({ children, incluido, destacado }) {
   return (
     <li className="flex items-start gap-2 text-sm">
