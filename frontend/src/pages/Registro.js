@@ -45,7 +45,7 @@ export default function Registro() {
 
     if (result.success) {
       toast.success('¡Registro exitoso! Bienvenido a CotizaBot');
-      navigate('/dashboard');
+      navigate('/onboarding');
     } else {
       toast.error(result.error);
     }

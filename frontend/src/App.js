@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import '@/App.css';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { Toaster } from 'sonner';
 import { HelmetProvider } from 'react-helmet-async';
@@ -25,6 +25,7 @@ import PortalCliente from './pages/PortalCliente';
 import AdminPromoCodes from './pages/AdminPromoCodes';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminTwilio from './pages/AdminTwilio';
+import Onboarding from './pages/Onboarding';
 // Páginas SEO
 import DemoPage from './pages/DemoPage';
 import FerreteriasSEO from './pages/FerreteriasSEO';
@@ -37,16 +38,17 @@ import { Menu, X } from 'lucide-react';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-function AppContent() {
+function AppRoutes() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logout, isAuthenticated } = useAuth();
+  const location = useLocation();
+  const isOnboarding = location.pathname.startsWith('/onboarding');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <BrowserRouter>
-        {/* Header - Solo mostrar en rutas autenticadas */}
-        {isAuthenticated && (
+    <>
+        {/* Header - Solo mostrar en rutas autenticadas (no en onboarding) */}
+        {isAuthenticated && !isOnboarding && (
           <header className="bg-white border-b border-slate-200 sticky top-0 z-50" data-testid="main-header">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
@@ -304,7 +306,7 @@ function AppContent() {
         )}
 
         {/* Main Content */}
-        <main className={isAuthenticated ? "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" : ""}>
+        <main className={isAuthenticated && !isOnboarding ? "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" : ""}>
           <Routes>
             {/* Rutas p\u00fablicas */}
             <Route path="/" element={<LandingPage />} />
@@ -313,6 +315,7 @@ function AppContent() {
             <Route path="/precios" element={<Precios />} />
             <Route path="/pago-exitoso" element={<PagoExitoso />} />
             <Route path="/portal/cotizacion/:token" element={<PortalCliente />} />
+            <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
             {/* Rutas SEO */}
             <Route path="/demo" element={<DemoPage />} />
             <Route path="/ferreterias" element={<FerreteriasSEO />} />
@@ -422,10 +425,8 @@ function AppContent() {
             />
           </Routes>
         </main>
-      </BrowserRouter>
-
       <Toaster position="top-right" richColors />
-    </div>
+    </>
   );
 }
 
@@ -433,7 +434,11 @@ function App() {
   return (
     <HelmetProvider>
       <AuthProvider>
-        <AppContent />
+        <BrowserRouter>
+          <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+            <AppRoutes />
+          </div>
+        </BrowserRouter>
       </AuthProvider>
     </HelmetProvider>
   );
