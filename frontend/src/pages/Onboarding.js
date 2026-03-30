@@ -44,6 +44,10 @@ export default function Onboarding() {
     giro: '',
     ciudad: '',
     descripcion: '',
+    whatsapp: '',
+    horario_semana: '08:00-18:00',
+    horario_sabado: '08:00-14:00',
+    horario_domingo: 'cerrado',
   });
 
   // Step 2: Products
@@ -79,12 +83,20 @@ export default function Onboarding() {
       toast.error('Selecciona el giro de tu negocio');
       return false;
     }
+    if (!businessData.whatsapp || businessData.whatsapp.length < 10) {
+      toast.error('Ingresa tu número de WhatsApp (10 dígitos)');
+      return false;
+    }
     try {
       setSaving(true);
       await axios.put(`${API}/empresa/perfil`, {
         giro: businessData.giro,
         ciudad: businessData.ciudad,
         descripcion: businessData.descripcion,
+        telefono: businessData.whatsapp,
+        horario_semana: businessData.horario_semana,
+        horario_sabado: businessData.horario_sabado,
+        horario_domingo: businessData.horario_domingo,
       }, { withCredentials: true });
       return true;
     } catch (err) {
@@ -259,6 +271,64 @@ export default function Onboarding() {
                     placeholder="Ej: Tablaroca, perfiles, tornillería, pastas..."
                     rows={2}
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    WhatsApp de tu negocio *
+                  </label>
+                  <p className="text-xs text-slate-500 mb-2">
+                    Este es el número donde tus clientes te escriben. Lo conectaremos al bot.
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-slate-500 bg-slate-100 px-3 py-2.5 rounded-lg border border-slate-300">+52</span>
+                    <input
+                      type="tel"
+                      value={businessData.whatsapp}
+                      onChange={(e) => setBusinessData({ ...businessData, whatsapp: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                      className="flex-1 px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      placeholder="10 dígitos (ej: 8112345678)"
+                      maxLength={10}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Horario de atención
+                  </label>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs text-slate-500 mb-1">Lun - Vie</label>
+                      <input
+                        type="text"
+                        value={businessData.horario_semana}
+                        onChange={(e) => setBusinessData({ ...businessData, horario_semana: e.target.value })}
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        placeholder="08:00-18:00"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-slate-500 mb-1">Sábado</label>
+                      <input
+                        type="text"
+                        value={businessData.horario_sabado}
+                        onChange={(e) => setBusinessData({ ...businessData, horario_sabado: e.target.value })}
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        placeholder="08:00-14:00"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-slate-500 mb-1">Domingo</label>
+                      <input
+                        type="text"
+                        value={businessData.horario_domingo}
+                        onChange={(e) => setBusinessData({ ...businessData, horario_domingo: e.target.value })}
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        placeholder="cerrado"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
