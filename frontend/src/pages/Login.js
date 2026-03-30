@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '../contexts/AuthContext';
@@ -29,7 +30,14 @@ export default function Login() {
 
     if (result.success) {
       toast.success('¡Bienvenido de nuevo!');
-      navigate('/dashboard');
+      // Check if onboarding is completed to decide redirect
+      try {
+        const meRes = await axios.get(`${process.env.REACT_APP_BACKEND_URL?.trim() || 'https://api.cotizaexpress.com'}/api/auth/me`, { withCredentials: true });
+        const onboardingDone = meRes.data?.user?.onboarding_completed;
+        navigate(onboardingDone ? '/dashboard' : '/onboarding');
+      } catch {
+        navigate('/dashboard');
+      }
     } else {
       toast.error(result.error);
     }
