@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { Download, Upload, FileSpreadsheet, CheckCircle, AlertCircle, Plus, Zap, Trash2 } from 'lucide-react';
+import { Download, Upload, FileSpreadsheet, CheckCircle, AlertCircle, Plus, Zap, Trash2, ClipboardPaste, X } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -13,13 +13,87 @@ export default function CargaProductos() {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [resultado, setResultado] = useState(null);
-  const [activeTab, setActiveTab] = useState('rapida'); // 'rapida' o 'excel'
-  
+  const [activeTab, setActiveTab] = useState('rapida'); // 'rapida', 'pegar', o 'excel'
+
   // Estado para carga rápida
   const [productosRapidos, setProductosRapidos] = useState([
     { nombre: '', precio: '' }
   ]);
   const [loadingRapida, setLoadingRapida] = useState(false);
+
+  // Estado para pegar lista
+  const [textoLista, setTextoLista] = useState('');
+  const [productosParsed, setProductosParsed] = useState([]);
+  const [loadingPegar, setLoadingPegar] = useState(false);
+
+  const parsearLista = (texto) => {
+    if (!texto.trim()) {
+      setProductosParsed([]);
+      return;
+    }
+    const lineas = texto.split('\n').filter(l => l.trim());
+    const parsed = [];
+    for (const linea of lineas) {
+      // Intentar separar por TAB primero (cuando pegas desde Excel)
+      let partes = linea.split('\t');
+      if (partes.length < 2) {
+        // Fallback: buscar el último $ o número al final de la línea
+        const match = linea.match(/^(.+?)\s+\$?\s*(\d[\d,]*\.?\d*)\s*$/);
+        if (match) {
+          partes = [match[1], match[2]];
+        }
+      }
+      if (partes.length >= 2) {
+        const nombre = partes[0].trim();
+        const precioStr = partes[partes.length - 1].replace(/[$,]/g, '').trim();
+        const precio = parseFloat(precioStr);
+        if (nombre && !isNaN(precio) && precio > 0) {
+          parsed.push({ nombre, precio: precio.toFixed(2), incluir: true });
+        }
+      }
+    }
+    setProductosParsed(parsed);
+  };
+
+  const toggleIncluir = (index) => {
+    const nuevos = [...productosParsed];
+    nuevos[index].incluir = !nuevos[index].incluir;
+    setProductosParsed(nuevos);
+  };
+
+  const editarParsed = (index, campo, valor) => {
+    const nuevos = [...productosParsed];
+    nuevos[index][campo] = valor;
+    setProductosParsed(nuevos);
+  };
+
+  const cargarPegados = async () => {
+    const productosValidos = productosParsed.filter(p => p.incluir && p.nombre.trim() && parseFloat(p.precio) > 0);
+    if (productosValidos.length === 0) {
+      toast.error('No hay productos válidos para cargar');
+      return;
+    }
+    setLoadingPegar(true);
+    try {
+      const response = await axios.post(`${API}/carga-productos/rapida`, {
+        productos: productosValidos.map(p => ({
+          nombre: p.nombre.trim(),
+          precio_base: parseFloat(p.precio),
+          categoria: 'General',
+          unidad: 'Pieza'
+        }))
+      });
+      toast.success(`${response.data.productos_insertados} productos cargados`);
+      setTextoLista('');
+      setProductosParsed([]);
+      setResultado(response.data);
+    } catch (error) {
+      console.error('Error en carga pegada:', error);
+      toast.error(error.response?.data?.detail || 'Error cargando productos');
+    } finally {
+      setLoadingPegar(false);
+    }
+  };
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -128,6 +202,17 @@ export default function CargaProductos() {
           Carga Rápida
         </button>
         <button
+          onClick={() => setActiveTab('pegar')}
+          className={`px-4 py-2 font-medium transition-colors ${
+            activeTab === 'pegar'
+              ? 'text-emerald-600 border-b-2 border-emerald-600'
+              : 'text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          <ClipboardPaste className="w-4 h-4 inline mr-2" />
+          Pegar Lista
+        </button>
+        <button
           onClick={() => setActiveTab('excel')}
           className={`px-4 py-2 font-medium transition-colors ${
             activeTab === 'excel'
@@ -234,6 +319,145 @@ export default function CargaProductos() {
               Los productos se guardarán con categoría "General" y unidad "Pieza". 
               Puedes editarlos después desde la sección de Productos.
             </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Pegar Lista */}
+      {activeTab === 'pegar' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ClipboardPaste className="w-5 h-5 text-blue-500" />
+              Pegar Lista desde Excel
+            </CardTitle>
+            <p className="text-sm text-slate-500">
+              Copia dos columnas de Excel (nombre y precio) y pégalas aquí.
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {/* Instrucción */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-sm text-blue-800">
+                  <strong>1.</strong> En Excel, selecciona las dos columnas (nombre + precio).{' '}
+                  <strong>2.</strong> Ctrl+C para copiar.{' '}
+                  <strong>3.</strong> Pega aquí abajo con Ctrl+V.
+                </p>
+              </div>
+
+              {/* Textarea */}
+              <textarea
+                className="w-full h-48 p-3 border border-slate-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                placeholder={"Pega tu lista aquí...\n\nEjemplo (desde Excel):\nCemento gris 50kg\t$185.00\nVarilla 3/8\t$89.50\nBlock 15cm\t$12.00\n\nTambién acepta:\nCemento gris 50kg  185.00\nVarilla 3/8  89.50"}
+                value={textoLista}
+                onChange={(e) => {
+                  setTextoLista(e.target.value);
+                  parsearLista(e.target.value);
+                }}
+                onPaste={(e) => {
+                  // Dejar que el paste ocurra normalmente, luego parsear
+                  setTimeout(() => {
+                    const val = e.target.value;
+                    setTextoLista(val);
+                    parsearLista(val);
+                  }, 50);
+                }}
+              />
+
+              {/* Preview */}
+              {productosParsed.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-semibold text-slate-700">
+                      Preview: {productosParsed.filter(p => p.incluir).length} productos detectados
+                    </p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => { setTextoLista(''); setProductosParsed([]); }}
+                      className="text-slate-400 hover:text-red-500"
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" /> Limpiar
+                    </Button>
+                  </div>
+
+                  <div className="border rounded-lg overflow-hidden">
+                    {/* Header */}
+                    <div className="grid grid-cols-12 gap-0 bg-slate-100 text-xs font-semibold text-slate-600 px-3 py-2 border-b">
+                      <div className="col-span-1 text-center">#</div>
+                      <div className="col-span-7">Nombre</div>
+                      <div className="col-span-3 text-right">Precio</div>
+                      <div className="col-span-1 text-center"></div>
+                    </div>
+
+                    {/* Rows */}
+                    <div className="max-h-80 overflow-y-auto">
+                      {productosParsed.map((p, i) => (
+                        <div
+                          key={i}
+                          className={`grid grid-cols-12 gap-0 items-center px-3 py-1.5 border-b text-sm ${
+                            p.incluir ? 'bg-white' : 'bg-slate-50 opacity-50'
+                          }`}
+                        >
+                          <div className="col-span-1 text-center text-xs text-slate-400">{i + 1}</div>
+                          <div className="col-span-7">
+                            <input
+                              className="w-full bg-transparent border-0 text-sm text-slate-800 focus:outline-none focus:bg-blue-50 rounded px-1"
+                              value={p.nombre}
+                              onChange={(e) => editarParsed(i, 'nombre', e.target.value)}
+                            />
+                          </div>
+                          <div className="col-span-3 text-right">
+                            <input
+                              className="w-full bg-transparent border-0 text-sm text-slate-800 text-right focus:outline-none focus:bg-blue-50 rounded px-1"
+                              value={`$${p.precio}`}
+                              onChange={(e) => {
+                                const val = e.target.value.replace(/[$,]/g, '');
+                                editarParsed(i, 'precio', val);
+                              }}
+                            />
+                          </div>
+                          <div className="col-span-1 text-center">
+                            <button
+                              onClick={() => toggleIncluir(i)}
+                              className={`text-xs ${p.incluir ? 'text-emerald-500 hover:text-red-500' : 'text-slate-400 hover:text-emerald-500'}`}
+                              title={p.incluir ? 'Click para excluir' : 'Click para incluir'}
+                            >
+                              {p.incluir ? <CheckCircle className="w-4 h-4" /> : <X className="w-4 h-4" />}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Botón cargar */}
+                  <Button
+                    onClick={cargarPegados}
+                    disabled={loadingPegar || productosParsed.filter(p => p.incluir).length === 0}
+                    className="w-full mt-4 bg-emerald-600 hover:bg-emerald-700"
+                  >
+                    {loadingPegar ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Cargando...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4 mr-2" />
+                        Cargar {productosParsed.filter(p => p.incluir).length} productos
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+
+              <p className="text-xs text-slate-400 text-center">
+                Los productos se guardarán con categoría "General" y unidad "Pieza".
+                Puedes editarlos después desde la sección de Productos.
+              </p>
+            </div>
           </CardContent>
         </Card>
       )}
