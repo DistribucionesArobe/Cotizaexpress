@@ -206,6 +206,27 @@ export default function AdminDashboard() {
           </Card>
         </Link>
 
+        {/* Motor de Búsqueda */}
+        <Link to="/admin/search" data-testid="link-admin-search">
+          <Card className="hover:border-purple-300 hover:shadow-md transition-all cursor-pointer h-full">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6 text-purple-600" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-slate-900 mb-1">Motor de Búsqueda</h4>
+                  <p className="text-sm text-slate-500 mb-3">
+                    Query events, jerga global, tasa de éxito
+                  </p>
+                  <Badge variant="secondary">Nuevo</Badge>
+                </div>
+                <ArrowRight className="w-5 h-5 text-slate-400" />
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+
         {/* Empresas (futuro) */}
         <Card className="opacity-60 cursor-not-allowed h-full">
           <CardContent className="pt-6">

@@ -25,6 +25,7 @@ import PortalCliente from './pages/PortalCliente';
 import AdminPromoCodes from './pages/AdminPromoCodes';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminTwilio from './pages/AdminTwilio';
+import AdminSearchStats from './pages/AdminSearchStats';
 import Onboarding from './pages/Onboarding';
 // Páginas SEO
 import DemoPage from './pages/DemoPage';
@@ -420,6 +421,14 @@ function AppRoutes() {
               element={
                 <ProtectedRoute>
                   <AdminTwilio />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/search"
+              element={
+                <ProtectedRoute>
+                  <AdminSearchStats />
                 </ProtectedRoute>
               }
             />
