@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -40,25 +41,9 @@ export default function Precios() {
     }
   };
 
-  const planActual = user?.empresa?.plan || user?.usuario?.plan || 'gratis';
+  const planActual = user?.empresa?.plan || user?.usuario?.plan || null;
 
   const planes = [
-    {
-      id: 'gratis',
-      nombre: 'Plan Gratis',
-      precio: 0,
-      precioIVA: 0,
-      descripcion: 'Para probar',
-      features: [
-        { texto: '5 cotizaciones incluidas', incluido: true },
-        { texto: 'Dashboard básico', incluido: true },
-        { texto: 'Carga de productos Excel', incluido: true },
-        { texto: 'WhatsApp integrado', incluido: false },
-        { texto: 'Cobros automáticos', incluido: false },
-      ],
-      popular: false,
-      btnTexto: 'Comenzar Gratis',
-    },
     {
       id: 'completo',
       nombre: 'Plan Completo',
@@ -99,6 +84,18 @@ export default function Precios() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <Helmet>
+        <title>Precios y Planes - CotizaBot | Desde $1,000 MXN/mes</title>
+        <meta name="description" content="Planes de CotizaBot para automatizar cotizaciones por WhatsApp. Plan Completo desde $1,000 MXN/mes y Plan Pro con cobros automaticos desde $2,000 MXN/mes." />
+        <link rel="canonical" href="https://cotizaexpress.com/precios" />
+        <meta property="og:title" content="Precios CotizaBot - Planes desde $1,000 MXN/mes" />
+        <meta property="og:description" content="Automatiza cotizaciones por WhatsApp con CotizaBot. Plan Completo y Plan Pro con cobros integrados." />
+        <meta property="og:url" content="https://cotizaexpress.com/precios" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://cotizaexpress.com/og-cotizabot.png" />
+        <meta property="og:locale" content="es_MX" />
+      </Helmet>
+
       {/* Navigation */}
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -131,7 +128,7 @@ export default function Precios() {
                   </Link>
                   <Link to="/registro">
                     <Button className="bg-emerald-600 hover:bg-emerald-700">
-                      Probar Gratis
+                      Comenzar
                     </Button>
                   </Link>
                 </>
@@ -149,12 +146,12 @@ export default function Precios() {
               Precios Simples y Transparentes
             </h1>
             <p className="text-lg sm:text-xl text-slate-600">
-              Empieza gratis. Escala cuando crezcas. <strong>Cobra a tus clientes</strong> con Plan Pro.
+              Precios claros, sin sorpresas. <strong>Cobra a tus clientes</strong> con Plan Pro.
             </p>
           </div>
 
           {/* Pricing Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {planes.map((plan) => {
               const esActual = planActual === plan.id;
               const esDestacado = plan.destacado;
@@ -238,14 +235,6 @@ export default function Precios() {
                         <Button variant="outline" className="w-full" disabled>
                           Plan Activo
                         </Button>
-                      ) : plan.id === 'gratis' ? (
-                        !isAuthenticated && (
-                          <Link to="/registro" className="block">
-                            <Button variant="outline" className="w-full">
-                              {plan.btnTexto}
-                            </Button>
-                          </Link>
-                        )
                       ) : (
                         isAuthenticated ? (
                           <Button 
@@ -339,7 +328,6 @@ export default function Precios() {
                 <thead className="bg-slate-50">
                   <tr>
                     <th className="px-4 py-4 text-left text-sm font-semibold text-slate-900">Característica</th>
-                    <th className="px-4 py-4 text-center text-sm font-semibold text-slate-500">Gratis</th>
                     <th className="px-4 py-4 text-center text-sm font-semibold text-emerald-600">Completo</th>
                     <th className="px-4 py-4 text-center text-sm font-semibold text-amber-600">Pro</th>
                   </tr>
@@ -347,49 +335,46 @@ export default function Precios() {
                 <tbody className="divide-y divide-slate-100">
                   <tr>
                     <td className="px-4 py-3 text-sm text-slate-700">Cotizaciones</td>
-                    <td className="px-4 py-3 text-center text-sm text-slate-600">5</td>
                     <td className="px-4 py-3 text-center text-sm text-emerald-600 font-medium">Ilimitadas</td>
                     <td className="px-4 py-3 text-center text-sm text-amber-600 font-medium">Ilimitadas</td>
                   </tr>
                   <tr className="bg-slate-50">
                     <td className="px-4 py-3 text-sm text-slate-700">WhatsApp integrado</td>
-                    <td className="px-4 py-3 text-center"><X className="w-5 h-5 text-slate-300 mx-auto" /></td>
                     <td className="px-4 py-3 text-center"><Check className="w-5 h-5 text-emerald-500 mx-auto" /></td>
                     <td className="px-4 py-3 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td>
                   </tr>
                   <tr>
                     <td className="px-4 py-3 text-sm text-slate-700">QR y Link propio</td>
-                    <td className="px-4 py-3 text-center"><X className="w-5 h-5 text-slate-300 mx-auto" /></td>
                     <td className="px-4 py-3 text-center"><Check className="w-5 h-5 text-emerald-500 mx-auto" /></td>
                     <td className="px-4 py-3 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td>
                   </tr>
                   <tr className="bg-slate-50">
-                    <td className="px-4 py-3 text-sm text-slate-700 font-medium">Cobros Mercado Pago</td>
-                    <td className="px-4 py-3 text-center"><X className="w-5 h-5 text-slate-300 mx-auto" /></td>
-                    <td className="px-4 py-3 text-center"><X className="w-5 h-5 text-slate-300 mx-auto" /></td>
+                    <td className="px-4 py-3 text-sm text-slate-700">Dashboard completo</td>
+                    <td className="px-4 py-3 text-center"><Check className="w-5 h-5 text-emerald-500 mx-auto" /></td>
                     <td className="px-4 py-3 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-3 text-sm text-slate-700 font-medium">Cobros SPEI</td>
-                    <td className="px-4 py-3 text-center"><X className="w-5 h-5 text-slate-300 mx-auto" /></td>
+                    <td className="px-4 py-3 text-sm text-slate-700 font-medium">Cobros Mercado Pago</td>
                     <td className="px-4 py-3 text-center"><X className="w-5 h-5 text-slate-300 mx-auto" /></td>
                     <td className="px-4 py-3 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td>
                   </tr>
                   <tr className="bg-slate-50">
-                    <td className="px-4 py-3 text-sm text-slate-700 font-medium">Notificaciones de pago</td>
-                    <td className="px-4 py-3 text-center"><X className="w-5 h-5 text-slate-300 mx-auto" /></td>
+                    <td className="px-4 py-3 text-sm text-slate-700 font-medium">Cobros SPEI</td>
                     <td className="px-4 py-3 text-center"><X className="w-5 h-5 text-slate-300 mx-auto" /></td>
                     <td className="px-4 py-3 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td>
                   </tr>
                   <tr>
+                    <td className="px-4 py-3 text-sm text-slate-700 font-medium">Notificaciones de pago</td>
+                    <td className="px-4 py-3 text-center"><X className="w-5 h-5 text-slate-300 mx-auto" /></td>
+                    <td className="px-4 py-3 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td>
+                  </tr>
+                  <tr className="bg-slate-50">
                     <td className="px-4 py-3 text-sm text-slate-700">Soporte</td>
-                    <td className="px-4 py-3 text-center text-sm text-slate-500">Email</td>
                     <td className="px-4 py-3 text-center text-sm text-emerald-600">Prioritario</td>
                     <td className="px-4 py-3 text-center text-sm text-amber-600">VIP</td>
                   </tr>
                   <tr className="bg-emerald-50">
-                    <td className="px-4 py-3 text-sm text-slate-900 font-bold">Precio mensual</td>
-                    <td className="px-4 py-3 text-center text-sm font-bold text-slate-600">$0</td>
+                    <td className="px-4 py-3 text-sm text-slate-900 font-bold">Precio mensual (con IVA)</td>
                     <td className="px-4 py-3 text-center text-sm font-bold text-emerald-600">$1,160</td>
                     <td className="px-4 py-3 text-center text-sm font-bold text-amber-600">$2,320</td>
                   </tr>
@@ -461,11 +446,11 @@ export default function Precios() {
             <div className="mt-16 text-center">
               <Link to="/registro">
                 <Button size="lg" className="text-lg px-8 py-6 bg-emerald-600 hover:bg-emerald-700">
-                  Comenzar con 5 Cotizaciones Gratis
+                  Crear Cuenta y Empezar
                 </Button>
               </Link>
               <p className="text-sm text-slate-500 mt-4">
-                Sin tarjeta de crédito • Cancela cuando quieras
+                Cancela cuando quieras • Soporte en español
               </p>
             </div>
           )}

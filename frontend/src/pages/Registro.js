@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -55,6 +56,17 @@ export default function Registro() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex items-center justify-center py-12 px-4">
+      <Helmet>
+        <title>Crear Cuenta - CotizaBot | Automatiza Cotizaciones por WhatsApp</title>
+        <meta name="description" content="Registrate en CotizaBot y automatiza las cotizaciones de tu ferreteria por WhatsApp con IA. Planes desde $1,000 MXN/mes." />
+        <link rel="canonical" href="https://cotizaexpress.com/registro" />
+        <meta property="og:title" content="Crear Cuenta en CotizaBot" />
+        <meta property="og:description" content="Automatiza cotizaciones por WhatsApp para tu ferreteria o distribuidora." />
+        <meta property="og:url" content="https://cotizaexpress.com/registro" />
+        <meta property="og:type" content="website" />
+        <meta property="og:locale" content="es_MX" />
+      </Helmet>
+
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-3 mb-6" data-testid="logo-link">
@@ -69,7 +81,7 @@ export default function Registro() {
             </div>
           </Link>
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Crear Cuenta</h1>
-          <p className="text-slate-600">Comienza gratis con 5 cotizaciones</p>
+          <p className="text-slate-600">Automatiza tus cotizaciones por WhatsApp</p>
         </div>
 
         <Card>
@@ -171,7 +183,7 @@ export default function Registro() {
                     Creando cuenta...
                   </>
                 ) : (
-                  'Crear Cuenta Gratis'
+                  'Crear Cuenta'
                 )}
               </Button>
 

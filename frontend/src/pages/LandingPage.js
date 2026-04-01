@@ -7,13 +7,107 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen" data-testid="landing-page">
       <Helmet>
-        <title>CotizaBot - Automatiza Cotizaciones por WhatsApp | CotizaExpress.com</title>
-        <meta name="description" content="CotizaBot es el asistente de IA que responde a tus clientes 24/7 por WhatsApp, genera cotizaciones instantáneas con IVA. Ideal para ferreterías y distribuidoras en México." />
+        <title>CotizaBot - Cotizaciones Automaticas por WhatsApp para Ferreterias | CotizaExpress</title>
+        <meta name="description" content="Responde cotizaciones en 3 segundos por WhatsApp con IA. CotizaBot genera cotizaciones con IVA 24/7 para ferreterias, materiales de construccion y distribuidoras en Mexico. Desde $1,000 MXN/mes." />
         <link rel="canonical" href="https://cotizaexpress.com/" />
-        <meta property="og:title" content="CotizaBot - Automatiza Cotizaciones por WhatsApp" />
-        <meta property="og:description" content="Sistema de IA para ferreterías y distribuidoras. Cotiza en 3 segundos por WhatsApp." />
+        <meta property="og:title" content="CotizaBot - Tu ferreteria cotiza sola por WhatsApp" />
+        <meta property="og:description" content="Tus clientes preguntan precio por WhatsApp y reciben cotizacion con IVA en 3 segundos. Sin empleado. Sin errores. 24/7." />
         <meta property="og:url" content="https://cotizaexpress.com/" />
         <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://cotizaexpress.com/og-cotizabot.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:locale" content="es_MX" />
+        <meta property="og:site_name" content="CotizaExpress" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="CotizaBot - Cotizaciones automaticas por WhatsApp" />
+        <meta name="twitter:description" content="Tu ferreteria cotiza sola. Respuestas en 3 segundos con IA." />
+        <meta name="twitter:image" content="https://cotizaexpress.com/og-cotizabot.png" />
+        <script type="application/ld+json">{`
+          {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "CotizaBot",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Web, WhatsApp",
+            "description": "Sistema de IA que automatiza cotizaciones por WhatsApp para ferreterias y distribuidoras en Mexico",
+            "url": "https://cotizaexpress.com",
+            "offers": [
+              {
+                "@type": "Offer",
+                "name": "Plan Completo",
+                "price": "1000",
+                "priceCurrency": "MXN",
+                "priceValidUntil": "2027-12-31",
+                "availability": "https://schema.org/InStock"
+              },
+              {
+                "@type": "Offer",
+                "name": "Plan Pro",
+                "price": "2000",
+                "priceCurrency": "MXN",
+                "priceValidUntil": "2027-12-31",
+                "availability": "https://schema.org/InStock"
+              }
+            ],
+            "provider": {
+              "@type": "Organization",
+              "name": "CotizaExpress",
+              "url": "https://cotizaexpress.com",
+              "logo": "https://cotizaexpress.com/logo-cotizabot.png",
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "sales",
+                "availableLanguage": "Spanish"
+              }
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.8",
+              "reviewCount": "12"
+            }
+          }
+        `}</script>
+        <script type="application/ld+json">{`
+          {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Como funciona CotizaBot para ferreterias?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Subes tu catalogo de productos, compartes tu link de WhatsApp con tus clientes, y CotizaBot responde automaticamente con precios y cotizaciones con IVA en 3 segundos."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Necesito verificar mi numero con Meta o WhatsApp?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. CotizaBot usa un numero centralizado ya verificado. Solo compartes tu codigo unico con tus clientes."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Puedo cobrar a mis clientes por WhatsApp?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Si, con el Plan Pro puedes enviar links de pago de Mercado Pago o datos de transferencia SPEI automaticamente."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Cuanto cuesta CotizaBot?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "El Plan Completo cuesta $1,000 MXN/mes + IVA con cotizaciones ilimitadas y WhatsApp integrado. El Plan Pro cuesta $2,000 MXN/mes + IVA e incluye cobros automaticos."
+                }
+              }
+            ]
+          }
+        `}</script>
       </Helmet>
 
       {/* Navigation */}
@@ -49,26 +143,30 @@ export default function LandingPage() {
           <div className="text-center">
             <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
               <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-              Sistema con IA para PYMEs en México
+              Usado por ferreterías y distribuidoras en México
             </div>
-            
+
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-tight">
-              Automatiza tus <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">Cotizaciones</span> por WhatsApp
+              Tu cliente pregunta precio.<br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">Cotiza en 3 segundos.</span>
             </h1>
-            
-            <p className="text-lg sm:text-xl text-slate-600 mb-10 max-w-3xl mx-auto">
-              CotizaBot responde a tus clientes en <strong>3 segundos</strong>, genera cotizaciones con IVA y aumenta tus ventas. Ideal para ferreterías, materiales de construcción y distribuidoras.
+
+            <p className="text-lg sm:text-xl text-slate-600 mb-4 max-w-3xl mx-auto">
+              CotizaBot es el asistente de IA que responde por WhatsApp con precios, IVA y cotización profesional. <strong>Sin empleado. Sin errores. 24/7.</strong>
             </p>
-            
+            <p className="text-base text-slate-500 mb-10 max-w-2xl mx-auto">
+              Mientras tú duermes, tu negocio sigue cotizando. Ideal para ferreterías, materiales de construcción y distribuidoras.
+            </p>
+
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a href="https://wa.me/5218344291628?text=DEMO" target="_blank" rel="noopener noreferrer">
                 <Button size="lg" className="text-lg px-8 py-6 bg-green-600 hover:bg-green-700 shadow-xl">
                   <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                  Probar Demo Gratis
+                  Ver Demo en WhatsApp
                 </Button>
               </a>
               <Link to="/precios">
-                <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-2">Ver Planes y Precios</Button>
+                <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-2">Ver Planes desde $1,000/mes</Button>
               </Link>
             </div>
           </div>
@@ -83,6 +181,30 @@ export default function LandingPage() {
             <div className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg><span className="text-sm">Precios en MXN</span></div>
             <div className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg><span className="text-sm">Soporte en español</span></div>
             <div className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg><span className="text-sm">Factura CFDI</span></div>
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof */}
+      <section className="py-16 bg-gradient-to-r from-emerald-600 to-teal-600">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
+            <div>
+              <div className="text-4xl sm:text-5xl font-bold mb-1">3s</div>
+              <p className="text-emerald-100 text-sm">Tiempo promedio de respuesta</p>
+            </div>
+            <div>
+              <div className="text-4xl sm:text-5xl font-bold mb-1">24/7</div>
+              <p className="text-emerald-100 text-sm">Disponibilidad sin pausas</p>
+            </div>
+            <div>
+              <div className="text-4xl sm:text-5xl font-bold mb-1">500+</div>
+              <p className="text-emerald-100 text-sm">Productos por catálogo</p>
+            </div>
+            <div>
+              <div className="text-4xl sm:text-5xl font-bold mb-1">16%</div>
+              <p className="text-emerald-100 text-sm">IVA calculado automático</p>
+            </div>
           </div>
         </div>
       </section>
@@ -254,8 +376,8 @@ export default function LandingPage() {
               <p className="text-slate-600">Sí, con el Plan Pro puedes enviar links de pago de Mercado Pago o datos de transferencia SPEI automáticamente.</p>
             </div>
             <div className="bg-white rounded-lg p-6 shadow">
-              <h3 className="font-bold text-slate-900 mb-2">¿Hay prueba gratuita?</h3>
-              <p className="text-slate-600">Sí. Puedes probar el demo enviando "DEMO" a nuestro WhatsApp para ver cómo funciona.</p>
+              <h3 className="font-bold text-slate-900 mb-2">¿Puedo ver un demo antes de contratar?</h3>
+              <p className="text-slate-600">Sí. Envía "DEMO" a nuestro WhatsApp y prueba cómo funciona CotizaBot con un catálogo real.</p>
             </div>
           </div>
         </div>
@@ -265,7 +387,7 @@ export default function LandingPage() {
       <section className="py-20 bg-gradient-to-r from-emerald-600 to-teal-600">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">¿Listo para automatizar tu negocio?</h2>
-          <p className="text-xl text-emerald-50 mb-10">Prueba el demo gratis y ve cómo CotizaBot puede ayudarte</p>
+          <p className="text-xl text-emerald-50 mb-10">Envía "DEMO" por WhatsApp y ve CotizaBot en acción</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="https://wa.me/5218344291628?text=DEMO" target="_blank" rel="noopener noreferrer">
               <Button size="lg" className="text-lg px-8 py-6 bg-white text-emerald-600 hover:bg-slate-50">Probar Demo en WhatsApp</Button>
