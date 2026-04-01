@@ -105,6 +105,7 @@ export default function Productos() {
       unit: producto.unit || '',
       sku: producto.sku || '',
       synonyms: '',
+      bundle_size: producto.bundle_size || '',
     });
     setSugerencias([]);
     try {
@@ -136,6 +137,7 @@ export default function Productos() {
         unit: editForm.unit,
         sku: editForm.sku,
         synonyms: editForm.synonyms,
+        bundle_size: editForm.bundle_size ? parseInt(editForm.bundle_size) : null,
       });
       toast.success('Producto actualizado');
       setProductoEditando(null);
@@ -314,9 +316,16 @@ export default function Productos() {
                 <Input value={editForm.unit || ''} onChange={e => setEditForm(prev => ({ ...prev, unit: e.target.value }))} placeholder="Pieza, Rollo, Kg..." />
               </div>
             </div>
-            <div className="space-y-1">
-              <Label>SKU</Label>
-              <Input value={editForm.sku || ''} onChange={e => setEditForm(prev => ({ ...prev, sku: e.target.value }))} placeholder="Código interno" />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label>SKU</Label>
+                <Input value={editForm.sku || ''} onChange={e => setEditForm(prev => ({ ...prev, sku: e.target.value }))} placeholder="Código interno" />
+              </div>
+              <div className="space-y-1">
+                <Label>Pzas por atado</Label>
+                <Input type="number" value={editForm.bundle_size || ''} onChange={e => setEditForm(prev => ({ ...prev, bundle_size: e.target.value }))} placeholder="Ej: 12" />
+                <p className="text-xs text-slate-500">Si el cliente pide "atados", se multiplica por este número</p>
+              </div>
             </div>
             <div className="space-y-1">
               <Label>Sinónimos</Label>
