@@ -120,18 +120,6 @@ function AppRoutes() {
                     Carga Masiva
                   </Link>
                   <Link
-                    to="/clientes"
-                    data-testid="nav-clientes"
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      activeTab === 'clientes'
-                        ? 'bg-emerald-50 text-emerald-700'
-                        : 'text-slate-600 hover:bg-slate-100'
-                    }`}
-                    onClick={() => setActiveTab('clientes')}
-                  >
-                    Clientes
-                  </Link>
-                  <Link
                     to="/conversaciones"
                     data-testid="nav-conversaciones"
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -244,15 +232,6 @@ function AppRoutes() {
                     onClick={() => { setActiveTab('productos'); setMobileMenuOpen(false); }}
                   >
                     📦 Productos
-                  </Link>
-                  <Link
-                    to="/clientes"
-                    className={`block px-4 py-3 rounded-lg text-sm font-medium ${
-                      activeTab === 'clientes' ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600'
-                    }`}
-                    onClick={() => { setActiveTab('clientes'); setMobileMenuOpen(false); }}
-                  >
-                    👥 Clientes
                   </Link>
                   <Link
                     to="/configuracion-whatsapp"
