@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -33,7 +33,7 @@ export default function Productos() {
   const { user } = useAuth();
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState('grid');
+  const [viewMode, setViewMode] = useState('list');
   const [selectedIds, setSelectedIds] = useState([]);
   const [searchQ, setSearchQ] = useState('');
   const [productoEditando, setProductoEditando] = useState(null);
@@ -43,9 +43,21 @@ export default function Productos() {
   const [productoAEliminar, setProductoAEliminar] = useState(null);
   const [eliminando, setEliminando] = useState(false);
 
+  // Inline editing state
+  const [inlineEdit, setInlineEdit] = useState(null); // { id, field, value }
+  const inlineRef = useRef(null);
+
   useEffect(() => {
     cargarProductos();
   }, []);
+
+  // Focus input when inline edit starts
+  useEffect(() => {
+    if (inlineEdit && inlineRef.current) {
+      inlineRef.current.focus();
+      inlineRef.current.select();
+    }
+  }, [inlineEdit]);
 
   const cargarProductos = async () => {
     try {
@@ -164,6 +176,75 @@ export default function Productos() {
     }
   };
 
+  // ── Inline editing handlers ──────────────────────────────────────
+  const startInlineEdit = (producto, field) => {
+    const value = field === 'price' ? (producto.price || '') : (producto[field] || '');
+    setInlineEdit({ id: producto.id, field, value: String(value) });
+  };
+
+  const saveInlineEdit = async () => {
+    if (!inlineEdit) return;
+    const { id, field, value } = inlineEdit;
+    const producto = productos.find(p => p.id === id);
+    if (!producto) { setInlineEdit(null); return; }
+
+    // Check if value actually changed
+    const oldValue = field === 'price' ? String(producto.price || '') : (producto[field] || '');
+    if (value.trim() === String(oldValue).trim()) {
+      setInlineEdit(null);
+      return;
+    }
+
+    // Validate
+    if (field === 'name' && !value.trim()) {
+      toast.error('El nombre no puede estar vacío');
+      return;
+    }
+    if (field === 'price' && (isNaN(parseFloat(value)) || parseFloat(value) < 0)) {
+      toast.error('Precio inválido');
+      return;
+    }
+
+    try {
+      const payload = {
+        name: producto.name,
+        price: producto.price,
+        unit: producto.unit,
+        sku: producto.sku,
+      };
+      if (field === 'price') {
+        payload.price = parseFloat(value);
+      } else {
+        payload[field] = value.trim();
+      }
+
+      await axios.patch(`${API}/pricebook/items/${id}`, payload);
+
+      // Update local state immediately (optimistic)
+      setProductos(prev => prev.map(p => {
+        if (p.id !== id) return p;
+        return { ...p, [field]: field === 'price' ? parseFloat(value) : value.trim() };
+      }));
+
+      toast.success('Actualizado');
+    } catch (e) {
+      toast.error('Error al guardar');
+    } finally {
+      setInlineEdit(null);
+    }
+  };
+
+  const cancelInlineEdit = () => setInlineEdit(null);
+
+  const handleInlineKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      saveInlineEdit();
+    } else if (e.key === 'Escape') {
+      cancelInlineEdit();
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -214,27 +295,74 @@ export default function Productos() {
           <table className="w-full text-sm">
             <thead className="bg-slate-50">
               <tr className="border-b text-slate-500">
-                <th className="text-left p-3">
+                <th className="text-left p-3 w-10">
                   <input type="checkbox" onChange={e => e.target.checked ? selectAll() : clearSelection()} checked={selectedIds.length === productos.length && productos.length > 0} />
                 </th>
                 <th className="text-left p-3">Nombre</th>
-                <th className="text-left p-3">SKU</th>
-                <th className="text-right p-3">Precio</th>
-                <th className="text-left p-3">Unidad</th>
-                <th className="text-left p-3">Acciones</th>
+                <th className="text-left p-3 w-24">SKU</th>
+                <th className="text-right p-3 w-28">Precio</th>
+                <th className="text-left p-3 w-20">Unidad</th>
+                <th className="text-left p-3 w-24">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {productos.map(p => (
                 <tr key={p.id} className="border-b hover:bg-slate-50">
                   <td className="p-3"><input type="checkbox" checked={selectedIds.includes(p.id)} onChange={() => toggleSelect(p.id)} /></td>
-                  <td className="p-3 font-medium">{p.name}</td>
+
+                  {/* Nombre — inline editable */}
+                  <td className="p-3">
+                    {inlineEdit && inlineEdit.id === p.id && inlineEdit.field === 'name' ? (
+                      <input
+                        ref={inlineRef}
+                        type="text"
+                        value={inlineEdit.value}
+                        onChange={e => setInlineEdit(prev => ({ ...prev, value: e.target.value }))}
+                        onKeyDown={handleInlineKeyDown}
+                        onBlur={saveInlineEdit}
+                        className="w-full px-2 py-1 text-sm border-2 border-emerald-400 rounded outline-none bg-white font-medium"
+                      />
+                    ) : (
+                      <span
+                        className="font-medium cursor-pointer hover:text-emerald-600 hover:underline decoration-dotted underline-offset-2"
+                        onDoubleClick={() => startInlineEdit(p, 'name')}
+                        title="Doble click para editar"
+                      >
+                        {p.name}
+                      </span>
+                    )}
+                  </td>
+
                   <td className="p-3 text-slate-500">{p.sku || '-'}</td>
-                  <td className="p-3 text-right text-emerald-600 font-semibold">${p.price?.toLocaleString('es-MX')}</td>
+
+                  {/* Precio — inline editable */}
+                  <td className="p-3 text-right">
+                    {inlineEdit && inlineEdit.id === p.id && inlineEdit.field === 'price' ? (
+                      <input
+                        ref={inlineRef}
+                        type="number"
+                        step="0.01"
+                        value={inlineEdit.value}
+                        onChange={e => setInlineEdit(prev => ({ ...prev, value: e.target.value }))}
+                        onKeyDown={handleInlineKeyDown}
+                        onBlur={saveInlineEdit}
+                        className="w-24 px-2 py-1 text-sm text-right border-2 border-emerald-400 rounded outline-none bg-white font-semibold ml-auto"
+                      />
+                    ) : (
+                      <span
+                        className="text-emerald-600 font-semibold cursor-pointer hover:text-emerald-700 hover:underline decoration-dotted underline-offset-2"
+                        onDoubleClick={() => startInlineEdit(p, 'price')}
+                        title="Doble click para editar"
+                      >
+                        ${p.price?.toLocaleString('es-MX')}
+                      </span>
+                    )}
+                  </td>
+
                   <td className="p-3 text-slate-500">{p.unit || '-'}</td>
                   <td className="p-3">
                     <div className="flex gap-1">
-                      <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => abrirEdicion(p)}>
+                      <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => abrirEdicion(p)} title="Editar todo">
                         <Pencil className="w-3 h-3" />
                       </Button>
                       <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-red-500 hover:text-red-700" onClick={() => setProductoAEliminar(p)}>
