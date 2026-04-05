@@ -39,7 +39,7 @@ export default function PerfilEmpresa() {
     domingo: 'cerrado',
   });
 
-  const [modulos, setModulos] = useState({ construccion_ligera: false });
+  const [modulos, setModulos] = useState({ construccion_ligera: false, rejacero: false });
   const [guardandoModulo, setGuardandoModulo] = useState(false);
 
   useEffect(() => {
@@ -87,10 +87,13 @@ export default function PerfilEmpresa() {
         setHorario(h);
       }
 
-      // Construccion ligera
+      // Module toggles
       try {
         const conn = await axios.get(`${API}/company/me`);
-        setModulos({ construccion_ligera: conn.data?.company?.construccion_ligera_enabled || false });
+        setModulos({
+          construccion_ligera: conn.data?.company?.construccion_ligera_enabled || false,
+          rejacero: conn.data?.company?.rejacero_enabled || false,
+        });
       } catch (_) {}
 
     } catch (error) {
@@ -133,7 +136,8 @@ export default function PerfilEmpresa() {
     try {
       setGuardandoModulo(true);
       // Guardamos en company settings como campo extra
-      await axios.post(`${API}/company/settings`, { [modulo === 'construccion_ligera' ? 'construccion_ligera_enabled' : modulo]: valor });
+      const fieldMap = { construccion_ligera: 'construccion_ligera_enabled', rejacero: 'rejacero_enabled' };
+      await axios.post(`${API}/company/settings`, { [fieldMap[modulo] || modulo]: valor });
       setModulos(prev => ({ ...prev, [modulo]: valor }));
       toast.success('Módulo actualizado');
     } catch (e) {
@@ -293,6 +297,20 @@ export default function PerfilEmpresa() {
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${modulos.construccion_ligera ? 'bg-emerald-600' : 'bg-slate-200'}`}
               >
                 <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow ${modulos.construccion_ligera ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+            </div>
+            <div className="flex items-center justify-between p-4 border rounded-lg mt-3">
+              <div>
+                <p className="font-medium text-slate-800">Rejacero</p>
+                <p className="text-sm text-slate-500">Activa para habilitar el calculador de reja ciclónica por WhatsApp (metros lineales → rejas, postes, abrazaderas)</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => toggleModulo('rejacero', !modulos.rejacero)}
+                disabled={guardandoModulo}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${modulos.rejacero ? 'bg-emerald-600' : 'bg-slate-200'}`}
+              >
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow ${modulos.rejacero ? 'translate-x-6' : 'translate-x-1'}`} />
               </button>
             </div>
           </CardContent>
