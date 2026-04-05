@@ -292,6 +292,7 @@ export default function Productos() {
 
       {viewMode === 'list' && (
         <div className="border rounded-lg overflow-hidden">
+          <p className="text-xs text-slate-400 italic px-3 py-1.5 bg-slate-50 border-b">Haz doble click en nombre o precio para editar rápido</p>
           <table className="w-full text-sm">
             <thead className="bg-slate-50">
               <tr className="border-b text-slate-500">
@@ -378,39 +379,79 @@ export default function Productos() {
       )}
 
       {viewMode === 'grid' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {productos.map(producto => (
-            <Card key={producto.id} className={`relative ${selectedIds.includes(producto.id) ? 'border-emerald-500 bg-emerald-50' : ''}`}>
-              <input type="checkbox" checked={selectedIds.includes(producto.id)} onChange={() => toggleSelect(producto.id)} className="absolute top-3 left-3 w-4 h-4 accent-emerald-600" />
-              <CardContent className="pt-6">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1 pl-5">
-                    <h3 className="font-semibold text-slate-900 text-sm leading-tight">{producto.name}</h3>
-                    {producto.sku && <p className="text-xs text-slate-500 mt-0.5">SKU: {producto.sku}</p>}
+        <>
+          <p className="text-xs text-slate-400 italic">Haz doble click en nombre o precio para editar rápido</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {productos.map(producto => (
+              <Card key={producto.id} className={`relative ${selectedIds.includes(producto.id) ? 'border-emerald-500 bg-emerald-50' : ''}`}>
+                <input type="checkbox" checked={selectedIds.includes(producto.id)} onChange={() => toggleSelect(producto.id)} className="absolute top-3 left-3 w-4 h-4 accent-emerald-600" />
+                <CardContent className="pt-6">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1 pl-5">
+                      {inlineEdit && inlineEdit.id === producto.id && inlineEdit.field === 'name' ? (
+                        <input
+                          ref={inlineRef}
+                          type="text"
+                          value={inlineEdit.value}
+                          onChange={e => setInlineEdit(prev => ({ ...prev, value: e.target.value }))}
+                          onKeyDown={handleInlineKeyDown}
+                          onBlur={saveInlineEdit}
+                          className="w-full px-2 py-1 text-sm border-2 border-emerald-400 rounded outline-none bg-white font-semibold"
+                        />
+                      ) : (
+                        <h3
+                          className="font-semibold text-slate-900 text-sm leading-tight cursor-pointer hover:text-emerald-600 hover:underline decoration-dotted underline-offset-2"
+                          onDoubleClick={() => startInlineEdit(producto, 'name')}
+                          title="Doble click para editar"
+                        >
+                          {producto.name}
+                        </h3>
+                      )}
+                      {producto.sku && <p className="text-xs text-slate-500 mt-0.5">SKU: {producto.sku}</p>}
+                    </div>
+                    <div className="flex gap-1 ml-2">
+                      <button onClick={() => abrirEdicion(producto)} className="text-slate-400 hover:text-emerald-600 p-1">
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => setProductoAEliminar(producto)} className="text-slate-400 hover:text-red-500 p-1">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex gap-1 ml-2">
-                    <button onClick={() => abrirEdicion(producto)} className="text-slate-400 hover:text-emerald-600 p-1">
-                      <Pencil className="w-3.5 h-3.5" />
-                    </button>
-                    <button onClick={() => setProductoAEliminar(producto)} className="text-slate-400 hover:text-red-500 p-1">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-slate-500">Precio:</p>
+                      {inlineEdit && inlineEdit.id === producto.id && inlineEdit.field === 'price' ? (
+                        <input
+                          ref={inlineRef}
+                          type="number"
+                          step="0.01"
+                          value={inlineEdit.value}
+                          onChange={e => setInlineEdit(prev => ({ ...prev, value: e.target.value }))}
+                          onKeyDown={handleInlineKeyDown}
+                          onBlur={saveInlineEdit}
+                          className="w-24 px-2 py-1 text-sm border-2 border-emerald-400 rounded outline-none bg-white font-bold"
+                        />
+                      ) : (
+                        <p
+                          className="text-emerald-600 font-bold text-base cursor-pointer hover:text-emerald-700 hover:underline decoration-dotted underline-offset-2"
+                          onDoubleClick={() => startInlineEdit(producto, 'price')}
+                          title="Doble click para editar"
+                        >
+                          ${producto.price?.toLocaleString('es-MX')}
+                        </p>
+                      )}
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-slate-500">Unidad:</p>
+                      <p className="text-slate-700 font-medium text-sm">{producto.unit || 'Pieza'}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-slate-500">Precio:</p>
-                    <p className="text-emerald-600 font-bold text-base">${producto.price?.toLocaleString('es-MX')}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-slate-500">Unidad:</p>
-                    <p className="text-slate-700 font-medium text-sm">{producto.unit || 'Pieza'}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </>
       )}
 
       {productos.length === 0 && (
