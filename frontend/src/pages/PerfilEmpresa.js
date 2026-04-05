@@ -60,6 +60,7 @@ export default function PerfilEmpresa() {
       setCompany(c);
 
       setFormData({
+        company_name: c.name || c.nombre || '',
         email: s.email || '',
         rfc: s.rfc || '',
         owner_phone: s.owner_phone || '',
@@ -238,6 +239,11 @@ export default function PerfilEmpresa() {
         <Card>
           <CardHeader><CardTitle>Datos de la Empresa</CardTitle></CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2 md:col-span-2">
+              <Label>Nombre Comercial</Label>
+              <Input name="company_name" value={formData.company_name} onChange={handleChange} placeholder="Ej: Aceromax" />
+              <p className="text-xs text-slate-500">Este nombre aparece en el saludo del bot de WhatsApp</p>
+            </div>
             <div className="space-y-2">
               <Label>Email</Label>
               <Input name="email" value={formData.email} onChange={handleChange} placeholder="contacto@empresa.com" />
