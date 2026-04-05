@@ -39,7 +39,7 @@ export default function PerfilEmpresa() {
     domingo: 'cerrado',
   });
 
-  const [modulos, setModulos] = useState({ construccion_ligera: false, rejacero: false });
+  const [modulos, setModulos] = useState({ construccion_ligera: false, rejacero: false, pintura: false, impermeabilizante: false });
   const [guardandoModulo, setGuardandoModulo] = useState(false);
 
   useEffect(() => {
@@ -94,6 +94,8 @@ export default function PerfilEmpresa() {
         setModulos({
           construccion_ligera: conn.data?.company?.construccion_ligera_enabled || false,
           rejacero: conn.data?.company?.rejacero_enabled || false,
+          pintura: conn.data?.company?.pintura_enabled || false,
+          impermeabilizante: conn.data?.company?.impermeabilizante_enabled || false,
         });
       } catch (_) {}
 
@@ -137,7 +139,7 @@ export default function PerfilEmpresa() {
     try {
       setGuardandoModulo(true);
       // Guardamos en company settings como campo extra
-      const fieldMap = { construccion_ligera: 'construccion_ligera_enabled', rejacero: 'rejacero_enabled' };
+      const fieldMap = { construccion_ligera: 'construccion_ligera_enabled', rejacero: 'rejacero_enabled', pintura: 'pintura_enabled', impermeabilizante: 'impermeabilizante_enabled' };
       await axios.post(`${API}/company/settings`, { [fieldMap[modulo] || modulo]: valor });
       setModulos(prev => ({ ...prev, [modulo]: valor }));
       toast.success('Módulo actualizado');
@@ -317,6 +319,34 @@ export default function PerfilEmpresa() {
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${modulos.rejacero ? 'bg-emerald-600' : 'bg-slate-200'}`}
               >
                 <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow ${modulos.rejacero ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+            </div>
+            <div className="flex items-center justify-between p-4 border rounded-lg mt-3">
+              <div>
+                <p className="font-medium text-slate-800">Pintura</p>
+                <p className="text-sm text-slate-500">Activa para habilitar el calculador de pintura por WhatsApp (m² → cubetas, galones, litros de vinílica o esmalte)</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => toggleModulo('pintura', !modulos.pintura)}
+                disabled={guardandoModulo}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${modulos.pintura ? 'bg-emerald-600' : 'bg-slate-200'}`}
+              >
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow ${modulos.pintura ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+            </div>
+            <div className="flex items-center justify-between p-4 border rounded-lg mt-3">
+              <div>
+                <p className="font-medium text-slate-800">Impermeabilizante</p>
+                <p className="text-sm text-slate-500">Activa para habilitar el calculador de impermeabilizante por WhatsApp (m² → litros/cubetas + malla de refuerzo)</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => toggleModulo('impermeabilizante', !modulos.impermeabilizante)}
+                disabled={guardandoModulo}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${modulos.impermeabilizante ? 'bg-emerald-600' : 'bg-slate-200'}`}
+              >
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow ${modulos.impermeabilizante ? 'translate-x-6' : 'translate-x-1'}`} />
               </button>
             </div>
           </CardContent>
