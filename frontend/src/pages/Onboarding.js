@@ -519,9 +519,9 @@ export default function Onboarding() {
                 </div>
 
                 <div className="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl p-6 text-center text-white">
-                  <h3 className="text-lg font-bold mb-1">Comienza gratis</h3>
+                  <h3 className="text-lg font-bold mb-1">Todo listo</h3>
                   <p className="text-emerald-100 text-sm mb-4">
-                    Tus primeras 5 cotizaciones son gratis. Después, elige el plan que necesites.
+                    Tu bot de WhatsApp está configurado. Activa tu plan para empezar a recibir pedidos.
                   </p>
                   <Button
                     onClick={completeOnboarding}

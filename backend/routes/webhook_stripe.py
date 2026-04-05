@@ -203,21 +203,21 @@ async def handle_subscription_deleted(subscription):
     
     empresa_id = sub_record.get('empresa_id')
     
-    # Degradar a plan gratis
+    # Degradar a plan pendiente (sin acceso)
     await empresas_collection.update_one(
         {'id': empresa_id},
         {
             '$set': {
-                'plan': 'gratis',
-                'cotizaciones_limite': 5,
-                'cotizaciones_usadas': 0,  # Reset contador
+                'plan': 'pendiente',
+                'cotizaciones_limite': 0,
+                'cotizaciones_usadas': 0,
                 'subscription_status': 'canceled',
                 'stripe_subscription_id': None,
                 'updated_at': datetime.now(timezone.utc).isoformat()
             }
         }
     )
-    
+
     # Actualizar registro de suscripción
     await subscriptions_collection.update_one(
         {'subscription_id': subscription_id},
@@ -229,8 +229,8 @@ async def handle_subscription_deleted(subscription):
             }
         }
     )
-    
-    logger.info(f"Suscripción cancelada: {subscription_id}, empresa degradada a plan gratis")
+
+    logger.info(f"Suscripción cancelada: {subscription_id}, empresa degradada a plan pendiente")
 
 async def handle_invoice_paid(invoice):
     """Procesa factura pagada (renovación mensual)"""

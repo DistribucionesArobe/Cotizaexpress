@@ -575,7 +575,7 @@ class WhatsAppRouter:
             return None
         
         # Verificar si tiene Plan Pro y cobros configurados
-        plan = empresa.get('plan', 'gratis')
+        plan = empresa.get('plan', 'pendiente')
         tiene_plan_pro = plan == 'pro'
         
         # Verificar métodos de cobro disponibles

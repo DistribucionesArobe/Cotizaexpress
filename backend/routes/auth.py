@@ -32,9 +32,9 @@ async def registrar_usuario(usuario_data: UsuarioCreate):
             'nombre': usuario_data.empresa_nombre,
             'telefono': usuario_data.telefono,
             'email': usuario_data.email,
-            'plan': 'gratis',  # Empieza con plan gratis (5 cotizaciones)
+            'plan': 'pendiente',  # Sin plan activo hasta que elija uno
             'cotizaciones_usadas': 0,
-            'cotizaciones_limite': 5,
+            'cotizaciones_limite': 0,
             'activo': True,
             'monto_mensual': 1000.0,
             'created_at': datetime.now(timezone.utc).isoformat()
@@ -76,10 +76,10 @@ async def registrar_usuario(usuario_data: UsuarioCreate):
                 'nombre': usuario_data.nombre,
                 'empresa_id': empresa_id,
                 'empresa_nombre': usuario_data.empresa_nombre,
-                'plan': 'gratis'
+                'plan': 'pendiente'
             }
         )
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -124,7 +124,7 @@ async def iniciar_sesion(credenciales: UsuarioLogin):
                 'email': usuario['email'],
                 'empresa_id': usuario['empresa_id'],
                 'rol': usuario.get('rol', 'admin'),
-                'plan': empresa.get('plan', 'gratis')
+                'plan': empresa.get('plan', 'pendiente')
             }
         )
         

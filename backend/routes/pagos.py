@@ -699,20 +699,21 @@ async def obtener_mi_suscripcion(current_user: dict = Depends(get_current_user))
         if not empresa:
             raise HTTPException(status_code=404, detail="Empresa no encontrada")
         
-        plan = empresa.get('plan', 'gratis')
-        
+        plan = empresa.get('plan', 'pendiente')
+
         # Obtener última transacción exitosa
         ultima_transaccion = await payment_transactions_collection.find_one(
             {'empresa_id': empresa_id, 'payment_status': 'paid'},
             {'_id': 0},
             sort=[('paid_at', -1)]
         )
-        
+
+        plan_nombres = {'completo': 'Plan Completo', 'pro': 'Plan Pro', 'pendiente': 'Sin plan activo'}
         return {
             "plan": plan,
-            "plan_nombre": "Plan Completo" if plan == 'completo' else "Plan Gratis",
+            "plan_nombre": plan_nombres.get(plan, 'Sin plan activo'),
             "cotizaciones_usadas": empresa.get('cotizaciones_usadas', 0),
-            "cotizaciones_limite": empresa.get('cotizaciones_limite', 5) if plan == 'gratis' else None,
+            "cotizaciones_limite": empresa.get('cotizaciones_limite', 0) if plan == 'pendiente' else None,
             "fecha_pago": empresa.get('fecha_pago'),
             "activo": empresa.get('activo', True),
             "subscription_status": empresa.get('subscription_status'),

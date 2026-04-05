@@ -38,10 +38,10 @@ class Empresa(BaseModel):
     # Datos fiscales para CFDI
     datos_fiscales: Optional[DatosFiscales] = None
     # Plan y suscripción
-    # Planes: gratis (5 cotizaciones), completo ($1,160), pro ($2,000 con cobros)
-    plan: str = 'gratis'
+    # Planes: completo ($1,160/mes), pro ($2,000/mes con cobros)
+    plan: str = 'pendiente'
     cotizaciones_usadas: int = 0
-    cotizaciones_limite: int = 5
+    cotizaciones_limite: int = 0
     subscription_status: Optional[str] = None
     stripe_subscription_id: Optional[str] = None
     # Configuración de cobros (Plan Pro)

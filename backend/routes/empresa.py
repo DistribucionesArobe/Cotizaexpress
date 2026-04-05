@@ -257,7 +257,7 @@ async def obtener_perfil_empresa(current_user: dict = Depends(get_current_user))
             "email": empresa.get('email'),
             "direccion": empresa.get('direccion'),
             "logo_url": empresa.get('logo_url'),
-            "plan": empresa.get('plan', 'gratis'),
+            "plan": empresa.get('plan', 'pendiente'),
             "subscription_status": empresa.get('subscription_status'),
             "datos_fiscales": empresa.get('datos_fiscales'),
             "created_at": empresa.get('created_at')
@@ -529,7 +529,7 @@ async def obtener_config_cobros(current_user: dict = Depends(get_current_user)):
         if not empresa:
             raise HTTPException(status_code=404, detail="Empresa no encontrada")
         
-        plan = empresa.get('plan', 'gratis')
+        plan = empresa.get('plan', 'pendiente')
         tiene_plan_pro = plan == 'pro'
         
         datos_bancarios = empresa.get('datos_bancarios', {})

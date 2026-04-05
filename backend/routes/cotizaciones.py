@@ -30,20 +30,27 @@ async def verificar_limite_cotizaciones(empresa_id: str):
     if not empresa:
         raise HTTPException(status_code=404, detail="Empresa no encontrada")
     
-    plan = empresa.get('plan', 'gratis')
-    
-    # Plan completo: sin límite
-    if plan == 'completo':
+    plan = empresa.get('plan', 'pendiente')
+
+    # Planes activos: sin límite
+    if plan in ('completo', 'pro'):
         return True
-    
-    # Plan gratis: verificar límite
-    cotizaciones_usadas = empresa.get('cotizaciones_usadas', 0)
-    cotizaciones_limite = empresa.get('cotizaciones_limite', 5)
-    
-    if cotizaciones_usadas >= cotizaciones_limite:
+
+    # Plan pendiente: no puede cotizar
+    if plan == 'pendiente':
         raise HTTPException(
             status_code=403,
-            detail=f"Has alcanzado el límite de {cotizaciones_limite} cotizaciones del plan gratuito. Actualiza a Plan Completo para cotizaciones ilimitadas."
+            detail="Activa tu plan para empezar a crear cotizaciones."
+        )
+
+    # Cualquier otro plan: verificar límite
+    cotizaciones_usadas = empresa.get('cotizaciones_usadas', 0)
+    cotizaciones_limite = empresa.get('cotizaciones_limite', 0)
+
+    if cotizaciones_limite > 0 and cotizaciones_usadas >= cotizaciones_limite:
+        raise HTTPException(
+            status_code=403,
+            detail=f"Has alcanzado el límite de {cotizaciones_limite} cotizaciones. Actualiza tu plan para cotizaciones ilimitadas."
         )
     
     return True
@@ -98,15 +105,15 @@ async def obtener_estadisticas_cotizaciones(current_user: dict = Depends(get_cur
         # Obtener info de la empresa
         empresa = await empresas_collection.find_one({'id': empresa_id}, {'_id': 0})
         
-        plan = empresa.get('plan', 'gratis') if empresa else 'gratis'
+        plan = empresa.get('plan', 'pendiente') if empresa else 'pendiente'
         cotizaciones_usadas = empresa.get('cotizaciones_usadas', 0) if empresa else 0
-        cotizaciones_limite = empresa.get('cotizaciones_limite', 5) if empresa else 5
-        
+        cotizaciones_limite = empresa.get('cotizaciones_limite', 0) if empresa else 0
+
         return {
             'plan': plan,
             'cotizaciones_usadas': cotizaciones_usadas,
-            'cotizaciones_limite': cotizaciones_limite if plan == 'gratis' else None,
-            'cotizaciones_restantes': (cotizaciones_limite - cotizaciones_usadas) if plan == 'gratis' else None
+            'cotizaciones_limite': cotizaciones_limite if plan == 'pendiente' else None,
+            'cotizaciones_restantes': (cotizaciones_limite - cotizaciones_usadas) if plan == 'pendiente' else None
         }
         
     except Exception as e:

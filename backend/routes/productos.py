@@ -20,7 +20,7 @@ async def listar_productos(
     """Lista productos del catálogo de la empresa del usuario"""
     try:
         empresa_id = current_user.get('empresa_id')
-        plan = current_user.get('plan', 'gratis')
+        plan = current_user.get('plan', 'pendiente')
         
         # Filtro para productos de la empresa
         filtro = {'activo': activo, 'empresa_id': empresa_id}

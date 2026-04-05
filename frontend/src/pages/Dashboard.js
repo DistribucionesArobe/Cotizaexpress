@@ -270,32 +270,10 @@ export default function Dashboard() {
           <h3 className="text-2xl font-bold text-slate-900">
             {esEmpresaActiva ? 'Mejora tu plan' : 'Elige tu plan'}
           </h3>
-          <p className="text-slate-600 mt-1">Comienza gratis y escala cuando lo necesites</p>
+          <p className="text-slate-600 mt-1">Elige el plan que mejor se adapte a tu negocio</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Plan Gratis */}
-          <Card className="relative">
-            <CardContent className="pt-6 pb-6">
-              <h4 className="text-lg font-bold text-slate-900">Gratis</h4>
-              <p className="text-slate-500 text-sm mt-1">Para probar</p>
-              <div className="mt-4 mb-6">
-                <span className="text-3xl font-bold text-slate-900">$0</span>
-                <span className="text-slate-500 text-sm"> /mes</span>
-              </div>
-              <ul className="space-y-2.5 mb-6">
-                <PlanFeature incluido>5 cotizaciones incluidas</PlanFeature>
-                <PlanFeature incluido>Dashboard básico</PlanFeature>
-                <PlanFeature incluido>Carga de productos Excel</PlanFeature>
-                <PlanFeature>WhatsApp integrado</PlanFeature>
-                <PlanFeature>Cobros automáticos</PlanFeature>
-              </ul>
-              <Button variant="outline" className="w-full" disabled>
-                Plan actual
-              </Button>
-            </CardContent>
-          </Card>
-
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
           {/* Plan Completo */}
           <Card className="relative border-emerald-500 border-2 shadow-lg">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2">

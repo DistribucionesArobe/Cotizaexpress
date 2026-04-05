@@ -92,7 +92,7 @@ async def get_whatsapp_config(current_user: dict = Depends(get_current_user)):
         'empresa': {
             'id': empresa['id'],
             'nombre': empresa.get('nombre'),
-            'plan': empresa.get('plan', 'gratis')
+            'plan': empresa.get('plan', 'pendiente')
         },
         'whatsapp': {
             'codigo': empresa.get('codigo_whatsapp'),
