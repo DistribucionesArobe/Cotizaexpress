@@ -31,6 +31,7 @@ export default function PerfilEmpresa() {
     bank_account_number: '',
     discount_threshold: '',
     discount_percent: '',
+    welcome_message: '',
   });
 
   const [horario, setHorario] = useState({
@@ -74,6 +75,7 @@ export default function PerfilEmpresa() {
         bank_account_number: s.bank_account_number || '',
         discount_threshold: s.discount_threshold || '',
         discount_percent: s.discount_percent || '',
+        welcome_message: s.welcome_message || '',
       });
 
       // Parsear horario desde hours_text si existe
@@ -245,6 +247,18 @@ export default function PerfilEmpresa() {
               <Label>Nombre Comercial</Label>
               <Input name="company_name" value={formData.company_name} onChange={handleChange} placeholder="Ej: Aceromax" />
               <p className="text-xs text-slate-500">Este nombre aparece en el saludo del bot de WhatsApp</p>
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label>Mensaje de bienvenida (WhatsApp)</Label>
+              <textarea
+                name="welcome_message"
+                value={formData.welcome_message}
+                onChange={handleChange}
+                placeholder="Ej: ¡Hola! Bienvenido a Aceromax, ¿en qué te puedo ayudar?"
+                className="w-full min-h-[80px] px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                rows={3}
+              />
+              <p className="text-xs text-slate-500">Personaliza el saludo que reciben tus clientes en WhatsApp. Si lo dejas vacío usará: "¡Hola! Soy el asistente de [tu nombre comercial]"</p>
             </div>
             <div className="space-y-2">
               <Label>Email</Label>
