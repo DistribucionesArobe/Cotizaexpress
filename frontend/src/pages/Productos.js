@@ -270,7 +270,7 @@ export default function Productos() {
           </Button>
           <Link to="/carga-productos">
             <Button className="bg-emerald-600 hover:bg-emerald-700">
-              <Upload className="w-4 h-4 mr-2" />Carga Masiva
+              <Upload className="w-4 h-4 mr-2" />Carga de Productos
             </Button>
           </Link>
         </div>

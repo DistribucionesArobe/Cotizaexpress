@@ -117,7 +117,7 @@ function AppRoutes() {
                     }`}
                     onClick={() => setActiveTab('carga-productos')}
                   >
-                    Carga Masiva
+                    Carga de Productos
                   </Link>
                   <Link
                     to="/conversaciones"
