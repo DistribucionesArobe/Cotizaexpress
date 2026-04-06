@@ -30,7 +30,7 @@ export default function ServiciosTecnicosSEO() {
               Automatiza cotizaciones de plomería, electricidad e instalaciones. Tus clientes describen el trabajo y el bot les da un precio estimado.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="https://wa.me/5218344291628?text=DEMO" target="_blank" rel="noopener noreferrer">
+              <a href="https://wa.me/5218342472640?text=DEMO" target="_blank" rel="noopener noreferrer">
                 <Button size="lg" className="bg-green-600 hover:bg-green-700">Probar Demo Gratis</Button>
               </a>
               <Link to="/registro"><Button size="lg" variant="outline">Crear Cuenta</Button></Link>
