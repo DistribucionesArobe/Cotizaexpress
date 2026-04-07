@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
@@ -8,7 +8,7 @@ import axios from 'axios';
 import {
   Store, Package, MessageSquare, Rocket,
   ChevronRight, ChevronLeft, Plus, Trash2,
-  Check, Sparkles, ArrowRight
+  Check, Sparkles, ArrowRight, Loader2
 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL?.trim() || 'https://api.cotizaexpress.com';
@@ -29,7 +29,7 @@ const GIROS = [
 const STEPS = [
   { icon: Store, title: 'Tu Negocio', desc: 'Cuéntanos sobre tu empresa' },
   { icon: Package, title: 'Tus Productos', desc: 'Agrega tus primeros productos' },
-  { icon: MessageSquare, title: 'Prueba el Bot', desc: 'Mira cómo funciona' },
+  { icon: MessageSquare, title: 'WhatsApp', desc: 'Conecta tu numero' },
   { icon: Rocket, title: '¡Listo!', desc: 'Activa tu CotizaBot' },
 ];
 
@@ -49,6 +49,112 @@ export default function Onboarding() {
     horario_sabado: '08:00-14:00',
     horario_domingo: 'cerrado',
   });
+
+  // WhatsApp Embedded Signup state
+  const [waConnected, setWaConnected] = useState(false);
+  const [waConnecting, setWaConnecting] = useState(false);
+  const [waPhone, setWaPhone] = useState('');
+  const [fbReady, setFbReady] = useState(false);
+
+  // Load Facebook SDK
+  useEffect(() => {
+    if (document.getElementById('facebook-jssdk')) {
+      if (window.FB) setFbReady(true);
+      return;
+    }
+    window.fbAsyncInit = function () {
+      window.FB.init({
+        appId: '1461694011992339',
+        cookie: true,
+        xfbml: true,
+        version: 'v21.0',
+      });
+      setFbReady(true);
+    };
+    const js = document.createElement('script');
+    js.id = 'facebook-jssdk';
+    js.src = 'https://connect.facebook.net/en_US/sdk.js';
+    js.async = true;
+    js.defer = true;
+    document.body.appendChild(js);
+  }, []);
+
+  // Listen for Embedded Signup session info
+  const handleWAMessage = useCallback((event) => {
+    if (event.origin !== 'https://www.facebook.com' && event.origin !== 'https://web.facebook.com') return;
+    try {
+      const data = JSON.parse(event.data);
+      if (data.type === 'WA_EMBEDDED_SIGNUP') {
+        if (data.event === 'FINISH') {
+          const { phone_number_id, waba_id } = data.data;
+          console.log('WA Embedded Signup finished:', { phone_number_id, waba_id });
+          // Store for use in the token exchange
+          window.__wa_signup_data = { phone_number_id, waba_id };
+        } else if (data.event === 'CANCEL') {
+          console.log('WA Embedded Signup cancelled');
+          setWaConnecting(false);
+        } else if (data.event === 'ERROR') {
+          console.error('WA Embedded Signup error:', data.data);
+          toast.error('Error al conectar WhatsApp. Intenta de nuevo.');
+          setWaConnecting(false);
+        }
+      }
+    } catch (e) {
+      // Not a JSON message, ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('message', handleWAMessage);
+    return () => window.removeEventListener('message', handleWAMessage);
+  }, [handleWAMessage]);
+
+  const launchWhatsAppSignup = () => {
+    if (!fbReady || !window.FB) {
+      toast.error('Cargando Facebook SDK, intenta en un momento...');
+      return;
+    }
+    setWaConnecting(true);
+    window.__wa_signup_data = null;
+
+    window.FB.login(
+      function (response) {
+        if (response.authResponse) {
+          const code = response.authResponse.code;
+          const signupData = window.__wa_signup_data || {};
+          // Send code + signup data to our backend
+          axios.post(`${API}/whatsapp/embedded-signup`, {
+            code,
+            phone_number_id: signupData.phone_number_id,
+            waba_id: signupData.waba_id,
+          }, { withCredentials: true })
+            .then((res) => {
+              setWaConnected(true);
+              setWaPhone(res.data?.phone_display || '');
+              toast.success('¡WhatsApp conectado exitosamente!');
+            })
+            .catch((err) => {
+              console.error('Embedded signup backend error:', err);
+              toast.error(err?.response?.data?.detail || 'Error al conectar WhatsApp');
+            })
+            .finally(() => setWaConnecting(false));
+        } else {
+          console.log('User cancelled login');
+          setWaConnecting(false);
+        }
+      },
+      {
+        config_id: '1877916580262483',
+        response_type: 'code',
+        override_default_response_type: true,
+        extras: {
+          setup: {},
+          featureType: '',
+          sessionInfoVersion: 3,
+        },
+      }
+    );
+  };
 
   // Step 2: Products
   const [products, setProducts] = useState([
@@ -403,72 +509,79 @@ export default function Onboarding() {
               </div>
             )}
 
-            {/* ── STEP 2: Try the Bot ── */}
+            {/* ── STEP 2: Connect WhatsApp ── */}
             {step === 2 && (
               <div className="space-y-6">
                 <div className="text-center mb-6">
-                  <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <MessageSquare className="w-8 h-8 text-purple-600" />
+                  <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <MessageSquare className="w-8 h-8 text-green-600" />
                   </div>
-                  <h2 className="text-2xl font-bold text-slate-900">Así funciona tu CotizaBot</h2>
+                  <h2 className="text-2xl font-bold text-slate-900">Conecta tu WhatsApp</h2>
                   <p className="text-slate-600 mt-1">
-                    Tus clientes mandan un mensaje y el bot responde al instante.
+                    Vincula tu número de WhatsApp Business para que el bot empiece a responder.
                   </p>
                 </div>
 
-                {/* WhatsApp demo mockup */}
-                <div className="bg-[#ECE5DD] rounded-2xl p-4 max-w-sm mx-auto shadow-inner">
-                  <div className="bg-[#075E54] text-white px-4 py-3 rounded-t-xl -mx-4 -mt-4 mb-4 flex items-center gap-3">
-                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-xs font-bold">
-                      {empresaNombre.charAt(0).toUpperCase()}
+                {waConnected ? (
+                  <div className="text-center space-y-4">
+                    <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                      <Check className="w-10 h-10 text-green-600" />
                     </div>
-                    <span className="font-medium text-sm">{empresaNombre}</span>
-                  </div>
-
-                  {/* Client message */}
-                  <div className="flex justify-end mb-2">
-                    <div className="bg-[#DCF8C6] rounded-lg px-3 py-2 max-w-[80%] shadow-sm">
-                      <p className="text-sm text-slate-800">Hola, necesito cotización de 10 bultos de cemento y 5 varillas 3/8</p>
-                      <span className="text-[10px] text-slate-500 float-right mt-1">10:30 AM</span>
+                    <div>
+                      <h3 className="text-lg font-bold text-green-700">WhatsApp conectado</h3>
+                      {waPhone && <p className="text-slate-600 mt-1">{waPhone}</p>}
+                    </div>
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-sm text-green-800">
+                      <Sparkles className="w-4 h-4 inline mr-1" />
+                      Tu bot ya tiene los <strong>{validProducts.length || 0} productos</strong> y est&aacute; listo para recibir mensajes.
                     </div>
                   </div>
-
-                  {/* Bot typing */}
-                  <div className="flex justify-start mb-2">
-                    <div className="bg-white rounded-lg px-3 py-2 shadow-sm">
-                      <div className="flex gap-1 items-center">
-                        <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                        <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                        <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                ) : (
+                  <div className="text-center space-y-6">
+                    <div className="bg-slate-50 rounded-xl p-6 space-y-4">
+                      <div className="space-y-3 text-left max-w-sm mx-auto">
+                        {[
+                          'Inicia sesion con tu cuenta de Facebook',
+                          'Selecciona o crea tu WhatsApp Business Account',
+                          'Verifica tu numero de telefono',
+                        ].map((txt, i) => (
+                          <div key={i} className="flex items-start gap-3">
+                            <div className="w-6 h-6 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                              {i + 1}
+                            </div>
+                            <p className="text-sm text-slate-700">{txt}</p>
+                          </div>
+                        ))}
                       </div>
-                    </div>
-                  </div>
 
-                  {/* Bot response */}
-                  <div className="flex justify-start">
-                    <div className="bg-white rounded-lg px-3 py-2 max-w-[85%] shadow-sm">
-                      <p className="text-sm text-slate-800">
-                        ¡Hola! Aquí tienes tu cotización:
-                      </p>
-                      <div className="mt-2 bg-slate-50 rounded p-2 text-xs font-mono">
-                        <p>10 Cemento Cruz Azul - $2,100.00</p>
-                        <p>5 Varilla 3/8 - $425.00</p>
-                        <p className="border-t mt-1 pt-1 font-bold">Subtotal: $2,525.00</p>
-                        <p>IVA (16%): $404.00</p>
-                        <p className="text-emerald-700 font-bold">Total: $2,929.00</p>
-                      </div>
-                      <span className="text-[10px] text-slate-500 float-right mt-1">10:30 AM</span>
+                      <Button
+                        onClick={launchWhatsAppSignup}
+                        disabled={waConnecting}
+                        size="lg"
+                        className="bg-[#25D366] hover:bg-[#20BD5A] text-white font-bold px-8 py-6 text-base"
+                      >
+                        {waConnecting ? (
+                          <span className="flex items-center gap-2">
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            Conectando...
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-2">
+                            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                              <path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.611.611l4.458-1.495A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.237 0-4.308-.744-5.977-1.998l-.418-.312-3.087 1.034 1.034-3.087-.312-.418A9.935 9.935 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+                            </svg>
+                            Conectar mi WhatsApp
+                          </span>
+                        )}
+                      </Button>
                     </div>
-                  </div>
-                </div>
 
-                <div className="text-center space-y-3">
-                  <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-sm text-emerald-800">
-                    <Sparkles className="w-4 h-4 inline mr-1" />
-                    Tu bot ya tiene los <strong>{validProducts.length || 0} productos</strong> que acabas de cargar.
-                    Nosotros conectaremos tu WhatsApp en menos de 24 horas.
+                    <p className="text-xs text-slate-400">
+                      Necesitas una cuenta de Facebook y un numero de WhatsApp Business
+                    </p>
                   </div>
-                </div>
+                )}
               </div>
             )}
 
@@ -489,20 +602,22 @@ export default function Onboarding() {
                   {[
                     {
                       num: '1',
-                      title: 'Conectamos tu WhatsApp',
-                      desc: 'Nuestro equipo conectará tu número de WhatsApp en menos de 24 horas. Te contactaremos por correo.',
+                      title: waConnected ? 'WhatsApp conectado' : 'Conecta tu WhatsApp',
+                      desc: waConnected
+                        ? 'Tu bot ya esta recibiendo mensajes en tu numero de WhatsApp.'
+                        : 'Puedes conectar tu WhatsApp desde el dashboard en cualquier momento.',
                       color: 'emerald',
                     },
                     {
                       num: '2',
-                      title: 'Completa tu catálogo',
-                      desc: 'Puedes agregar más productos desde el dashboard, uno por uno o por archivo Excel.',
+                      title: 'Completa tu catalogo',
+                      desc: 'Puedes agregar mas productos desde el dashboard, uno por uno o por archivo Excel.',
                       color: 'blue',
                     },
                     {
                       num: '3',
                       title: 'Tus clientes empiezan a cotizar',
-                      desc: 'Comparte tu número de WhatsApp y tus clientes podrán pedir cotizaciones automáticas.',
+                      desc: 'Comparte tu numero de WhatsApp y tus clientes podran pedir cotizaciones automaticas.',
                       color: 'purple',
                     },
                   ].map((item) => (
