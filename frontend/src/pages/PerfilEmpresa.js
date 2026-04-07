@@ -21,6 +21,7 @@ export default function PerfilEmpresa() {
     email: '',
     rfc: '',
     owner_phone: '',
+    telefono_atencion: '',
     address_text: '',
     hours_text: '',
     google_maps_url: '',
@@ -65,6 +66,7 @@ export default function PerfilEmpresa() {
         email: s.email || '',
         rfc: s.rfc || '',
         owner_phone: s.owner_phone || '',
+        telefono_atencion: s.telefono_atencion || '',
         address_text: s.address_text || '',
         hours_text: s.hours_text || '',
         google_maps_url: s.google_maps_url || '',
@@ -271,6 +273,11 @@ export default function PerfilEmpresa() {
             <div className="space-y-2">
               <Label>Teléfono del Dueño (WhatsApp)</Label>
               <Input name="owner_phone" value={formData.owner_phone} onChange={handleChange} placeholder="+5281XXXXXXXX" />
+            </div>
+            <div className="space-y-2">
+              <Label>Teléfono de Atención al Cliente</Label>
+              <Input name="telefono_atencion" value={formData.telefono_atencion} onChange={handleChange} placeholder="+5281XXXXXXXX" />
+              <p className="text-xs text-slate-400">Cuando un cliente pide hablar con alguien, el bot le da este número como link de WhatsApp</p>
             </div>
             <div className="space-y-2">
               <Label>Dirección</Label>
