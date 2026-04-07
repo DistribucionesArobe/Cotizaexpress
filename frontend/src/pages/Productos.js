@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
-import { Package, Upload, Pencil, Trash2, LayoutGrid, LayoutList, X, Check, Plus } from 'lucide-react';
+import { Package, Upload, Pencil, Trash2, LayoutGrid, LayoutList, X, Check, Plus, Star } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -182,6 +182,17 @@ export default function Productos() {
     setInlineEdit({ id: producto.id, field, value: String(value) });
   };
 
+  const toggleDefault = async (producto) => {
+    const newVal = !producto.is_default;
+    try {
+      await axios.patch(`${API}/pricebook/items/${producto.id}`, { is_default: newVal }, { withCredentials: true });
+      setProductos(prev => prev.map(p => p.id === producto.id ? { ...p, is_default: newVal } : p));
+      toast.success(newVal ? `"${producto.name}" marcado como predeterminado` : `"${producto.name}" ya no es predeterminado`);
+    } catch (err) {
+      toast.error('Error al actualizar');
+    }
+  };
+
   const saveInlineEdit = async () => {
     if (!inlineEdit) return;
     const { id, field, value } = inlineEdit;
@@ -303,6 +314,7 @@ export default function Productos() {
                 <th className="text-left p-3 w-24">SKU</th>
                 <th className="text-right p-3 w-28">Precio</th>
                 <th className="text-left p-3 w-20">Unidad</th>
+                <th className="text-center p-3 w-14" title="Producto predeterminado: cuando el cliente no especifica variante, se usa este">Default</th>
                 <th className="text-left p-3 w-24">Acciones</th>
               </tr>
             </thead>
@@ -361,6 +373,15 @@ export default function Productos() {
                   </td>
 
                   <td className="p-3 text-slate-500">{p.unit || '-'}</td>
+                  <td className="p-3 text-center">
+                    <button
+                      onClick={() => toggleDefault(p)}
+                      className={`p-1 rounded hover:bg-yellow-50 transition-colors ${p.is_default ? 'text-yellow-500' : 'text-slate-300 hover:text-yellow-400'}`}
+                      title={p.is_default ? 'Producto predeterminado (click para quitar)' : 'Marcar como predeterminado'}
+                    >
+                      <Star className="w-4 h-4" fill={p.is_default ? 'currentColor' : 'none'} />
+                    </button>
+                  </td>
                   <td className="p-3">
                     <div className="flex gap-1">
                       <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => abrirEdicion(p)} title="Editar todo">
