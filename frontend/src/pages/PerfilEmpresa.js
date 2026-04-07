@@ -66,7 +66,7 @@ export default function PerfilEmpresa() {
         email: s.email || '',
         rfc: s.rfc || '',
         owner_phone: s.owner_phone || '',
-        telefono_atencion: s.telefono_atencion || '',
+        telefono_atencion: (s.telefono_atencion || s.owner_phone || '').replace(/^\+?52/, '').replace(/\D/g, '').slice(-10),
         address_text: s.address_text || '',
         hours_text: s.hours_text || '',
         google_maps_url: s.google_maps_url || '',
@@ -123,8 +123,11 @@ export default function PerfilEmpresa() {
       // Construir hours_text desde el horario
       const hours_text = `Lunes a Viernes: ${horario.lunes_viernes}\nSábado: ${horario.sabado}\nDomingo: ${horario.domingo}`;
 
+      // Sync: telefono_atencion → owner_phone for backward compatibility
+      const phoneToSave = formData.telefono_atencion || '';
       await axios.post(`${API}/company/settings`, {
         ...formData,
+        owner_phone: phoneToSave,
         hours_text,
         discount_threshold: formData.discount_threshold ? parseFloat(formData.discount_threshold) : null,
         discount_percent: formData.discount_percent ? parseFloat(formData.discount_percent) : null,
@@ -271,12 +274,21 @@ export default function PerfilEmpresa() {
               <Input name="rfc" value={formData.rfc} onChange={handleChange} placeholder="XAXX010101000" />
             </div>
             <div className="space-y-2">
-              <Label>Teléfono del Dueño (WhatsApp)</Label>
-              <Input name="owner_phone" value={formData.owner_phone} onChange={handleChange} placeholder="+5281XXXXXXXX" />
-            </div>
-            <div className="space-y-2">
-              <Label>Teléfono de Atención al Cliente</Label>
-              <Input name="telefono_atencion" value={formData.telefono_atencion} onChange={handleChange} placeholder="+5281XXXXXXXX" />
+              <Label>Teléfono de Atención (WhatsApp)</Label>
+              <div className="flex">
+                <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-slate-200 bg-slate-100 text-slate-600 text-sm font-medium select-none">+52</span>
+                <Input
+                  name="telefono_atencion"
+                  value={formData.telefono_atencion}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(/\D/g, '').slice(0, 10);
+                    setFormData({ ...formData, telefono_atencion: v });
+                  }}
+                  placeholder="10 dígitos"
+                  maxLength={10}
+                  className="rounded-l-none"
+                />
+              </div>
               <p className="text-xs text-slate-400">Cuando un cliente pide hablar con alguien, el bot le da este número como link de WhatsApp</p>
             </div>
             <div className="space-y-2">
