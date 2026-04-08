@@ -33,6 +33,8 @@ export default function PerfilEmpresa() {
     discount_threshold: '',
     discount_percent: '',
     welcome_message: '',
+    marcas_propias: '',
+    marcas_competencia: '',
   });
 
   const [horario, setHorario] = useState({
@@ -67,6 +69,8 @@ export default function PerfilEmpresa() {
         rfc: s.rfc || '',
         owner_phone: s.owner_phone || '',
         telefono_atencion: (s.telefono_atencion || s.owner_phone || '').replace(/^\+?52/, '').replace(/\D/g, '').slice(-10),
+        marcas_propias: s.marcas_propias || '',
+        marcas_competencia: s.marcas_competencia || '',
         address_text: s.address_text || '',
         hours_text: s.hours_text || '',
         google_maps_url: s.google_maps_url || '',
@@ -298,6 +302,40 @@ export default function PerfilEmpresa() {
             <div className="space-y-2 md:col-span-2">
               <Label>URL Google Maps</Label>
               <Input name="google_maps_url" value={formData.google_maps_url} onChange={handleChange} placeholder="https://maps.google.com/..." />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Marcas y Competencia */}
+        <Card>
+          <CardHeader>
+            <CardTitle>🏷️ Marcas y Competencia</CardTitle>
+            <p className="text-sm text-slate-500">Cuando un cliente pida productos de la competencia, el bot buscará el equivalente en tus marcas.</p>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Marcas que manejas</Label>
+              <textarea
+                name="marcas_propias"
+                value={formData.marcas_propias}
+                onChange={handleChange}
+                placeholder="Ej: USG, Redimix, Coflex, Truper"
+                className="w-full min-h-[60px] px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                rows={2}
+              />
+              <p className="text-xs text-slate-400">Separa con comas las marcas principales de tus productos</p>
+            </div>
+            <div className="space-y-2">
+              <Label>Marcas de tu competencia</Label>
+              <textarea
+                name="marcas_competencia"
+                value={formData.marcas_competencia}
+                onChange={handleChange}
+                placeholder="Ej: Panel Rey, Crest, Rugo, Surtej"
+                className="w-full min-h-[60px] px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                rows={2}
+              />
+              <p className="text-xs text-slate-400">Marcas que tus clientes mencionan pero tú no vendes</p>
             </div>
           </CardContent>
         </Card>

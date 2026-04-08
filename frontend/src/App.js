@@ -21,7 +21,6 @@ import CargaProductos from './pages/CargaProductos';
 import ConfiguracionWhatsApp from './pages/ConfiguracionWhatsApp';
 import ConfigCobros from './pages/ConfigCobros';
 import PerfilEmpresa from './pages/PerfilEmpresa';
-import Equivalencias from './pages/Equivalencias';
 import PortalCliente from './pages/PortalCliente';
 import AdminPromoCodes from './pages/AdminPromoCodes';
 import AdminDashboard from './pages/AdminDashboard';
@@ -157,18 +156,6 @@ function AppRoutes() {
                     💰 Cobros
                   </Link>
                   <Link
-                    to="/equivalencias"
-                    data-testid="nav-equivalencias"
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      activeTab === 'equivalencias'
-                        ? 'bg-emerald-50 text-emerald-700'
-                        : 'text-slate-600 hover:bg-slate-100'
-                    }`}
-                    onClick={() => setActiveTab('equivalencias')}
-                  >
-                    Equivalencias
-                  </Link>
-                  <Link
                     to="/perfil-empresa"
                     data-testid="nav-perfil"
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -263,15 +250,6 @@ function AppRoutes() {
                     onClick={() => { setActiveTab('cobros'); setMobileMenuOpen(false); }}
                   >
                     💰 Cobros
-                  </Link>
-                  <Link
-                    to="/equivalencias"
-                    className={`block px-4 py-3 rounded-lg text-sm font-medium ${
-                      activeTab === 'equivalencias' ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600'
-                    }`}
-                    onClick={() => { setActiveTab('equivalencias'); setMobileMenuOpen(false); }}
-                  >
-                    🔄 Equivalencias
                   </Link>
                   <Link
                     to="/perfil-empresa"
@@ -396,14 +374,6 @@ function AppRoutes() {
               element={
                 <ProtectedRoute>
                   <PerfilEmpresa />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/equivalencias"
-              element={
-                <ProtectedRoute>
-                  <Equivalencias />
                 </ProtectedRoute>
               }
             />
