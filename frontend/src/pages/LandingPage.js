@@ -6,11 +6,11 @@ import { Link } from 'react-router-dom';
 
 const DEMO_MESSAGES = [
   { from: 'client', text: 'Hola, precio de 10 tablaroca ultralight y 5 bultos de redimix', delay: 0 },
-  { from: 'bot', text: '...',  typing: true, delay: 800 },
-  { from: 'bot', text: 'Cotizacion:\n\n- 10 x Tablaroca ultralight USG — $2,450\n- 5 x Redimix 28 kg USG — $3,300\n\nTotal: $5,750 (IVA incluido)\n\nEscribe *pagar* para datos bancarios.', delay: 2200 },
-  { from: 'client', text: 'Y 100 pijas 6x1?', delay: 5000 },
-  { from: 'bot', text: '...',  typing: true, delay: 5800 },
-  { from: 'bot', text: 'Agregado:\n\n- 100 x Pija 6 x 1 — $28\n\nNuevo total: $5,778 (IVA incluido)', delay: 7500 },
+  { from: 'bot', text: '...', typing: true, delay: 800 },
+  { from: 'bot', text: '✅ 2 producto(s) cotizados.\nCotización:\n\n• 10 x Tablaroca ultralight USG — $2,450\n• 5 x Redimix 28 kg USG — $3,300\n\nTotal: $5,750 (IVA incluido)\n📋 Folio: CX-7KM2PN\n💳 Escribe *pagar* y te mandamos datos bancarios o link para pago con tarjeta.', delay: 2400 },
+  { from: 'client', text: 'Agrega 100 pijas 6x1', delay: 5500 },
+  { from: 'bot', text: '...', typing: true, delay: 6300 },
+  { from: 'bot', text: '✅ 3 producto(s) cotizados.\nCotización:\n\n• 10 x Tablaroca ultralight USG — $2,450\n• 5 x Redimix 28 kg USG — $3,300\n• 100 x Pija 6 x 1 — $28\n\nTotal: $5,778 (IVA incluido)\n📋 Folio: CX-7KM2PN\n💳 Escribe *pagar* y te mandamos datos bancarios o link para pago con tarjeta.', delay: 8200 },
 ];
 
 function ChatWidget() {
@@ -96,7 +96,9 @@ function ChatWidget() {
                       <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
                       <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
                     </span>
-                  ) : msg.text}
+                  ) : (
+                    <span dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*([^*]+)\*/g, '<b>$1</b>').replace(/\n/g, '<br/>') }} />
+                  )}
                 </div>
               </div>
             ))}
