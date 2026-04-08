@@ -45,6 +45,8 @@ export default function PerfilEmpresa() {
 
   const [modulos, setModulos] = useState({ construccion_ligera: false, rejacero: false, pintura: false, impermeabilizante: false });
   const [guardandoModulo, setGuardandoModulo] = useState(false);
+  const [brandSuggestions, setBrandSuggestions] = useState([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
 
   useEffect(() => {
     cargarDatos();
@@ -312,30 +314,102 @@ export default function PerfilEmpresa() {
             <CardTitle>🏷️ Marcas y Competencia</CardTitle>
             <p className="text-sm text-slate-500">Cuando un cliente pida productos de la competencia, el bot buscará el equivalente en tus marcas.</p>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Marcas que manejas</Label>
-              <textarea
-                name="marcas_propias"
-                value={formData.marcas_propias}
-                onChange={handleChange}
-                placeholder="Ej: USG, Redimix, Coflex, Truper"
-                className="w-full min-h-[60px] px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                rows={2}
-              />
-              <p className="text-xs text-slate-400">Separa con comas las marcas principales de tus productos</p>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Marcas que manejas</Label>
+                <textarea
+                  name="marcas_propias"
+                  value={formData.marcas_propias}
+                  onChange={handleChange}
+                  placeholder="Ej: USG, Redimix, Coflex, Truper"
+                  className="w-full min-h-[60px] px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={2}
+                />
+                <p className="text-xs text-slate-400">Separa con comas las marcas principales de tus productos</p>
+              </div>
+              <div className="space-y-2">
+                <Label>Marcas de tu competencia</Label>
+                <textarea
+                  name="marcas_competencia"
+                  value={formData.marcas_competencia}
+                  onChange={handleChange}
+                  placeholder="Ej: Panel Rey, Crest, Rugo, Surtej"
+                  className="w-full min-h-[60px] px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={2}
+                />
+                <p className="text-xs text-slate-400">Marcas que tus clientes mencionan pero tú no vendes</p>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label>Marcas de tu competencia</Label>
-              <textarea
-                name="marcas_competencia"
-                value={formData.marcas_competencia}
-                onChange={handleChange}
-                placeholder="Ej: Panel Rey, Crest, Rugo, Surtej"
-                className="w-full min-h-[60px] px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                rows={2}
-              />
-              <p className="text-xs text-slate-400">Marcas que tus clientes mencionan pero tú no vendes</p>
+            {/* AI Suggestions */}
+            <div className="pt-2 border-t border-slate-100">
+              <div className="flex items-center gap-2 mb-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={loadingSuggestions || !formData.marcas_propias?.trim()}
+                  onClick={async () => {
+                    setLoadingSuggestions(true);
+                    setBrandSuggestions([]);
+                    try {
+                      const res = await axios.post(`${API}/company/suggest-brands`, {
+                        marcas_propias: formData.marcas_propias,
+                      });
+                      const existing = (formData.marcas_competencia || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
+                      const filtered = (res.data?.suggestions || []).filter(s => !existing.includes(s.toLowerCase()));
+                      setBrandSuggestions(filtered);
+                      if (!filtered.length) toast.info('No hay sugerencias nuevas');
+                    } catch (e) {
+                      toast.error('Error al obtener sugerencias');
+                    } finally {
+                      setLoadingSuggestions(false);
+                    }
+                  }}
+                  className="text-xs"
+                >
+                  {loadingSuggestions ? (
+                    <><span className="animate-spin mr-1">⏳</span> Analizando...</>
+                  ) : (
+                    <><span className="mr-1">✨</span> Sugerir competencia con IA</>
+                  )}
+                </Button>
+                <span className="text-xs text-slate-400">Basado en tus marcas, te sugiere competidores</span>
+              </div>
+              {brandSuggestions.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {brandSuggestions.map((s, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      className="px-3 py-1 text-xs rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors"
+                      onClick={() => {
+                        const current = (formData.marcas_competencia || '').trim();
+                        const updated = current ? `${current}, ${s}` : s;
+                        setFormData({ ...formData, marcas_competencia: updated });
+                        setBrandSuggestions(prev => prev.filter((_, j) => j !== i));
+                        toast.success(`"${s}" agregado`);
+                      }}
+                    >
+                      + {s}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    className="px-3 py-1 text-xs rounded-full border border-slate-200 text-slate-500 hover:bg-slate-50 transition-colors"
+                    onClick={() => {
+                      const current = (formData.marcas_competencia || '').trim();
+                      const all = brandSuggestions.join(', ');
+                      const updated = current ? `${current}, ${all}` : all;
+                      setFormData({ ...formData, marcas_competencia: updated });
+                      setBrandSuggestions([]);
+                      toast.success('Todas las sugerencias agregadas');
+                    }}
+                  >
+                    Agregar todas
+                  </button>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
