@@ -1,7 +1,163 @@
+import { useState, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
+
+const DEMO_MESSAGES = [
+  { from: 'client', text: 'Hola, precio de 10 tablaroca ultralight y 5 bultos de redimix', delay: 0 },
+  { from: 'bot', text: '...',  typing: true, delay: 800 },
+  { from: 'bot', text: 'Cotizacion:\n\n- 10 x Tablaroca ultralight USG — $2,450\n- 5 x Redimix 28 kg USG — $3,300\n\nTotal: $5,750 (IVA incluido)\n\nEscribe *pagar* para datos bancarios.', delay: 2200 },
+  { from: 'client', text: 'Y 100 pijas 6x1?', delay: 5000 },
+  { from: 'bot', text: '...',  typing: true, delay: 5800 },
+  { from: 'bot', text: 'Agregado:\n\n- 100 x Pija 6 x 1 — $28\n\nNuevo total: $5,778 (IVA incluido)', delay: 7500 },
+];
+
+function ChatWidget() {
+  const [open, setOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [hasPlayed, setHasPlayed] = useState(false);
+  const chatEndRef = useRef(null);
+
+  useEffect(() => {
+    if (open && !hasPlayed) {
+      setHasPlayed(true);
+      setMessages([]);
+      DEMO_MESSAGES.forEach((msg, i) => {
+        setTimeout(() => {
+          setMessages(prev => {
+            // Replace typing indicator from same sender
+            if (!msg.typing) {
+              const filtered = prev.filter(m => !(m.typing && m.from === msg.from));
+              return [...filtered, msg];
+            }
+            return [...prev, msg];
+          });
+        }, msg.delay);
+      });
+    }
+  }, [open, hasPlayed]);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const replay = () => {
+    setMessages([]);
+    setHasPlayed(false);
+    setTimeout(() => setHasPlayed(false), 50);
+    // Trigger replay
+    setTimeout(() => {
+      setMessages([]);
+      DEMO_MESSAGES.forEach((msg, i) => {
+        setTimeout(() => {
+          setMessages(prev => {
+            if (!msg.typing) {
+              const filtered = prev.filter(m => !(m.typing && m.from === msg.from));
+              return [...filtered, msg];
+            }
+            return [...prev, msg];
+          });
+        }, msg.delay);
+      });
+    }, 100);
+  };
+
+  return (
+    <>
+      {/* Chat Dialog */}
+      {open && (
+        <div className="fixed bottom-24 right-4 sm:right-6 z-50 w-[340px] sm:w-[380px] rounded-2xl shadow-2xl overflow-hidden border border-slate-200 bg-white"
+             style={{ animation: 'slide-up 0.3s ease-out' }}>
+          {/* Header */}
+          <div className="bg-[#075E54] text-white px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold">CB</div>
+              <div>
+                <p className="font-semibold text-sm leading-tight">CotizaBot Demo</p>
+                <p className="text-[11px] text-emerald-200">En linea</p>
+              </div>
+            </div>
+            <button onClick={() => setOpen(false)} className="text-white/70 hover:text-white text-xl leading-none p-1">&times;</button>
+          </div>
+          {/* Messages */}
+          <div className="h-[320px] overflow-y-auto px-3 py-3 space-y-2"
+               style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'200\' height=\'200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cdefs%3E%3Cpattern id=\'p\' width=\'40\' height=\'40\' patternUnits=\'userSpaceOnUse\'%3E%3Cpath d=\'M0 20h40M20 0v40\' stroke=\'%23e8e5de\' stroke-width=\'.5\' fill=\'none\'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width=\'200\' height=\'200\' fill=\'%23ECE5DD\'/%3E%3Crect width=\'200\' height=\'200\' fill=\'url(%23p)\'/%3E%3C/svg%3E")' }}>
+            {messages.map((msg, i) => (
+              <div key={i} className={`flex ${msg.from === 'client' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[80%] px-3 py-2 rounded-lg text-[13px] leading-relaxed shadow-sm whitespace-pre-line ${
+                  msg.from === 'client'
+                    ? 'bg-[#DCF8C6] text-slate-800 rounded-tr-none'
+                    : 'bg-white text-slate-800 rounded-tl-none'
+                }`}>
+                  {msg.typing ? (
+                    <span className="flex gap-1 py-1 px-1">
+                      <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                      <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                      <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                    </span>
+                  ) : msg.text}
+                </div>
+              </div>
+            ))}
+            <div ref={chatEndRef} />
+          </div>
+          {/* Footer CTA */}
+          <div className="border-t border-slate-200 px-3 py-3 bg-white flex flex-col gap-2">
+            <a
+              href="https://wa.me/5218342472640?text=DEMO"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full bg-[#25D366] hover:bg-[#1ebe57] text-white text-center py-2.5 rounded-lg font-semibold text-sm transition-colors flex items-center justify-center gap-2"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+              Pruebalo en WhatsApp ahora
+            </a>
+            <button onClick={replay} className="text-xs text-slate-400 hover:text-slate-600 transition-colors">
+              Repetir demo
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Floating trigger button */}
+      <button
+        onClick={() => setOpen(o => !o)}
+        className={`fixed bottom-6 right-4 sm:right-6 z-50 flex items-center gap-2 text-white pl-4 pr-5 py-3 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 ${
+          open ? 'bg-slate-600 hover:bg-slate-700' : 'bg-[#25D366] hover:bg-[#1ebe57]'
+        }`}
+        style={!open ? { animation: 'float-pulse 3s ease-in-out infinite' } : {}}
+      >
+        {open ? (
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        ) : (
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/>
+            <path d="M7 9h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"/>
+          </svg>
+        )}
+        <span className="font-semibold text-sm whitespace-nowrap">
+          {open ? 'Cerrar' : 'Prueba el bot'}
+        </span>
+      </button>
+
+      <style>{`
+        @keyframes float-pulse {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
+        }
+        @keyframes slide-up {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+    </>
+  );
+}
 
 export default function LandingPage() {
   return (
@@ -435,27 +591,7 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
-      {/* Floating WhatsApp Demo Button */}
-      <a
-        href="https://wa.me/5218342472640?text=DEMO"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe57] text-white pl-4 pr-5 py-3 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
-        style={{ animation: 'float-pulse 3s ease-in-out infinite' }}
-      >
-        <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 flex-shrink-0">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-        </svg>
-        <span className="font-semibold text-sm whitespace-nowrap">
-          Prueba el bot gratis
-        </span>
-      </a>
-      <style>{`
-        @keyframes float-pulse {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-4px); }
-        }
-      `}</style>
+      <ChatWidget />
     </div>
   );
 }
