@@ -62,8 +62,28 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "craco build",
+    "build": "craco build && react-snap",
     "test": "craco test"
+  },
+  "reactSnap": {
+    "source": "build",
+    "inlineCss": true,
+    "puppeteerArgs": ["--no-sandbox", "--disable-setuid-sandbox"],
+    "include": [
+      "/",
+      "/precios",
+      "/demo",
+      "/ferreterias",
+      "/refaccionarias",
+      "/servicios-tecnicos",
+      "/privacidad",
+      "/terminos",
+      "/login",
+      "/registro"
+    ],
+    "skipThirdPartyRequests": true,
+    "headless": true,
+    "crawl": false
   },
   "browserslist": {
     "production": [
@@ -78,6 +98,7 @@
     ]
   },
   "devDependencies": {
+    "react-snap": "^1.23.0",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@craco/craco": "^7.1.0",
     "@eslint/js": "9.23.0",

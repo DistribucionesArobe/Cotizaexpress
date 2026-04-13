@@ -10,7 +10,10 @@ Allow: /terminos
 Allow: /registro
 
 Disallow: /login
+Disallow: /onboarding
+Disallow: /pago-exitoso
 Disallow: /dashboard
+Disallow: /carga-productos
 Disallow: /cotizaciones
 Disallow: /productos
 Disallow: /clientes
