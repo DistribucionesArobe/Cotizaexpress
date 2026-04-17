@@ -1505,15 +1505,18 @@ async def whatsapp_webhook(request: Request):
             text = lr_id if lr_id.upper().startswith("PICK_") else lr_title
         elif itype == "button_reply":
             text = (interactive.get("button_reply") or {}).get("title") or ""
+        print(f"INTERACTIVE MSG: type={itype} text={text!r} from={from_phone}")
 
     if text:
         log_message(company["company_id"], from_phone, "user", text)
 
+    print(f"WEBHOOK DISPATCH: msg_type={msg_type} text={text!r} is_interactive={msg_type == 'interactive'}")
     reply = build_reply_for_company(
         company["company_id"], text,
         wa_from=from_phone,
         is_interactive=(msg_type == "interactive"),
     )
+    print(f"WEBHOOK REPLY: type={type(reply).__name__} empty={not reply} preview={str(reply)[:120] if reply else 'NONE'}")
 
     if not reply:
         return {"ok": True}
@@ -2288,6 +2291,8 @@ def build_reply_for_company(company_id: str, user_text: str, wa_from: str = "", 
         "hablar con alguien", "horarios y ubicacion",
     }
     _is_button_click = is_interactive and _raw_current_stripped in _button_click_triggers
+    if is_interactive:
+        print(f"BTN_DEBUG: raw_stripped={_raw_current_stripped!r} is_button_click={_is_button_click} in_triggers={_raw_current_stripped in _button_click_triggers}")
 
     # Flush stale message buffer (>15s old) — prepend to current message
     # SKIP if current message is a button click (prevents buffer from mangling it)
