@@ -39,7 +39,7 @@ export default function AdminPromoCodes() {
   const [unUsoPorCliente, setUnUsoPorCliente] = useState(true);
 
   // Verificar si es admin
-  const esAdmin = user?.usuario?.rol === 'admin';
+  const esAdmin = user?.rol === 'admin';
 
   useEffect(() => {
     if (esAdmin) {
