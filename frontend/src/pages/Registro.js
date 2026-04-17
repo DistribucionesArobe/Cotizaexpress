@@ -15,14 +15,33 @@ export default function Registro() {
     password: '',
     nombre: '',
     empresa_nombre: '',
-    telefono: ''
+    telefono: '',
+    promo_code: ''
   });
+  const [promoStatus, setPromoStatus] = useState(null); // null | {valid, description} | 'checking'
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'promo_code') setPromoStatus(null);
+  };
+
+  const validatePromo = async () => {
+    const code = (formData.promo_code || '').trim();
+    if (!code) return;
+    setPromoStatus('checking');
+    try {
+      const API = import.meta.env.VITE_API_URL || '';
+      const res = await fetch(`${API}/api/pagos/promo/validar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+      setPromoStatus(data.valid ? { valid: true, description: data.description } : { valid: false, reason: data.reason || 'Código inválido' });
+    } catch {
+      setPromoStatus({ valid: false, reason: 'Error validando código' });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -168,6 +187,36 @@ export default function Registro() {
                   placeholder="5512345678"
                   data-testid="input-telefono"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Código Promocional (Opcional)
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    name="promo_code"
+                    value={formData.promo_code}
+                    onChange={handleChange}
+                    className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 uppercase"
+                    placeholder="Ej: PRUEBA10"
+                    data-testid="input-promo"
+                  />
+                  <button
+                    type="button"
+                    onClick={validatePromo}
+                    disabled={!formData.promo_code?.trim() || promoStatus === 'checking'}
+                    className="px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {promoStatus === 'checking' ? 'Validando...' : 'Validar'}
+                  </button>
+                </div>
+                {promoStatus && promoStatus !== 'checking' && (
+                  <p className={`text-sm mt-1 ${promoStatus.valid ? 'text-emerald-600' : 'text-red-500'}`}>
+                    {promoStatus.valid ? `✓ ${promoStatus.description}` : `✗ ${promoStatus.reason}`}
+                  </p>
+                )}
               </div>
 
               <Button

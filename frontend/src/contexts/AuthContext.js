@@ -40,11 +40,13 @@ export const AuthProvider = ({ children }) => {
   };
 
   // ✅ Registro (backend: /api/auth/register)
-  const registro = async ({ email, password }) => {
+  const registro = async ({ email, password, promo_code }) => {
     try {
+      const payload = { email, password };
+      if (promo_code && promo_code.trim()) payload.promo_code = promo_code.trim();
       await axios.post(
         `${API}/auth/register`,
-        { email, password },
+        payload,
         { withCredentials: true }
       );
 

@@ -7,9 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 import { Navigate } from 'react-router-dom';
-import { 
-  Tag, Plus, Trash2, ToggleLeft, ToggleRight, 
-  Users, Calendar, Percent, DollarSign, Loader2,
+import {
+  Tag, Plus, Trash2, ToggleLeft, ToggleRight,
+  Users, Calendar, Percent, Clock, Loader2,
   Shield, Copy, Check
 } from 'lucide-react';
 import {
@@ -21,8 +21,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_API_URL || ''}/api`;
 
 export default function AdminPromoCodes() {
   const { user } = useAuth();
@@ -31,14 +30,13 @@ export default function AdminPromoCodes() {
   const [showCrearModal, setShowCrearModal] = useState(false);
   const [creando, setCreando] = useState(false);
   const [copiedCode, setCopiedCode] = useState(null);
-  
+
   // Form para crear código
   const [nuevoCode, setNuevoCode] = useState('');
-  const [tipoDescuento, setTipoDescuento] = useState('porcentaje');
-  const [valorDescuento, setValorDescuento] = useState('');
-  const [maxUsos, setMaxUsos] = useState('1');
+  const [tipoDescuento, setTipoDescuento] = useState('trial_days');
+  const [valorDescuento, setValorDescuento] = useState('10');
+  const [maxUsos, setMaxUsos] = useState('');
   const [unUsoPorCliente, setUnUsoPorCliente] = useState(true);
-  const [descripcion, setDescripcion] = useState('');
 
   // Verificar si es admin
   const esAdmin = user?.usuario?.rol === 'admin';
@@ -52,8 +50,8 @@ export default function AdminPromoCodes() {
   const cargarPromoCodes = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API}/pagos/promo/listar`);
-      setPromoCodes(response.data.promo_codes || []);
+      const response = await axios.get(`${API}/pagos/promo/listar`, { withCredentials: true });
+      setPromoCodes(response.data.promos || []);
     } catch (error) {
       console.error('Error cargando códigos:', error);
       if (error.response?.status === 403) {
@@ -72,28 +70,23 @@ export default function AdminPromoCodes() {
       return;
     }
     if (!valorDescuento || parseFloat(valorDescuento) <= 0) {
-      toast.error('Ingresa un valor de descuento válido');
+      toast.error('Ingresa un valor válido');
       return;
     }
 
     try {
       setCreando(true);
-      
+
       const payload = {
         code: nuevoCode.trim().toUpperCase(),
-        max_usos: parseInt(maxUsos) || 1,
-        un_uso_por_cliente: unUsoPorCliente,
-        descripcion: descripcion || undefined
+        discount_type: tipoDescuento,
+        discount_value: parseFloat(valorDescuento),
+        max_uses: maxUsos ? parseInt(maxUsos) : null,
+        one_per_customer: unUsoPorCliente,
       };
 
-      if (tipoDescuento === 'porcentaje') {
-        payload.descuento_porcentaje = parseInt(valorDescuento);
-      } else {
-        payload.descuento_fijo = parseFloat(valorDescuento);
-      }
+      await axios.post(`${API}/pagos/promo/crear`, payload, { withCredentials: true });
 
-      await axios.post(`${API}/pagos/promo/crear`, payload);
-      
       toast.success(`Código ${payload.code} creado exitosamente`);
       setShowCrearModal(false);
       resetForm();
@@ -106,15 +99,19 @@ export default function AdminPromoCodes() {
     }
   };
 
-  const togglePromoCode = async (promoId, currentState) => {
+  const togglePromoCode = async (promoId, currentActive) => {
     try {
-      const response = await axios.patch(`${API}/pagos/promo/${promoId}/toggle`);
-      
-      setPromoCodes(prev => prev.map(p => 
-        p.id === promoId ? { ...p, activo: response.data.activo } : p
+      const response = await axios.patch(
+        `${API}/pagos/promo/${promoId}/toggle`,
+        { active: !currentActive },
+        { withCredentials: true }
+      );
+
+      setPromoCodes(prev => prev.map(p =>
+        p.id === promoId ? { ...p, active: response.data.active } : p
       ));
-      
-      toast.success(`Código ${response.data.activo ? 'activado' : 'desactivado'}`);
+
+      toast.success(`Código ${response.data.active ? 'activado' : 'desactivado'}`);
     } catch (error) {
       console.error('Error actualizando código:', error);
       toast.error('Error al actualizar código');
@@ -125,7 +122,7 @@ export default function AdminPromoCodes() {
     if (!confirm(`¿Eliminar el código ${code}?`)) return;
 
     try {
-      await axios.delete(`${API}/pagos/promo/${promoId}`);
+      await axios.delete(`${API}/pagos/promo/${promoId}`, { withCredentials: true });
       setPromoCodes(prev => prev.filter(p => p.id !== promoId));
       toast.success('Código eliminado');
     } catch (error) {
@@ -143,11 +140,17 @@ export default function AdminPromoCodes() {
 
   const resetForm = () => {
     setNuevoCode('');
-    setTipoDescuento('porcentaje');
-    setValorDescuento('');
-    setMaxUsos('1');
+    setTipoDescuento('trial_days');
+    setValorDescuento('10');
+    setMaxUsos('');
     setUnUsoPorCliente(true);
-    setDescripcion('');
+  };
+
+  const formatDiscount = (promo) => {
+    if (promo.discount_type === 'trial_days') {
+      return `${parseInt(promo.discount_value)} días gratis`;
+    }
+    return `${parseInt(promo.discount_value)}% desc.`;
   };
 
   // Si no es admin, redirigir
@@ -176,8 +179,8 @@ export default function AdminPromoCodes() {
             <p className="text-slate-600">Administra los descuentos y promociones</p>
           </div>
         </div>
-        
-        <Button 
+
+        <Button
           onClick={() => setShowCrearModal(true)}
           className="bg-emerald-600 hover:bg-emerald-700"
           data-testid="btn-crear-promo"
@@ -202,7 +205,7 @@ export default function AdminPromoCodes() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
@@ -211,14 +214,14 @@ export default function AdminPromoCodes() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">
-                  {promoCodes.filter(p => p.activo).length}
+                  {promoCodes.filter(p => p.active).length}
                 </p>
                 <p className="text-sm text-slate-500">Activos</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
@@ -227,7 +230,7 @@ export default function AdminPromoCodes() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">
-                  {promoCodes.reduce((acc, p) => acc + (p.usos_completados || 0), 0)}
+                  {promoCodes.reduce((acc, p) => acc + (p.times_used || 0), 0)}
                 </p>
                 <p className="text-sm text-slate-500">Usos totales</p>
               </div>
@@ -251,10 +254,10 @@ export default function AdminPromoCodes() {
           ) : (
             <div className="space-y-3">
               {promoCodes.map((promo) => (
-                <div 
+                <div
                   key={promo.id}
                   className={`flex items-center justify-between p-4 rounded-lg border ${
-                    promo.activo ? 'bg-white border-slate-200' : 'bg-slate-50 border-slate-200'
+                    promo.active ? 'bg-white border-slate-200' : 'bg-slate-50 border-slate-200'
                   }`}
                   data-testid={`promo-${promo.code}`}
                 >
@@ -262,7 +265,7 @@ export default function AdminPromoCodes() {
                     {/* Código */}
                     <div className="flex items-center gap-2">
                       <code className={`px-3 py-1 rounded-md font-mono text-lg ${
-                        promo.activo ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'
+                        promo.active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'
                       }`}>
                         {promo.code}
                       </code>
@@ -278,43 +281,41 @@ export default function AdminPromoCodes() {
                         )}
                       </button>
                     </div>
-                    
+
                     {/* Descuento */}
-                    <Badge variant={promo.activo ? 'default' : 'secondary'}>
-                      {promo.descuento_porcentaje 
-                        ? `${promo.descuento_porcentaje}%`
-                        : `$${promo.descuento_fijo} MXN`
-                      }
+                    <Badge variant={promo.active ? 'default' : 'secondary'}>
+                      {promo.discount_type === 'trial_days' ? (
+                        <><Clock className="w-3 h-3 mr-1" />{formatDiscount(promo)}</>
+                      ) : (
+                        <><Percent className="w-3 h-3 mr-1" />{formatDiscount(promo)}</>
+                      )}
                     </Badge>
-                    
+
                     {/* Info adicional */}
                     <div className="hidden md:flex items-center gap-4 text-sm text-slate-500">
                       <span className="flex items-center gap-1">
                         <Users className="w-4 h-4" />
-                        {promo.usos_actuales || 0}/{promo.max_usos || '∞'}
+                        {promo.times_used || 0}/{promo.max_uses || '\u221e'}
                       </span>
-                      {promo.descripcion && (
-                        <span className="max-w-xs truncate">{promo.descripcion}</span>
-                      )}
                     </div>
                   </div>
-                  
+
                   {/* Acciones */}
                   <div className="flex items-center gap-2">
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => togglePromoCode(promo.id, promo.activo)}
-                      className={promo.activo ? 'text-emerald-600' : 'text-slate-400'}
-                      title={promo.activo ? 'Desactivar' : 'Activar'}
+                      onClick={() => togglePromoCode(promo.id, promo.active)}
+                      className={promo.active ? 'text-emerald-600' : 'text-slate-400'}
+                      title={promo.active ? 'Desactivar' : 'Activar'}
                     >
-                      {promo.activo ? (
+                      {promo.active ? (
                         <ToggleRight className="w-5 h-5" />
                       ) : (
                         <ToggleLeft className="w-5 h-5" />
                       )}
                     </Button>
-                    
+
                     <Button
                       variant="ghost"
                       size="sm"
@@ -341,16 +342,16 @@ export default function AdminPromoCodes() {
               Crear Código Promocional
             </DialogTitle>
             <DialogDescription>
-              Crea un nuevo código de descuento para tus clientes
+              Crea un nuevo código de descuento o trial gratuito
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             {/* Código */}
             <div>
               <label className="text-sm font-medium text-slate-700">Código</label>
               <Input
-                placeholder="Ej: BIENVENIDO, PROMO50"
+                placeholder="Ej: PRUEBA10, BIENVENIDO"
                 value={nuevoCode}
                 onChange={(e) => setNuevoCode(e.target.value.toUpperCase())}
                 className="mt-1"
@@ -360,25 +361,25 @@ export default function AdminPromoCodes() {
 
             {/* Tipo de descuento */}
             <div>
-              <label className="text-sm font-medium text-slate-700">Tipo de descuento</label>
+              <label className="text-sm font-medium text-slate-700">Tipo</label>
               <div className="flex gap-2 mt-1">
                 <Button
                   type="button"
-                  variant={tipoDescuento === 'porcentaje' ? 'default' : 'outline'}
+                  variant={tipoDescuento === 'trial_days' ? 'default' : 'outline'}
                   className="flex-1"
-                  onClick={() => setTipoDescuento('porcentaje')}
+                  onClick={() => { setTipoDescuento('trial_days'); setValorDescuento('10'); }}
                 >
-                  <Percent className="w-4 h-4 mr-2" />
-                  Porcentaje
+                  <Clock className="w-4 h-4 mr-2" />
+                  Días gratis
                 </Button>
                 <Button
                   type="button"
-                  variant={tipoDescuento === 'fijo' ? 'default' : 'outline'}
+                  variant={tipoDescuento === 'percentage' ? 'default' : 'outline'}
                   className="flex-1"
-                  onClick={() => setTipoDescuento('fijo')}
+                  onClick={() => { setTipoDescuento('percentage'); setValorDescuento(''); }}
                 >
-                  <DollarSign className="w-4 h-4 mr-2" />
-                  Monto fijo
+                  <Percent className="w-4 h-4 mr-2" />
+                  Porcentaje
                 </Button>
               </div>
             </div>
@@ -386,29 +387,34 @@ export default function AdminPromoCodes() {
             {/* Valor */}
             <div>
               <label className="text-sm font-medium text-slate-700">
-                {tipoDescuento === 'porcentaje' ? 'Porcentaje de descuento' : 'Monto de descuento (MXN)'}
+                {tipoDescuento === 'trial_days' ? 'Días de trial gratuito' : 'Porcentaje de descuento'}
               </label>
               <div className="relative mt-1">
                 <Input
                   type="number"
-                  placeholder={tipoDescuento === 'porcentaje' ? '10, 25, 50...' : '100, 200, 500...'}
+                  placeholder={tipoDescuento === 'trial_days' ? '10' : '25'}
                   value={valorDescuento}
                   onChange={(e) => setValorDescuento(e.target.value)}
                   className="pl-8"
                   data-testid="input-valor-descuento"
                 />
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                  {tipoDescuento === 'porcentaje' ? '%' : '$'}
+                  {tipoDescuento === 'trial_days' ? '\ud83d\udcc5' : '%'}
                 </span>
               </div>
+              {tipoDescuento === 'trial_days' && (
+                <p className="text-xs text-slate-500 mt-1">
+                  El usuario tendrá acceso al plan Pro durante estos días
+                </p>
+              )}
             </div>
 
             {/* Usos máximos */}
             <div>
-              <label className="text-sm font-medium text-slate-700">Usos máximos</label>
+              <label className="text-sm font-medium text-slate-700">Usos máximos (vacío = ilimitado)</label>
               <Input
                 type="number"
-                placeholder="Cantidad de veces que se puede usar"
+                placeholder="Sin límite"
                 value={maxUsos}
                 onChange={(e) => setMaxUsos(e.target.value)}
                 className="mt-1"
@@ -428,18 +434,6 @@ export default function AdminPromoCodes() {
               <label htmlFor="unUsoPorCliente" className="text-sm text-slate-700">
                 Solo un uso por cliente
               </label>
-            </div>
-
-            {/* Descripción */}
-            <div>
-              <label className="text-sm font-medium text-slate-700">Descripción (opcional)</label>
-              <Input
-                placeholder="Ej: Descuento de bienvenida"
-                value={descripcion}
-                onChange={(e) => setDescripcion(e.target.value)}
-                className="mt-1"
-                data-testid="input-descripcion"
-              />
             </div>
           </div>
 
