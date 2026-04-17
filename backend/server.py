@@ -2276,6 +2276,10 @@ def build_reply_for_company(company_id: str, user_text: str, wa_from: str = "", 
     _raw_current = (user_text or "").strip().lower()
     _raw_current_stripped = re.sub(r"[^\w\s]", "", _raw_current).strip()
     _raw_current_stripped = re.sub(r"\s+", " ", _raw_current_stripped)
+    # Strip accents for comparison (ubicación→ubicacion, más→mas, etc.)
+    import unicodedata as _ud
+    _raw_current_stripped = _ud.normalize("NFD", _raw_current_stripped)
+    _raw_current_stripped = "".join(c for c in _raw_current_stripped if _ud.category(c) != "Mn")
     _button_click_triggers = {
         "quitar producto", "quitar productos", "quitar",
         "eliminar producto", "eliminar", "borrar producto", "remover", "remover producto",
