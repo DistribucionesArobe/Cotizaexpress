@@ -21,8 +21,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+const API = `${import.meta.env.VITE_API_URL || ''}/api`;
 
 export default function AdminPromoCodes() {
   const { user } = useAuth();
