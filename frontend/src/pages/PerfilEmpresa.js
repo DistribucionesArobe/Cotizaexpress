@@ -16,6 +16,9 @@ export default function PerfilEmpresa() {
   const [settings, setSettings] = useState(null);
   const [company, setCompany] = useState(null);
   const fileInputRef = useRef(null);
+  const [waPreview, setWaPreview] = useState(null);
+  const [waPreviewMode, setWaPreviewMode] = useState(null); // 'solo' | 'cotizabot'
+  const [loadingPreview, setLoadingPreview] = useState(false);
 
   const [formData, setFormData] = useState({
     email: '',
@@ -262,15 +265,16 @@ export default function PerfilEmpresa() {
                     type="button"
                     variant="outline"
                     size="sm"
-                    disabled={uploading}
+                    disabled={uploading || loadingPreview}
                     onClick={async () => {
                       try {
-                        setUploading(true);
-                        const r = await axios.post(`${API}/company/logo/update-wa-profile?with_cotizabot=false`);
-                        if (r.data?.ok) toast.success('Foto de WhatsApp actualizada (solo tu logo)');
-                        else toast.error('Error al actualizar foto de WhatsApp');
-                      } catch { toast.error('Error al actualizar'); }
-                      finally { setUploading(false); }
+                        setLoadingPreview(true);
+                        setWaPreviewMode('solo');
+                        const r = await axios.get(`${API}/company/logo/wa-preview?with_cotizabot=false`);
+                        if (r.data?.preview) setWaPreview(r.data.preview);
+                        else toast.error('Error al generar preview');
+                      } catch { toast.error('Error al generar preview'); }
+                      finally { setLoadingPreview(false); }
                     }}
                   >
                     Solo mi logo
@@ -278,23 +282,78 @@ export default function PerfilEmpresa() {
                   <Button
                     type="button"
                     size="sm"
-                    disabled={uploading}
+                    disabled={uploading || loadingPreview}
                     className="bg-emerald-600 hover:bg-emerald-700 text-white"
                     onClick={async () => {
                       try {
-                        setUploading(true);
-                        const r = await axios.post(`${API}/company/logo/update-wa-profile?with_cotizabot=true`);
-                        if (r.data?.ok) toast.success('Foto de WhatsApp actualizada con branding CotizaBot');
-                        else toast.error('Error al actualizar foto de WhatsApp');
-                      } catch { toast.error('Error al actualizar'); }
-                      finally { setUploading(false); }
+                        setLoadingPreview(true);
+                        setWaPreviewMode('cotizabot');
+                        const r = await axios.get(`${API}/company/logo/wa-preview?with_cotizabot=true`);
+                        if (r.data?.preview) setWaPreview(r.data.preview);
+                        else toast.error('Error al generar preview');
+                      } catch { toast.error('Error al generar preview'); }
+                      finally { setLoadingPreview(false); }
                     }}
                   >
                     <img src="/logo-cotizabot.png" alt="" className="w-5 h-5 mr-1.5 inline-block" />
                     Combinar con CotizaBot
                   </Button>
                 </div>
-                <p className="text-xs text-slate-500 mt-2">Elige cómo se ve tu foto de perfil en WhatsApp. "Combinar con CotizaBot" añade nuestro logo al tuyo.</p>
+                <p className="text-xs text-slate-500 mt-1">Elige cómo se ve tu foto de perfil en WhatsApp</p>
+
+                {/* Preview */}
+                {(waPreview || loadingPreview) && (
+                  <div className="mt-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <p className="text-sm font-medium text-slate-600 mb-3">
+                      Vista previa {waPreviewMode === 'cotizabot' ? '(con CotizaBot)' : '(solo tu logo)'}
+                    </p>
+                    <div className="flex items-start gap-4">
+                      {loadingPreview ? (
+                        <div className="w-32 h-32 rounded-full bg-slate-200 animate-pulse flex-shrink-0" />
+                      ) : (
+                        <div className="flex-shrink-0">
+                          <img
+                            src={waPreview}
+                            alt="Preview"
+                            className="w-32 h-32 rounded-full object-cover border-2 border-slate-200 shadow-sm"
+                          />
+                          <p className="text-[10px] text-slate-400 text-center mt-1">Así se ve en WhatsApp</p>
+                        </div>
+                      )}
+                      <div className="flex flex-col gap-2 pt-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          disabled={uploading || loadingPreview}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                          onClick={async () => {
+                            try {
+                              setUploading(true);
+                              const withCb = waPreviewMode === 'cotizabot';
+                              const r = await axios.post(`${API}/company/logo/update-wa-profile?with_cotizabot=${withCb}`);
+                              if (r.data?.ok) {
+                                toast.success('Foto de perfil de WhatsApp actualizada');
+                                setWaPreview(null);
+                                setWaPreviewMode(null);
+                              } else toast.error('Error al actualizar');
+                            } catch { toast.error('Error al actualizar'); }
+                            finally { setUploading(false); }
+                          }}
+                        >
+                          {uploading ? 'Aplicando...' : 'Aplicar a WhatsApp'}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => { setWaPreview(null); setWaPreviewMode(null); }}
+                        >
+                          Cancelar
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
