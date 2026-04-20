@@ -179,8 +179,13 @@ export default function PerfilEmpresa() {
       setUploading(true);
       const fd = new FormData();
       fd.append('file', file);
-      await axios.post(`${API}/company/logo`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const resp = await axios.post(`${API}/company/logo`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       toast.success('Logo actualizado');
+      if (resp.data?.wa_profile_updated === true) {
+        toast.success('Foto de perfil de WhatsApp actualizada');
+      } else if (resp.data?.wa_profile_updated === false) {
+        toast.error('No se pudo actualizar la foto de WhatsApp');
+      }
       cargarDatos();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Error al subir logo');
