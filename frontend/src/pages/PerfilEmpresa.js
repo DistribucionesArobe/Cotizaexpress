@@ -252,6 +252,51 @@ export default function PerfilEmpresa() {
                 <p className="text-xs text-slate-500">PNG, JPG o WEBP. Máx 2MB</p>
               </div>
             </div>
+
+            {/* CotizaBot branding toggle for WhatsApp */}
+            {settings?.logo_url && (
+              <div className="mt-4 pt-4 border-t border-slate-200">
+                <p className="text-sm font-medium text-slate-700 mb-2">Foto de perfil de WhatsApp</p>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={uploading}
+                    onClick={async () => {
+                      try {
+                        setUploading(true);
+                        const r = await axios.post(`${API}/company/logo/update-wa-profile?with_cotizabot=false`);
+                        if (r.data?.ok) toast.success('Foto de WhatsApp actualizada (solo tu logo)');
+                        else toast.error('Error al actualizar foto de WhatsApp');
+                      } catch { toast.error('Error al actualizar'); }
+                      finally { setUploading(false); }
+                    }}
+                  >
+                    Solo mi logo
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    disabled={uploading}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                    onClick={async () => {
+                      try {
+                        setUploading(true);
+                        const r = await axios.post(`${API}/company/logo/update-wa-profile?with_cotizabot=true`);
+                        if (r.data?.ok) toast.success('Foto de WhatsApp actualizada con branding CotizaBot');
+                        else toast.error('Error al actualizar foto de WhatsApp');
+                      } catch { toast.error('Error al actualizar'); }
+                      finally { setUploading(false); }
+                    }}
+                  >
+                    <img src="/logo-cotizabot.png" alt="" className="w-5 h-5 mr-1.5 inline-block" />
+                    Combinar con CotizaBot
+                  </Button>
+                </div>
+                <p className="text-xs text-slate-500 mt-2">Elige cómo se ve tu foto de perfil en WhatsApp. "Combinar con CotizaBot" añade nuestro logo al tuyo.</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
