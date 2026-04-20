@@ -23,6 +23,14 @@ export default function Dashboard() {
 
   useEffect(() => {
     cargarStats();
+    // Google Ads conversion — fires once when user reaches Dashboard
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'conversion', {
+        'send_to': 'AW-16644469311/C9COCMPJh8MZEL_k2YA-',
+        'value': 1.0,
+        'currency': 'MXN'
+      });
+    }
   }, []);
 
   const cargarStats = async () => {
