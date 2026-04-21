@@ -89,25 +89,25 @@ const calculatorFunctions = {
     ];
   },
 
-  rejacero: (largo, ancho) => {
-    const area = largo * ancho;
-    const spacing = 0.15;
-    const varillasLargo = Math.ceil(ancho / spacing) + 1;
-    const varillasAncho = Math.ceil(largo / spacing) + 1;
-    const piezasLargo = varillasLargo * Math.ceil(largo / 12);
-    const piezasAncho = varillasAncho * Math.ceil(ancho / 12);
-    const totalVarillas = piezasLargo + piezasAncho;
-    // Castillos: 1 per 3m of perimeter, 4 varillas each at 3m height
-    const perimetro = (largo + ancho) * 2;
-    const numCastillos = Math.ceil(perimetro / 3);
-    const varCastillos = numCastillos * 4;
-    // Estribos: every 15cm per castillo at 3m height
-    const estribos = numCastillos * Math.ceil(3 / 0.15);
+  rejacero: (metros, alturaIdx) => {
+    // alturaIdx: 1=1.00m, 1.5=1.50m, 2=2.00m, 2.5=2.50m
+    const altura = alturaIdx;
+    const rejas = Math.ceil(metros / 2.50);
+    const postes = rejas + 1;
+    // Abrazaderas per post based on height
+    let abrPerPost = 2;
+    if (altura >= 2.50) abrPerPost = 5;
+    else if (altura >= 2.00) abrPerPost = 4;
+    else if (altura >= 1.50) abrPerPost = 3;
+    const abrazaderas = postes * abrPerPost;
+    // Poste height is 0.50m taller than reja
+    const alturaPosteMap = { 1: '1.50', 1.5: '2.00', 2: '2.50', 2.5: '3.10' };
+    const alturaPoste = alturaPosteMap[altura] || (altura + 0.5).toFixed(2);
+    const alturaStr = String(altura).replace(/\.?0+$/, '');
     return [
-      { name: 'Varilla 3/8 (12m) — parrilla', qty: totalVarillas, unit: 'pza' },
-      { name: 'Varilla 3/8 (12m) — castillos', qty: varCastillos, unit: 'pza' },
-      { name: 'Estribos 15x15', qty: estribos, unit: 'pza' },
-      { name: 'Alambre recocido', qty: Math.ceil(area / 3), unit: 'kg' },
+      { name: `Reja ciclónica ${alturaStr}m × 2.50m`, qty: rejas, unit: 'pza' },
+      { name: `Poste ${alturaPoste}m para rejacero`, qty: postes, unit: 'pza' },
+      { name: 'Abrazadera para rejacero', qty: abrazaderas, unit: 'pza' },
     ];
   },
 };
@@ -149,10 +149,10 @@ const Calculadoras = () => {
     },
     rejacero: {
       label: '🔩 Rejacero',
-      description: 'Calcula acero estructural y refuerzo',
+      description: 'Calcula reja ciclónica, postes y abrazaderas',
       directCalc: 'rejacero',
       subcategories: {
-        rejacero: { label: 'Rejacero', fields: ['largo', 'ancho'] },
+        rejacero: { label: 'Reja ciclónica', fields: ['metrosReja', 'alturaReja'] },
       },
     },
   };
@@ -217,8 +217,13 @@ const Calculadoras = () => {
       ancho: { label: 'Ancho (metros)', placeholder: 'Ej: 4' },
       m2: { label: 'Área total (m²)', placeholder: 'Ej: 100' },
       manos: { label: 'Número de manos', placeholder: '1-3 (default 2)', min: 1, max: 3 },
-      cantidad: { label: 'Cantidad', placeholder: 'Ej: 10' },
-      perimetro: { label: 'Perímetro (metros)', placeholder: 'Ej: 20' },
+      metrosReja: { label: 'Metros lineales de reja', placeholder: 'Ej: 25' },
+      alturaReja: { label: 'Altura de la reja', type: 'select', options: [
+        { value: 1, label: '1.00 m' },
+        { value: 1.5, label: '1.50 m' },
+        { value: 2, label: '2.00 m' },
+        { value: 2.5, label: '2.50 m' },
+      ]},
     };
 
     return (
@@ -228,16 +233,29 @@ const Calculadoras = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               {fieldLabels[field]?.label}
             </label>
-            <input
-              type="number"
-              placeholder={fieldLabels[field]?.placeholder}
-              value={inputs[field] !== undefined && inputs[field] !== '' ? inputs[field] : ''}
-              onChange={e => handleInputChange(field, e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              min={fieldLabels[field]?.min}
-              max={fieldLabels[field]?.max}
-              step="0.01"
-            />
+            {fieldLabels[field]?.type === 'select' ? (
+              <select
+                value={inputs[field] !== undefined ? inputs[field] : ''}
+                onChange={e => handleInputChange(field, e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white"
+              >
+                <option value="">Selecciona...</option>
+                {fieldLabels[field].options.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="number"
+                placeholder={fieldLabels[field]?.placeholder}
+                value={inputs[field] !== undefined && inputs[field] !== '' ? inputs[field] : ''}
+                onChange={e => handleInputChange(field, e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                min={fieldLabels[field]?.min}
+                max={fieldLabels[field]?.max}
+                step="0.01"
+              />
+            )}
           </div>
         ))}
         <Button
