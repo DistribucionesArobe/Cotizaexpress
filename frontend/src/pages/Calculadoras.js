@@ -89,36 +89,25 @@ const calculatorFunctions = {
     ];
   },
 
-  losa: (largo, ancho) => {
+  rejacero: (largo, ancho) => {
     const area = largo * ancho;
     const spacing = 0.15;
     const varillasLargo = Math.ceil(ancho / spacing) + 1;
     const varillasAncho = Math.ceil(largo / spacing) + 1;
     const piezasLargo = varillasLargo * Math.ceil(largo / 12);
     const piezasAncho = varillasAncho * Math.ceil(ancho / 12);
+    const totalVarillas = piezasLargo + piezasAncho;
+    // Castillos: 1 per 3m of perimeter, 4 varillas each at 3m height
+    const perimetro = (largo + ancho) * 2;
+    const numCastillos = Math.ceil(perimetro / 3);
+    const varCastillos = numCastillos * 4;
+    // Estribos: every 15cm per castillo at 3m height
+    const estribos = numCastillos * Math.ceil(3 / 0.15);
     return [
-      { name: 'Varilla 3/8 (12m)', qty: piezasLargo + piezasAncho, unit: 'pza' },
-      { name: 'Alambre recocido', qty: Math.ceil(area / 5), unit: 'kg' },
-    ];
-  },
-
-  castillo: (cantidad, alto) => {
-    const varillas = cantidad * 4 * Math.ceil(alto / 12);
-    const estribos = cantidad * Math.ceil(alto / 0.15);
-    return [
-      { name: 'Varilla 3/8 (12m)', qty: Math.ceil(varillas), unit: 'pza' },
-      { name: 'Alambre recocido', qty: Math.ceil(cantidad * alto * 0.5), unit: 'kg' },
+      { name: 'Varilla 3/8 (12m) — parrilla', qty: totalVarillas, unit: 'pza' },
+      { name: 'Varilla 3/8 (12m) — castillos', qty: varCastillos, unit: 'pza' },
       { name: 'Estribos 15x15', qty: estribos, unit: 'pza' },
-    ];
-  },
-
-  dala: (perimetro, alto = 0.15) => {
-    const varillas = 4 * Math.ceil(perimetro / 12);
-    const estribos = Math.ceil(perimetro / 0.20);
-    return [
-      { name: 'Varilla 3/8 (12m)', qty: varillas, unit: 'pza' },
-      { name: 'Alambre recocido', qty: Math.ceil(perimetro * 0.5), unit: 'kg' },
-      { name: 'Estribos 15x15', qty: estribos, unit: 'pza' },
+      { name: 'Alambre recocido', qty: Math.ceil(area / 3), unit: 'kg' },
     ];
   },
 };
@@ -145,6 +134,7 @@ const Calculadoras = () => {
     pintura: {
       label: '🎨 Pintura',
       description: 'Calcula pintura y accesorios necesarios',
+      directCalc: 'pintura',
       subcategories: {
         pintura: { label: 'Pintura Vinílica', fields: ['m2', 'manos'] },
       },
@@ -152,6 +142,7 @@ const Calculadoras = () => {
     impermeabilizante: {
       label: '🛡️ Impermeabilizantes',
       description: 'Calcula materiales impermeabilizantes',
+      directCalc: 'impermeabilizante',
       subcategories: {
         impermeabilizante: { label: 'Impermeabilizante', fields: ['m2', 'manos'] },
       },
@@ -159,10 +150,9 @@ const Calculadoras = () => {
     rejacero: {
       label: '🔩 Rejacero',
       description: 'Calcula acero estructural y refuerzo',
+      directCalc: 'rejacero',
       subcategories: {
-        losa: { label: 'Losa', fields: ['largo', 'ancho'] },
-        castillo: { label: 'Castillo', fields: ['cantidad', 'alto'] },
-        dala: { label: 'Dala', fields: ['perimetro'] },
+        rejacero: { label: 'Rejacero', fields: ['largo', 'ancho'] },
       },
     },
   };
@@ -241,7 +231,7 @@ const Calculadoras = () => {
             <input
               type="number"
               placeholder={fieldLabels[field]?.placeholder}
-              value={inputs[field] || ''}
+              value={inputs[field] !== undefined && inputs[field] !== '' ? inputs[field] : ''}
               onChange={e => handleInputChange(field, e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               min={fieldLabels[field]?.min}
@@ -309,7 +299,19 @@ const Calculadoras = () => {
                 <Card
                   key={key}
                   className="cursor-pointer hover:shadow-lg transition-shadow"
-                  onClick={() => setActiveCategory(key)}
+                  onClick={() => {
+                    setActiveCategory(key);
+                    // If category has directCalc, skip subcategory selection
+                    if (category.directCalc) {
+                      setActiveSubcategory(category.directCalc);
+                      // Set default manos=2 for pintura/impermeabilizante
+                      if (category.directCalc === 'pintura' || category.directCalc === 'impermeabilizante') {
+                        setInputs({ manos: 2 });
+                      } else {
+                        setInputs({});
+                      }
+                    }
+                  }}
                 >
                   <CardHeader>
                     <CardTitle className="text-2xl">{category.label}</CardTitle>
@@ -379,17 +381,19 @@ const Calculadoras = () => {
                           {categories[activeCategory].subcategories[activeSubcategory].label}
                         </h3>
                         {renderInputFields()}
-                        <Button
-                          variant="outline"
-                          onClick={() => {
-                            setActiveSubcategory(null);
-                            setInputs({});
-                            setResults(null);
-                          }}
-                          className="w-full mt-4"
-                        >
-                          Cambiar tipo
-                        </Button>
+                        {!categories[activeCategory].directCalc && (
+                          <Button
+                            variant="outline"
+                            onClick={() => {
+                              setActiveSubcategory(null);
+                              setInputs({});
+                              setResults(null);
+                            }}
+                            className="w-full mt-4"
+                          >
+                            Cambiar tipo
+                          </Button>
+                        )}
                       </div>
 
                       {/* Results Section */}
