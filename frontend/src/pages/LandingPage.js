@@ -283,6 +283,7 @@ export default function LandingPage() {
             <div className="flex items-center gap-4">
               <Link to="/precios" className="text-slate-600 hover:text-emerald-600 font-medium hidden sm:block">Precios</Link>
               <Link to="/ferreterias" className="text-slate-600 hover:text-emerald-600 font-medium hidden md:block">Ferreterías</Link>
+              <Link to="/calculadoras" className="text-slate-600 hover:text-emerald-600 font-medium hidden md:block">Calculadoras</Link>
               <Link to="/demo" className="text-slate-600 hover:text-emerald-600 font-medium hidden md:block">Demo</Link>
               <Link to="/login">
                 <Button variant="ghost" className="text-slate-600">Iniciar Sesión</Button>
@@ -578,6 +579,7 @@ export default function LandingPage() {
                 <li><Link to="/demo" className="text-slate-400 hover:text-white">Demo</Link></li>
                 <li><Link to="/ferreterias" className="text-slate-400 hover:text-white">Para Ferreterías</Link></li>
                 <li><Link to="/refaccionarias" className="text-slate-400 hover:text-white">Para Refaccionarias</Link></li>
+                <li><Link to="/calculadoras" className="text-slate-400 hover:text-white">Calculadoras</Link></li>
               </ul>
             </div>
             <div>
