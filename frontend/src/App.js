@@ -170,7 +170,7 @@ function AppRoutes() {
                   </Link>
 
                   {/* Enlace de Admin - Solo visible para admins */}
-                  {user?.usuario?.rol === 'admin' && (
+                  {user?.rol === 'admin' && (
                     <Link
                       to="/admin"
                       data-testid="nav-admin"
@@ -262,7 +262,7 @@ function AppRoutes() {
                     🏢 Mi Empresa
                   </Link>
                   
-                  {user?.usuario?.rol === 'admin' && (
+                  {user?.rol === 'admin' && (
                     <Link
                       to="/admin"
                       className={`block px-4 py-3 rounded-lg text-sm font-medium ${

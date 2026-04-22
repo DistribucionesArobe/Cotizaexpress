@@ -21,7 +21,7 @@ export default function AdminTwilio() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  const esAdmin = user?.usuario?.rol === 'admin';
+  const esAdmin = user?.rol === 'admin';
 
   useEffect(() => {
     if (esAdmin) {

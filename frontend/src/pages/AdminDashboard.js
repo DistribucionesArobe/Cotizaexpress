@@ -52,7 +52,7 @@ export default function AdminDashboard() {
   const [filter, setFilter] = useState('all'); // all, paid, free, trial
   const [searchTerm, setSearchTerm] = useState('');
 
-  const esAdmin = user?.usuario?.rol === 'admin';
+  const esAdmin = user?.rol === 'admin';
 
   useEffect(() => {
     if (esAdmin) {
