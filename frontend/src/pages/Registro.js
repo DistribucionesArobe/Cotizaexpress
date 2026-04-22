@@ -31,7 +31,7 @@ export default function Registro() {
     if (!code) return;
     setPromoStatus('checking');
     try {
-      const API = import.meta.env.VITE_API_URL || '';
+      const API = process.env.REACT_APP_BACKEND_URL || '';
       const res = await fetch(`${API}/api/pagos/promo/validar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
