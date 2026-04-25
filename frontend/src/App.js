@@ -35,6 +35,7 @@ import ServiciosTecnicosSEO from './pages/ServiciosTecnicosSEO';
 import PrivacidadPage from './pages/PrivacidadPage';
 import TerminosPage from './pages/TerminosPage';
 import Calculadoras from './pages/Calculadoras';
+import Contacto from './pages/Contacto';
 import { Menu, X } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -305,6 +306,7 @@ function AppRoutes() {
             <Route path="/privacidad" element={<PrivacidadPage />} />
             <Route path="/terminos" element={<TerminosPage />} />
             <Route path="/calculadoras" element={<Calculadoras />} />
+            <Route path="/contacto" element={<Contacto />} />
 
             {/* Rutas protegidas */}
             <Route
