@@ -142,27 +142,44 @@ export default function ConfiguracionWhatsApp() {
                   Conectar mi WhatsApp
                 </Button>
 
-                <div className="bg-white rounded-lg p-4 border border-emerald-200">
-                  <p className="text-sm text-slate-700">
-                    <strong>Necesitas un número que no tenga WhatsApp instalado.</strong> Nuestro equipo te ayuda con la configuración.
-                  </p>
-                </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Phone number help section */}
-          <Card>
+          {/* Antes de conectar */}
+          <Card className="border-amber-200 bg-amber-50">
             <CardHeader>
-              <CardTitle className="text-base">¿No tienes número extra?</CardTitle>
+              <CardTitle className="text-base text-amber-900">Antes de conectar, prepara tu número</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-slate-600 mb-3">
-                Compra un chip prepago (~$50 MXN) y no le instales WhatsApp. Solo necesitas poder recibir un SMS de verificación.
-              </p>
-              <p className="text-sm text-slate-500">
-                Una vez que tengas el número, haz clic en "Conectar mi WhatsApp" arriba para completar la configuración.
-              </p>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <span className="w-6 h-6 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center text-sm font-bold flex-shrink-0">1</span>
+                  <div>
+                    <p className="text-sm font-medium text-slate-900">Consigue un número dedicado para el bot</p>
+                    <p className="text-xs text-slate-600">Compra un chip prepago (~$50 MXN). Este número será exclusivo para tu CotizaBot.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="w-6 h-6 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center text-sm font-bold flex-shrink-0">2</span>
+                  <div>
+                    <p className="text-sm font-medium text-slate-900">NO le instales WhatsApp al chip</p>
+                    <p className="text-xs text-slate-600">El número debe estar limpio — sin WhatsApp ni WhatsApp Business instalado.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="w-6 h-6 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center text-sm font-bold flex-shrink-0">3</span>
+                  <div>
+                    <p className="text-sm font-medium text-slate-900">¿Ya tiene WhatsApp Business? Desconéctalo primero</p>
+                    <p className="text-xs text-slate-600">Abre WhatsApp Business → Ajustes → Cuenta → Eliminar cuenta. Espera 3 minutos y luego conecta aquí.</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-amber-200">
+                <p className="text-xs text-amber-800">
+                  <strong>¿Necesitas ayuda?</strong> Nuestro equipo te guía por videollamada para configurarlo en 15 minutos. Escríbenos por WhatsApp al botón de contacto.
+                </p>
+              </div>
             </CardContent>
           </Card>
 
