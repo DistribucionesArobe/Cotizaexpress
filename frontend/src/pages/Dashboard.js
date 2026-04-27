@@ -103,7 +103,7 @@ export default function Dashboard() {
       titulo: 'Conecta WhatsApp',
       descripcion: esEmpresaActiva
         ? 'WhatsApp conectado y funcionando'
-        : 'Nuestro equipo conectará tu número. Te contactaremos por correo.',
+        : 'Vincula tu WhatsApp Business para recibir cotizaciones automáticas',
       completado: esEmpresaActiva,
       link: '/configuracion-whatsapp',
       linkTexto: esEmpresaActiva ? 'Configuración' : 'Conectar WhatsApp',
