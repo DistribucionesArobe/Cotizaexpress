@@ -17,7 +17,7 @@ const API = `${BACKEND_URL}/api`;
 export default function Dashboard() {
   const { user } = useAuth();
   const [stats, setStats] = useState({
-    productos: 0, conversaciones: 0, perfilCompleto: false, loading: true
+    productos: 0, conversaciones: 0, perfilCompleto: false, waConectado: false, loading: true
   });
   const [loadingPlan, setLoadingPlan] = useState(null);
 
@@ -35,10 +35,11 @@ export default function Dashboard() {
 
   const cargarStats = async () => {
     try {
-      const [prodRes, convRes, settingsRes] = await Promise.allSettled([
+      const [prodRes, convRes, settingsRes, waRes] = await Promise.allSettled([
         axios.get(`${API}/pricebook/items?limit=1`),
         axios.get(`${API}/conversations`),
         axios.get(`${API}/company/settings`),
+        axios.get(`${API}/whatsapp/configuracion`),
       ]);
 
       const productos = prodRes.status === 'fulfilled'
@@ -48,8 +49,10 @@ export default function Dashboard() {
       const settings = settingsRes.status === 'fulfilled'
         ? settingsRes.value.data.settings : {};
       const perfilCompleto = !!(settings?.hours_text && settings?.owner_phone);
+      const waConectado = waRes.status === 'fulfilled'
+        ? !!(waRes.value.data.wa_phone_number_id) : false;
 
-      setStats({ productos, conversaciones, perfilCompleto, loading: false });
+      setStats({ productos, conversaciones, perfilCompleto, waConectado, loading: false });
     } catch (err) {
       console.warn('Stats load error:', err);
       setStats(s => ({ ...s, loading: false }));
@@ -74,8 +77,8 @@ export default function Dashboard() {
     }
   };
 
-  // Determine if this is an active company (has conversations = WhatsApp connected)
-  const esEmpresaActiva = stats.conversaciones > 0;
+  // Determine if WhatsApp is connected (via Meta channel, not just conversations)
+  const esEmpresaActiva = stats.waConectado || stats.conversaciones > 0;
 
   // Setup steps
   const pasos = [
