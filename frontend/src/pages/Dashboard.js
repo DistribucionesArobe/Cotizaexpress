@@ -105,7 +105,7 @@ export default function Dashboard() {
         ? 'WhatsApp conectado y funcionando'
         : 'Vincula tu WhatsApp Business para recibir cotizaciones automáticas',
       completado: esEmpresaActiva,
-      link: '/configuracion-whatsapp',
+      link: esEmpresaActiva ? '/configuracion-whatsapp' : '/onboarding',
       linkTexto: esEmpresaActiva ? 'Configuración' : 'Conectar WhatsApp',
       icon: MessageSquare,
     },
