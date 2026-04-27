@@ -85,7 +85,7 @@ export default function Dashboard() {
         ? `${stats.productos} producto${stats.productos !== 1 ? 's' : ''} en tu catálogo`
         : 'Sube tu catálogo por Excel o agrégalos uno por uno',
       completado: stats.productos > 0,
-      link: '/carga-masiva',
+      link: '/carga-productos',
       linkTexto: stats.productos > 0 ? 'Agregar más' : 'Cargar productos',
       icon: Package,
     },
@@ -95,7 +95,7 @@ export default function Dashboard() {
         ? 'Datos de negocio configurados'
         : 'Agrega tu horario, teléfono y datos de contacto',
       completado: stats.perfilCompleto,
-      link: '/mi-empresa',
+      link: '/perfil-empresa',
       linkTexto: stats.perfilCompleto ? 'Editar perfil' : 'Completar perfil',
       icon: UserCircle,
     },
@@ -105,8 +105,8 @@ export default function Dashboard() {
         ? 'WhatsApp conectado y funcionando'
         : 'Nuestro equipo conectará tu número. Te contactaremos por correo.',
       completado: esEmpresaActiva,
-      link: '/whatsapp',
-      linkTexto: esEmpresaActiva ? 'Configuración' : 'Ver estado',
+      link: '/configuracion-whatsapp',
+      linkTexto: esEmpresaActiva ? 'Configuración' : 'Conectar WhatsApp',
       icon: MessageSquare,
     },
   ];
@@ -255,7 +255,7 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
             </Link>
-            <Link to="/mi-empresa">
+            <Link to="/perfil-empresa">
               <Card className="hover:shadow-md transition-all cursor-pointer group">
                 <CardContent className="pt-5 pb-4 flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-violet-100 text-violet-600 flex items-center justify-center group-hover:bg-violet-200 transition-colors">
