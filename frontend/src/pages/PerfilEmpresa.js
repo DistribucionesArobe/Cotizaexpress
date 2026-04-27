@@ -9,6 +9,20 @@ import { toast } from 'sonner';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+const GIROS = [
+  'Ferretería',
+  'Materiales de construcción',
+  'Plomería',
+  'Electricidad',
+  'Pinturas',
+  'Herrería',
+  'Refaccionaria',
+  'Mueblería',
+  'Papelería',
+  'Servicios técnicos',
+  'Otro',
+];
+
 export default function PerfilEmpresa() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -38,6 +52,8 @@ export default function PerfilEmpresa() {
     welcome_message: '',
     marcas_propias: '',
     marcas_competencia: '',
+    giro: '',
+    giro_otro: '',
   });
 
   const [horario, setHorario] = useState({
@@ -87,6 +103,8 @@ export default function PerfilEmpresa() {
         discount_threshold: s.discount_threshold || '',
         discount_percent: s.discount_percent || '',
         welcome_message: s.welcome_message || '',
+        giro: s.giro || '',
+        giro_otro: s.giro_otro || '',
       });
 
       // Parsear horario desde hours_text si existe
@@ -367,6 +385,35 @@ export default function PerfilEmpresa() {
               <Label>Nombre Comercial</Label>
               <Input name="company_name" value={formData.company_name} onChange={handleChange} placeholder="Ej: Aceromax" />
               <p className="text-xs text-slate-500">Este nombre aparece en el saludo del bot de WhatsApp</p>
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label>Giro del negocio</Label>
+              <div className="flex flex-wrap gap-2">
+                {GIROS.map(g => (
+                  <button
+                    key={g}
+                    type="button"
+                    className={`px-3 py-1.5 text-sm rounded-full border transition-all ${
+                      formData.giro === g
+                        ? 'bg-emerald-600 text-white border-emerald-600'
+                        : 'bg-white text-slate-600 border-slate-300 hover:border-emerald-400'
+                    }`}
+                    onClick={() => setFormData({ ...formData, giro: g, ...(g !== 'Otro' ? { giro_otro: '' } : {}) })}
+                  >
+                    {g}
+                  </button>
+                ))}
+              </div>
+              {formData.giro === 'Otro' && (
+                <Input
+                  name="giro_otro"
+                  value={formData.giro_otro}
+                  onChange={handleChange}
+                  placeholder="Ej: Mueblería, Tlapalería, Abarrotera..."
+                  className="mt-2"
+                />
+              )}
+              <p className="text-xs text-slate-500">El bot usa tu giro para entender mejor la jerga de tu industria</p>
             </div>
             <div className="space-y-2 md:col-span-2">
               <Label>Mensaje de bienvenida (WhatsApp)</Label>
