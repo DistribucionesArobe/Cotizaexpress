@@ -473,6 +473,33 @@ export default function ConfiguracionWhatsApp() {
         </CardContent>
       </Card>
 
+      {/* Número propio (opcional) */}
+      {isConfigured && (
+        <Card className="border border-dashed border-slate-300 bg-slate-50/50">
+          <CardContent className="py-6">
+            <div className="flex flex-col md:flex-row items-center gap-4">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Smartphone className="w-6 h-6 text-blue-600" />
+              </div>
+              <div className="flex-1 text-center md:text-left">
+                <h4 className="font-medium text-slate-900">¿Quieres tu propio número de WhatsApp?</h4>
+                <p className="text-sm text-slate-500 mt-1">
+                  Conecta un número dedicado para que tus clientes te escriban directo sin código.
+                  Necesitas un número que <strong>no tenga WhatsApp instalado</strong>.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => window.location.href = '/onboarding'}
+                className="flex-shrink-0"
+              >
+                Conectar número propio
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Modal QR Grande */}
       <Dialog open={showQRModal} onOpenChange={setShowQRModal}>
         <DialogContent className="sm:max-w-md">
