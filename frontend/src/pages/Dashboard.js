@@ -171,7 +171,7 @@ export default function Dashboard() {
             value="Activo"
             isText
             color="emerald"
-            link="/whatsapp"
+            link="/configuracion-whatsapp"
           />
         </div>
       )}
