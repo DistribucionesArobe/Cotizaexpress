@@ -26,8 +26,9 @@ export default function Precios() {
       setLoading(planId);
       
       const response = await axios.post(`${API}/pagos/crear-checkout`, {
-        plan_id: planId,
-        origin_url: window.location.origin
+        plan: planId,
+        success_url: `${window.location.origin}/pago-exitoso`,
+        cancel_url: `${window.location.origin}/precios`,
       });
 
       if (response.data.checkout_url) {
@@ -45,7 +46,7 @@ export default function Precios() {
 
   const planes = [
     {
-      id: 'completo',
+      id: 'cotizabot',
       nombre: 'Plan Completo',
       precio: 1000,
       precioIVA: 1160,

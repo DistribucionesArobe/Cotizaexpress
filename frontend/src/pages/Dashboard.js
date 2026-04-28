@@ -63,8 +63,9 @@ export default function Dashboard() {
     try {
       setLoadingPlan(planId);
       const response = await axios.post(`${API}/pagos/crear-checkout`, {
-        plan_id: planId,
-        origin_url: window.location.origin
+        plan: planId,
+        success_url: `${window.location.origin}/pago-exitoso`,
+        cancel_url: `${window.location.origin}/precios`,
       });
       if (response.data.checkout_url) {
         window.location.href = response.data.checkout_url;
@@ -308,10 +309,10 @@ export default function Dashboard() {
               </ul>
               <Button
                 className="w-full bg-emerald-600 hover:bg-emerald-700"
-                onClick={() => handleUpgrade('completo')}
-                disabled={loadingPlan === 'completo'}
+                onClick={() => handleUpgrade('cotizabot')}
+                disabled={loadingPlan === 'cotizabot'}
               >
-                {loadingPlan === 'completo' ? (
+                {loadingPlan === 'cotizabot' ? (
                   <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" /> Procesando...</>
                 ) : (
                   <>Empezar Ahora <ArrowRight className="w-4 h-4 ml-1" /></>
