@@ -39,7 +39,7 @@ export default function PagoExitoso() {
       const response = await axios.get(`${API}/pagos/checkout-status/${sessionId}`);
       const data = response.data;
 
-      if (data.payment_status === 'paid' || data.plan_activado) {
+      if (data.payment_status === 'paid' || data.payment_status === 'no_payment_required' || data.plan_activado) {
         setStatus('success');
         setMensaje(data.mensaje || '¡Pago exitoso! Tu Plan Completo está activo.');
       } else if (data.status === 'expired') {

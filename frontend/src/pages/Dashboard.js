@@ -49,10 +49,11 @@ export default function Dashboard() {
       const settings = settingsRes.status === 'fulfilled'
         ? settingsRes.value.data.settings : {};
       const perfilCompleto = !!(settings?.hours_text && settings?.owner_phone);
+      const planCode = settings?.plan_code || 'free';
       const waConectado = waRes.status === 'fulfilled'
         ? !!(waRes.value.data.wa_phone_number_id) : false;
 
-      setStats({ productos, conversaciones, perfilCompleto, waConectado, loading: false });
+      setStats({ productos, conversaciones, perfilCompleto, waConectado, planCode, loading: false });
     } catch (err) {
       console.warn('Stats load error:', err);
       setStats(s => ({ ...s, loading: false }));
@@ -280,81 +281,113 @@ export default function Dashboard() {
       <div>
         <div className="text-center mb-6">
           <h3 className="text-2xl font-bold text-slate-900">
-            {esEmpresaActiva ? 'Mejora tu plan' : 'Elige tu plan'}
+            {stats.planCode && stats.planCode !== 'free' ? 'Tu Plan' : (esEmpresaActiva ? 'Mejora tu plan' : 'Elige tu plan')}
           </h3>
-          <p className="text-slate-600 mt-1">Elige el plan que mejor se adapte a tu negocio</p>
+          <p className="text-slate-600 mt-1">
+            {stats.planCode && stats.planCode !== 'free'
+              ? 'Aquí puedes ver tu plan actual o mejorar'
+              : 'Elige el plan que mejor se adapte a tu negocio'}
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
           {/* Plan Completo */}
-          <Card className="relative border-emerald-500 border-2 shadow-lg">
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-              <Badge className="bg-emerald-500 text-white px-3 py-1">Popular</Badge>
-            </div>
-            <CardContent className="pt-6 pb-6">
-              <h4 className="text-lg font-bold text-slate-900">Completo</h4>
-              <p className="text-slate-500 text-sm mt-1">Para negocios en crecimiento</p>
-              <div className="mt-4 mb-1">
-                <span className="text-3xl font-bold text-slate-900">$1,000</span>
-                <span className="text-slate-500 text-sm"> /mes + IVA</span>
-              </div>
-              <p className="text-xs text-slate-400 mb-6">$1,160 MXN con IVA</p>
-              <ul className="space-y-2.5 mb-6">
-                <PlanFeature incluido>Cotizaciones ilimitadas</PlanFeature>
-                <PlanFeature incluido>WhatsApp Business integrado</PlanFeature>
-                <PlanFeature incluido>QR y link propio</PlanFeature>
-                <PlanFeature incluido>Dashboard completo</PlanFeature>
-                <PlanFeature incluido>Soporte prioritario</PlanFeature>
-                <PlanFeature>Cobros automáticos</PlanFeature>
-              </ul>
-              <Button
-                className="w-full bg-emerald-600 hover:bg-emerald-700"
-                onClick={() => handleUpgrade('cotizabot')}
-                disabled={loadingPlan === 'cotizabot'}
-              >
-                {loadingPlan === 'cotizabot' ? (
-                  <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" /> Procesando...</>
-                ) : (
-                  <>Empezar Ahora <ArrowRight className="w-4 h-4 ml-1" /></>
-                )}
-              </Button>
-            </CardContent>
-          </Card>
+          {(() => {
+            const isCurrent = stats.planCode === 'cotizabot';
+            return (
+              <Card className={`relative ${isCurrent ? 'border-slate-300 bg-slate-50 opacity-80' : 'border-emerald-500 border-2 shadow-lg'}`}>
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <Badge className={`${isCurrent ? 'bg-slate-500' : 'bg-emerald-500'} text-white px-3 py-1`}>
+                    {isCurrent ? 'Plan Activo' : 'Popular'}
+                  </Badge>
+                </div>
+                <CardContent className="pt-6 pb-6">
+                  <h4 className={`text-lg font-bold ${isCurrent ? 'text-slate-500' : 'text-slate-900'}`}>Completo</h4>
+                  <p className="text-slate-500 text-sm mt-1">Para negocios en crecimiento</p>
+                  <div className="mt-4 mb-1">
+                    <span className={`text-3xl font-bold ${isCurrent ? 'text-slate-400' : 'text-slate-900'}`}>$1,000</span>
+                    <span className="text-slate-500 text-sm"> /mes + IVA</span>
+                  </div>
+                  <p className="text-xs text-slate-400 mb-6">$1,160 MXN con IVA</p>
+                  <ul className="space-y-2.5 mb-6">
+                    <PlanFeature incluido>Cotizaciones ilimitadas</PlanFeature>
+                    <PlanFeature incluido>WhatsApp Business integrado</PlanFeature>
+                    <PlanFeature incluido>QR y link propio</PlanFeature>
+                    <PlanFeature incluido>Dashboard completo</PlanFeature>
+                    <PlanFeature incluido>Soporte prioritario</PlanFeature>
+                    <PlanFeature>Cobros automáticos</PlanFeature>
+                  </ul>
+                  {isCurrent ? (
+                    <Button className="w-full bg-slate-300 text-slate-500 cursor-default" disabled>
+                      <Check className="w-4 h-4 mr-1" /> Ya tienes este plan
+                    </Button>
+                  ) : (
+                    <Button
+                      className="w-full bg-emerald-600 hover:bg-emerald-700"
+                      onClick={() => handleUpgrade('cotizabot')}
+                      disabled={loadingPlan === 'cotizabot'}
+                    >
+                      {loadingPlan === 'cotizabot' ? (
+                        <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" /> Procesando...</>
+                      ) : (
+                        <>Empezar Ahora <ArrowRight className="w-4 h-4 ml-1" /></>
+                      )}
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })()}
 
           {/* Plan Pro */}
-          <Card className="relative bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200">
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-              <Badge className="bg-amber-500 text-white px-3 py-1">Cobra a tus clientes</Badge>
-            </div>
-            <CardContent className="pt-6 pb-6">
-              <h4 className="text-lg font-bold text-slate-900">Pro</h4>
-              <p className="text-slate-500 text-sm mt-1">Cobra directo por WhatsApp</p>
-              <div className="mt-4 mb-1">
-                <span className="text-3xl font-bold text-slate-900">$2,000</span>
-                <span className="text-slate-500 text-sm"> /mes + IVA</span>
-              </div>
-              <p className="text-xs text-slate-400 mb-6">$2,320 MXN con IVA</p>
-              <ul className="space-y-2.5 mb-6">
-                <PlanFeature incluido>Todo del Plan Completo</PlanFeature>
-                <PlanFeature incluido destacado>Link de pago Mercado Pago</PlanFeature>
-                <PlanFeature incluido destacado>Datos SPEI automáticos</PlanFeature>
-                <PlanFeature incluido destacado>Notificaciones de pago</PlanFeature>
-                <PlanFeature incluido>Configura tu CLABE</PlanFeature>
-                <PlanFeature incluido>Recibe pagos 24/7</PlanFeature>
-              </ul>
-              <Button
-                className="w-full bg-amber-500 hover:bg-amber-600 text-white"
-                onClick={() => handleUpgrade('pro')}
-                disabled={loadingPlan === 'pro'}
-              >
-                {loadingPlan === 'pro' ? (
-                  <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" /> Procesando...</>
-                ) : (
-                  <>Quiero Cobrar <CreditCard className="w-4 h-4 ml-1" /></>
-                )}
-              </Button>
-            </CardContent>
-          </Card>
+          {(() => {
+            const isCurrent = stats.planCode === 'pro';
+            return (
+              <Card className={`relative ${isCurrent ? 'border-slate-300 bg-slate-50 opacity-80' : 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200'}`}>
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <Badge className={`${isCurrent ? 'bg-slate-500' : 'bg-amber-500'} text-white px-3 py-1`}>
+                    {isCurrent ? 'Plan Activo' : 'Cobra a tus clientes'}
+                  </Badge>
+                </div>
+                <CardContent className="pt-6 pb-6">
+                  <h4 className={`text-lg font-bold ${isCurrent ? 'text-slate-500' : 'text-slate-900'}`}>Pro</h4>
+                  <p className="text-slate-500 text-sm mt-1">Cobra directo por WhatsApp</p>
+                  <div className="mt-4 mb-1">
+                    <span className={`text-3xl font-bold ${isCurrent ? 'text-slate-400' : 'text-slate-900'}`}>$2,000</span>
+                    <span className="text-slate-500 text-sm"> /mes + IVA</span>
+                  </div>
+                  <p className="text-xs text-slate-400 mb-6">$2,320 MXN con IVA</p>
+                  <ul className="space-y-2.5 mb-6">
+                    <PlanFeature incluido>Todo del Plan Completo</PlanFeature>
+                    <PlanFeature incluido destacado={!isCurrent}>Link de pago Mercado Pago</PlanFeature>
+                    <PlanFeature incluido destacado={!isCurrent}>Datos SPEI automáticos</PlanFeature>
+                    <PlanFeature incluido destacado={!isCurrent}>Notificaciones de pago</PlanFeature>
+                    <PlanFeature incluido>Configura tu CLABE</PlanFeature>
+                    <PlanFeature incluido>Recibe pagos 24/7</PlanFeature>
+                  </ul>
+                  {isCurrent ? (
+                    <Button className="w-full bg-slate-300 text-slate-500 cursor-default" disabled>
+                      <Check className="w-4 h-4 mr-1" /> Ya tienes este plan
+                    </Button>
+                  ) : (
+                    <Button
+                      className="w-full bg-amber-500 hover:bg-amber-600 text-white"
+                      onClick={() => handleUpgrade('pro')}
+                      disabled={loadingPlan === 'pro'}
+                    >
+                      {loadingPlan === 'pro' ? (
+                        <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" /> Procesando...</>
+                      ) : stats.planCode === 'cotizabot' ? (
+                        <>Mejorar a Pro <ArrowRight className="w-4 h-4 ml-1" /></>
+                      ) : (
+                        <>Quiero Cobrar <CreditCard className="w-4 h-4 ml-1" /></>
+                      )}
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })()}
         </div>
 
         <p className="text-center text-xs text-slate-400 mt-4">
