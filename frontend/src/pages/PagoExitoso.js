@@ -21,41 +21,46 @@ export default function PagoExitoso() {
 
   useEffect(() => {
     if (sessionId) {
-      checkPaymentStatus();
+      let attempt = 0;
+      const poll = async () => {
+        if (attempt >= maxAttempts) {
+          setStatus('timeout');
+          setMensaje('No pudimos confirmar tu pago. Por favor contacta a soporte.');
+          return;
+        }
+        attempt++;
+        setAttempts(attempt);
+
+        try {
+          const response = await axios.get(`${API}/pagos/checkout-status/${sessionId}`);
+          const data = response.data;
+
+          if (data.payment_status === 'paid' || data.payment_status === 'no_payment_required' || data.plan_activado) {
+            setStatus('success');
+            setMensaje(data.mensaje || '¡Pago exitoso! Tu plan está activo.');
+          } else if (data.status === 'expired') {
+            setStatus('expired');
+            setMensaje('La sesión de pago expiró. Por favor intenta de nuevo.');
+          } else {
+            // Seguir polling
+            setTimeout(poll, 2000);
+          }
+        } catch (error) {
+          console.error('Error verificando pago:', error);
+          if (attempt < maxAttempts) {
+            setTimeout(poll, 3000); // Wait longer on errors
+          } else {
+            setStatus('timeout');
+            setMensaje('No pudimos confirmar tu pago. Si completaste el pago, tu plan se activará automáticamente en unos minutos.');
+          }
+        }
+      };
+      poll();
     } else {
       setStatus('error');
       setMensaje('No se encontró información del pago');
     }
   }, [sessionId]);
-
-  const checkPaymentStatus = async () => {
-    if (attempts >= maxAttempts) {
-      setStatus('timeout');
-      setMensaje('No pudimos confirmar tu pago. Por favor contacta a soporte.');
-      return;
-    }
-
-    try {
-      const response = await axios.get(`${API}/pagos/checkout-status/${sessionId}`);
-      const data = response.data;
-
-      if (data.payment_status === 'paid' || data.payment_status === 'no_payment_required' || data.plan_activado) {
-        setStatus('success');
-        setMensaje(data.mensaje || '¡Pago exitoso! Tu Plan Completo está activo.');
-      } else if (data.status === 'expired') {
-        setStatus('expired');
-        setMensaje('La sesión de pago expiró. Por favor intenta de nuevo.');
-      } else {
-        // Seguir polling
-        setAttempts(prev => prev + 1);
-        setTimeout(checkPaymentStatus, 2000);
-      }
-    } catch (error) {
-      console.error('Error verificando pago:', error);
-      setAttempts(prev => prev + 1);
-      setTimeout(checkPaymentStatus, 2000);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex items-center justify-center py-12 px-4">
