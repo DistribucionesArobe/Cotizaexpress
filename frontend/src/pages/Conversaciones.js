@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Send, Bot, User, Search, MessageSquare, ArrowLeft } from 'lucide-react';
+import { Send, Bot, User, Search, MessageSquare, ArrowLeft, X, Info } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -69,6 +69,9 @@ export default function Conversaciones() {
   const [mensaje, setMensaje] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [busqueda, setBusqueda] = useState('');
+  const [showTip, setShowTip] = useState(() => {
+    try { return sessionStorage.getItem('conv_tip_dismissed') !== '1'; } catch { return true; }
+  });
   const scrollRef = useRef(null);
 
   useEffect(() => { cargarConversaciones(); }, []);
@@ -294,6 +297,25 @@ export default function Conversaciones() {
               <div className="bg-blue-50 border-b border-blue-200 px-4 py-2 text-xs text-blue-700 flex items-center gap-2">
                 <User className="w-3.5 h-3.5" />
                 Bot pausado — escribe abajo para responder manualmente
+              </div>
+            )}
+
+            {/* Instruction tip banner */}
+            {showTip && conversacionSeleccionada && (
+              <div className="bg-amber-50 border-b border-amber-200 px-4 py-2.5 flex items-start gap-2">
+                <Info className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-amber-800 flex-1 leading-relaxed">
+                  <strong>Tip:</strong> Usa el botón <span className="inline-flex items-center gap-0.5 bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full text-[10px] font-medium"><Bot className="w-3 h-3" />Bot activo</span> para que el bot responda automáticamente. Cámbialo a <span className="inline-flex items-center gap-0.5 bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded-full text-[10px] font-medium"><User className="w-3 h-3" />Manual</span> cuando quieras responder tú.
+                </p>
+                <button
+                  onClick={() => {
+                    setShowTip(false);
+                    try { sessionStorage.setItem('conv_tip_dismissed', '1'); } catch {}
+                  }}
+                  className="text-amber-400 hover:text-amber-600 mt-0.5 flex-shrink-0"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
               </div>
             )}
 
