@@ -407,6 +407,20 @@ export default function Precios() {
             <p className="text-xs text-slate-400 mt-2">Pagos seguros procesados por Stripe</p>
           </div>
 
+          {/* Mexican company badge */}
+          <div className="mt-8 max-w-2xl mx-auto">
+            <div className="bg-green-50 border border-green-200 rounded-xl p-5 text-center">
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <span className="text-2xl">🇲🇽</span>
+                <h3 className="text-lg font-bold text-green-900">Empresa 100% Mexicana</h3>
+              </div>
+              <p className="text-sm text-green-800">
+                Emitimos <strong>factura fiscal (CFDI)</strong> deducible de impuestos.
+                Soporte en español, precios en pesos mexicanos, sin cargos en dólares.
+              </p>
+            </div>
+          </div>
+
           {/* FAQ */}
           <div className="mt-16 max-w-3xl mx-auto">
             <h2 className="text-2xl font-bold text-center text-slate-900 mb-8">
@@ -418,6 +432,15 @@ export default function Precios() {
                   <h3 className="font-bold text-slate-900 mb-2">¿El precio incluye IVA?</h3>
                   <p className="text-sm text-slate-600">
                     Los precios mostrados son + 16% IVA. Plan Completo: $1,000 + IVA = $1,160. Plan Pro: $2,000 + IVA = $2,320.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="py-4">
+                  <h3 className="font-bold text-slate-900 mb-2">¿Puedo facturar? ¿Es deducible?</h3>
+                  <p className="text-sm text-slate-600">
+                    Sí. Emitimos factura CFDI a tu RFC. Tu suscripción es 100% deducible como gasto de operación. Solicita tu factura por WhatsApp o email después de tu pago.
                   </p>
                 </CardContent>
               </Card>
@@ -451,7 +474,7 @@ export default function Precios() {
                 </Button>
               </Link>
               <p className="text-sm text-slate-500 mt-4">
-                Cancela cuando quieras • Soporte en español
+                Cancela cuando quieras • Factura CFDI deducible • Soporte en español 🇲🇽
               </p>
             </div>
           )}

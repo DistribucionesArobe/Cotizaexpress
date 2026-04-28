@@ -358,7 +358,7 @@ export default function Dashboard() {
         </div>
 
         <p className="text-center text-xs text-slate-400 mt-4">
-          Todos los precios son en pesos mexicanos (MXN). Cancela cuando quieras.
+          Todos los precios son en pesos mexicanos (MXN). Cancela cuando quieras. Factura CFDI deducible disponible 🇲🇽
         </p>
       </div>
     </div>
