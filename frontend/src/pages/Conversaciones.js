@@ -275,21 +275,18 @@ export default function Conversaciones() {
               </div>
 
               {/* Bot toggle */}
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => toggleBot(conversacionSeleccionada, getBotState(conversacionSeleccionada))}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-                    ${botActivo ? 'bg-emerald-400' : 'bg-white/30'}`}
-                >
-                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow
-                    ${botActivo ? 'translate-x-6' : 'translate-x-1'}`}
-                  />
-                </button>
-                {botActivo
-                  ? <Bot className="w-5 h-5 text-emerald-200" />
-                  : <User className="w-5 h-5 text-emerald-200" />
-                }
-              </div>
+              <button
+                onClick={() => toggleBot(conversacionSeleccionada, getBotState(conversacionSeleccionada))}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all
+                  ${botActivo
+                    ? 'bg-emerald-400/20 text-emerald-100 border border-emerald-400/40'
+                    : 'bg-white/10 text-white/70 border border-white/20'
+                  }`}
+                title={botActivo ? 'Clic para tomar control manual' : 'Clic para activar respuestas automáticas'}
+              >
+                {botActivo ? <Bot className="w-4 h-4" /> : <User className="w-4 h-4" />}
+                {botActivo ? 'Bot activo' : 'Manual'}
+              </button>
             </div>
 
             {/* Bot paused banner */}
