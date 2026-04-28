@@ -49,7 +49,6 @@ export default function Precios() {
       id: 'cotizabot',
       nombre: 'Plan Completo',
       precio: 1000,
-      precioIVA: 1160,
       descripcion: 'Para empresas en crecimiento',
       features: [
         { texto: 'Cotizaciones ilimitadas', incluido: true },
@@ -66,7 +65,6 @@ export default function Precios() {
       id: 'pro',
       nombre: 'Plan Pro',
       precio: 2000,
-      precioIVA: 2320,
       descripcion: '¡Cobra directamente por WhatsApp!',
       badge: '💰 COBRA A TUS CLIENTES',
       features: [
@@ -87,7 +85,7 @@ export default function Precios() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <Helmet>
         <title>Precios y Planes - CotizaBot | Desde $1,000 MXN/mes</title>
-        <meta name="description" content="Planes de CotizaBot para automatizar cotizaciones por WhatsApp. Plan Completo desde $1,000 MXN/mes y Plan Pro con cobros automaticos desde $2,000 MXN/mes." />
+        <meta name="description" content="Planes de CotizaBot para automatizar cotizaciones por WhatsApp. Plan Completo $1,000 MXN/mes y Plan Pro con cobros automáticos $2,000 MXN/mes. Factura CFDI disponible." />
         <link rel="canonical" href="https://cotizaexpress.com/precios" />
         <meta property="og:title" content="Precios CotizaBot - Planes desde $1,000 MXN/mes" />
         <meta property="og:description" content="Automatiza cotizaciones por WhatsApp con CotizaBot. Plan Completo y Plan Pro con cobros integrados." />
@@ -198,10 +196,7 @@ export default function Precios() {
                         ${plan.precio.toLocaleString()}
                       </div>
                       {plan.precio > 0 ? (
-                        <>
-                          <p className="text-sm text-slate-500">MXN/mes + IVA</p>
-                          <p className="text-xs text-slate-400 mb-6">Total: ${plan.precioIVA.toLocaleString()} MXN</p>
-                        </>
+                        <p className="text-sm text-slate-500 mb-6">MXN/mes</p>
                       ) : (
                         <p className="text-sm text-slate-500 mb-6">Para siempre</p>
                       )}
@@ -251,7 +246,7 @@ export default function Precios() {
                               </>
                             ) : (
                               <>
-                                {plan.btnTexto} - ${plan.precioIVA.toLocaleString()}
+                                {plan.btnTexto}
                               </>
                             )}
                           </Button>
@@ -375,9 +370,9 @@ export default function Precios() {
                     <td className="px-4 py-3 text-center text-sm text-amber-600">VIP</td>
                   </tr>
                   <tr className="bg-emerald-50">
-                    <td className="px-4 py-3 text-sm text-slate-900 font-bold">Precio mensual (con IVA)</td>
-                    <td className="px-4 py-3 text-center text-sm font-bold text-emerald-600">$1,160</td>
-                    <td className="px-4 py-3 text-center text-sm font-bold text-amber-600">$2,320</td>
+                    <td className="px-4 py-3 text-sm text-slate-900 font-bold">Precio mensual</td>
+                    <td className="px-4 py-3 text-center text-sm font-bold text-emerald-600">$1,000</td>
+                    <td className="px-4 py-3 text-center text-sm font-bold text-amber-600">$2,000</td>
                   </tr>
                 </tbody>
               </table>
@@ -429,9 +424,9 @@ export default function Precios() {
             <div className="space-y-4">
               <Card>
                 <CardContent className="py-4">
-                  <h3 className="font-bold text-slate-900 mb-2">¿El precio incluye IVA?</h3>
+                  <h3 className="font-bold text-slate-900 mb-2">¿Puedo pagar con tarjeta?</h3>
                   <p className="text-sm text-slate-600">
-                    Los precios mostrados son + 16% IVA. Plan Completo: $1,000 + IVA = $1,160. Plan Pro: $2,000 + IVA = $2,320.
+                    Sí. Aceptamos Visa, Mastercard y American Express. Los pagos se procesan de forma segura por Stripe.
                   </p>
                 </CardContent>
               </Card>

@@ -306,9 +306,9 @@ export default function Dashboard() {
                   <p className="text-slate-500 text-sm mt-1">Para negocios en crecimiento</p>
                   <div className="mt-4 mb-1">
                     <span className={`text-3xl font-bold ${isCurrent ? 'text-slate-400' : 'text-slate-900'}`}>$1,000</span>
-                    <span className="text-slate-500 text-sm"> /mes + IVA</span>
+                    <span className="text-slate-500 text-sm"> MXN/mes</span>
                   </div>
-                  <p className="text-xs text-slate-400 mb-6">$1,160 MXN con IVA</p>
+                  <p className="text-xs text-slate-400 mb-6">Factura CFDI disponible</p>
                   <ul className="space-y-2.5 mb-6">
                     <PlanFeature incluido>Cotizaciones ilimitadas</PlanFeature>
                     <PlanFeature incluido>WhatsApp Business integrado</PlanFeature>
@@ -354,9 +354,9 @@ export default function Dashboard() {
                   <p className="text-slate-500 text-sm mt-1">Cobra directo por WhatsApp</p>
                   <div className="mt-4 mb-1">
                     <span className={`text-3xl font-bold ${isCurrent ? 'text-slate-400' : 'text-slate-900'}`}>$2,000</span>
-                    <span className="text-slate-500 text-sm"> /mes + IVA</span>
+                    <span className="text-slate-500 text-sm"> MXN/mes</span>
                   </div>
-                  <p className="text-xs text-slate-400 mb-6">$2,320 MXN con IVA</p>
+                  <p className="text-xs text-slate-400 mb-6">Factura CFDI disponible</p>
                   <ul className="space-y-2.5 mb-6">
                     <PlanFeature incluido>Todo del Plan Completo</PlanFeature>
                     <PlanFeature incluido destacado={!isCurrent}>Link de pago Mercado Pago</PlanFeature>
@@ -391,7 +391,7 @@ export default function Dashboard() {
         </div>
 
         <p className="text-center text-xs text-slate-400 mt-4">
-          Todos los precios son en pesos mexicanos (MXN). Cancela cuando quieras. Factura CFDI deducible disponible 🇲🇽
+          Precios en pesos mexicanos (MXN). Cancela cuando quieras. Factura CFDI deducible disponible 🇲🇽
         </p>
       </div>
     </div>
