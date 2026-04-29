@@ -175,10 +175,22 @@ export default function ConfiguracionWhatsApp() {
                   </div>
                 </div>
               </div>
-              <div className="bg-white rounded-lg p-3 border border-amber-200">
-                <p className="text-xs text-amber-800">
-                  <strong>¿Necesitas ayuda?</strong> Nuestro equipo te guía por videollamada para configurarlo en 15 minutos. Escríbenos por WhatsApp al botón de contacto.
+              <div className="bg-white rounded-lg p-4 border border-amber-200">
+                <p className="text-sm font-medium text-amber-900 mb-1">¿Necesitas ayuda con este paso?</p>
+                <p className="text-xs text-amber-700 mb-3">
+                  Nuestro equipo te guía por videollamada para configurar tu WhatsApp en 15 minutos.
                 </p>
+                <a
+                  href="https://calendly.com/cotizaexpress/configuracion-whatsapp"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 text-sm font-medium rounded-lg transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  Agenda una llamada
+                </a>
               </div>
             </CardContent>
           </Card>

@@ -18,10 +18,14 @@ const GIROS = [
   'Ferretería',
   'Materiales de construcción',
   'Plomería',
-  'Electricidad',
+  'Material eléctrico',
   'Pinturas',
   'Herrería',
   'Refaccionaria',
+  'Distribuidora',
+  'Mueblería',
+  'Papelería',
+  'Abarrotes / Mayoreo',
   'Servicios técnicos',
   'Otro',
 ];
@@ -374,7 +378,7 @@ export default function Onboarding() {
                     value={businessData.descripcion}
                     onChange={(e) => setBusinessData({ ...businessData, descripcion: e.target.value })}
                     className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                    placeholder="Ej: Tablaroca, perfiles, tornillería, pastas..."
+                    placeholder="Ej: Cemento, varilla, tornillería, refacciones..."
                     rows={2}
                   />
                 </div>
@@ -580,6 +584,25 @@ export default function Onboarding() {
                     <p className="text-xs text-slate-400">
                       Necesitas una cuenta de Facebook y un numero de WhatsApp Business
                     </p>
+
+                    {/* Help CTA - Task #22 */}
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-4 text-left">
+                      <p className="text-sm font-medium text-amber-900 mb-1">¿Necesitas ayuda con este paso?</p>
+                      <p className="text-xs text-amber-700 mb-3">
+                        Nuestro equipo te guía por videollamada para configurar tu WhatsApp en 15 minutos.
+                      </p>
+                      <a
+                        href="https://calendly.com/cotizaexpress/configuracion-whatsapp"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 text-sm font-medium rounded-lg transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Agenda una llamada
+                      </a>
+                    </div>
                   </div>
                 )}
               </div>

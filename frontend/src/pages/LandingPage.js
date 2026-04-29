@@ -5,12 +5,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
 
 const DEMO_MESSAGES = [
-  { from: 'client', text: 'Hola, precio de 10 tablaroca ultralight y 5 bultos de redimix', delay: 0 },
+  { from: 'client', text: 'Hola, necesito precio de 20 bultos de cemento y 10 varillas 3/8', delay: 0 },
   { from: 'bot', text: '...', typing: true, delay: 800 },
-  { from: 'bot', text: '✅ 2 producto(s) cotizados.\nCotización:\n\n• 10 x Tablaroca ultralight USG — $2,450\n• 5 x Redimix 28 kg USG — $3,300\n\nTotal: $5,750 (IVA incluido)\n📋 Folio: CX-7KM2PN\n💳 Escribe *pagar* y te mandamos datos bancarios o link para pago con tarjeta.', delay: 2400 },
-  { from: 'client', text: 'Agrega 100 pijas 6x1', delay: 5500 },
+  { from: 'bot', text: '✅ 2 producto(s) cotizados.\nCotización:\n\n• 20 x Cemento Gris Monterrey 50kg — $4,200\n• 10 x Varilla corrugada 3/8" — $1,850\n\nTotal: $6,050 (IVA incluido)\n📋 Folio: CX-7KM2PN\n💳 Escribe *pagar* y te mandamos datos bancarios o link para pago con tarjeta.', delay: 2400 },
+  { from: 'client', text: 'Agrega 5 sacos de pegazulejo', delay: 5500 },
   { from: 'bot', text: '...', typing: true, delay: 6300 },
-  { from: 'bot', text: '✅ 3 producto(s) cotizados.\nCotización:\n\n• 10 x Tablaroca ultralight USG — $2,450\n• 5 x Redimix 28 kg USG — $3,300\n• 100 x Pija 6 x 1 — $28\n\nTotal: $5,778 (IVA incluido)\n📋 Folio: CX-7KM2PN\n💳 Escribe *pagar* y te mandamos datos bancarios o link para pago con tarjeta.', delay: 8200 },
+  { from: 'bot', text: '✅ 3 producto(s) cotizados.\nCotización:\n\n• 20 x Cemento Gris Monterrey 50kg — $4,200\n• 10 x Varilla corrugada 3/8" — $1,850\n• 5 x Pegazulejo Interceramic 20kg — $475\n\nTotal: $6,525 (IVA incluido)\n📋 Folio: CX-7KM2PN\n💳 Escribe *pagar* y te mandamos datos bancarios o link para pago con tarjeta.', delay: 8200 },
 ];
 
 function ChatWidget() {
@@ -165,10 +165,10 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen" data-testid="landing-page">
       <Helmet>
-        <title>CotizaBot - Cotizaciones Automaticas por WhatsApp para Ferreterias | CotizaExpress</title>
-        <meta name="description" content="Responde cotizaciones en 3 segundos por WhatsApp con IA. CotizaBot genera cotizaciones con IVA 24/7 para ferreterias, materiales de construccion y distribuidoras en Mexico. Desde $1,000 MXN/mes." />
+        <title>CotizaBot - Cotizaciones Automáticas por WhatsApp con IA | CotizaExpress</title>
+        <meta name="description" content="Responde cotizaciones en 3 segundos por WhatsApp con IA. CotizaBot genera cotizaciones con IVA 24/7 para ferreterías, distribuidoras, materiales eléctricos, plomería y más. Desde $1,000 MXN/mes." />
         <link rel="canonical" href="https://cotizaexpress.com/" />
-        <meta property="og:title" content="CotizaBot - Tu ferreteria cotiza sola por WhatsApp" />
+        <meta property="og:title" content="CotizaBot - Tu negocio cotiza solo por WhatsApp" />
         <meta property="og:description" content="Tus clientes preguntan precio por WhatsApp y reciben cotizacion con IVA en 3 segundos. Sin empleado. Sin errores. 24/7." />
         <meta property="og:url" content="https://cotizaexpress.com/" />
         <meta property="og:type" content="website" />
@@ -179,7 +179,7 @@ export default function LandingPage() {
         <meta property="og:site_name" content="CotizaExpress" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="CotizaBot - Cotizaciones automaticas por WhatsApp" />
-        <meta name="twitter:description" content="Tu ferreteria cotiza sola. Respuestas en 3 segundos con IA." />
+        <meta name="twitter:description" content="Tu negocio cotiza solo. Respuestas en 3 segundos con IA por WhatsApp." />
         <meta name="twitter:image" content="https://cotizaexpress.com/og-cotizabot.png" />
         <script type="application/ld+json">{`
           {
@@ -188,12 +188,12 @@ export default function LandingPage() {
             "name": "CotizaBot",
             "applicationCategory": "BusinessApplication",
             "operatingSystem": "Web, WhatsApp",
-            "description": "Sistema de IA que automatiza cotizaciones por WhatsApp para ferreterias y distribuidoras en Mexico",
+            "description": "Sistema de IA que automatiza cotizaciones por WhatsApp para negocios con catálogo de productos en México",
             "url": "https://cotizaexpress.com",
             "offers": [
               {
                 "@type": "Offer",
-                "name": "Plan Completo",
+                "name": "CotizaBot",
                 "price": "1000",
                 "priceCurrency": "MXN",
                 "priceValidUntil": "2027-12-31",
@@ -201,7 +201,7 @@ export default function LandingPage() {
               },
               {
                 "@type": "Offer",
-                "name": "Plan Pro",
+                "name": "CotizaBot Pro",
                 "price": "2000",
                 "priceCurrency": "MXN",
                 "priceValidUntil": "2027-12-31",
@@ -233,7 +233,7 @@ export default function LandingPage() {
             "mainEntity": [
               {
                 "@type": "Question",
-                "name": "Como funciona CotizaBot para ferreterias?",
+                "name": "Como funciona CotizaBot para mi negocio?",
                 "acceptedAnswer": {
                   "@type": "Answer",
                   "text": "Subes tu catalogo de productos, compartes tu link de WhatsApp con tus clientes, y CotizaBot responde automaticamente con precios y cotizaciones con IVA en 3 segundos."
@@ -252,7 +252,7 @@ export default function LandingPage() {
                 "name": "Puedo cobrar a mis clientes por WhatsApp?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Si, con el Plan Pro puedes enviar links de pago de Mercado Pago o datos de transferencia SPEI automaticamente."
+                  "text": "Si, con el CotizaBot Pro puedes enviar links de pago de Mercado Pago o datos de transferencia SPEI automaticamente."
                 }
               },
               {
@@ -260,7 +260,7 @@ export default function LandingPage() {
                 "name": "Cuanto cuesta CotizaBot?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "El Plan Completo cuesta $1,000 MXN/mes + IVA con cotizaciones ilimitadas y WhatsApp integrado. El Plan Pro cuesta $2,000 MXN/mes + IVA e incluye cobros automaticos."
+                  "text": "El CotizaBot cuesta $1,000 MXN/mes + IVA con cotizaciones ilimitadas y WhatsApp integrado. El CotizaBot Pro cuesta $2,000 MXN/mes + IVA e incluye cobros automaticos."
                 }
               }
             ]
@@ -303,7 +303,7 @@ export default function LandingPage() {
           <div className="text-center">
             <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
               <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-              Usado por ferreterías y distribuidoras en México
+              Usado por ferreterías, distribuidoras y negocios en México
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-tight">
@@ -315,7 +315,7 @@ export default function LandingPage() {
               CotizaBot es el asistente de IA que responde por WhatsApp con precios, IVA y cotización profesional. <strong>Sin empleado. Sin errores. 24/7.</strong>
             </p>
             <p className="text-base text-slate-500 mb-10 max-w-2xl mx-auto">
-              Mientras tú duermes, tu negocio sigue cotizando. Ideal para ferreterías, materiales de construcción y distribuidoras.
+              Mientras tú duermes, tu negocio sigue cotizando. Ideal para ferreterías, distribuidoras, materiales eléctricos, plomería y más.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -433,7 +433,7 @@ export default function LandingPage() {
       <section className="py-20 bg-slate-50" id="casos-de-uso">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl sm:text-4xl font-bold text-center text-slate-900 mb-4">¿Para qué negocios es CotizaBot?</h2>
-          <p className="text-center text-slate-600 mb-12">Diseñado para PYMEs mexicanas que venden materiales y productos</p>
+          <p className="text-center text-slate-600 mb-12">Si vendes productos con catálogo, CotizaBot es para ti</p>
           
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <Link to="/ferreterias" className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition text-center">
@@ -460,12 +460,36 @@ export default function LandingPage() {
               <p className="text-sm text-slate-600">Autopartes, refacciones, aceites</p>
             </Link>
 
-            <Link to="/servicios-tecnicos" className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition text-center">
+            <div className="bg-white rounded-xl p-6 shadow-md text-center">
               <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
               </div>
-              <h3 className="font-bold text-slate-900 mb-2">Servicios Técnicos</h3>
-              <p className="text-sm text-slate-600">Plomería, electricidad, instalaciones</p>
+              <h3 className="font-bold text-slate-900 mb-2">Material Eléctrico</h3>
+              <p className="text-sm text-slate-600">Cables, contactos, iluminación</p>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-md text-center">
+              <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+              </div>
+              <h3 className="font-bold text-slate-900 mb-2">Distribuidoras</h3>
+              <p className="text-sm text-slate-600">Alimentos, limpieza, papelería</p>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-md text-center">
+              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              </div>
+              <h3 className="font-bold text-slate-900 mb-2">Refaccionarias</h3>
+              <p className="text-sm text-slate-600">Autopartes, refacciones, aceites</p>
+            </div>
+
+            <Link to="/registro" className="bg-emerald-50 rounded-xl p-6 shadow-md hover:shadow-lg transition text-center border-2 border-dashed border-emerald-300">
+              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/></svg>
+              </div>
+              <h3 className="font-bold text-emerald-700 mb-2">¿Otro giro?</h3>
+              <p className="text-sm text-emerald-600">Si vendes con catálogo, funciona para ti</p>
             </Link>
           </div>
         </div>
@@ -480,7 +504,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-2 gap-8">
             <Card className="border-2 border-slate-200">
               <CardContent className="pt-8 pb-8 text-center">
-                <h3 className="text-2xl font-bold mb-2">Plan Completo</h3>
+                <h3 className="text-2xl font-bold mb-2">CotizaBot</h3>
                 <div className="text-5xl font-bold text-slate-700 mb-2">$1,000</div>
                 <p className="text-slate-500 mb-6">MXN/mes + IVA</p>
                 <ul className="text-left space-y-3 mb-8">
@@ -496,11 +520,11 @@ export default function LandingPage() {
             <Card className="border-2 border-emerald-500 shadow-xl relative overflow-hidden">
               <div className="absolute top-0 right-0 bg-emerald-500 text-white px-4 py-1 text-sm font-medium">Recomendado</div>
               <CardContent className="pt-8 pb-8 text-center">
-                <h3 className="text-2xl font-bold mb-2">Plan Pro</h3>
+                <h3 className="text-2xl font-bold mb-2">CotizaBot Pro</h3>
                 <div className="text-5xl font-bold text-emerald-600 mb-2">$2,000</div>
                 <p className="text-slate-500 mb-6">MXN/mes + IVA</p>
                 <ul className="text-left space-y-3 mb-8">
-                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Todo del Plan Completo</li>
+                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Todo del CotizaBot</li>
                   <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg><strong>Cobra por WhatsApp</strong></li>
                   <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Mercado Pago y SPEI</li>
                   <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Notificaciones de pago</li>
@@ -533,7 +557,7 @@ export default function LandingPage() {
             </div>
             <div className="bg-white rounded-lg p-6 shadow">
               <h3 className="font-bold text-slate-900 mb-2">¿Puedo cobrar a mis clientes por WhatsApp?</h3>
-              <p className="text-slate-600">Sí, con el Plan Pro puedes enviar links de pago de Mercado Pago o datos de transferencia SPEI automáticamente.</p>
+              <p className="text-slate-600">Sí, con el CotizaBot Pro puedes enviar links de pago de Mercado Pago o datos de transferencia SPEI automáticamente.</p>
             </div>
             <div className="bg-white rounded-lg p-6 shadow">
               <h3 className="font-bold text-slate-900 mb-2">¿Puedo ver un demo antes de contratar?</h3>

@@ -77,10 +77,10 @@ export default function Registro() {
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex items-center justify-center py-12 px-4">
       <Helmet>
         <title>Crear Cuenta - CotizaBot | Automatiza Cotizaciones por WhatsApp</title>
-        <meta name="description" content="Registrate en CotizaBot y automatiza las cotizaciones de tu ferreteria por WhatsApp con IA. Planes desde $1,000 MXN/mes." />
+        <meta name="description" content="Registra tu negocio en CotizaBot y automatiza cotizaciones por WhatsApp con IA. Para ferreterías, distribuidoras, materiales y más. Desde $1,000 MXN/mes." />
         <link rel="canonical" href="https://cotizaexpress.com/registro" />
         <meta property="og:title" content="Crear Cuenta en CotizaBot" />
-        <meta property="og:description" content="Automatiza cotizaciones por WhatsApp para tu ferreteria o distribuidora." />
+        <meta property="og:description" content="Automatiza cotizaciones por WhatsApp para tu negocio con IA." />
         <meta property="og:url" content="https://cotizaexpress.com/registro" />
         <meta property="og:type" content="website" />
         <meta property="og:locale" content="es_MX" />
@@ -168,7 +168,7 @@ export default function Registro() {
                   value={formData.empresa_nombre}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  placeholder="Mi Ferretería"
+                  placeholder="Mi Negocio"
                   required
                   data-testid="input-empresa"
                 />
