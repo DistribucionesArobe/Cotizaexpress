@@ -47,7 +47,7 @@ export default function Precios() {
   const planes = [
     {
       id: 'cotizabot',
-      nombre: 'Plan Completo',
+      nombre: 'CotizaBot',
       precio: 1000,
       descripcion: 'Para empresas en crecimiento',
       features: [
@@ -56,19 +56,19 @@ export default function Precios() {
         { texto: 'Código QR y link propio', incluido: true },
         { texto: 'Dashboard completo', incluido: true },
         { texto: 'Soporte prioritario', incluido: true },
-        { texto: 'Cobros automáticos', incluido: false, nota: 'Disponible en Plan Pro' },
+        { texto: 'Cobros automáticos', incluido: false, nota: 'Disponible en CotizaBot Pro' },
       ],
       popular: true,
       btnTexto: 'Empezar Ahora',
     },
     {
       id: 'pro',
-      nombre: 'Plan Pro',
+      nombre: 'CotizaBot Pro',
       precio: 2000,
       descripcion: '¡Cobra directamente por WhatsApp!',
       badge: '💰 COBRA A TUS CLIENTES',
       features: [
-        { texto: 'Todo del Plan Completo', incluido: true },
+        { texto: 'Todo de CotizaBot', incluido: true },
         { texto: 'Link de pago Mercado Pago', incluido: true, destacado: true },
         { texto: 'Datos SPEI automáticos', incluido: true, destacado: true },
         { texto: 'Notificaciones de pago', incluido: true, destacado: true },
@@ -85,10 +85,10 @@ export default function Precios() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <Helmet>
         <title>Precios y Planes - CotizaBot | Desde $1,000 MXN/mes</title>
-        <meta name="description" content="Planes de CotizaBot para automatizar cotizaciones por WhatsApp. Plan Completo $1,000 MXN/mes y Plan Pro con cobros automáticos $2,000 MXN/mes. Factura CFDI disponible." />
+        <meta name="description" content="Planes de CotizaBot para automatizar cotizaciones por WhatsApp. CotizaBot $1,000 MXN/mes y CotizaBot Pro con cobros automáticos $2,000 MXN/mes. Factura CFDI disponible." />
         <link rel="canonical" href="https://cotizaexpress.com/precios" />
         <meta property="og:title" content="Precios CotizaBot - Planes desde $1,000 MXN/mes" />
-        <meta property="og:description" content="Automatiza cotizaciones por WhatsApp con CotizaBot. Plan Completo y Plan Pro con cobros integrados." />
+        <meta property="og:description" content="Automatiza cotizaciones por WhatsApp con CotizaBot. CotizaBot y CotizaBot Pro con cobros integrados." />
         <meta property="og:url" content="https://cotizaexpress.com/precios" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://cotizaexpress.com/og-cotizabot.png" />
@@ -145,7 +145,7 @@ export default function Precios() {
               Precios Simples y Transparentes
             </h1>
             <p className="text-lg sm:text-xl text-slate-600">
-              Precios claros, sin sorpresas. <strong>Cobra a tus clientes</strong> con Plan Pro.
+              Precios claros, sin sorpresas. <strong>Cobra a tus clientes</strong> con CotizaBot Pro.
             </p>
           </div>
 
@@ -265,7 +265,7 @@ export default function Precios() {
             })}
           </div>
 
-          {/* Plan Pro Highlight */}
+          {/* CotizaBot Pro Highlight */}
           <div className="mt-16 max-w-4xl mx-auto">
             <Card className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200">
               <CardContent className="py-8">
@@ -324,8 +324,8 @@ export default function Precios() {
                 <thead className="bg-slate-50">
                   <tr>
                     <th className="px-4 py-4 text-left text-sm font-semibold text-slate-900">Característica</th>
-                    <th className="px-4 py-4 text-center text-sm font-semibold text-emerald-600">Completo</th>
-                    <th className="px-4 py-4 text-center text-sm font-semibold text-amber-600">Pro</th>
+                    <th className="px-4 py-4 text-center text-sm font-semibold text-emerald-600">CotizaBot</th>
+                    <th className="px-4 py-4 text-center text-sm font-semibold text-amber-600">CotizaBot Pro</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -442,7 +442,7 @@ export default function Precios() {
 
               <Card>
                 <CardContent className="py-4">
-                  <h3 className="font-bold text-slate-900 mb-2">¿Cómo funciona el cobro con Plan Pro?</h3>
+                  <h3 className="font-bold text-slate-900 mb-2">¿Cómo funciona el cobro con CotizaBot Pro?</h3>
                   <p className="text-sm text-slate-600">
                     Configuras tu CLABE y/o Mercado Pago en tu panel. Cuando confirmas una cotización, el bot envía automáticamente los datos de pago a tu cliente.
                   </p>
@@ -453,7 +453,7 @@ export default function Precios() {
                 <CardContent className="py-4">
                   <h3 className="font-bold text-slate-900 mb-2">¿Recibo notificación cuando me pagan?</h3>
                   <p className="text-sm text-slate-600">
-                    Sí, con Plan Pro puedes configurar un número de WhatsApp o email para recibir alertas de pago.
+                    Sí, con CotizaBot Pro puedes configurar un número de WhatsApp o email para recibir alertas de pago.
                   </p>
                 </CardContent>
               </Card>

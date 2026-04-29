@@ -88,7 +88,7 @@ export default function PagoExitoso() {
                 <p className="text-slate-600 mb-6">{mensaje}</p>
                 
                 <div className="bg-emerald-50 rounded-lg p-4 mb-6 text-left">
-                  <h3 className="font-semibold text-emerald-800 mb-2">Tu Plan Completo incluye:</h3>
+                  <h3 className="font-semibold text-emerald-800 mb-2">Tu plan incluye:</h3>
                   <ul className="text-sm text-emerald-700 space-y-1">
                     <li className="flex items-center gap-2">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

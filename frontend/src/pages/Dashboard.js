@@ -302,7 +302,7 @@ export default function Dashboard() {
                   </Badge>
                 </div>
                 <CardContent className="pt-6 pb-6">
-                  <h4 className={`text-lg font-bold ${isCurrent ? 'text-slate-500' : 'text-slate-900'}`}>Completo</h4>
+                  <h4 className={`text-lg font-bold ${isCurrent ? 'text-slate-500' : 'text-slate-900'}`}>CotizaBot</h4>
                   <p className="text-slate-500 text-sm mt-1">Para negocios en crecimiento</p>
                   <div className="mt-4 mb-1">
                     <span className={`text-3xl font-bold ${isCurrent ? 'text-slate-400' : 'text-slate-900'}`}>$1,000</span>
@@ -350,7 +350,7 @@ export default function Dashboard() {
                   </Badge>
                 </div>
                 <CardContent className="pt-6 pb-6">
-                  <h4 className={`text-lg font-bold ${isCurrent ? 'text-slate-500' : 'text-slate-900'}`}>Pro</h4>
+                  <h4 className={`text-lg font-bold ${isCurrent ? 'text-slate-500' : 'text-slate-900'}`}>CotizaBot Pro</h4>
                   <p className="text-slate-500 text-sm mt-1">Cobra directo por WhatsApp</p>
                   <div className="mt-4 mb-1">
                     <span className={`text-3xl font-bold ${isCurrent ? 'text-slate-400' : 'text-slate-900'}`}>$2,000</span>
@@ -358,7 +358,7 @@ export default function Dashboard() {
                   </div>
                   <p className="text-xs text-slate-400 mb-6">Factura CFDI disponible</p>
                   <ul className="space-y-2.5 mb-6">
-                    <PlanFeature incluido>Todo del Plan Completo</PlanFeature>
+                    <PlanFeature incluido>Todo del plan CotizaBot</PlanFeature>
                     <PlanFeature incluido destacado={!isCurrent}>Link de pago Mercado Pago</PlanFeature>
                     <PlanFeature incluido destacado={!isCurrent}>Datos SPEI automáticos</PlanFeature>
                     <PlanFeature incluido destacado={!isCurrent}>Notificaciones de pago</PlanFeature>
@@ -378,7 +378,7 @@ export default function Dashboard() {
                       {loadingPlan === 'pro' ? (
                         <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" /> Procesando...</>
                       ) : stats.planCode === 'cotizabot' ? (
-                        <>Mejorar a Pro <ArrowRight className="w-4 h-4 ml-1" /></>
+                        <>Mejorar a CotizaBot Pro <ArrowRight className="w-4 h-4 ml-1" /></>
                       ) : (
                         <>Quiero Cobrar <CreditCard className="w-4 h-4 ml-1" /></>
                       )}
