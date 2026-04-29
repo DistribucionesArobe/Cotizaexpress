@@ -20,6 +20,8 @@ export default function Dashboard() {
     productos: 0, conversaciones: 0, perfilCompleto: false, waConectado: false, loading: true
   });
   const [loadingPlan, setLoadingPlan] = useState(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     cargarStats();
@@ -76,6 +78,21 @@ export default function Dashboard() {
       toast.error(error.response?.data?.detail || 'Error al procesar el pago');
     } finally {
       setLoadingPlan(null);
+    }
+  };
+
+  const handleCancelPlan = async () => {
+    try {
+      setCancelling(true);
+      await axios.post(`${API}/pagos/cancelar`);
+      toast.success('Tu suscripción ha sido cancelada');
+      setShowCancelModal(false);
+      cargarStats(); // Refresh to show free plan
+    } catch (error) {
+      console.error('Error cancelando:', error);
+      toast.error(error.response?.data?.detail || 'Error al cancelar la suscripción');
+    } finally {
+      setCancelling(false);
     }
   };
 
@@ -393,7 +410,48 @@ export default function Dashboard() {
         <p className="text-center text-xs text-slate-400 mt-4">
           Precios en pesos mexicanos (MXN). Cancela cuando quieras. Factura CFDI deducible disponible 🇲🇽
         </p>
+
+        {/* Cancel plan link — only show if user has an active paid plan */}
+        {stats.planCode && stats.planCode !== 'free' && (
+          <div className="text-center mt-3">
+            <button
+              onClick={() => setShowCancelModal(true)}
+              className="text-xs text-slate-400 hover:text-red-500 underline transition-colors"
+            >
+              Cancelar mi plan
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* Cancel confirmation modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6">
+            <h3 className="text-lg font-bold text-slate-900 mb-2">¿Cancelar tu plan?</h3>
+            <p className="text-sm text-slate-600 mb-4">
+              Al cancelar, perderás acceso a las funciones de tu plan actual. Tu bot dejará de responder y tus datos se mantendrán por si decides regresar.
+            </p>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => setShowCancelModal(false)}
+                disabled={cancelling}
+              >
+                Mejor no
+              </Button>
+              <Button
+                className="flex-1 bg-red-500 hover:bg-red-600 text-white"
+                onClick={handleCancelPlan}
+                disabled={cancelling}
+              >
+                {cancelling ? 'Cancelando...' : 'Sí, cancelar'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
