@@ -502,34 +502,43 @@ export default function LandingPage() {
           <p className="text-center text-slate-600 mb-12">Elige el plan que mejor se adapte a tu negocio</p>
           
           <div className="grid md:grid-cols-2 gap-8">
-            <Card className="border-2 border-slate-200">
-              <CardContent className="pt-8 pb-8 text-center">
-                <h3 className="text-2xl font-bold mb-2">CotizaBot</h3>
-                <div className="text-5xl font-bold text-slate-700 mb-2">$1,000</div>
-                <p className="text-slate-500 mb-6">MXN/mes + IVA</p>
+            <Card className="border-2 border-amber-400 shadow-lg relative overflow-hidden">
+              <div className="bg-amber-400 text-white text-center py-2 text-sm font-bold tracking-wide">Recomendado</div>
+              <CardContent className="pt-6 pb-8 text-center">
+                <h3 className="text-2xl font-bold mb-1">CotizaBot</h3>
+                <p className="text-sm text-slate-500 mb-4">Para empresas en crecimiento</p>
+                <div className="text-5xl font-bold text-slate-800 mb-2">$1,000</div>
+                <p className="text-slate-500 mb-6">MXN/mes</p>
                 <ul className="text-left space-y-3 mb-8">
                   <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Cotizaciones ilimitadas</li>
                   <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>WhatsApp Business integrado</li>
+                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Código QR y link propio</li>
                   <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Dashboard completo</li>
                   <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Soporte prioritario</li>
                 </ul>
-                <Link to="/registro"><Button variant="outline" className="w-full" size="lg">Comenzar</Button></Link>
+                <Link to="/registro"><Button className="w-full bg-amber-500 hover:bg-amber-600 text-white" size="lg">Empezar Ahora</Button></Link>
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-emerald-500 shadow-xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-emerald-500 text-white px-4 py-1 text-sm font-medium">Recomendado</div>
-              <CardContent className="pt-8 pb-8 text-center">
-                <h3 className="text-2xl font-bold mb-2">CotizaBot Pro</h3>
-                <div className="text-5xl font-bold text-emerald-600 mb-2">$2,000</div>
-                <p className="text-slate-500 mb-6">MXN/mes + IVA</p>
+            <Card className="border-2 border-orange-400 shadow-lg relative overflow-hidden">
+              <div className="bg-orange-400 text-white text-center py-2 text-sm font-bold tracking-wide flex items-center justify-center gap-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                COBRA A TUS CLIENTES
+              </div>
+              <CardContent className="pt-6 pb-8 text-center">
+                <h3 className="text-2xl font-bold mb-1">CotizaBot Pro</h3>
+                <p className="text-sm text-slate-500 mb-4">¡Cobra directamente por WhatsApp!</p>
+                <div className="text-5xl font-bold text-orange-500 mb-2">$2,000</div>
+                <p className="text-slate-500 mb-6">MXN/mes</p>
                 <ul className="text-left space-y-3 mb-8">
-                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Todo del CotizaBot</li>
-                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg><strong>Cobra por WhatsApp</strong></li>
-                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Mercado Pago y SPEI</li>
-                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Notificaciones de pago</li>
+                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Todo de CotizaBot</li>
+                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg><strong className="text-orange-600">Link de pago Mercado Pago</strong></li>
+                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg><strong className="text-orange-600">Datos SPEI automáticos</strong></li>
+                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg><strong className="text-orange-600">Notificaciones de pago</strong></li>
+                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Configura tu CLABE</li>
+                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Recibe pagos 24/7</li>
                 </ul>
-                <Link to="/registro"><Button className="w-full bg-emerald-600 hover:bg-emerald-700" size="lg">Empezar con Pro</Button></Link>
+                <Link to="/registro"><Button className="w-full bg-orange-500 hover:bg-orange-600 text-white" size="lg">Quiero Cobrar</Button></Link>
               </CardContent>
             </Card>
           </div>
