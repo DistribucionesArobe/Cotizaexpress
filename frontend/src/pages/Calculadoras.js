@@ -234,6 +234,54 @@ const calculatorFunctions = {
     ];
   },
 
+  mallaCiclonica: (metros, altura, esquinas, concertina) => {
+    const items = [];
+    const add = (name, qty, unit) => { if (qty > 0) items.push({ name, qty: Math.ceil(qty), unit }); };
+
+    // Malla por metro
+    add(`Malla ciclónica ${altura}m cal 12.5`, metros, 'm');
+
+    // Tubo 3" (esquinas) — de 1 tubo de 6m salen 2 postes
+    add('Tubo galvanizado 3" x 6m cal 18', Math.ceil(esquinas / 2), 'pza');
+
+    // Tubo 2" (intermedios cada 3m) — de 1 tubo de 4.80m salen 2 postes
+    const totalPostes = Math.floor(metros / 3) + 1;
+    const postesInt = Math.max(0, totalPostes - esquinas);
+    add('Tubo galvanizado 2" x 4.80m cal 20', Math.ceil(postesInt / 2), 'pza');
+
+    // Tubo 1½" (barra superior) — tramos de 6m
+    const tubos15 = Math.ceil(metros / 6);
+    add('Tubo galvanizado 1½" x 6m cal 20', tubos15, 'pza');
+
+    // Conexiones
+    add('Conector para barra 1½"', Math.max(0, tubos15 - 1), 'pza');
+    add('Cople universal 1½"', esquinas, 'pza');
+
+    // Tensión
+    const abrTension = esquinas * 4 * 2;
+    add('Abrazadera tensión 3"', abrTension, 'pza');
+    add('Abrazadera arranque 3"', esquinas * 2, 'pza');
+    add('Solera galvanizada ¾×⅛ x 2m', esquinas * 2, 'pza');
+
+    // Tornillería
+    const tornillos = abrTension + (esquinas * 2);
+    add('Tornillo coche galv 5/16×1¼"', tornillos, 'pza');
+    add('Tuerca galvanizada 5/16"', tornillos, 'pza');
+    add('Alambre galvanizado cal 14', Math.ceil(metros / 18), 'kg');
+
+    // Acabado superior
+    if (concertina === 1) {
+      add('Concertina 18"', Math.ceil(metros / 8), 'pza');
+      add('Espada para concertina 3"', esquinas, 'pza');
+      add('Espada para concertina 2"', postesInt, 'pza');
+    } else {
+      add('Capucha simple 3"', esquinas, 'pza');
+      add('Capucha marco 2"', postesInt, 'pza');
+    }
+
+    return items;
+  },
+
   rejacero: (metros, alturaIdx) => {
     // alturaIdx: 1=1.00m, 1.5=1.50m, 2=2.00m, 2.5=2.50m
     const altura = alturaIdx;
@@ -300,10 +348,19 @@ const Calculadoras = () => {
         rejacero: { label: 'Reja ciclónica', fields: ['metrosReja', 'alturaReja'] },
       },
     },
+    mallaCiclonica: {
+      label: '🔗 Malla Ciclónica',
+      description: 'Calcula todos los materiales para cerco de malla ciclónica',
+      directCalc: 'mallaCiclonica',
+      subcategories: {
+        mallaCiclonica: { label: 'Cerco de Malla Ciclónica', fields: ['metrosMalla', 'alturaMalla', 'esquinasMalla', 'concertinaMalla'] },
+      },
+    },
   };
 
   const handleInputChange = (field, value) => {
-    setInputs({ ...inputs, [field]: parseFloat(value) || '' });
+    const parsed = parseFloat(value);
+    setInputs({ ...inputs, [field]: isNaN(parsed) ? '' : parsed });
   };
 
   const handleCalculate = () => {
@@ -369,6 +426,23 @@ const Calculadoras = () => {
         { value: 2, label: '2.00 m' },
         { value: 2.5, label: '2.50 m' },
       ]},
+      metrosMalla: { label: 'Metros lineales de cerco', placeholder: 'Ej: 25' },
+      alturaMalla: { label: 'Altura de la malla', type: 'select', options: [
+        { value: 1, label: '1.00 m' },
+        { value: 1.25, label: '1.25 m' },
+        { value: 1.5, label: '1.50 m' },
+        { value: 1.75, label: '1.75 m' },
+        { value: 2, label: '2.00 m' },
+      ]},
+      esquinasMalla: { label: 'Número de esquinas', type: 'select', options: [
+        { value: 2, label: '2 — Línea recta' },
+        { value: 3, label: '3 — En L' },
+        { value: 4, label: '4 — Cuadrado / Rectángulo' },
+      ]},
+      concertinaMalla: { label: '¿Lleva concertina?', type: 'select', options: [
+        { value: 0, label: 'No' },
+        { value: 1, label: 'Sí' },
+      ]},
     };
 
     return (
@@ -423,7 +497,7 @@ const Calculadoras = () => {
         />
         <meta
           name="keywords"
-          content="calculadora de materiales, calcular tablaroca, calcular pintura, calculadora construcción, materiales construcción"
+          content="calculadora de materiales, calcular tablaroca, calcular pintura, calculadora construcción, materiales construcción, malla ciclónica, cerco ciclónico, calculadora malla"
         />
         <meta property="og:title" content="Calculadora de Materiales de Construcción | CotizaExpress" />
         <meta property="og:description" content="Calcula los materiales que necesitas para tu proyecto" />
