@@ -238,8 +238,8 @@ const calculatorFunctions = {
     const items = [];
     const add = (name, qty, unit) => { if (qty > 0) items.push({ name, qty: Math.ceil(qty), unit }); };
 
-    // Malla por metro
-    add(`Malla ciclónica ${altura}m cal 12.5`, metros, 'm');
+    // Malla en rollos de 20m
+    add(`Malla ciclónica ${altura}m cal 12.5 (rollo 20m)`, Math.ceil(metros / 20), 'rollo');
 
     // Tubo 3" (esquinas) — de 1 tubo de 6m salen 2 postes
     add('Tubo galvanizado 3" x 6m cal 18', Math.ceil(esquinas / 2), 'pza');
@@ -255,7 +255,9 @@ const calculatorFunctions = {
 
     // Conexiones
     add('Conector para barra 1½"', Math.max(0, tubos15 - 1), 'pza');
-    add('Cople universal 1½"', esquinas, 'pza');
+    // Coples: remates llevan 1, esquinas reales llevan 2
+    const coples = esquinas === 4 ? esquinas * 2 : 2 + (esquinas - 2) * 2;
+    add('Cople universal 1½"', coples, 'pza');
 
     // Tensión
     const abrTension = esquinas * 4 * 2;
