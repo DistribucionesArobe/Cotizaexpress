@@ -244,6 +244,17 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
         </Link>
+        <Link to="/admin/seo">
+          <Card className="hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer">
+            <CardContent className="py-3 px-4">
+              <div className="flex items-center gap-3">
+                <TrendingUp className="w-4 h-4 text-blue-600" />
+                <span className="text-sm font-medium text-slate-700">SEO & Analytics</span>
+                <ArrowRight className="w-3 h-3 text-slate-400 ml-auto" />
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
         <a href="https://dashboard.stripe.com" target="_blank" rel="noopener noreferrer">
           <Card className="hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer">
             <CardContent className="py-3 px-4">

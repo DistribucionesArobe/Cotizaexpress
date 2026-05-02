@@ -26,6 +26,7 @@ import AdminPromoCodes from './pages/AdminPromoCodes';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminTwilio from './pages/AdminTwilio';
 import AdminSearchStats from './pages/AdminSearchStats';
+import AdminSEO from './pages/AdminSEO';
 import Onboarding from './pages/Onboarding';
 // Páginas SEO
 import DemoPage from './pages/DemoPage';
@@ -412,6 +413,14 @@ function AppRoutes() {
               element={
                 <ProtectedRoute>
                   <AdminSearchStats />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/seo"
+              element={
+                <ProtectedRoute>
+                  <AdminSEO />
                 </ProtectedRoute>
               }
             />
