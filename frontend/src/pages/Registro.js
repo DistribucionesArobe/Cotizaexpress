@@ -49,7 +49,7 @@ export default function Registro() {
     setLoading(true);
 
     // Validaciones
-    if (!formData.email || !formData.password || !formData.nombre || !formData.empresa_nombre) {
+    if (!formData.email || !formData.password || !formData.nombre || !formData.empresa_nombre || !formData.telefono) {
       toast.error('Por favor completa todos los campos requeridos');
       setLoading(false);
       return;
@@ -176,7 +176,7 @@ export default function Registro() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Teléfono (Opcional)
+                  Teléfono (WhatsApp) *
                 </label>
                 <input
                   type="tel"
@@ -184,9 +184,11 @@ export default function Registro() {
                   value={formData.telefono}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  placeholder="5512345678"
+                  placeholder="81 1234 5678"
+                  required
                   data-testid="input-telefono"
                 />
+                <p className="text-xs text-slate-500 mt-1">Para poder ayudarte con la configuración</p>
               </div>
 
               <div>

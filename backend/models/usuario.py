@@ -19,7 +19,7 @@ class UsuarioCreate(BaseModel):
     password: str
     nombre: str
     empresa_nombre: str
-    telefono: Optional[str] = None
+    telefono: str
 
 class UsuarioLogin(BaseModel):
     email: EmailStr
