@@ -8,7 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 import {
   Check, X, Package, UserCircle, MessageSquare, CreditCard,
-  ArrowRight, TrendingUp, ShoppingCart, Users, Clock
+  ArrowRight, TrendingUp, ShoppingCart, Users, Clock, AlertTriangle
 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -22,9 +22,11 @@ export default function Dashboard() {
   const [loadingPlan, setLoadingPlan] = useState(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [needsPricing, setNeedsPricing] = useState([]);
 
   useEffect(() => {
     cargarStats();
+    cargarNeedsPricing();
     // Google Ads conversion — fires once when user reaches Dashboard
     if (typeof window.gtag === 'function') {
       window.gtag('event', 'conversion', {
@@ -59,6 +61,15 @@ export default function Dashboard() {
     } catch (err) {
       console.warn('Stats load error:', err);
       setStats(s => ({ ...s, loading: false }));
+    }
+  };
+
+  const cargarNeedsPricing = async () => {
+    try {
+      const res = await axios.get(`${API}/pricebook/needs-pricing`);
+      setNeedsPricing(res.data.items || []);
+    } catch (err) {
+      // silently ignore — feature is optional
     }
   };
 
@@ -161,6 +172,43 @@ export default function Dashboard() {
           }
         </p>
       </div>
+
+      {/* ─── NEEDS PRICING ALERT ─── */}
+      {needsPricing.length > 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <AlertTriangle className="w-5 h-5 text-amber-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-amber-900">
+                {needsPricing.length} producto{needsPricing.length > 1 ? 's' : ''} sin precio
+              </h3>
+              <p className="text-sm text-amber-700 mt-1">
+                Tus clientes pidieron estos productos pero no estaban en tu catálogo. Los agregamos automáticamente — solo falta que les pongas precio.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {needsPricing.slice(0, 5).map(item => (
+                  <span key={item.id} className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                    {item.name}
+                  </span>
+                ))}
+                {needsPricing.length > 5 && (
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-600">
+                    +{needsPricing.length - 5} más
+                  </span>
+                )}
+              </div>
+              <Link
+                to="/productos"
+                className="inline-flex items-center gap-1.5 mt-3 text-sm font-medium text-amber-700 hover:text-amber-900"
+              >
+                Ir a Productos para poner precios <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ─── ACTIVE COMPANY: Metrics cards ─── */}
       {esEmpresaActiva && (
