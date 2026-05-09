@@ -174,8 +174,28 @@ async def procesar_mensaje_whatsapp(
             )
             return
         
-        # 3. Preparar estado inicial para el orquestador
+        # 3. Cargar historial de conversación
         from datetime import datetime, timezone
+        historial_cliente = []
+        try:
+            conversaciones = db.get_collection('conversaciones') if db is not None else None
+            if conversaciones:
+                conv = await conversaciones.find_one({
+                    'user_phone': user_phone,
+                    'company_id': empresa_id
+                })
+                if conv and conv.get('messages'):
+                    # Últimos 6 mensajes (3 pares user/bot)
+                    ultimos = conv['messages'][-6:]
+                    historial_cliente = [
+                        {'direccion': m['role'], 'contenido': m['content']}
+                        for m in ultimos
+                    ]
+                    logger.info(f"📜 Historial cargado: {len(historial_cliente)} mensajes")
+        except Exception as e:
+            logger.warning(f"⚠️ No se pudo cargar historial: {e}")
+
+        # 4. Preparar estado inicial para el orquestador
         estado_inicial = {
             'mensaje': message_text,
             'cliente_telefono': user_phone,
@@ -186,7 +206,7 @@ async def procesar_mensaje_whatsapp(
             'confianza_intencion': 0.0,
             'cliente_id': None,
             'cliente_nombre': contact_name,
-            'historial_cliente': [],
+            'historial_cliente': historial_cliente,
             'cotizacion_actual': None,
             'productos_solicitados': [],
             'respuesta_cotizador': None,
@@ -204,11 +224,11 @@ async def procesar_mensaje_whatsapp(
             'timestamp': datetime.now(timezone.utc).isoformat()
         }
         
-        # 4. Ejecutar orquestador
+        # 5. Ejecutar orquestador
         logger.info(f"🤖 Ejecutando orquestador para {empresa_nombre}")
         resultado = await orquestador.ejecutar(estado_inicial)
         
-        # 5. Enviar respuesta
+        # 6. Enviar respuesta
         respuesta = resultado.get('respuesta_final', '')
         
         if respuesta:
@@ -228,7 +248,7 @@ async def procesar_mensaje_whatsapp(
                 message=f"🤖 CotizaBot – {empresa_nombre}\n\n¿En qué puedo ayudarte?"
             )
         
-        # 6. Guardar conversación
+        # 7. Guardar conversación
         await guardar_conversacion(
             user_phone=user_phone,
             empresa_id=empresa_id,

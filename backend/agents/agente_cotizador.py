@@ -90,9 +90,19 @@ REGLAS:
                 for p in productos_db
             ])
             
+            # Incluir historial si existe para contexto de picks pendientes
+            historial = state.get('historial_cliente', [])
+            historial_str = ""
+            if historial:
+                historial_str = "\nHISTORIAL RECIENTE:\n"
+                for msg in historial[-4:]:
+                    role = "Cliente" if msg.get('direccion') == 'user' else "Bot"
+                    historial_str += f"  {role}: {msg.get('contenido', '')[:200]}\n"
+                historial_str += "\nSi el historial muestra que el bot pidió elegir opciones (pick_A1, pick_A2) y el cliente ahora pide cotizar o dice 'ninguno', genera la cotización con los productos ya identificados SIN el producto ambiguo. NO vuelvas a empezar de cero.\n"
+
             user_message = UserMessage(
                 text=f"""Mensaje del cliente: {mensaje}
-
+{historial_str}
 CATÁLOGO DE {empresa_nombre.upper()}:
 {catalogo_str}
 
@@ -101,6 +111,7 @@ INSTRUCCIONES:
 2. Si NO menciona cantidad, ESTIMA una cantidad razonable basada en uso típico
 3. Si hay varios productos similares, pregunta cuál prefiere CON PRECIOS
 4. Interpreta sinónimos y errores de escritura
+5. Si un producto NO existe en el catálogo (ej: "tiras de madera"), NO lo fuerces a otro producto diferente. Ponlo en productos_ambiguos con opciones vacías o simplemente omítelo y menciona que no lo manejas.
 
 Responde en JSON."""
             )

@@ -39,6 +39,8 @@ IMPORTANTE:
 - Si el historial pregunta método de pago y responde "1" o "2" → METODO_PAGO
 - Errores de escritura como "tablarok", "sement", "variya" → COTIZAR
 - "cuánto sale", "a cómo", "precio de" → COTIZAR
+- Si el historial muestra que el bot pidió elegir opciones (pick_A1, pick_A2, etc.) y el usuario responde con un número, "ninguno", o pide cotizar → COTIZAR
+- Si el usuario dice "cotízame", "cotízame por favor", "mándame la cotización" después de que el bot mostró opciones → COTIZAR (continuar la cotización pendiente)
 
 Responde SOLO en JSON:
 {"intencion": "COTIZAR", "confianza": 0.95, "razon": "Menciona producto y pregunta precio"}
