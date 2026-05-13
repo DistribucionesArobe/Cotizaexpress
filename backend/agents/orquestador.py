@@ -64,15 +64,34 @@ class OrquestadorCotizaBot:
 
     def _decidir_ruta_intencion(self, state: AgentState) -> Literal["cotizar", "confirmar", "metodo_pago"]:
         """Decide ruta. Por defecto TODO va al LLM (cotizar).
-        Solo confirmar y metodo_pago van por ruta separada."""
+        Solo confirmar y metodo_pago van por ruta separada, Y solo si hay contexto válido."""
         intencion = state.get('intencion', 'OTRO')
+        historial = state.get('historial_cliente', [])
 
         if intencion == 'CONFIRMAR':
-            return "confirmar"
+            # Validar que hay cotización pendiente en el historial
+            # Si no hay, el "sí" probablemente es respuesta a otra cosa → LLM
+            hay_cotizacion = any(
+                'Cotización #' in msg.get('contenido', '') or 'confirmas' in msg.get('contenido', '').lower()
+                for msg in historial
+            )
+            if hay_cotizacion:
+                return "confirmar"
+            else:
+                logger.info("CONFIRMAR sin cotización pendiente → redirigiendo al LLM")
+                return "cotizar"
         elif intencion == 'METODO_PAGO':
-            return "metodo_pago"
+            # Validar que el bot preguntó por método de pago
+            pregunto_pago = any(
+                'método de pago' in msg.get('contenido', '').lower() or 'forma de pago' in msg.get('contenido', '').lower()
+                for msg in historial
+            )
+            if pregunto_pago:
+                return "metodo_pago"
+            else:
+                logger.info("METODO_PAGO sin contexto de pago → redirigiendo al LLM")
+                return "cotizar"
         else:
-            # TODO lo demás: COTIZAR, STOCK, SALUDO, OTRO, FACTURA, etc.
             return "cotizar"
     
     async def _nodo_clasificar(self, state: AgentState) -> AgentState:
