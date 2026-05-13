@@ -23,12 +23,15 @@ REGLA DE ORO: Asume intención de COTIZAR cuando el usuario mencione:
 - "precio", "cuánto cuesta", "info", "material", "necesito", "barato"
 - Nombres de productos (aunque estén mal escritos)
 - Usos o problemas ("para una pared", "se me rompió", "necesito arreglar")
+- "tienen [producto]?", "manejan [producto]?", "hay [producto]?" → SIEMPRE es COTIZAR, NO STOCK
+- Especificaciones sueltas como "calibre 14", "de 2.44", "1/2 pulgada", "4x8" → COTIZAR (el cliente pregunta por un producto)
+- "qué medida tienen?", "qué calibres manejan?", "qué medida tiene?" → COTIZAR (quiere ver opciones del catálogo)
 
 INTENCIONES POSIBLES:
-1. COTIZAR: Quiere precio, producto, material, cotización, presupuesto
+1. COTIZAR: Quiere precio, producto, material, cotización, presupuesto, PREGUNTA SI TIENEN algo, pide especificaciones, pregunta medidas/calibres disponibles
 2. CONFIRMAR: Dice "sí", "si", "acepto", "confirmo", "va", "dale", "ok", "está bien"
 3. METODO_PAGO: Selecciona pago "1", "2", "mercado pago", "transferencia", "spei"
-4. STOCK: Pregunta si hay disponible, si tienen, cuántos quedan
+4. STOCK: SOLO cuando pregunta cantidades exactas disponibles ("¿cuántos les quedan?", "¿tienen 500 en existencia?"). NO usar para "¿tienen polines?" — eso es COTIZAR
 5. SEGUIMIENTO: Da seguimiento a cotización previa, pregunta por pedido
 6. FACTURA: Pide factura, RFC, datos fiscales
 7. SALUDO: Solo saluda sin pedir nada específico

@@ -36,6 +36,13 @@ MANEJO DE CANTIDADES:
 - Si dicen "no sé": usa valor medio y ofrece ajustar
 - NUNCA esperes datos perfectos para cotizar
 
+MANEJO DE "¿TIENEN X?" / CONSULTAS DE DISPONIBILIDAD:
+- Cuando el cliente pregunta "¿tienen polines?", "¿manejan canal?", "¿hay tablaroca?" → busca en el catálogo y MUESTRA las opciones disponibles con precios
+- Si hay varias variantes (ej: polín calibre 14, polín calibre 12), lista todas con precio
+- Si el cliente luego dice una especificación ("calibre 14", "de 2.44", "q medida tiene?"), usa el HISTORIAL para saber de qué producto habla y responde con las opciones/medidas disponibles en el catálogo
+- NUNCA respondas "mándame tu lista" cuando el cliente ya mencionó un producto
+- Si el producto NO existe en el catálogo, dilo claramente: "No manejamos polines por el momento"
+
 FORMATO DE RESPUESTA JSON:
 {
   "productos_identificados": [
@@ -45,12 +52,15 @@ FORMATO DE RESPUESTA JSON:
   "necesita_aclaracion": false,
   "pregunta_aclaracion": "",
   "cantidad_estimada": true,
-  "nota_vendedor": "Estimé 5 sacos para un cuarto estándar"
+  "nota_vendedor": "Estimé 5 sacos para un cuarto estándar",
+  "es_consulta_disponibilidad": false,
+  "respuesta_disponibilidad": ""
 }
 
 REGLAS:
 - Si el producto es claro pero falta cantidad → estima y pon cantidad_estimada=true
 - Si hay varios productos similares → pregunta con opciones y precios
+- Si es consulta de disponibilidad ("¿tienen X?", "¿qué medidas manejan?") → pon es_consulta_disponibilidad=true y en respuesta_disponibilidad escribe la respuesta natural con las opciones del catálogo y precios. NO pongas productos_identificados vacío.
 - Siempre en español mexicano, cercano y profesional
 - Frases cortas, máximo 4 líneas
 """
@@ -186,7 +196,19 @@ Responde en JSON."""
                     })
             
             # Construir respuesta
-            if resultado.get('necesita_aclaracion', False) and resultado.get('productos_ambiguos'):
+            # Primero: si es consulta de disponibilidad, responder directamente
+            if resultado.get('es_consulta_disponibilidad', False) and resultado.get('respuesta_disponibilidad'):
+                empresa_nombre = state.get('empresa_context', {}).get('company_name', 'la empresa')
+                respuesta = f"🤖 CotizaBot – {empresa_nombre}\n\n{resultado['respuesta_disponibilidad']}"
+                accion = 'esperar_info'
+
+                return {
+                    'productos_solicitados': productos_solicitados,
+                    'respuesta_cotizador': respuesta,
+                    'accion': accion,
+                    'agentes_ejecutados': state['agentes_ejecutados'] + ['cotizador']
+                }
+            elif resultado.get('necesita_aclaracion', False) and resultado.get('productos_ambiguos'):
                 # Solo preguntar si hay ambigüedad real en productos
                 pregunta = resultado.get('pregunta_aclaracion', '')
                 respuesta = f"{pregunta}"
