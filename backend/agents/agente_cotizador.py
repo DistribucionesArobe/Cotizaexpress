@@ -98,7 +98,13 @@ REGLAS:
                 for msg in historial[-4:]:
                     role = "Cliente" if msg.get('direccion') == 'user' else "Bot"
                     historial_str += f"  {role}: {msg.get('contenido', '')[:200]}\n"
-                historial_str += "\nSi el historial muestra que el bot pidió elegir opciones (pick_A1, pick_A2) y el cliente ahora pide cotizar o dice 'ninguno', genera la cotización con los productos ya identificados SIN el producto ambiguo. NO vuelvas a empezar de cero.\n"
+                historial_str += """
+REGLAS DE CONTEXTO:
+- Si el historial muestra que el bot pidió elegir opciones (pick_A1, pick_A2) y el cliente ahora pide cotizar o dice 'ninguno', genera la cotización con los productos ya identificados SIN el producto ambiguo. NO vuelvas a empezar de cero.
+- Si el historial muestra una cotización reciente (con folio, productos, total) y el cliente CORRIGE un detalle (ej: "el canal es calibre 26", "son 15 no 10", "ponle cal 26"), RE-COTIZA con la corrección aplicada. Mantén todos los demás productos igual y solo cambia lo que el cliente pidió corregir.
+- Si el cliente agrega un producto después de una cotización (ej: "agrégale 5 bultos de cemento"), incluye los productos anteriores + el nuevo.
+- NUNCA respondas "Mándame tu lista" si ya hay una cotización en el historial — el cliente ya mandó su lista, solo está ajustando.
+"""
 
             user_message = UserMessage(
                 text=f"""Mensaje del cliente: {mensaje}

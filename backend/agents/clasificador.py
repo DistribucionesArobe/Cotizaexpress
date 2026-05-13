@@ -41,6 +41,8 @@ IMPORTANTE:
 - "cuánto sale", "a cómo", "precio de" → COTIZAR
 - Si el historial muestra que el bot pidió elegir opciones (pick_A1, pick_A2, etc.) y el usuario responde con un número, "ninguno", o pide cotizar → COTIZAR
 - Si el usuario dice "cotízame", "cotízame por favor", "mándame la cotización" después de que el bot mostró opciones → COTIZAR (continuar la cotización pendiente)
+- CORRECCIONES: Si el historial muestra una cotización reciente (con folio, productos, total) y el usuario corrige un detalle como "el canal es calibre 26", "son 15 no 10", "ponle cal 26", "pero es de 2.44" → COTIZAR (es una corrección a la cotización, NO un mensaje nuevo)
+- CUALQUIER mensaje que mencione un producto o especificación después de una cotización reciente → COTIZAR (el usuario quiere ajustar o agregar algo)
 
 Responde SOLO en JSON:
 {"intencion": "COTIZAR", "confianza": 0.95, "razon": "Menciona producto y pregunta precio"}
