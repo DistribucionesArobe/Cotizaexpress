@@ -14,41 +14,26 @@ class AgenteClasificador:
         self.chat = LlmChat(
             api_key=settings.emergent_llm_key,
             session_id="clasificador",
-            system_message="""Eres un clasificador de intenciones para CotizaBot, un asistente de ventas por WhatsApp.
+            system_message="""Eres un clasificador SIMPLE para CotizaBot. Tu trabajo es MUY sencillo.
 
-Tu trabajo es interpretar LA INTENCIÓN del usuario, no la forma exacta de su mensaje.
-Los usuarios escriben mal, usan sinónimos, abrevian y no dan datos completos. ESO ES NORMAL.
+Solo necesitas distinguir 3 casos:
 
-REGLA DE ORO: Asume intención de COTIZAR cuando el usuario mencione:
-- "precio", "cuánto cuesta", "info", "material", "necesito", "barato"
-- Nombres de productos (aunque estén mal escritos)
-- Usos o problemas ("para una pared", "se me rompió", "necesito arreglar")
-- "tienen [producto]?", "manejan [producto]?", "hay [producto]?" → SIEMPRE es COTIZAR, NO STOCK
-- Especificaciones sueltas como "calibre 14", "de 2.44", "1/2 pulgada", "4x8" → COTIZAR (el cliente pregunta por un producto)
-- "qué medida tienen?", "qué calibres manejan?", "qué medida tiene?" → COTIZAR (quiere ver opciones del catálogo)
+1. CONFIRMAR: El usuario acepta/confirma una cotización previa
+   - "sí", "si", "acepto", "confirmo", "va", "dale", "ok", "está bien", "sale"
+   - SOLO cuando el historial muestra una cotización reciente pendiente de confirmar
 
-INTENCIONES POSIBLES:
-1. COTIZAR: Quiere precio, producto, material, cotización, presupuesto, PREGUNTA SI TIENEN algo, pide especificaciones, pregunta medidas/calibres disponibles
-2. CONFIRMAR: Dice "sí", "si", "acepto", "confirmo", "va", "dale", "ok", "está bien"
-3. METODO_PAGO: Selecciona pago "1", "2", "mercado pago", "transferencia", "spei"
-4. STOCK: SOLO cuando pregunta cantidades exactas disponibles ("¿cuántos les quedan?", "¿tienen 500 en existencia?"). NO usar para "¿tienen polines?" — eso es COTIZAR
-5. SEGUIMIENTO: Da seguimiento a cotización previa, pregunta por pedido
-6. FACTURA: Pide factura, RFC, datos fiscales
-7. SALUDO: Solo saluda sin pedir nada específico
-8. OTRO: Cualquier otra cosa
+2. METODO_PAGO: El usuario selecciona un método de pago
+   - "1", "2", "mercado pago", "transferencia", "spei", "efectivo"
+   - SOLO cuando el historial muestra que el bot preguntó por método de pago
 
-IMPORTANTE:
-- Si el historial muestra una cotización reciente y el usuario dice "sí/ok/va" → CONFIRMAR
-- Si el historial pregunta método de pago y responde "1" o "2" → METODO_PAGO
-- Errores de escritura como "tablarok", "sement", "variya" → COTIZAR
-- "cuánto sale", "a cómo", "precio de" → COTIZAR
-- Si el historial muestra que el bot pidió elegir opciones (pick_A1, pick_A2, etc.) y el usuario responde con un número, "ninguno", o pide cotizar → COTIZAR
-- Si el usuario dice "cotízame", "cotízame por favor", "mándame la cotización" después de que el bot mostró opciones → COTIZAR (continuar la cotización pendiente)
-- CORRECCIONES: Si el historial muestra una cotización reciente (con folio, productos, total) y el usuario corrige un detalle como "el canal es calibre 26", "son 15 no 10", "ponle cal 26", "pero es de 2.44" → COTIZAR (es una corrección a la cotización, NO un mensaje nuevo)
-- CUALQUIER mensaje que mencione un producto o especificación después de una cotización reciente → COTIZAR (el usuario quiere ajustar o agregar algo)
+3. OTRO: TODO lo demás va aquí. Esto incluye:
+   - Saludos, preguntas, cotizaciones, disponibilidad, correcciones, especificaciones, quejas, etc.
+   - El LLM principal se encarga de manejar todo esto inteligentemente
+
+REGLA CLAVE: En caso de duda → OTRO. Solo usa CONFIRMAR o METODO_PAGO cuando estés MUY seguro por el contexto del historial.
 
 Responde SOLO en JSON:
-{"intencion": "COTIZAR", "confianza": 0.95, "razon": "Menciona producto y pregunta precio"}
+{"intencion": "OTRO", "confianza": 0.95, "razon": "Mensaje general, va al LLM principal"}
 """
         ).with_model("openai", "gpt-4o")
     

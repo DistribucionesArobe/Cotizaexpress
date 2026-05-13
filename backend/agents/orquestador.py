@@ -24,57 +24,56 @@ class OrquestadorCotizaBot:
         self.graph = self._build_graph()
     
     def _build_graph(self) -> StateGraph:
-        """Construye el grafo de estados del sistema"""
+        """Construye el grafo de estados del sistema.
+
+        Arquitectura simplificada: TODO pasa por el LLM (cotizador).
+        Solo CONFIRMAR y METODO_PAGO tienen ruta separada porque son transaccionales.
+        El clasificador solo distingue estos 3 casos: cotizar (default), confirmar, metodo_pago.
+        """
         workflow = StateGraph(AgentState)
-        
+
         # Nodos del grafo
         workflow.add_node("clasificar", self._nodo_clasificar)
         workflow.add_node("cotizar", self._nodo_cotizar)
-        workflow.add_node("stock", self._nodo_stock)
         workflow.add_node("compliance", self._nodo_compliance)
         workflow.add_node("confirmar", self._nodo_confirmar_cotizacion)
         workflow.add_node("metodo_pago", self._nodo_metodo_pago)
         workflow.add_node("finalizar", self._nodo_finalizar)
-        
+
         # Punto de entrada
         workflow.set_entry_point("clasificar")
-        
-        # Rutas condicionales
+
+        # Rutas: todo va al cotizador excepto confirmar y metodo_pago
         workflow.add_conditional_edges(
             "clasificar",
             self._decidir_ruta_intencion,
             {
                 "cotizar": "cotizar",
-                "stock": "stock",
                 "confirmar": "confirmar",
                 "metodo_pago": "metodo_pago",
-                "otro": "finalizar"
             }
         )
-        
+
         workflow.add_edge("cotizar", "compliance")
         workflow.add_edge("compliance", "finalizar")
-        workflow.add_edge("stock", "finalizar")
         workflow.add_edge("confirmar", "finalizar")
         workflow.add_edge("metodo_pago", "finalizar")
         workflow.add_edge("finalizar", END)
-        
+
         return workflow.compile()
-    
-    def _decidir_ruta_intencion(self, state: AgentState) -> Literal["cotizar", "stock", "confirmar", "metodo_pago", "otro"]:
-        """Decide qué agente ejecutar según la intención"""
+
+    def _decidir_ruta_intencion(self, state: AgentState) -> Literal["cotizar", "confirmar", "metodo_pago"]:
+        """Decide ruta. Por defecto TODO va al LLM (cotizar).
+        Solo confirmar y metodo_pago van por ruta separada."""
         intencion = state.get('intencion', 'OTRO')
-        
-        if intencion == 'COTIZAR':
-            return "cotizar"
-        elif intencion == 'STOCK':
-            return "stock"
-        elif intencion == 'CONFIRMAR':
+
+        if intencion == 'CONFIRMAR':
             return "confirmar"
         elif intencion == 'METODO_PAGO':
             return "metodo_pago"
         else:
-            return "otro"
+            # TODO lo demás: COTIZAR, STOCK, SALUDO, OTRO, FACTURA, etc.
+            return "cotizar"
     
     async def _nodo_clasificar(self, state: AgentState) -> AgentState:
         """Nodo que clasifica la intención"""
@@ -86,12 +85,6 @@ class OrquestadorCotizaBot:
         """Nodo que procesa cotizaciones"""
         logger.info("Ejecutando nodo: cotizar")
         resultado = await self.cotizador.procesar(state)
-        return {**state, **resultado}
-    
-    async def _nodo_stock(self, state: AgentState) -> AgentState:
-        """Nodo que maneja consultas de stock"""
-        logger.info("Ejecutando nodo: stock")
-        resultado = await self.operativo.procesar(state)
         return {**state, **resultado}
     
     async def _nodo_compliance(self, state: AgentState) -> AgentState:
@@ -119,21 +112,16 @@ class OrquestadorCotizaBot:
         # Consolidar respuesta final
         respuesta_final = ""
         
-        # Prioridad: cobros > cotizador > operativo > compliance
+        # Prioridad: cobros > cotizador + compliance
         if state.get('respuesta_cobros'):
             respuesta_final = state['respuesta_cobros']
         elif state.get('respuesta_cotizador'):
-            respuesta_final += state['respuesta_cotizador']
-        
-        if state.get('respuesta_compliance') and not state.get('respuesta_cobros'):
-            respuesta_final += state['respuesta_compliance']
-        
-        if state.get('respuesta_operativo'):
-            respuesta_final = state['respuesta_operativo']
-        
+            respuesta_final = state['respuesta_cotizador']
+            if state.get('respuesta_compliance'):
+                respuesta_final += state['respuesta_compliance']
+
         if not respuesta_final:
-            # Respuesta genérica para otras intenciones
-            respuesta_final = "Gracias por tu mensaje. ¿Cómo puedo ayudarte con materiales de construcción hoy?"
+            respuesta_final = "¡Hola! 👋 ¿En qué te puedo ayudar hoy?"
             state['accion'] = 'enviar_mensaje'
         
         return {
