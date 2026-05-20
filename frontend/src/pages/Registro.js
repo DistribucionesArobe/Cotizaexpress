@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '../contexts/AuthContext';
@@ -8,8 +8,10 @@ import { toast } from 'sonner';
 
 export default function Registro() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { registro } = useAuth();
   const [loading, setLoading] = useState(false);
+  const referralCode = searchParams.get('ref') || '';
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -61,7 +63,7 @@ export default function Registro() {
       return;
     }
 
-    const result = await registro(formData);
+    const result = await registro({ ...formData, referral_code: referralCode });
 
     if (result.success) {
       toast.success('¡Registro exitoso! Bienvenido a CotizaBot');
@@ -101,6 +103,11 @@ export default function Registro() {
           </Link>
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Crear Cuenta</h1>
           <p className="text-slate-600">Automatiza tus cotizaciones por WhatsApp</p>
+          {referralCode && (
+            <div className="mt-3 inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 text-sm font-medium px-4 py-2 rounded-full border border-emerald-200">
+              <span>Referido por un afiliado</span>
+            </div>
+          )}
         </div>
 
         <Card>
