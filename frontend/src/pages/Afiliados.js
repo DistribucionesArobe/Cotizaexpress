@@ -127,7 +127,7 @@ export default function Afiliados() {
             Estructura de Comisiones
           </h2>
           <p style={{ color: '#6b7280', marginBottom: 50, fontSize: 17, maxWidth: 600, margin: '0 auto 50px' }}>
-            Gana desde el primer día y sigue ganando cada mes mientras tu referido sea cliente.
+            Gana un bono al tercer mes de tu referido + comisión recurrente mensual.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 30 }}>
             {/* Plan CotizaBot */}
@@ -139,8 +139,8 @@ export default function Afiliados() {
               <CardContent style={{ padding: 24 }}>
                 <div style={{ textAlign: 'left' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #f1f5f9' }}>
-                    <span style={{ fontWeight: 600 }}>Bono primer mes</span>
-                    <span style={{ color: GREEN, fontWeight: 700, fontSize: 18 }}>$1,000</span>
+                    <span style={{ fontWeight: 600 }}>Bono de activación (mes 3)</span>
+                    <span style={{ color: GREEN, fontWeight: 700, fontSize: 18 }}>$500</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #f1f5f9' }}>
                     <span style={{ fontWeight: 600 }}>Comisión mensual (15%)</span>
@@ -148,9 +148,10 @@ export default function Afiliados() {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0' }}>
                     <span style={{ fontWeight: 600 }}>Ganancia año 1</span>
-                    <span style={{ color: PRIMARY, fontWeight: 700, fontSize: 18 }}>$2,650</span>
+                    <span style={{ color: PRIMARY, fontWeight: 700, fontSize: 18 }}>$1,850</span>
                   </div>
                 </div>
+                <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 8 }}>$500 bono + 9 meses x $150</p>
               </CardContent>
             </Card>
 
@@ -170,8 +171,8 @@ export default function Afiliados() {
               <CardContent style={{ padding: 24 }}>
                 <div style={{ textAlign: 'left' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #f1f5f9' }}>
-                    <span style={{ fontWeight: 600 }}>Bono primer mes</span>
-                    <span style={{ color: GREEN, fontWeight: 700, fontSize: 18 }}>$2,000</span>
+                    <span style={{ fontWeight: 600 }}>Bono de activación (mes 3)</span>
+                    <span style={{ color: GREEN, fontWeight: 700, fontSize: 18 }}>$1,000</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #f1f5f9' }}>
                     <span style={{ fontWeight: 600 }}>Comisión mensual (15%)</span>
@@ -179,9 +180,10 @@ export default function Afiliados() {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0' }}>
                     <span style={{ fontWeight: 600 }}>Ganancia año 1</span>
-                    <span style={{ color: PRIMARY, fontWeight: 700, fontSize: 18 }}>$5,300</span>
+                    <span style={{ color: PRIMARY, fontWeight: 700, fontSize: 18 }}>$3,700</span>
                   </div>
                 </div>
+                <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 8 }}>$1,000 bono + 9 meses x $300</p>
               </CardContent>
             </Card>
           </div>
