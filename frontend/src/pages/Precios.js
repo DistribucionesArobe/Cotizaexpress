@@ -399,7 +399,7 @@ export default function Precios() {
                 </svg>
               </div>
             </div>
-            <p className="text-xs text-slate-400 mt-2">Pagos seguros procesados por Stripe</p>
+            <p className="text-xs text-slate-400 mt-2">Pagos seguros procesados por Mercado Pago</p>
           </div>
 
           {/* Mexican company badge */}
@@ -426,7 +426,7 @@ export default function Precios() {
                 <CardContent className="py-4">
                   <h3 className="font-bold text-slate-900 mb-2">¿Puedo pagar con tarjeta?</h3>
                   <p className="text-sm text-slate-600">
-                    Sí. Aceptamos Visa, Mastercard y American Express. Los pagos se procesan de forma segura por Stripe.
+                    Sí. Aceptamos Visa, Mastercard, American Express, débito, Oxxo, SPEI y saldo de Mercado Pago. Los pagos se procesan de forma segura por Mercado Pago.
                   </p>
                 </CardContent>
               </Card>

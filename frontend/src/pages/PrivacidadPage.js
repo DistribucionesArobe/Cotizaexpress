@@ -33,7 +33,7 @@ export default function PrivacidadPage() {
             <li>Número de teléfono</li>
             <li>Dirección fiscal (para facturación)</li>
             <li>RFC (para facturación CFDI)</li>
-            <li>Información de pago (procesada por Stripe)</li>
+            <li>Información de pago (procesada por Mercado Pago)</li>
             <li>Conversaciones de WhatsApp relacionadas con cotizaciones</li>
           </ul>
 
@@ -51,7 +51,7 @@ export default function PrivacidadPage() {
           <h2 className="text-2xl font-bold mt-8 mb-4">4. Transferencia de Datos</h2>
           <p>Sus datos pueden ser compartidos con:</p>
           <ul className="list-disc pl-6 mb-4">
-            <li>Stripe (procesamiento de pagos)</li>
+            <li>Mercado Pago (procesamiento de pagos)</li>
             <li>360dialog (integración de WhatsApp)</li>
             <li>Facturama (emisión de CFDI)</li>
             <li>OpenAI (procesamiento de lenguaje natural)</li>

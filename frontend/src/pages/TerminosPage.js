@@ -40,7 +40,7 @@ export default function TerminosPage() {
             <li><strong>Plan Completo:</strong> $1,000 MXN + IVA mensual</li>
             <li><strong>Plan Pro:</strong> $2,000 MXN + IVA mensual</li>
           </ul>
-          <p>Los pagos se procesan a través de Stripe de forma segura. Las suscripciones se renuevan automáticamente.</p>
+          <p>Los pagos se procesan a través de Mercado Pago de forma segura. Las suscripciones se renuevan automáticamente.</p>
 
           <h2 className="text-2xl font-bold mt-8 mb-4">4. Cancelación</h2>
           <p>Puede cancelar su suscripción en cualquier momento desde el dashboard. La cancelación toma efecto al final del período de facturación actual. No hay reembolsos por períodos parciales.</p>

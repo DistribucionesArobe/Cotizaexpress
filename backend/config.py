@@ -28,9 +28,9 @@ class Settings(BaseSettings):
     # Redis/Celery
     redis_url: str = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
     
-    # Stripe
-    stripe_api_key: str = os.environ.get('STRIPE_API_KEY', '')
-    stripe_publishable_key: str = os.environ.get('STRIPE_PUBLISHABLE_KEY', '')
+    # Mercado Pago
+    mp_access_token: str = os.environ.get('MP_ACCESS_TOKEN', '')
+    mp_webhook_url: str = os.environ.get('MP_WEBHOOK_URL', '')
     
     # Email (Resend)
     resend_api_key: str = os.environ.get('RESEND_API_KEY', '')

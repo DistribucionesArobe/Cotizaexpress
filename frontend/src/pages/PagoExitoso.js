@@ -17,50 +17,82 @@ export default function PagoExitoso() {
   const [attempts, setAttempts] = useState(0);
   const maxAttempts = 10;
 
+  // Mercado Pago redirect params
+  const collectionId = searchParams.get('collection_id');
+  const collectionStatus = searchParams.get('collection_status');
+  const paymentId = searchParams.get('payment_id');
+  const externalReference = searchParams.get('external_reference');
+  const preferenceId = searchParams.get('preference_id');
+  // Legacy Stripe param
   const sessionId = searchParams.get('session_id');
 
   useEffect(() => {
-    if (sessionId) {
-      let attempt = 0;
-      const poll = async () => {
-        if (attempt >= maxAttempts) {
-          setStatus('timeout');
-          setMensaje('No pudimos confirmar tu pago. Por favor contacta a soporte.');
-          return;
-        }
-        attempt++;
-        setAttempts(attempt);
-
-        try {
-          const response = await axios.get(`${API}/pagos/checkout-status/${sessionId}`);
-          const data = response.data;
-
-          if (data.payment_status === 'paid' || data.payment_status === 'no_payment_required' || data.plan_activado) {
-            setStatus('success');
-            setMensaje(data.mensaje || '¡Pago exitoso! Tu plan está activo.');
-          } else if (data.status === 'expired') {
-            setStatus('expired');
-            setMensaje('La sesión de pago expiró. Por favor intenta de nuevo.');
-          } else {
-            // Seguir polling
-            setTimeout(poll, 2000);
-          }
-        } catch (error) {
-          console.error('Error verificando pago:', error);
-          if (attempt < maxAttempts) {
-            setTimeout(poll, 3000); // Wait longer on errors
-          } else {
-            setStatus('timeout');
-            setMensaje('No pudimos confirmar tu pago. Si completaste el pago, tu plan se activará automáticamente en unos minutos.');
-          }
-        }
-      };
-      poll();
+    // If MP returned "approved" directly, we can fast-track
+    if (collectionStatus === 'approved' && (collectionId || paymentId)) {
+      verifyPayment();
+    } else if (collectionStatus === 'pending') {
+      setStatus('pending');
+      setMensaje('Tu pago está pendiente de confirmación. Te notificaremos cuando se acredite.');
+    } else if (collectionStatus === 'rejected' || collectionStatus === 'cancelled') {
+      setStatus('error');
+      setMensaje('El pago fue rechazado o cancelado. Por favor intenta de nuevo.');
+    } else if (collectionId || paymentId || sessionId) {
+      verifyPayment();
     } else {
       setStatus('error');
       setMensaje('No se encontró información del pago');
     }
-  }, [sessionId]);
+  }, []);
+
+  const verifyPayment = async () => {
+    let attempt = 0;
+    const poll = async () => {
+      if (attempt >= maxAttempts) {
+        setStatus('timeout');
+        setMensaje('No pudimos confirmar tu pago. Si completaste el pago, tu plan se activará automáticamente en unos minutos.');
+        return;
+      }
+      attempt++;
+      setAttempts(attempt);
+
+      try {
+        // Build query params for MP or legacy
+        const params = new URLSearchParams();
+        if (paymentId) params.set('payment_id', paymentId);
+        if (collectionId) params.set('collection_id', collectionId);
+        if (collectionStatus) params.set('collection_status', collectionStatus);
+        if (externalReference) params.set('external_reference', externalReference);
+        if (preferenceId) params.set('preference_id', preferenceId);
+        if (sessionId) params.set('session_id', sessionId);
+
+        const response = await axios.get(`${API}/pagos/estado?${params.toString()}`);
+        const data = response.data;
+
+        if (data.paid) {
+          setStatus('success');
+          setMensaje(data.mensaje || '¡Pago exitoso! Tu plan está activo.');
+        } else if (data.status === 'pending' || data.status === 'in_process') {
+          setStatus('pending');
+          setMensaje('Tu pago está siendo procesado. Te notificaremos cuando se acredite.');
+        } else if (data.status === 'rejected' || data.status === 'cancelled') {
+          setStatus('error');
+          setMensaje('El pago fue rechazado. Por favor intenta de nuevo.');
+        } else {
+          // Keep polling
+          setTimeout(poll, 2000);
+        }
+      } catch (error) {
+        console.error('Error verificando pago:', error);
+        if (attempt < maxAttempts) {
+          setTimeout(poll, 3000);
+        } else {
+          setStatus('timeout');
+          setMensaje('No pudimos confirmar tu pago. Si completaste el pago, tu plan se activará automáticamente en unos minutos.');
+        }
+      }
+    };
+    poll();
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex items-center justify-center py-12 px-4">
@@ -86,7 +118,7 @@ export default function PagoExitoso() {
                 </div>
                 <h1 className="text-2xl font-bold text-emerald-700 mb-2">¡Pago Exitoso!</h1>
                 <p className="text-slate-600 mb-6">{mensaje}</p>
-                
+
                 <div className="bg-emerald-50 rounded-lg p-4 mb-6 text-left">
                   <h3 className="font-semibold text-emerald-800 mb-2">Tu plan incluye:</h3>
                   <ul className="text-sm text-emerald-700 space-y-1">
@@ -129,6 +161,23 @@ export default function PagoExitoso() {
                     </Button>
                   </Link>
                 </div>
+              </>
+            )}
+
+            {status === 'pending' && (
+              <>
+                <div className="w-20 h-20 mx-auto mb-6 bg-amber-100 rounded-full flex items-center justify-center">
+                  <svg className="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h1 className="text-2xl font-bold text-amber-700 mb-2">Pago Pendiente</h1>
+                <p className="text-slate-600 mb-6">{mensaje}</p>
+                <Link to="/dashboard">
+                  <Button className="w-full" size="lg">
+                    Ir al Dashboard
+                  </Button>
+                </Link>
               </>
             )}
 

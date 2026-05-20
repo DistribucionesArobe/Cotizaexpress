@@ -255,12 +255,12 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
         </Link>
-        <a href="https://dashboard.stripe.com" target="_blank" rel="noopener noreferrer">
+        <a href="https://www.mercadopago.com.mx/developers/panel" target="_blank" rel="noopener noreferrer">
           <Card className="hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer">
             <CardContent className="py-3 px-4">
               <div className="flex items-center gap-3">
                 <CreditCard className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-medium text-slate-700">Stripe</span>
+                <span className="text-sm font-medium text-slate-700">Mercado Pago</span>
                 <ExternalLink className="w-3 h-3 text-slate-400 ml-auto" />
               </div>
             </CardContent>
@@ -274,7 +274,7 @@ export default function AdminDashboard() {
           <div className="flex flex-wrap items-center gap-6">
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-emerald-500" />
-              <span className="text-sm text-slate-600">Stripe</span>
+              <span className="text-sm text-slate-600">Mercado Pago</span>
             </div>
             <div className="flex items-center gap-2">
               {stats?.twilio_connected ? (
@@ -452,9 +452,9 @@ export default function AdminDashboard() {
                               <p className="text-slate-700">
                                 Plan: <PlanBadge plan={company.plan_code} />
                               </p>
-                              {company.stripe_customer_id && (
+                              {company.mp_payment_id && (
                                 <p className="text-slate-700 text-xs">
-                                  Stripe: <code className="bg-slate-100 px-1 rounded">{company.stripe_customer_id}</code>
+                                  MP Pago: <code className="bg-slate-100 px-1 rounded">{company.mp_payment_id}</code>
                                 </p>
                               )}
                               {company.trial_end && (

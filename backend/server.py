@@ -5310,21 +5310,24 @@ def delete_company_logo(request: Request):
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# STRIPE
+# MERCADO PAGO
 # ══════════════════════════════════════════════════════════════════════════════
 
-import stripe as _stripe
+import mercadopago
 
-_STRIPE_SECRET_KEY     = (os.getenv("STRIPE_SECRET_KEY") or "").strip()
-_STRIPE_WEBHOOK_SECRET = (os.getenv("STRIPE_WEBHOOK_SECRET") or "").strip()
+_MP_ACCESS_TOKEN = (os.getenv("MP_ACCESS_TOKEN") or "").strip()
 
-_STRIPE_PRICES = {
-    "cotizabot": "price_1TCSlDF3nSPXsrl4Q05iH98d",
-    "pro":        "price_1TCSlcF3nSPXsrl4mDPdBvN3",
-    "enterprise": "price_1TCSlvF3nSPXsrl41CLP8xv7",
+_MP_PLAN_PRICES = {
+    "cotizabot":   1160.00,   # $1,000 + IVA 16% = $1,160 MXN
+    "pro":         2320.00,   # $2,000 + IVA 16% = $2,320 MXN
+    "enterprise":  4640.00,   # $4,000 + IVA 16% = $4,640 MXN
 }
 
-_PRICE_TO_PLAN = {v: k for k, v in _STRIPE_PRICES.items()}
+_MP_PLAN_NAMES = {
+    "cotizabot":   "CotizaBot - Plan Mensual",
+    "pro":         "CotizaBot Pro - Plan Mensual",
+    "enterprise":  "CotizaBot Enterprise - Plan Mensual",
+}
 
 
 class CheckoutBody(BaseModel):
@@ -5335,108 +5338,203 @@ class CheckoutBody(BaseModel):
 
 @app.post("/api/pagos/crear-checkout")
 def crear_checkout(request: Request, body: CheckoutBody):
-    if not _STRIPE_SECRET_KEY:
-        raise HTTPException(status_code=500, detail="STRIPE_SECRET_KEY no configurada")
+    if not _MP_ACCESS_TOKEN:
+        raise HTTPException(status_code=500, detail="MP_ACCESS_TOKEN no configurada")
 
     plan = (body.plan or "").strip().lower()
-    price_id = _STRIPE_PRICES.get(plan)
-    if not price_id:
+    price = _MP_PLAN_PRICES.get(plan)
+    if not price:
         raise HTTPException(status_code=400, detail=f"Plan inválido: {plan}")
 
     company_id = require_company_id(request)
 
-    _stripe.api_key = _STRIPE_SECRET_KEY
+    sdk = mercadopago.SDK(_MP_ACCESS_TOKEN)
     try:
-        session = _stripe.checkout.Session.create(
-            mode="subscription",
-            line_items=[{"price": price_id, "quantity": 1}],
-            success_url=body.success_url + "?session_id={CHECKOUT_SESSION_ID}",
-            cancel_url=body.cancel_url,
-            metadata={"company_id": company_id, "plan": plan},
-            currency="mxn",
-        )
-        return {"ok": True, "checkout_url": session.url, "session_id": session.id}
+        preference_data = {
+            "items": [
+                {
+                    "title": _MP_PLAN_NAMES.get(plan, f"CotizaBot {plan}"),
+                    "quantity": 1,
+                    "unit_price": price,
+                    "currency_id": "MXN",
+                    "description": f"Suscripción mensual CotizaExpress - Plan {plan.capitalize()}",
+                }
+            ],
+            "back_urls": {
+                "success": body.success_url,
+                "failure": body.cancel_url,
+                "pending": body.success_url,
+            },
+            "auto_return": "approved",
+            "external_reference": f"{company_id}|{plan}",
+            "notification_url": os.getenv("MP_WEBHOOK_URL", "").strip() or None,
+            "statement_descriptor": "CotizaExpress",
+        }
+
+        # Remove notification_url if empty
+        if not preference_data["notification_url"]:
+            del preference_data["notification_url"]
+
+        result = sdk.preference().create(preference_data)
+        pref = result["response"]
+
+        return {
+            "ok": True,
+            "checkout_url": pref["init_point"],
+            "session_id": pref["id"],
+        }
     except Exception as e:
-        print("STRIPE CHECKOUT ERROR:", repr(e))
+        print("MP CHECKOUT ERROR:", repr(e))
         raise HTTPException(status_code=500, detail=f"Error creando checkout: {str(e)}")
 
 
 @app.get("/api/pagos/estado")
-def pago_estado(request: Request, session_id: str = Query(...)):
-    if not _STRIPE_SECRET_KEY:
-        raise HTTPException(status_code=500, detail="STRIPE_SECRET_KEY no configurada")
+def pago_estado(request: Request, session_id: str = Query(None), payment_id: str = Query(None),
+                collection_id: str = Query(None), collection_status: str = Query(None),
+                external_reference: str = Query(None), preference_id: str = Query(None)):
+    """Verifica estado de pago. Acepta parámetros de MP redirect o session_id directo."""
+    if not _MP_ACCESS_TOKEN:
+        raise HTTPException(status_code=500, detail="MP_ACCESS_TOKEN no configurada")
 
-    _stripe.api_key = _STRIPE_SECRET_KEY
+    sdk = mercadopago.SDK(_MP_ACCESS_TOKEN)
+
+    # MP redirect sends collection_id and collection_status
+    _payment_id = payment_id or collection_id
+    _status = collection_status
+
     try:
-        session = _stripe.checkout.Session.retrieve(session_id)
-        paid = session.payment_status == "paid"
-        plan = session.metadata.get("plan") if session.metadata else None
-        return {"ok": True, "paid": paid, "plan": plan, "status": session.payment_status}
+        if _payment_id:
+            # Verify directly with MP API
+            payment_info = sdk.payment().get(int(_payment_id))
+            payment = payment_info["response"]
+            paid = payment.get("status") == "approved"
+            ext_ref = payment.get("external_reference", "")
+            parts = ext_ref.split("|") if ext_ref else []
+            plan = parts[1] if len(parts) > 1 else None
+            mp_company_id = parts[0] if len(parts) > 0 else None
+
+            # If paid, activate plan
+            if paid and mp_company_id and plan:
+                try:
+                    conn = get_conn()
+                    cur = conn.cursor()
+                    cur.execute(
+                        """
+                        UPDATE companies
+                        SET plan_code=%s, mp_payment_id=%s, updated_at=now()
+                        WHERE id=%s
+                        RETURNING id
+                        """,
+                        (plan, str(_payment_id), mp_company_id),
+                    )
+                    cur.close()
+                    conn.close()
+                    print(f"MP PLAN ACTIVADO: company={mp_company_id} plan={plan}")
+                except Exception as e:
+                    print("MP ESTADO DB ERROR:", repr(e))
+
+            return {"ok": True, "paid": paid, "plan": plan, "status": payment.get("status", "unknown")}
+
+        elif _status:
+            # Trust the redirect params but also check external_reference
+            paid = _status == "approved"
+            parts = (external_reference or "").split("|")
+            plan = parts[1] if len(parts) > 1 else None
+            mp_company_id = parts[0] if len(parts) > 0 else None
+
+            if paid and mp_company_id and plan:
+                try:
+                    conn = get_conn()
+                    cur = conn.cursor()
+                    cur.execute(
+                        """
+                        UPDATE companies
+                        SET plan_code=%s, updated_at=now()
+                        WHERE id=%s
+                        RETURNING id
+                        """,
+                        (plan, mp_company_id),
+                    )
+                    cur.close()
+                    conn.close()
+                    print(f"MP PLAN ACTIVADO (redirect): company={mp_company_id} plan={plan}")
+                except Exception as e:
+                    print("MP ESTADO REDIRECT DB ERROR:", repr(e))
+
+            return {"ok": True, "paid": paid, "plan": plan, "status": _status}
+
+        else:
+            return {"ok": False, "paid": False, "plan": None, "status": "unknown"}
+
     except Exception as e:
-        print("STRIPE ESTADO ERROR:", repr(e))
+        print("MP ESTADO ERROR:", repr(e))
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/api/pagos/webhook")
-async def stripe_webhook(request: Request):
-    payload = await request.body()
-    sig_header = request.headers.get("stripe-signature", "")
-
-    if not _STRIPE_WEBHOOK_SECRET:
-        raise HTTPException(status_code=500, detail="STRIPE_WEBHOOK_SECRET no configurada")
-
-    _stripe.api_key = _STRIPE_SECRET_KEY
+async def mp_webhook(request: Request):
+    """Webhook de Mercado Pago (IPN) para notificaciones de pago."""
     try:
-        event = _stripe.Webhook.construct_event(payload, sig_header, _STRIPE_WEBHOOK_SECRET)
-    except Exception as e:
-        print("STRIPE WEBHOOK SIGNATURE ERROR:", repr(e))
-        raise HTTPException(status_code=400, detail="Invalid signature")
+        body = await request.json()
+    except Exception:
+        body = {}
 
-    event_type = event.get("type")
-    print(f"STRIPE EVENT: {event_type}")
+    action = body.get("action", "")
+    data_id = (body.get("data") or {}).get("id")
 
-    if event_type == "checkout.session.completed":
-        session = event["data"]["object"]
-        company_id = (session.get("metadata") or {}).get("company_id")
-        plan       = (session.get("metadata") or {}).get("plan")
-        stripe_customer_id = session.get("customer")
+    print(f"MP WEBHOOK: action={action} data_id={data_id}")
 
-        if company_id and plan:
+    if not _MP_ACCESS_TOKEN:
+        return {"ok": True}  # Silently accept if not configured
+
+    # Only process payment notifications
+    if action == "payment.created" or body.get("type") == "payment":
+        if data_id:
+            sdk = mercadopago.SDK(_MP_ACCESS_TOKEN)
             try:
-                conn = get_conn()
-                cur  = conn.cursor()
-                cur.execute(
-                    """
-                    UPDATE companies
-                    SET plan_code=%s, stripe_customer_id=%s, updated_at=now()
-                    WHERE id=%s
-                    RETURNING id
-                    """,
-                    (plan, stripe_customer_id, company_id),
-                )
-                row = cur.fetchone()
-                cur.close()
-                conn.close()
-                print(f"STRIPE PLAN ACTIVADO: company={company_id} plan={plan}")
-            except Exception as e:
-                print("STRIPE WEBHOOK DB ERROR:", repr(e))
+                payment_info = sdk.payment().get(int(data_id))
+                payment = payment_info["response"]
+                status = payment.get("status")
+                ext_ref = payment.get("external_reference", "")
+                parts = ext_ref.split("|") if ext_ref else []
+                company_id = parts[0] if len(parts) > 0 else None
+                plan = parts[1] if len(parts) > 1 else None
 
-    elif event_type == "customer.subscription.deleted":
-        subscription = event["data"]["object"]
-        stripe_customer_id = subscription.get("customer")
-        if stripe_customer_id:
-            try:
-                conn = get_conn()
-                cur  = conn.cursor()
-                cur.execute(
-                    "UPDATE companies SET plan_code='free', updated_at=now() WHERE stripe_customer_id=%s",
-                    (stripe_customer_id,),
-                )
-                cur.close()
-                conn.close()
-                print(f"STRIPE SUSCRIPCION CANCELADA: customer={stripe_customer_id}")
+                if status == "approved" and company_id and plan:
+                    try:
+                        conn = get_conn()
+                        cur = conn.cursor()
+                        cur.execute(
+                            """
+                            UPDATE companies
+                            SET plan_code=%s, mp_payment_id=%s, updated_at=now()
+                            WHERE id=%s
+                            RETURNING id
+                            """,
+                            (plan, str(data_id), company_id),
+                        )
+                        cur.close()
+                        conn.close()
+                        print(f"MP WEBHOOK PLAN ACTIVADO: company={company_id} plan={plan}")
+                    except Exception as e:
+                        print("MP WEBHOOK DB ERROR:", repr(e))
+
+                elif status == "refunded" and company_id:
+                    try:
+                        conn = get_conn()
+                        cur = conn.cursor()
+                        cur.execute(
+                            "UPDATE companies SET plan_code='free', updated_at=now() WHERE id=%s",
+                            (company_id,),
+                        )
+                        cur.close()
+                        conn.close()
+                        print(f"MP WEBHOOK REFUND: company={company_id}")
+                    except Exception as e:
+                        print("MP WEBHOOK REFUND DB ERROR:", repr(e))
+
             except Exception as e:
-                print("STRIPE CANCEL DB ERROR:", repr(e))
+                print("MP WEBHOOK PAYMENT ERROR:", repr(e))
 
     return {"ok": True}
 
