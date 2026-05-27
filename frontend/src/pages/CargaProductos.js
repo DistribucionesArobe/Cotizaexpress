@@ -483,12 +483,11 @@ export default function CargaProductos() {
                 <p className="text-xs font-semibold text-slate-700 mb-2">Columnas del template:</p>
                 <ul className="text-xs text-slate-600 space-y-1">
                   <li>• <strong>nombre</strong>: Nombre del producto *</li>
-                  <li>• <strong>categoria</strong>: Categoría (Cemento, Acero, etc.) *</li>
-                  <li>• <strong>precio_base</strong>: Precio sin IVA *</li>
-                  <li>• <strong>unidad</strong>: Saco, Pieza, Metro, etc.</li>
-                  <li>• <strong>stock</strong>: Cantidad disponible (opcional)</li>
-                  <li>• <strong>descripcion</strong>: Descripción del producto (opcional)</li>
+                  <li>• <strong>precio_base</strong>: Precio unitario *</li>
+                  <li>• <strong>unidad</strong>: Bulto, Pieza, Metro, etc.</li>
+                  <li>• <strong>sku</strong>: Código del producto (opcional)</li>
                 </ul>
+                <p className="text-xs text-slate-500 mt-2">* La plantilla incluye 3 ejemplos que puedes borrar.</p>
               </div>
               <Button
                 onClick={async () => {
