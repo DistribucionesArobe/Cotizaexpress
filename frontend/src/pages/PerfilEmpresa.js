@@ -64,6 +64,14 @@ export default function PerfilEmpresa() {
     domingo: 'cerrado',
   });
 
+  // Horario de atención HUMANA (cuando hay asesores disponibles)
+  const [atencionHumana, setAtencionHumana] = useState({
+    tz: 'America/Mexico_City',
+    lunes_viernes: '',
+    sabado: '',
+    domingo: '',
+  });
+
   const [modulos, setModulos] = useState({ construccion_ligera: false, rejacero: false, pintura: false, impermeabilizante: false });
   const [guardandoModulo, setGuardandoModulo] = useState(false);
   const [brandSuggestions, setBrandSuggestions] = useState([]);
@@ -121,6 +129,18 @@ export default function PerfilEmpresa() {
         setHorario(h);
       }
 
+      // Cargar horario de atención humana (attention_schedule JSON)
+      if (s.attention_schedule?.days) {
+        const d = s.attention_schedule.days;
+        const fmt = (day) => (!day || day.closed || !day.open) ? 'cerrado' : `${day.open}-${day.close}`;
+        setAtencionHumana({
+          tz: s.attention_schedule.tz || 'America/Mexico_City',
+          lunes_viernes: fmt(d.mon),
+          sabado: fmt(d.sat),
+          domingo: fmt(d.sun),
+        });
+      }
+
       // Module toggles
       try {
         const conn = await axios.get(`${API}/company/me`);
@@ -152,12 +172,39 @@ export default function PerfilEmpresa() {
       // Construir hours_text desde el horario
       const hours_text = `Lunes a Viernes: ${horario.lunes_viernes}\nSábado: ${horario.sabado}\nDomingo: ${horario.domingo}`;
 
+      // Construir attention_schedule (horario con asesores) si hay algo capturado
+      const parseRange = (str) => {
+        const v = (str || '').trim().toLowerCase();
+        if (!v || v === 'cerrado') return { closed: true };
+        const m = v.match(/(\d{1,2}:?\d{0,2})\s*[-a]\s*(\d{1,2}:?\d{0,2})/);
+        if (!m) return { closed: true };
+        const norm = (t) => {
+          t = t.replace(':', '');
+          const h = t.length <= 2 ? t.padStart(2, '0') + '00' : t.padStart(4, '0');
+          return h.slice(0, 2) + ':' + h.slice(2);
+        };
+        return { open: norm(m[1]), close: norm(m[2]), closed: false };
+      };
+      let attention_schedule = null;
+      const hasAtencion = [atencionHumana.lunes_viernes, atencionHumana.sabado, atencionHumana.domingo]
+        .some(x => (x || '').trim() !== '');
+      if (hasAtencion) {
+        const lv = parseRange(atencionHumana.lunes_viernes);
+        const sab = parseRange(atencionHumana.sabado);
+        const dom = parseRange(atencionHumana.domingo);
+        attention_schedule = {
+          tz: atencionHumana.tz || 'America/Mexico_City',
+          days: { mon: lv, tue: lv, wed: lv, thu: lv, fri: lv, sat: sab, sun: dom },
+        };
+      }
+
       // Sync: telefono_atencion → owner_phone for backward compatibility
       const phoneToSave = formData.telefono_atencion || '';
       await axios.post(`${API}/company/settings`, {
         ...formData,
         owner_phone: phoneToSave,
         hours_text,
+        ...(attention_schedule ? { attention_schedule } : {}),
         discount_threshold: formData.discount_threshold ? parseFloat(formData.discount_threshold) : null,
         discount_percent: formData.discount_percent ? parseFloat(formData.discount_percent) : null,
       });
@@ -589,6 +636,47 @@ export default function PerfilEmpresa() {
               ))}
             </div>
             <p className="text-xs text-slate-500 mt-2">Formato: 08:00-18:00 o "cerrado"</p>
+          </CardContent>
+        </Card>
+
+        {/* Horario con asesores (atención humana) */}
+        <Card>
+          <CardHeader><CardTitle>👥 Horario con asesores</CardTitle></CardHeader>
+          <CardContent>
+            <p className="text-sm text-slate-600 mb-4">
+              Horas en las que hay personas atendiendo. Cuando un cliente pida hablar
+              con alguien fuera de este horario, el bot le dirá cuándo lo contactarán
+              y le ofrecerá cotizar mientras tanto.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[['lunes_viernes', 'Lunes a Viernes'], ['sabado', 'Sábado'], ['domingo', 'Domingo']].map(([key, label]) => (
+                <div key={key} className="space-y-1">
+                  <Label>{label}</Label>
+                  <Input
+                    value={atencionHumana[key] || ''}
+                    onChange={e => setAtencionHumana(prev => ({ ...prev, [key]: e.target.value }))}
+                    placeholder='09:00-18:00 o "cerrado"'
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 space-y-1">
+              <Label>Zona horaria</Label>
+              <select
+                value={atencionHumana.tz}
+                onChange={e => setAtencionHumana(prev => ({ ...prev, tz: e.target.value }))}
+                className="w-full md:w-64 h-10 rounded-md border border-slate-200 bg-white px-3 text-sm"
+              >
+                <option value="America/Mexico_City">Centro (CDMX, Tamaulipas, etc.)</option>
+                <option value="America/Monterrey">Monterrey</option>
+                <option value="America/Chihuahua">Pacífico (Chihuahua, BCS)</option>
+                <option value="America/Tijuana">Noroeste (Tijuana)</option>
+                <option value="America/Cancun">Sureste (Cancún)</option>
+              </select>
+            </div>
+            <p className="text-xs text-slate-500 mt-2">
+              Deja los campos vacíos si no quieres usar esta función — el bot se comporta como siempre.
+            </p>
           </CardContent>
         </Card>
 
