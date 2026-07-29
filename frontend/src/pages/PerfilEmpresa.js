@@ -73,12 +73,59 @@ export default function PerfilEmpresa() {
   });
 
   const [modulos, setModulos] = useState({ construccion_ligera: false, rejacero: false, pintura: false, impermeabilizante: false });
+
+  // Equipo (multi-admin)
+  const [teamUsers, setTeamUsers] = useState([]);
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserPass, setNewUserPass] = useState('');
+  const [addingUser, setAddingUser] = useState(false);
+
+  const cargarEquipo = async () => {
+    try {
+      const r = await axios.get(`${API}/company/users`);
+      setTeamUsers(r.data?.users || []);
+    } catch (_) {}
+  };
+
+  const agregarUsuario = async () => {
+    if (!newUserEmail.trim() || !newUserPass.trim()) {
+      toast.error('Email y contraseña son requeridos');
+      return;
+    }
+    try {
+      setAddingUser(true);
+      await axios.post(`${API}/company/users`, {
+        email: newUserEmail.trim(),
+        password: newUserPass,
+      });
+      toast.success(`Usuario ${newUserEmail.trim()} agregado`);
+      setNewUserEmail('');
+      setNewUserPass('');
+      cargarEquipo();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Error al agregar usuario');
+    } finally {
+      setAddingUser(false);
+    }
+  };
+
+  const eliminarUsuario = async (userId, email) => {
+    if (!window.confirm(`¿Eliminar el acceso de ${email}?`)) return;
+    try {
+      await axios.delete(`${API}/company/users/${userId}`);
+      toast.success('Usuario eliminado');
+      cargarEquipo();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Error al eliminar');
+    }
+  };
   const [guardandoModulo, setGuardandoModulo] = useState(false);
   const [brandSuggestions, setBrandSuggestions] = useState([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
 
   useEffect(() => {
     cargarDatos();
+    cargarEquipo();
   }, []);
 
   const cargarDatos = async () => {
@@ -677,6 +724,67 @@ export default function PerfilEmpresa() {
             <p className="text-xs text-slate-500 mt-2">
               Deja los campos vacíos si no quieres usar esta función — el bot se comporta como siempre.
             </p>
+          </CardContent>
+        </Card>
+
+        {/* Equipo (multi-admin) */}
+        <Card>
+          <CardHeader><CardTitle>👤 Equipo</CardTitle></CardHeader>
+          <CardContent>
+            <p className="text-sm text-slate-600 mb-4">
+              Agrega más personas de tu equipo con acceso a este panel.
+              Cada quien entra con su propio email y contraseña, y ven la misma
+              empresa: catálogo, cotizaciones y configuración.
+            </p>
+            <div className="space-y-2 mb-4">
+              {teamUsers.map(u => (
+                <div key={u.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div>
+                    <p className="font-medium text-slate-800">{u.email}</p>
+                    {u.created_at && <p className="text-xs text-slate-400">Desde {u.created_at.slice(0, 10)}</p>}
+                  </div>
+                  {teamUsers.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="text-red-600 border-red-200 hover:bg-red-50"
+                      onClick={() => eliminarUsuario(u.id, u.email)}
+                    >
+                      Eliminar
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+              <div className="space-y-1">
+                <Label>Email del nuevo usuario</Label>
+                <Input
+                  type="email"
+                  value={newUserEmail}
+                  onChange={e => setNewUserEmail(e.target.value)}
+                  placeholder="persona@tuempresa.com"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>Contraseña (mín. 8 caracteres)</Label>
+                <Input
+                  type="password"
+                  value={newUserPass}
+                  onChange={e => setNewUserPass(e.target.value)}
+                  placeholder="••••••••"
+                />
+              </div>
+              <Button
+                type="button"
+                onClick={agregarUsuario}
+                disabled={addingUser}
+                className="bg-emerald-600 hover:bg-emerald-700"
+              >
+                {addingUser ? 'Agregando...' : '+ Agregar usuario'}
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
