@@ -493,7 +493,7 @@ export default function CargaProductos() {
                 onClick={async () => {
                   try {
                     toast.info('Descargando template...');
-                    const response = await fetch(`${API}/carga-productos/template`);
+                    const response = await fetch(`${API}/carga-productos/template`, { credentials: 'include' });
                     if (!response.ok) throw new Error('Error al descargar');
                     const blob = await response.blob();
                     const url = window.URL.createObjectURL(blob);
