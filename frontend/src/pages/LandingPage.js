@@ -612,6 +612,8 @@ export default function LandingPage() {
                 <li><Link to="/precios" className="text-slate-400 hover:text-white">Precios</Link></li>
                 <li><Link to="/demo" className="text-slate-400 hover:text-white">Demo</Link></li>
                 <li><Link to="/blog" className="text-slate-400 hover:text-white">Blog</Link></li>
+                <li><Link to="/generador-de-cotizaciones" className="text-slate-400 hover:text-white">Generador de Cotizaciones Gratis</Link></li>
+                <li><Link to="/calculadora-iva" className="text-slate-400 hover:text-white">Calculadora de IVA</Link></li>
                 <li><Link to="/calculadoras" className="text-slate-400 hover:text-white">Calculadoras</Link></li>
               </ul>
             </div>
