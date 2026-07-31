@@ -611,9 +611,25 @@ export default function LandingPage() {
               <ul className="space-y-2 text-sm">
                 <li><Link to="/precios" className="text-slate-400 hover:text-white">Precios</Link></li>
                 <li><Link to="/demo" className="text-slate-400 hover:text-white">Demo</Link></li>
-                <li><Link to="/ferreterias" className="text-slate-400 hover:text-white">Para Ferreterías</Link></li>
-                <li><Link to="/refaccionarias" className="text-slate-400 hover:text-white">Para Refaccionarias</Link></li>
+                <li><Link to="/blog" className="text-slate-400 hover:text-white">Blog</Link></li>
                 <li><Link to="/calculadoras" className="text-slate-400 hover:text-white">Calculadoras</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Soluciones por giro</h4>
+              <ul className="space-y-2 text-sm">
+                <li><Link to="/ferreterias" className="text-slate-400 hover:text-white">Ferreterías</Link></li>
+                <li><Link to="/materiales-construccion" className="text-slate-400 hover:text-white">Materiales de Construcción</Link></li>
+                <li><Link to="/refaccionarias" className="text-slate-400 hover:text-white">Refaccionarias</Link></li>
+                <li><Link to="/plomerias" className="text-slate-400 hover:text-white">Plomerías</Link></li>
+                <li><Link to="/material-electrico" className="text-slate-400 hover:text-white">Material Eléctrico</Link></li>
+                <li><Link to="/pinturas" className="text-slate-400 hover:text-white">Pinturas</Link></li>
+                <li><Link to="/herrerias" className="text-slate-400 hover:text-white">Herrerías</Link></li>
+                <li><Link to="/distribuidoras" className="text-slate-400 hover:text-white">Distribuidoras</Link></li>
+                <li><Link to="/papelerias" className="text-slate-400 hover:text-white">Papelerías</Link></li>
+                <li><Link to="/abarrotes-mayoreo" className="text-slate-400 hover:text-white">Abarrotes Mayoreo</Link></li>
+                <li><Link to="/muebleria" className="text-slate-400 hover:text-white">Mueblerías</Link></li>
+                <li><Link to="/servicios-tecnicos" className="text-slate-400 hover:text-white">Servicios Técnicos</Link></li>
               </ul>
             </div>
             <div>

@@ -38,6 +38,9 @@ import TerminosPage from './pages/TerminosPage';
 import Calculadoras from './pages/Calculadoras';
 import Contacto from './pages/Contacto';
 import Afiliados from './pages/Afiliados';
+import GiroSEO from './pages/GiroSEO';
+import Blog from './pages/Blog';
+import BlogPost from './pages/BlogPost';
 import { Menu, X } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -310,6 +313,17 @@ function AppRoutes() {
             <Route path="/calculadoras" element={<Calculadoras />} />
             <Route path="/contacto" element={<Contacto />} />
             <Route path="/afiliados" element={<Afiliados />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:postSlug" element={<BlogPost />} />
+            <Route path="/materiales-construccion" element={<GiroSEO slug="materiales-construccion" />} />
+            <Route path="/plomerias" element={<GiroSEO slug="plomerias" />} />
+            <Route path="/material-electrico" element={<GiroSEO slug="material-electrico" />} />
+            <Route path="/pinturas" element={<GiroSEO slug="pinturas" />} />
+            <Route path="/herrerias" element={<GiroSEO slug="herrerias" />} />
+            <Route path="/distribuidoras" element={<GiroSEO slug="distribuidoras" />} />
+            <Route path="/muebleria" element={<GiroSEO slug="muebleria" />} />
+            <Route path="/papelerias" element={<GiroSEO slug="papelerias" />} />
+            <Route path="/abarrotes-mayoreo" element={<GiroSEO slug="abarrotes-mayoreo" />} />
 
             {/* Rutas protegidas */}
             <Route

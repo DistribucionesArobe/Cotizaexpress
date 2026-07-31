@@ -8,6 +8,16 @@ Allow: /servicios-tecnicos
 Allow: /privacidad
 Allow: /terminos
 Allow: /registro
+Allow: /blog
+Allow: /materiales-construccion
+Allow: /plomerias
+Allow: /material-electrico
+Allow: /pinturas
+Allow: /herrerias
+Allow: /distribuidoras
+Allow: /muebleria
+Allow: /papelerias
+Allow: /abarrotes-mayoreo
 
 Disallow: /login
 Disallow: /onboarding
