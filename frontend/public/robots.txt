@@ -11,6 +11,7 @@ Allow: /registro
 Allow: /blog
 Allow: /generador-de-cotizaciones
 Allow: /calculadora-iva
+Allow: /plantillas/
 Allow: /materiales-construccion
 Allow: /plomerias
 Allow: /material-electrico

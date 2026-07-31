@@ -124,6 +124,92 @@ const BLOG_POSTS = [
 <p>No compres IA por moda; automatiza lo que hoy te quita tiempo o te cuesta ventas. Para la mayoría de los negocios con catálogo, eso es el WhatsApp. <a href="https://wa.me/5218342472640?text=DEMO">Prueba aquí un bot de cotizaciones real</a> — sin registrarte, mandando un mensaje como si fueras cliente.</p>
 `,
   },
+  {
+    slug: 'como-cobrar-por-whatsapp',
+    title: 'Cómo cobrar por WhatsApp en México: 5 formas que sí funcionan',
+    description: 'Guía para cobrar a tus clientes por WhatsApp: transferencia SPEI, links de pago con tarjeta, OXXO y más. Ventajas, comisiones y cómo automatizarlo.',
+    date: '2026-07-31',
+    readMin: 5,
+    content: `
+<p>Vender por WhatsApp ya lo dominas — el reto es cobrar sin que la venta se enfríe. Estas son las formas que usan los negocios mexicanos, de la más simple a la más completa.</p>
+<h2>1. Transferencia SPEI</h2>
+<p>La más usada en México: mandas tu CLABE y el cliente transfiere desde su app bancaria. Sin comisiones y el dinero llega en segundos. La fricción: el cliente tiene que capturar 18 dígitos — mándala siempre como texto copiable, nunca en imagen.</p>
+<h2>2. Links de pago con tarjeta</h2>
+<p>Servicios como Mercado Pago, Clip o Stripe generan un link que mandas por el chat; el cliente paga con tarjeta sin salir de su teléfono. Cobran comisión (3-4%) pero eliminan la excusa de "no tengo cómo transferir". Ideal para clientes nuevos que aún no te tienen confianza.</p>
+<h2>3. Depósito en OXXO</h2>
+<p>Para clientes no bancarizados: con tarjetas tipo Spin o con referencias de pago, pueden pagar en efectivo en cualquier OXXO. Cobra sentido en abarrotes, materiales y mercados donde el efectivo sigue mandando.</p>
+<h2>4. Pago contra entrega</h2>
+<p>El clásico. Funciona con clientes conocidos, pero congela tu flujo y te expone a cancelaciones. Úsalo con historial, no con desconocidos.</p>
+<h2>5. Anticipo + liquidación</h2>
+<p>Para pedidos grandes o sobre pedido: 50% para arrancar (por SPEI o link) y el resto contra entrega. Protege a ambas partes.</p>
+<h2>El truco que multiplica los cobros: pedir el pago en el momento</h2>
+<p>La mayoría de las ventas por WhatsApp se pierden entre "¿me pasas precio?" y el pago — cada minuto que tardas en mandar la cotización y los datos de pago, la intención se enfría. Por eso los negocios que automatizan cobran más: <a href="/">CotizaBot</a> manda la cotización con IVA al instante y, cuando el cliente escribe "pagar", le entrega tus datos bancarios o tu link de pago automáticamente. <a href="https://wa.me/5218342472640?text=DEMO">Pruébalo aquí</a>.</p>
+`,
+  },
+  {
+    slug: 'respuestas-automaticas-whatsapp-business',
+    title: 'Respuestas automáticas en WhatsApp Business: guía completa 2026',
+    description: 'Cómo configurar mensajes de bienvenida, ausencia y respuestas rápidas en WhatsApp Business — y cuándo necesitas un bot con IA de verdad.',
+    date: '2026-07-31',
+    readMin: 5,
+    content: `
+<p>WhatsApp Business trae tres herramientas de automatización gratis. Bien configuradas te ahorran horas — pero también tienen un límite que te conviene conocer antes de prometerles milagros.</p>
+<h2>Mensaje de bienvenida</h2>
+<p>Se envía automáticamente al primer contacto (o tras 14 días de inactividad). Configúralo en Ajustes → Herramientas para la empresa → Mensaje de bienvenida. Consejo: en vez del genérico "gracias por contactarnos", pide de una vez lo que necesitas: "¡Hola! Mándanos tu lista de productos y te cotizamos enseguida".</p>
+<h2>Mensaje de ausencia</h2>
+<p>Responde automáticamente fuera de tu horario. Defínelo con tu horario real y di cuándo respondes: "Estamos fuera de horario. Te contestamos mañana a partir de las 9:00". Evitas que el cliente sienta que lo dejaste en visto.</p>
+<h2>Respuestas rápidas</h2>
+<p>Atajos con "/" para textos que repites: /ubicacion, /horario, /cuenta (tus datos bancarios). No son automáticas — tú las disparas — pero convierten respuestas de 2 minutos en 2 segundos.</p>
+<h2>El límite: nada de esto responde preguntas reales</h2>
+<p>Las herramientas nativas mandan textos fijos. Cuando el cliente escribe "precio de 10 tablarocas y 5 bultos de redimix", el mensaje de bienvenida no puede cotizarle — y ahí se pierde la venta si nadie está al teléfono.</p>
+<h2>El siguiente nivel: un bot que entiende y cotiza</h2>
+<p>Un bot con IA conectado a tu catálogo lee el pedido real del cliente, encuentra los productos, calcula IVA y responde con la cotización en PDF — a cualquier hora. Eso hace <a href="/">CotizaBot</a>: tus respuestas automáticas dejan de ser un "ahorita te atendemos" y se vuelven la venta cerrada. <a href="https://wa.me/5218342472640?text=DEMO">Mira la diferencia en la demo</a>.</p>
+`,
+  },
+  {
+    slug: 'como-hacer-lista-de-precios',
+    title: 'Cómo hacer una lista de precios para tu negocio (que sí venda)',
+    description: 'Guía práctica para armar la lista de precios de tu negocio: estructura, errores comunes, cada cuándo actualizarla y cómo convertirla en cotizador automático.',
+    date: '2026-07-31',
+    readMin: 5,
+    content: `
+<p>La lista de precios es el documento más importante de un negocio con catálogo — y el más descuidado. Una lista clara vende sola; una desactualizada te hace perder dinero en cada venta.</p>
+<h2>La estructura correcta</h2>
+<p>Cuatro columnas mínimas: <strong>producto</strong> (nombre completo con medida y calibre — "Poste 6.35 cal 20", no solo "Poste"), <strong>unidad</strong> (pieza, caja, bulto, metro), <strong>precio</strong>, y opcionalmente <strong>SKU o clave</strong>. Si manejas mayoreo, agrega la columna de precio por volumen con su mínimo de compra.</p>
+<h2>Los 4 errores que más cuestan</h2>
+<p><strong>Nombres ambiguos.</strong> Si tienes canal cal 22 y cal 26, y tu lista dice solo "canal", cada venta es una moneda al aire. <strong>Precios sin fecha.</strong> Nunca sabes si esa lista que circula es la de hoy o la de hace 3 meses. <strong>PDF viejo circulando.</strong> Mandaste la lista al cliente hace meses y sigue comprando con esos precios. <strong>Precios en $0 o "preguntar".</strong> Si el cliente tiene que preguntar, ya le costó trabajo comprarte.</p>
+<h2>¿Cada cuándo actualizarla?</h2>
+<p>Cada vez que tu proveedor te suba precios — el mismo día. En materiales y acero eso puede ser semanal. La regla: si el costo cambió y tu lista no, el margen que pierdes es tuyo, no del cliente.</p>
+<h2>De lista de precios a cotizador automático</h2>
+<p>Una lista de precios en Excel es información; conectada a WhatsApp es un vendedor. Con <a href="/">CotizaBot</a> subes tu lista en Excel y se convierte en un cotizador que atiende tu WhatsApp: el cliente pide "10 postes cal 20 y 5 canales", el bot busca en TU lista con TUS precios vigentes y responde la cotización con IVA en segundos. Actualizas el Excel y el bot cotiza con los precios nuevos al instante. <a href="https://wa.me/5218342472640?text=DEMO">Pruébalo con tu propia lista</a>.</p>
+`,
+  },
+  {
+    slug: 'mensajes-para-atender-clientes-whatsapp',
+    title: '25 mensajes listos para atender clientes por WhatsApp (con ejemplos)',
+    description: 'Ejemplos de mensajes profesionales para WhatsApp Business: bienvenida, cotización, seguimiento, cobro y recuperación de clientes. Copia y pega.',
+    date: '2026-07-31',
+    readMin: 6,
+    content: `
+<p>Lo que escribes en WhatsApp es tu imagen de negocio. Estos formatos están probados para vender más — cópialos y adáptalos a tu giro.</p>
+<h2>Para dar la bienvenida</h2>
+<p>"¡Hola! Gracias por escribir a [Negocio] 👋 Mándanos tu lista de productos y te cotizamos de inmediato con precios e IVA incluido."</p>
+<p>"¡Buen día! ¿Qué materiales necesitas hoy? Mándanos tu lista (puede ser foto) y te pasamos precios enseguida."</p>
+<h2>Para enviar una cotización</h2>
+<p>"Aquí está tu cotización con IVA incluido 📋 [detalle]. Precios vigentes 15 días. ¿Te la preparamos?"</p>
+<p>"Listo, te cotizamos los [N] productos: Total $[monto] con IVA. ¿Quieres agregar algo más antes de cerrar el pedido?"</p>
+<h2>Para dar seguimiento (sin ser intenso)</h2>
+<p>"Hola [nombre], ¿pudiste revisar la cotización que te mandamos ayer? Cualquier ajuste que necesites, con gusto lo hacemos."</p>
+<p>"¡Hola! Los precios de tu cotización vencen mañana. Si la quieres asegurar, te la respetamos apartando hoy 👍"</p>
+<h2>Para cobrar</h2>
+<p>"Perfecto ✅ Puedes pagar por transferencia a esta cuenta: [CLABE] a nombre de [razón social]. Nos mandas el comprobante y preparamos tu pedido."</p>
+<p>"Te dejo el link para pagar con tarjeta de forma segura: [link]. En cuanto se acredite, tu pedido queda apartado."</p>
+<h2>Para recuperar clientes dormidos</h2>
+<p>"Hola [nombre], hace tiempo que no nos pedías. Tenemos precios nuevos en [categoría] — ¿te mando la lista actualizada?"</p>
+<h2>El problema de los mensajes perfectos: alguien tiene que enviarlos</h2>
+<p>Puedes tener los mejores textos del mundo, pero si el cliente escribe a las 9 de la noche y nadie contesta hasta mañana, el mensaje perfecto llega tarde. <a href="/">CotizaBot</a> responde al instante con la cotización real — con tus precios, IVA y PDF — y usa este tipo de lenguaje profesional automáticamente. <a href="https://wa.me/5218342472640?text=DEMO">Pruébalo aquí</a>.</p>
+`,
+  },
 ];
 
 export default BLOG_POSTS;

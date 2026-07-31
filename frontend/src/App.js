@@ -41,6 +41,7 @@ import Afiliados from './pages/Afiliados';
 import GiroSEO from './pages/GiroSEO';
 import Blog from './pages/Blog';
 import CalculadoraIVA from './pages/CalculadoraIVA';
+import PlantillasCotizacion from './pages/PlantillasCotizacion';
 import GeneradorCotizaciones from './pages/GeneradorCotizaciones';
 import BlogPost from './pages/BlogPost';
 import { Menu, X } from 'lucide-react';
@@ -316,6 +317,7 @@ function AppRoutes() {
             <Route path="/contacto" element={<Contacto />} />
             <Route path="/afiliados" element={<Afiliados />} />
             <Route path="/calculadora-iva" element={<CalculadoraIVA />} />
+            <Route path="/plantillas/cotizacion" element={<PlantillasCotizacion />} />
             <Route path="/generador-de-cotizaciones" element={<GeneradorCotizaciones />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:postSlug" element={<BlogPost />} />
