@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { useAuth } from '../contexts/AuthContext';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -25,7 +26,11 @@ const GIROS = [
   'Otro',
 ];
 
+const SUPER_ADMINS = ['ealejandro.robledo@gmail.com'];
+
 export default function PerfilEmpresa() {
+  const { user } = useAuth();
+  const isSuperAdmin = SUPER_ADMINS.includes((user?.email || '').toLowerCase());
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -59,17 +64,18 @@ export default function PerfilEmpresa() {
   });
 
   const [horario, setHorario] = useState({
-    lunes_viernes: '08:00-18:00',
-    sabado: '08:00-14:00',
-    domingo: 'cerrado',
+    lunes_viernes: { open: '08:00', close: '18:00', closed: false },
+    sabado: { open: '08:00', close: '14:00', closed: false },
+    domingo: { open: '08:00', close: '14:00', closed: true },
   });
 
   // Horario de atención HUMANA (cuando hay asesores disponibles)
+  const [atencionActiva, setAtencionActiva] = useState(false);
   const [atencionHumana, setAtencionHumana] = useState({
     tz: 'America/Mexico_City',
-    lunes_viernes: '',
-    sabado: '',
-    domingo: '',
+    lunes_viernes: { open: '09:00', close: '18:00', closed: false },
+    sabado: { open: '09:00', close: '14:00', closed: false },
+    domingo: { open: '09:00', close: '14:00', closed: true },
   });
 
   const [modulos, setModulos] = useState({ construccion_ligera: false, rejacero: false, pintura: false, impermeabilizante: false });
@@ -120,8 +126,6 @@ export default function PerfilEmpresa() {
     }
   };
   const [guardandoModulo, setGuardandoModulo] = useState(false);
-  const [brandSuggestions, setBrandSuggestions] = useState([]);
-  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
 
   useEffect(() => {
     cargarDatos();
@@ -141,8 +145,10 @@ export default function PerfilEmpresa() {
       setSettings(s);
       setCompany(c);
 
+      const _rawName = c.name || c.nombre || '';
+      const _nombreComercial = (!_rawName || _rawName.includes('@')) ? 'Mi empresa' : _rawName;
       setFormData({
-        company_name: c.name || c.nombre || '',
+        company_name: _nombreComercial,
         email: s.email || '',
         rfc: s.rfc || '',
         owner_phone: s.owner_phone || '',
@@ -159,32 +165,42 @@ export default function PerfilEmpresa() {
         bank_account_number: s.bank_account_number || '',
         discount_threshold: s.discount_threshold || '',
         discount_percent: s.discount_percent || '',
-        welcome_message: s.welcome_message || '',
+        welcome_message: s.welcome_message || `Hola, bienvenido a ${_nombreComercial} 👋`,
         giro: s.giro || '',
         giro_otro: s.giro_otro || '',
       });
 
-      // Parsear horario desde hours_text si existe
+      // Parsear horario desde hours_text (regex robusto: soporta el formato viejo con |)
       if (s.hours_text) {
-        const lines = s.hours_text.split('\n');
-        const h = { lunes_viernes: '08:00-18:00', sabado: '08:00-14:00', domingo: 'cerrado' };
-        lines.forEach(line => {
-          if (line.toLowerCase().includes('lunes')) h.lunes_viernes = line.split(':').slice(1).join(':').trim();
-          if (line.toLowerCase().includes('sábado') || line.toLowerCase().includes('sabado')) h.sabado = line.split(':').slice(1).join(':').trim();
-          if (line.toLowerCase().includes('domingo')) h.domingo = line.split(':').slice(1).join(':').trim();
+        const parseDay = (re, fallback) => {
+          const m = s.hours_text.match(re);
+          if (!m) return fallback;
+          const seg = m[1];
+          if (/cerrado/i.test(seg)) return { ...fallback, closed: true };
+          const t = seg.match(/(\d{1,2}:\d{2})\s*[-a]\s*(\d{1,2}:\d{2})/);
+          if (!t) return fallback;
+          const pad = (x) => (x.length === 4 ? '0' + x : x);
+          return { open: pad(t[1]), close: pad(t[2]), closed: false };
+        };
+        setHorario({
+          lunes_viernes: parseDay(/lunes[^:]*:\s*([^|\n]+)/i, { open: '08:00', close: '18:00', closed: false }),
+          sabado: parseDay(/s[áa]bado[^:]*:\s*([^|\n]+)/i, { open: '08:00', close: '14:00', closed: false }),
+          domingo: parseDay(/domingo[^:]*:\s*([^|\n]+)/i, { open: '08:00', close: '14:00', closed: true }),
         });
-        setHorario(h);
       }
 
       // Cargar horario de atención humana (attention_schedule JSON)
       if (s.attention_schedule?.days) {
         const d = s.attention_schedule.days;
-        const fmt = (day) => (!day || day.closed || !day.open) ? 'cerrado' : `${day.open}-${day.close}`;
+        const toDay = (day, fb) => (!day || day.closed || !day.open)
+          ? { ...fb, closed: true }
+          : { open: day.open, close: day.close, closed: false };
+        setAtencionActiva(true);
         setAtencionHumana({
           tz: s.attention_schedule.tz || 'America/Mexico_City',
-          lunes_viernes: fmt(d.mon),
-          sabado: fmt(d.sat),
-          domingo: fmt(d.sun),
+          lunes_viernes: toDay(d.mon, { open: '09:00', close: '18:00' }),
+          sabado: toDay(d.sat, { open: '09:00', close: '14:00' }),
+          domingo: toDay(d.sun, { open: '09:00', close: '14:00' }),
         });
       }
 
@@ -216,33 +232,23 @@ export default function PerfilEmpresa() {
     try {
       setSaving(true);
 
-      // Construir hours_text desde el horario
-      const hours_text = `Lunes a Viernes: ${horario.lunes_viernes}\nSábado: ${horario.sabado}\nDomingo: ${horario.domingo}`;
+      // Construir hours_text desde el horario (objetos con time pickers)
+      const fmtDay = (d) => (d.closed ? 'cerrado' : `${d.open}-${d.close}`);
+      const hours_text = `Lunes a Viernes: ${fmtDay(horario.lunes_viernes)}\nSábado: ${fmtDay(horario.sabado)}\nDomingo: ${fmtDay(horario.domingo)}`;
 
-      // Construir attention_schedule (horario con asesores) si hay algo capturado
-      const parseRange = (str) => {
-        const v = (str || '').trim().toLowerCase();
-        if (!v || v === 'cerrado') return { closed: true };
-        const m = v.match(/(\d{1,2}:?\d{0,2})\s*[-a]\s*(\d{1,2}:?\d{0,2})/);
-        if (!m) return { closed: true };
-        const norm = (t) => {
-          t = t.replace(':', '');
-          const h = t.length <= 2 ? t.padStart(2, '0') + '00' : t.padStart(4, '0');
-          return h.slice(0, 2) + ':' + h.slice(2);
-        };
-        return { open: norm(m[1]), close: norm(m[2]), closed: false };
-      };
+      // Construir attention_schedule (horario con asesores)
       let attention_schedule = null;
-      const hasAtencion = [atencionHumana.lunes_viernes, atencionHumana.sabado, atencionHumana.domingo]
-        .some(x => (x || '').trim() !== '');
-      if (hasAtencion) {
-        const lv = parseRange(atencionHumana.lunes_viernes);
-        const sab = parseRange(atencionHumana.sabado);
-        const dom = parseRange(atencionHumana.domingo);
+      if (atencionActiva) {
+        const toApi = (d) => (d.closed ? { closed: true } : { open: d.open, close: d.close, closed: false });
+        const lv = toApi(atencionHumana.lunes_viernes);
+        const sab = toApi(atencionHumana.sabado);
+        const dom = toApi(atencionHumana.domingo);
         attention_schedule = {
           tz: atencionHumana.tz || 'America/Mexico_City',
           days: { mon: lv, tue: lv, wed: lv, thu: lv, fri: lv, sat: sab, sun: dom },
         };
+      } else {
+        attention_schedule = {};
       }
 
       // Sync: telefono_atencion → owner_phone for backward compatibility
@@ -251,7 +257,7 @@ export default function PerfilEmpresa() {
         ...formData,
         owner_phone: phoneToSave,
         hours_text,
-        ...(attention_schedule ? { attention_schedule } : {}),
+        attention_schedule,
         discount_threshold: formData.discount_threshold ? parseFloat(formData.discount_threshold) : null,
         discount_percent: formData.discount_percent ? parseFloat(formData.discount_percent) : null,
       });
@@ -560,171 +566,114 @@ export default function PerfilEmpresa() {
           </CardContent>
         </Card>
 
-        {/* Marcas y Competencia */}
-        <Card>
-          <CardHeader>
-            <CardTitle>🏷️ Marcas y Competencia</CardTitle>
-            <p className="text-sm text-slate-500">Cuando un cliente pida productos de la competencia, el bot buscará el equivalente en tus marcas.</p>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Marcas que manejas</Label>
-                <textarea
-                  name="marcas_propias"
-                  value={formData.marcas_propias}
-                  onChange={handleChange}
-                  placeholder="Ej: USG, Redimix, Coflex, Truper"
-                  className="w-full min-h-[60px] px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows={2}
-                />
-                <p className="text-xs text-slate-400">Separa con comas las marcas principales de tus productos</p>
-              </div>
-              <div className="space-y-2">
-                <Label>Marcas de tu competencia</Label>
-                <textarea
-                  name="marcas_competencia"
-                  value={formData.marcas_competencia}
-                  onChange={handleChange}
-                  placeholder="Ej: Panel Rey, Crest, Rugo, Surtej"
-                  className="w-full min-h-[60px] px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows={2}
-                />
-                <p className="text-xs text-slate-400">Marcas que tus clientes mencionan pero tú no vendes</p>
-              </div>
-            </div>
-            {/* AI Suggestions */}
-            <div className="pt-2 border-t border-slate-100">
-              <div className="flex items-center gap-2 mb-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  disabled={loadingSuggestions || !formData.marcas_propias?.trim()}
-                  onClick={async () => {
-                    setLoadingSuggestions(true);
-                    setBrandSuggestions([]);
-                    try {
-                      const res = await axios.post(`${API}/company/suggest-brands`, {
-                        marcas_propias: formData.marcas_propias,
-                      });
-                      const existing = (formData.marcas_competencia || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
-                      const filtered = (res.data?.suggestions || []).filter(s => !existing.includes(s.toLowerCase()));
-                      setBrandSuggestions(filtered);
-                      if (!filtered.length) toast.info('No hay sugerencias nuevas');
-                    } catch (e) {
-                      toast.error('Error al obtener sugerencias');
-                    } finally {
-                      setLoadingSuggestions(false);
-                    }
-                  }}
-                  className="text-xs"
-                >
-                  {loadingSuggestions ? (
-                    <><span className="animate-spin mr-1">⏳</span> Analizando...</>
-                  ) : (
-                    <><span className="mr-1">✨</span> Sugerir competencia con IA</>
-                  )}
-                </Button>
-                <span className="text-xs text-slate-400">Basado en tus marcas, te sugiere competidores</span>
-              </div>
-              {brandSuggestions.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {brandSuggestions.map((s, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      className="px-3 py-1 text-xs rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors"
-                      onClick={() => {
-                        const current = (formData.marcas_competencia || '').trim();
-                        const updated = current ? `${current}, ${s}` : s;
-                        setFormData({ ...formData, marcas_competencia: updated });
-                        setBrandSuggestions(prev => prev.filter((_, j) => j !== i));
-                        toast.success(`"${s}" agregado`);
-                      }}
-                    >
-                      + {s}
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    className="px-3 py-1 text-xs rounded-full border border-slate-200 text-slate-500 hover:bg-slate-50 transition-colors"
-                    onClick={() => {
-                      const current = (formData.marcas_competencia || '').trim();
-                      const all = brandSuggestions.join(', ');
-                      const updated = current ? `${current}, ${all}` : all;
-                      setFormData({ ...formData, marcas_competencia: updated });
-                      setBrandSuggestions([]);
-                      toast.success('Todas las sugerencias agregadas');
-                    }}
-                  >
-                    Agregar todas
-                  </button>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Horario de Atención */}
         <Card>
-          <CardHeader><CardTitle>⏰ Horario de Atención</CardTitle></CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {[['lunes_viernes', 'Lunes a Viernes'], ['sabado', 'Sábado'], ['domingo', 'Domingo']].map(([key, label]) => (
-                <div key={key} className="space-y-1">
-                  <Label>{label}</Label>
-                  <Input
-                    value={horario[key] || ''}
-                    onChange={e => setHorario(prev => ({ ...prev, [key]: e.target.value }))}
-                    placeholder='08:00-18:00 o "cerrado"'
+          <CardHeader>
+            <CardTitle>⏰ Horario de Atención</CardTitle>
+            <p className="text-sm text-slate-500">El horario público de tu negocio — el bot lo comparte cuando el cliente pregunta.</p>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {[['lunes_viernes', 'Lunes a Viernes'], ['sabado', 'Sábado'], ['domingo', 'Domingo']].map(([key, label]) => (
+              <div key={key} className="flex flex-wrap items-center gap-3 p-3 border rounded-lg">
+                <span className="font-medium text-slate-700 w-36">{label}</span>
+                <label className="flex items-center gap-1.5 text-sm text-slate-500 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={horario[key].closed}
+                    onChange={e => setHorario(prev => ({ ...prev, [key]: { ...prev[key], closed: e.target.checked } }))}
+                    className="w-4 h-4 accent-slate-500"
                   />
-                </div>
-              ))}
-            </div>
-            <p className="text-xs text-slate-500 mt-2">Formato: 08:00-18:00 o "cerrado"</p>
+                  Cerrado
+                </label>
+                {!horario[key].closed && (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="time"
+                      value={horario[key].open}
+                      onChange={e => setHorario(prev => ({ ...prev, [key]: { ...prev[key], open: e.target.value } }))}
+                      className="h-9 rounded-md border border-slate-200 px-2 text-sm"
+                    />
+                    <span className="text-slate-400">a</span>
+                    <input
+                      type="time"
+                      value={horario[key].close}
+                      onChange={e => setHorario(prev => ({ ...prev, [key]: { ...prev[key], close: e.target.value } }))}
+                      className="h-9 rounded-md border border-slate-200 px-2 text-sm"
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
           </CardContent>
         </Card>
 
         {/* Horario con asesores (atención humana) */}
         <Card>
-          <CardHeader><CardTitle>👥 Horario con asesores</CardTitle></CardHeader>
-          <CardContent>
-            <p className="text-sm text-slate-600 mb-4">
-              Horas en las que hay personas atendiendo. Cuando un cliente pida hablar
-              con alguien fuera de este horario, el bot le dirá cuándo lo contactarán
-              y le ofrecerá cotizar mientras tanto.
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>👥 Horario con asesores</CardTitle>
+              <button
+                type="button"
+                onClick={() => setAtencionActiva(v => !v)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${atencionActiva ? 'bg-emerald-600' : 'bg-slate-200'}`}
+              >
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow ${atencionActiva ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+            </div>
+            <p className="text-sm text-slate-500">
+              Horas en las que hay personas atendiendo. Fuera de este horario, el bot
+              le dice al cliente cuándo lo contactarán y le ofrece cotizar mientras tanto.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          </CardHeader>
+          {atencionActiva && (
+            <CardContent className="space-y-3">
               {[['lunes_viernes', 'Lunes a Viernes'], ['sabado', 'Sábado'], ['domingo', 'Domingo']].map(([key, label]) => (
-                <div key={key} className="space-y-1">
-                  <Label>{label}</Label>
-                  <Input
-                    value={atencionHumana[key] || ''}
-                    onChange={e => setAtencionHumana(prev => ({ ...prev, [key]: e.target.value }))}
-                    placeholder='09:00-18:00 o "cerrado"'
-                  />
+                <div key={key} className="flex flex-wrap items-center gap-3 p-3 border rounded-lg">
+                  <span className="font-medium text-slate-700 w-36">{label}</span>
+                  <label className="flex items-center gap-1.5 text-sm text-slate-500 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={atencionHumana[key].closed}
+                      onChange={e => setAtencionHumana(prev => ({ ...prev, [key]: { ...prev[key], closed: e.target.checked } }))}
+                      className="w-4 h-4 accent-slate-500"
+                    />
+                    Sin asesores
+                  </label>
+                  {!atencionHumana[key].closed && (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="time"
+                        value={atencionHumana[key].open}
+                        onChange={e => setAtencionHumana(prev => ({ ...prev, [key]: { ...prev[key], open: e.target.value } }))}
+                        className="h-9 rounded-md border border-slate-200 px-2 text-sm"
+                      />
+                      <span className="text-slate-400">a</span>
+                      <input
+                        type="time"
+                        value={atencionHumana[key].close}
+                        onChange={e => setAtencionHumana(prev => ({ ...prev, [key]: { ...prev[key], close: e.target.value } }))}
+                        className="h-9 rounded-md border border-slate-200 px-2 text-sm"
+                      />
+                    </div>
+                  )}
                 </div>
               ))}
-            </div>
-            <div className="mt-4 space-y-1">
-              <Label>Zona horaria</Label>
-              <select
-                value={atencionHumana.tz}
-                onChange={e => setAtencionHumana(prev => ({ ...prev, tz: e.target.value }))}
-                className="w-full md:w-64 h-10 rounded-md border border-slate-200 bg-white px-3 text-sm"
-              >
-                <option value="America/Mexico_City">Centro (CDMX, Tamaulipas, etc.)</option>
-                <option value="America/Monterrey">Monterrey</option>
-                <option value="America/Chihuahua">Pacífico (Chihuahua, BCS)</option>
-                <option value="America/Tijuana">Noroeste (Tijuana)</option>
-                <option value="America/Cancun">Sureste (Cancún)</option>
-              </select>
-            </div>
-            <p className="text-xs text-slate-500 mt-2">
-              Deja los campos vacíos si no quieres usar esta función — el bot se comporta como siempre.
-            </p>
-          </CardContent>
+              <div className="mt-2 space-y-1">
+                <Label>Zona horaria</Label>
+                <select
+                  value={atencionHumana.tz}
+                  onChange={e => setAtencionHumana(prev => ({ ...prev, tz: e.target.value }))}
+                  className="w-full md:w-64 h-10 rounded-md border border-slate-200 bg-white px-3 text-sm"
+                >
+                  <option value="America/Mexico_City">Centro (CDMX, Tamaulipas, etc.)</option>
+                  <option value="America/Monterrey">Monterrey</option>
+                  <option value="America/Chihuahua">Pacífico (Chihuahua, BCS)</option>
+                  <option value="America/Tijuana">Noroeste (Tijuana)</option>
+                  <option value="America/Cancun">Sureste (Cancún)</option>
+                </select>
+              </div>
+            </CardContent>
+          )}
         </Card>
 
         {/* Equipo (multi-admin) */}
@@ -792,9 +741,10 @@ export default function PerfilEmpresa() {
         <Card>
           <CardHeader><CardTitle>🔧 Módulos</CardTitle></CardHeader>
           <CardContent>
+            {isSuperAdmin && (<>
             <div className="flex items-center justify-between p-4 border rounded-lg">
               <div>
-                <p className="font-medium text-slate-800">Construccion Ligera</p>
+                <p className="font-medium text-slate-800">Construccion Ligera <span className="text-xs text-amber-600 font-normal">(solo CotizaExpress)</span></p>
                 <p className="text-sm text-slate-500">Activa para habilitar el módulo de materiales de construcción ligera (tablaroca, plafón, perfiles, etc.)</p>
               </div>
               <button
@@ -808,7 +758,7 @@ export default function PerfilEmpresa() {
             </div>
             <div className="flex items-center justify-between p-4 border rounded-lg mt-3">
               <div>
-                <p className="font-medium text-slate-800">Rejacero</p>
+                <p className="font-medium text-slate-800">Rejacero <span className="text-xs text-amber-600 font-normal">(solo CotizaExpress)</span></p>
                 <p className="text-sm text-slate-500">Activa para habilitar el calculador de reja ciclónica por WhatsApp (metros lineales → rejas, postes, abrazaderas)</p>
               </div>
               <button
@@ -820,7 +770,8 @@ export default function PerfilEmpresa() {
                 <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow ${modulos.rejacero ? 'translate-x-6' : 'translate-x-1'}`} />
               </button>
             </div>
-            <div className="flex items-center justify-between p-4 border rounded-lg mt-3">
+            </>)}
+            <div className={`flex items-center justify-between p-4 border rounded-lg ${isSuperAdmin ? 'mt-3' : ''}`}>
               <div>
                 <p className="font-medium text-slate-800">Pintura</p>
                 <p className="text-sm text-slate-500">Activa para habilitar el calculador de pintura por WhatsApp (m² → cubetas, galones, litros de vinílica o esmalte)</p>
