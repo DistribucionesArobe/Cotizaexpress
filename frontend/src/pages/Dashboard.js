@@ -100,6 +100,11 @@ export default function Dashboard() {
         success_url: `${window.location.origin}/pago-exitoso`,
         cancel_url: `${window.location.origin}/precios`,
       });
+      if (response.data.activated) {
+        toast.success(response.data.message || '¡Plan activado! 🎉');
+        cargarStats();
+        return;
+      }
       if (response.data.checkout_url) {
         window.location.href = response.data.checkout_url;
       }
