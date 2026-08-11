@@ -37,6 +37,25 @@ export default function Dashboard() {
     }
   }, []);
 
+  const [promoCode, setPromoCode] = useState('');
+  const [applyingPromo, setApplyingPromo] = useState(false);
+
+  const aplicarPromo = async () => {
+    const code = promoCode.trim().toUpperCase();
+    if (!code) { toast.error('Escribe tu código'); return; }
+    try {
+      setApplyingPromo(true);
+      const res = await axios.post(`${API}/pagos/promo/aplicar`, { code });
+      toast.success(res.data?.message || '¡Código aplicado! 🎉');
+      setPromoCode('');
+      cargarStats();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'No se pudo aplicar el código');
+    } finally {
+      setApplyingPromo(false);
+    }
+  };
+
   const cargarStats = async () => {
     try {
       const [prodRes, convRes, settingsRes, waRes] = await Promise.allSettled([
@@ -458,6 +477,28 @@ export default function Dashboard() {
         <p className="text-center text-xs text-slate-400 mt-4">
           Precios en pesos mexicanos (MXN). Cancela cuando quieras. Factura CFDI deducible disponible 🇲🇽
         </p>
+
+        {/* Código promocional */}
+        <div className="max-w-md mx-auto mt-6 bg-white border border-slate-200 rounded-xl p-4">
+          <p className="text-sm font-semibold text-slate-700 mb-2">🎟️ ¿Tienes un código promocional?</p>
+          <div className="flex gap-2">
+            <input
+              value={promoCode}
+              onChange={e => setPromoCode(e.target.value.toUpperCase())}
+              onKeyDown={e => { if (e.key === 'Enter') aplicarPromo(); }}
+              placeholder="Ej. PRUEBA10"
+              className="flex-1 h-10 rounded-md border border-slate-200 px-3 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+            <button
+              type="button"
+              onClick={aplicarPromo}
+              disabled={applyingPromo}
+              className="h-10 px-4 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold disabled:opacity-50"
+            >
+              {applyingPromo ? 'Aplicando...' : 'Aplicar'}
+            </button>
+          </div>
+        </div>
 
         {/* Cancel plan link — only show if user has an active paid plan */}
         {stats.planCode && stats.planCode !== 'free' && (
