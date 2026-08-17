@@ -540,6 +540,19 @@ export default function Onboarding() {
                       <Sparkles className="w-4 h-4 inline mr-1" />
                       Tu bot ya tiene los <strong>{validProducts.length || 0} productos</strong> y est&aacute; listo para recibir mensajes.
                     </div>
+                    <div>
+                      <Button
+                        variant="outline"
+                        onClick={launchWhatsAppSignup}
+                        disabled={waConnecting}
+                        className="mt-2"
+                      >
+                        {waConnecting ? 'Conectando...' : 'Conectar otro número'}
+                      </Button>
+                      <p className="text-xs text-slate-400 mt-2">
+                        ¿Conectaste un número de prueba (+1 555...) o quieres cambiarlo? Vuelve a hacer la conexión con el número correcto.
+                      </p>
+                    </div>
                   </div>
                 ) : (
                   <div className="text-center space-y-6">

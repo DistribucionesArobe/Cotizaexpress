@@ -230,6 +230,18 @@ export default function ConfiguracionWhatsApp() {
                   <CheckCircle className="w-6 h-6 text-white" />
                 </div>
               </div>
+              <div className="mt-4 pt-4 border-t border-emerald-200 flex items-center justify-between gap-3 flex-wrap">
+                <p className="text-xs text-emerald-700">
+                  ¿Es un número de prueba (+1 555...) o quieres usar otro? Puedes reconectar con el número correcto.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.location.href = '/onboarding'}
+                >
+                  Cambiar número
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
