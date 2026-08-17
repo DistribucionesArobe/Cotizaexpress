@@ -10,6 +10,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import LandingPage from './pages/LandingPage';
 import Registro from './pages/Registro';
 import Login from './pages/Login';
+import { RecuperarContrasena, RestablecerContrasena } from './pages/RecuperarContrasena';
 import Precios from './pages/Precios';
 import PagoExitoso from './pages/PagoExitoso';
 import Dashboard from './pages/Dashboard';
@@ -302,6 +303,8 @@ function AppRoutes() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/registro" element={<Registro />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/recuperar-contrasena" element={<RecuperarContrasena />} />
+            <Route path="/restablecer-contrasena" element={<RestablecerContrasena />} />
             <Route path="/precios" element={<Precios />} />
             <Route path="/pago-exitoso" element={<PagoExitoso />} />
             <Route path="/portal/cotizacion/:token" element={<PortalCliente />} />

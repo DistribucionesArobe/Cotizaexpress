@@ -100,6 +100,11 @@ export default function Login() {
                   required
                   data-testid="input-password"
                 />
+                <div className="text-right mt-1">
+                  <Link to="/recuperar-contrasena" className="text-sm text-emerald-600 hover:text-emerald-700">
+                    ¿Olvidaste tu contraseña?
+                  </Link>
+                </div>
               </div>
 
               <Button
