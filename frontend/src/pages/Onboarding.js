@@ -144,6 +144,7 @@ export default function Onboarding() {
             .finally(() => setWaConnecting(false));
         } else {
           console.log('User cancelled login');
+          toast.info('Conexión cancelada. Si te atoraste, revisa los problemas comunes aquí abajo o escríbenos — te ayudamos por videollamada en 15 minutos.');
           setWaConnecting(false);
         }
       },
@@ -542,12 +543,32 @@ export default function Onboarding() {
                   </div>
                 ) : (
                   <div className="text-center space-y-6">
+                    {/* Antes de empezar */}
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-left max-w-md mx-auto">
+                      <p className="text-sm font-bold text-emerald-900 mb-2">✅ Antes de empezar necesitas:</p>
+                      <div className="space-y-2">
+                        {[
+                          ['Una cuenta de Facebook', 'La personal sirve. Solo se usa para autorizar la conexión.'],
+                          ['Un número para el bot', 'Que NO esté usando WhatsApp en ningún teléfono. Un chip nuevo o un número fijo funcionan perfecto.'],
+                          ['Recibir un código en ese número', 'Por SMS o llamada, para verificarlo.'],
+                        ].map(([t, d], i) => (
+                          <div key={i} className="flex items-start gap-2">
+                            <Check className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                            <p className="text-xs text-slate-700"><strong>{t}.</strong> {d}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
                     <div className="bg-slate-50 rounded-xl p-6 space-y-4">
+                      <p className="text-sm font-semibold text-slate-900 text-left max-w-sm mx-auto">Al picar el botón se abre una ventana de Facebook. Esto es lo que vas a ver:</p>
                       <div className="space-y-3 text-left max-w-sm mx-auto">
                         {[
-                          'Inicia sesion con tu cuenta de Facebook',
-                          'Selecciona o crea tu WhatsApp Business Account',
-                          'Verifica tu numero de telefono',
+                          'Inicia sesión con tu cuenta de Facebook y pica "Continuar".',
+                          'Escribe el nombre de tu negocio cuando te lo pida.',
+                          'Agrega el número que usará el bot (el chip nuevo o fijo).',
+                          'Escribe el código que te llega por SMS o llamada.',
+                          'Cierra la ventana — aquí verás "WhatsApp conectado". ✅',
                         ].map((txt, i) => (
                           <div key={i} className="flex items-start gap-3">
                             <div className="w-6 h-6 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
@@ -581,8 +602,23 @@ export default function Onboarding() {
                       </Button>
                     </div>
 
+                    {/* Atorones comunes */}
+                    <div className="text-left max-w-md mx-auto space-y-2">
+                      <p className="text-sm font-semibold text-slate-700">¿Te atoraste? Los 3 problemas más comunes:</p>
+                      {[
+                        ['"Este número ya está registrado en WhatsApp"', 'Ese número tiene WhatsApp activo en un teléfono. Opción A: usa otro número (chip nuevo o fijo). Opción B: en ese teléfono ve a WhatsApp → Ajustes → Cuenta → Eliminar cuenta, espera 5 minutos e intenta de nuevo.'],
+                        ['No se abre la ventana de Facebook', 'Tu navegador bloqueó la ventana emergente. Busca el aviso de "popup bloqueado" en la barra de dirección y permítelo, o intenta desde Chrome.'],
+                        ['No llega el código SMS', 'En la pantalla de verificación elige la opción "Llamarme" — a los números fijos siempre se les verifica por llamada.'],
+                      ].map(([q, a], i) => (
+                        <details key={i} className="bg-white border border-slate-200 rounded-lg px-4 py-2">
+                          <summary className="text-sm font-medium text-slate-800 cursor-pointer">{q}</summary>
+                          <p className="text-xs text-slate-600 mt-2">{a}</p>
+                        </details>
+                      ))}
+                    </div>
+
                     <p className="text-xs text-slate-400">
-                      Necesitas una cuenta de Facebook y un numero de WhatsApp Business
+                      Importante: el número que conectes quedará dedicado al bot — ya no podrás usarlo en la app de WhatsApp del teléfono.
                     </p>
 
                     {/* Help CTA - Task #22 */}
