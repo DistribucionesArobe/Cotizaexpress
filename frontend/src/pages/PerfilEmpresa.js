@@ -57,6 +57,7 @@ export default function PerfilEmpresa() {
     discount_threshold: '',
     discount_percent: '',
     welcome_message: '',
+    brand_color: '#059669',
     marcas_propias: '',
     marcas_competencia: '',
     giro: '',
@@ -166,6 +167,7 @@ export default function PerfilEmpresa() {
         discount_threshold: s.discount_threshold || '',
         discount_percent: s.discount_percent || '',
         welcome_message: s.welcome_message || `Hola, bienvenido a ${_nombreComercial} 👋`,
+        brand_color: s.brand_color || '#059669',
         giro: s.giro || '',
         giro_otro: s.giro_otro || '',
       });
@@ -476,6 +478,46 @@ export default function PerfilEmpresa() {
                 )}
               </div>
             )}
+            {/* Color de marca */}
+            <div className="mt-6 pt-6 border-t border-slate-200">
+              <p className="font-medium text-slate-900 mb-1">Color de marca</p>
+              <p className="text-sm text-slate-500 mb-3">Se usa en tus cotizaciones PDF (encabezado, tabla y total).</p>
+              <div className="flex items-center gap-2 flex-wrap">
+                {['#059669', '#2563eb', '#dc2626', '#ea580c', '#7c3aed', '#db2777', '#334155', '#111827'].map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, brand_color: c }))}
+                    className={`w-9 h-9 rounded-full border-2 transition-transform hover:scale-110 ${
+                      (formData.brand_color || '').toLowerCase() === c ? 'border-slate-900 scale-110' : 'border-white shadow'
+                    }`}
+                    style={{ backgroundColor: c }}
+                    title={c}
+                  />
+                ))}
+                <label className="flex items-center gap-2 ml-2 cursor-pointer text-sm text-slate-600">
+                  <input
+                    type="color"
+                    value={formData.brand_color || '#059669'}
+                    onChange={(e) => setFormData(prev => ({ ...prev, brand_color: e.target.value }))}
+                    className="w-9 h-9 rounded cursor-pointer border border-slate-300 p-0.5 bg-white"
+                  />
+                  Otro color
+                </label>
+              </div>
+              {/* Vista previa */}
+              <div className="mt-4 max-w-sm border border-slate-200 rounded-lg overflow-hidden">
+                <div className="px-4 py-2 text-white text-sm font-bold flex justify-between items-center" style={{ backgroundColor: formData.brand_color || '#059669' }}>
+                  <span>{formData.company_name || 'Mi empresa'}</span>
+                  <span className="font-normal text-xs opacity-80">COTIZACIÓN CX-EJEMPLO</span>
+                </div>
+                <div className="px-4 py-2 text-xs text-slate-500 bg-white">Así se verá el encabezado de tus cotizaciones.</div>
+                <div className="px-4 py-2 text-white text-sm font-bold flex justify-between" style={{ backgroundColor: formData.brand_color || '#059669' }}>
+                  <span>TOTAL (IVA incluido)</span><span>$869.50</span>
+                </div>
+              </div>
+              <p className="text-xs text-slate-400 mt-2">Recuerda picar "Guardar" al final para aplicar el cambio.</p>
+            </div>
           </CardContent>
         </Card>
 
