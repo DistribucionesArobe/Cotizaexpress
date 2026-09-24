@@ -562,8 +562,8 @@ export default function Onboarding() {
                       <div className="space-y-2">
                         {[
                           ['Una cuenta de Facebook', 'La personal sirve. Solo se usa para autorizar la conexión.'],
-                          ['Un número para el bot', 'Puede ser tu número de siempre (tus clientes ya lo tienen) o uno nuevo. Si usas el de siempre, primero elimina su cuenta de WhatsApp en el teléfono — desde ese momento el bot contesta por ti.'],
-                          ['Recibir un código en ese número', 'Por SMS o llamada, para verificarlo.'],
+                          ['Un número para el bot — 3 opciones', '📞 El FIJO de tu negocio (recomendado: no tiene WhatsApp, se verifica por llamada y tus clientes ya lo conocen) · tu celular de siempre (eliminando antes su cuenta de WhatsApp en el teléfono) · o un chip nuevo.'],
+                          ['Poder recibir el código', 'Si es fijo, elige "Llamarme": te llama una grabación y te dicta el código. Si es celular, llega por SMS.'],
                         ].map(([t, d], i) => (
                           <div key={i} className="flex items-start gap-2">
                             <Check className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
@@ -577,10 +577,10 @@ export default function Onboarding() {
                       <p className="text-sm font-semibold text-slate-900 text-left max-w-sm mx-auto">Al picar el botón se abre una ventana de Facebook. Esto es lo que vas a ver:</p>
                       <div className="space-y-3 text-left max-w-sm mx-auto">
                         {[
-                          'Inicia sesión con tu cuenta de Facebook y pica "Continuar".',
+                          'Inicia sesión con tu Facebook. Verás "Distribuciones Arobe quiere acceder..." — es la empresa detrás de CotizaBot, es normal: pica Continuar.',
                           'Escribe el nombre de tu negocio cuando te lo pida.',
-                          'Agrega el número que usará el bot (el chip nuevo o fijo).',
-                          'Escribe el código que te llega por SMS o llamada.',
+                          'Agrega el número que usará el bot (tu fijo, tu número o un chip nuevo).',
+                          'Verifícalo: elige "Llamarme" si es fijo (una grabación te dicta el código) o SMS si es celular. Escribe el código.',
                           'Cierra la ventana — aquí verás "WhatsApp conectado". ✅',
                         ].map((txt, i) => (
                           <div key={i} className="flex items-start gap-3">
@@ -621,7 +621,8 @@ export default function Onboarding() {
                       {[
                         ['"Este número ya está registrado en WhatsApp"', 'Ese número tiene WhatsApp activo en un teléfono. Si quieres usar ese mismo número para el bot: en el teléfono ve a WhatsApp → Ajustes → Cuenta → Eliminar cuenta, espera 5 minutos e intenta de nuevo (tus chats se pierden, respáldalos antes si los necesitas). Si prefieres conservarlo como está, conecta otro número.'],
                         ['No se abre la ventana de Facebook', 'Tu navegador bloqueó la ventana emergente. Busca el aviso de "popup bloqueado" en la barra de dirección y permítelo, o intenta desde Chrome.'],
-                        ['No llega el código SMS', 'En la pantalla de verificación elige la opción "Llamarme" — a los números fijos siempre se les verifica por llamada.'],
+                        ['No llega el código SMS', 'En la pantalla de verificación elige la opción "Llamarme" — a los números fijos siempre se les verifica por llamada. Ten el teléfono a la mano: la grabación dicta el código una vez.'],
+                        ['"¿Por qué dice Distribuciones Arobe?"', 'Es el nombre registrado en Meta de la empresa que opera CotizaExpress y CotizaBot. Facebook siempre muestra ese nombre al autorizar. Es normal y seguro — pica Continuar.'],
                       ].map(([q, a], i) => (
                         <details key={i} className="bg-white border border-slate-200 rounded-lg px-4 py-2">
                           <summary className="text-sm font-medium text-slate-800 cursor-pointer">{q}</summary>
