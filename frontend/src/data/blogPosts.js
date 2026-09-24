@@ -210,6 +210,181 @@ const BLOG_POSTS = [
 <p>Puedes tener los mejores textos del mundo, pero si el cliente escribe a las 9 de la noche y nadie contesta hasta mañana, el mensaje perfecto llega tarde. <a href="/">CotizaBot</a> responde al instante con la cotización real — con tus precios, IVA y PDF — y usa este tipo de lenguaje profesional automáticamente. <a href="https://wa.me/5218342472640?text=DEMO">Pruébalo aquí</a>.</p>
 `,
   },
+
+  {
+    slug: 'meta-business-agent-vs-bot-cotizaciones',
+    title: 'Meta Business Agent vs bot de cotizaciones: ¿cuál necesita tu negocio?',
+    description: 'Meta lanzó su agente de IA gratis para WhatsApp Business. Qué hace bien, qué no hace, y cuándo tu negocio necesita un bot que sí cotice con precios, IVA y PDF.',
+    date: '2026-09-23',
+    readMin: 6,
+    content: `
+<p>En junio de 2026 Meta lanzó globalmente su <strong>Business Agent</strong>: un asistente de IA integrado gratis en WhatsApp Business, Instagram y Messenger. Más de un millón de negocios ya lo activaron. La pregunta obligada: si Meta regala un bot, ¿para qué pagar por otro?</p>
+<p>Respuesta corta: son herramientas distintas para trabajos distintos. Aquí la comparación honesta.</p>
+<h2>Qué hace bien el Meta Business Agent</h2>
+<p>Responde preguntas generales del negocio (horario, ubicación, "¿qué venden?"), recomienda productos del catálogo nativo de Meta, agenda citas y pasa la conversación a un humano. Se activa desde la app de WhatsApp Business en minutos y empezar no cuesta. Para un negocio con pocas consultas tipo preguntas frecuentes, es suficiente.</p>
+<h2>Qué NO hace</h2>
+<p><strong>No cotiza.</strong> Si tu cliente manda "10 tablaroca 1/2, 5 postes cal 26, 3 kg pijas", el agente de Meta no procesa la lista, no busca cada producto con su medida y calibre, no calcula subtotales ni IVA, y no genera una cotización formal en PDF con folio. Recomienda productos, pero no vende como cotiza un mostrador.</p>
+<p>Tampoco maneja un catálogo de cientos de productos desde Excel (el catálogo de Meta se captura a mano), no registra qué productos te pidieron y no tienes, no manda datos de pago ni recibe comprobantes, y su personalización es limitada.</p>
+<h2>Cuándo el gratis te basta</h2>
+<p>Si recibes pocas consultas al día, tus respuestas son tipo FAQ y no cotizas listas de productos, activa el agente de Meta y listo. No pagues por lo que no necesitas.</p>
+<h2>Cuándo necesitas un bot de cotizaciones</h2>
+<p>Si tu negocio es una ferretería, casa de materiales, refaccionaria o distribuidora, tu WhatsApp no recibe preguntas: recibe <em>pedidos</em>. Listas largas, con jerga, medidas y calibres, que hay que convertir en cotización con IVA en segundos — porque el cliente le preguntó a tres negocios y le compra al primero que contesta completo.</p>
+<p>Ese es exactamente el trabajo de <a href="/registro">CotizaBot</a>: lee la lista (aunque venga con errores o abreviada), busca en tu catálogo real —el que subes desde Excel y actualizas cuando cambian los precios—, arma la cotización con IVA y manda el PDF con folio. Además te avisa cuando piden un asesor, registra los productos que no manejas y conecta el cobro.</p>
+<h2>La comparación en una tabla</h2>
+<p><strong>Meta Business Agent:</strong> respuestas generales ✅ · catálogo manual de Meta · sin cotizaciones con IVA · sin PDF · sin listas largas · sin reportes de demanda · empezar no cuesta.</p>
+<p><strong>CotizaBot:</strong> especialista en cotizar ✅ · catálogo desde Excel (cientos de productos) · IVA y PDF con folio ✅ · listas largas con jerga y calibres ✅ · registro de búsquedas sin resultado ✅ · desde $1,000 MXN/mes.</p>
+<h2>Conclusión</h2>
+<p>El agente de Meta validó lo que los negocios mexicanos ya sabían: WhatsApp es el mostrador digital. Para conversar, el gratis está bien. Para <em>cotizar y vender</em>, necesitas un especialista. <a href="https://wa.me/5218342472640?text=DEMO">Prueba el demo de CotizaBot</a>: mándale una lista real de materiales y cronometra.</p>
+`,
+  },
+  {
+    slug: 'whatsapp-business-api-que-es-guia',
+    title: 'WhatsApp Business API en México: qué es, requisitos y costos (guía simple)',
+    description: 'La diferencia entre la app de WhatsApp Business y la API, qué necesitas para conectarte, cuánto cuesta y cuándo dar el paso. Explicado sin tecnicismos.',
+    date: '2026-09-23',
+    readMin: 5,
+    content: `
+<p>Si investigaste sobre bots para WhatsApp, ya te topaste con el término "API de WhatsApp Business". Aquí te explicamos qué es, sin tecnicismos.</p>
+<h2>App vs API: la diferencia que importa</h2>
+<p>La <strong>app de WhatsApp Business</strong> (la verde) es para atender a mano desde un teléfono: perfil de negocio, respuestas rápidas, catálogo. Gratis y suficiente para empezar.</p>
+<p>La <strong>API de WhatsApp Business</strong> es la conexión oficial de Meta para que un <em>sistema</em> conteste por ti: bots que cotizan, envíos automáticos, integraciones. No tiene interfaz propia — el número se conecta a un software (como CotizaBot) que hace el trabajo.</p>
+<h2>Qué necesitas para conectarte</h2>
+<p>Tres cosas: una cuenta de Facebook (la personal sirve, solo autoriza la conexión), un número de teléfono que no esté usando WhatsApp en ninguna app (un chip nuevo o un número fijo funcionan; también puedes migrar tu número de siempre eliminando primero su cuenta de WhatsApp en el teléfono), y un proveedor que te conecte — el software del bot se encarga del proceso técnico.</p>
+<p>Importante: un número conectado a la API queda dedicado al sistema. Ya no se usa desde la app del teléfono; tú atiendes desde el panel web del proveedor.</p>
+<h2>¿Cuánto cuesta?</h2>
+<p>Meta cobra por "conversaciones" iniciadas por el negocio (plantillas), pero <strong>responder mensajes que el cliente inicia es gratis</strong> dentro de una ventana de 24 horas — que es justo lo que hace un bot de cotizaciones: el cliente pregunta, el bot responde. Por eso un negocio que cotiza por WhatsApp paga esencialmente solo la mensualidad de su software (en México, desde $1,000 MXN/mes).</p>
+<h2>¿Cuándo dar el paso?</h2>
+<p>Cuando contestar a mano ya te cuesta ventas: mensajes acumulados en horas pico, clientes de noche sin respuesta, listas largas que dan flojera capturar. Si eso te suena, la API con un bot de cotizaciones se paga sola con las ventas que dejas de perder. <a href="/registro">Con CotizaExpress la conexión es guiada</a> y tarda menos de 15 minutos.</p>
+`,
+  },
+  {
+    slug: 'como-vender-materiales-construccion-por-whatsapp',
+    title: 'Cómo vender materiales de construcción por WhatsApp (guía 2026)',
+    description: 'El manual para casas de materiales: cómo organizar tu catálogo, responder listas de obra en segundos y cobrar por WhatsApp sin perder ventas.',
+    date: '2026-09-23',
+    readMin: 6,
+    content: `
+<p>El contratista de hoy no llama: manda su lista de obra por WhatsApp a tres casas de materiales y le compra a la primera que contesta con precios completos. Así se gana (o se pierde) la venta de materiales en México.</p>
+<h2>1. Tu catálogo es tu arma</h2>
+<p>Ten tu lista de precios en Excel, limpia y al día: nombre claro con medida y calibre ("Poste 6.35 cal 20", no "poste"), precio, unidad. La ambigüedad mata cotizaciones: si vendes cal 20, 22 y 26, cada uno es un renglón.</p>
+<h2>2. Responde en minutos, no en horas</h2>
+<p>La lista de 20 renglones que llega a la 1:47 pm se queda "para al rato" porque hay fila en mostrador — y al rato el cliente ya compró. Las dos soluciones: una persona dedicada al WhatsApp (cuesta $8,000-12,000 al mes) o un <a href="/materiales-construccion">bot de cotizaciones</a> que lee la lista, entiende "tabla roca", "galletas", "canal listón", y responde la cotización completa con IVA en segundos, a cualquier hora.</p>
+<h2>3. Cotización formal, no lista de precios suelta</h2>
+<p>El contratista necesita presentar tu cotización: PDF con folio, desglose, IVA y vigencia. Eso te hace ver serio y le facilita elegirte. Si cotizas a mano, usa nuestro <a href="/generador-de-cotizaciones">generador gratuito</a>; si quieres que salga solo, el bot lo genera en cada pedido.</p>
+<h2>4. Cobra en el mismo chat</h2>
+<p>Datos de transferencia y liga de pago en el momento en que el cliente dice "va". Cada hora entre el "va" y los datos de pago es espacio para que se arrepienta o le llegue otra oferta.</p>
+<h2>5. Registra lo que te piden y no tienes</h2>
+<p>Si tres clientes a la semana piden malla electrosoldada y no la manejas, eso es inventario que te está pidiendo el mercado. Un buen sistema registra estas búsquedas sin resultado; a mano, basta una libreta junto al teléfono.</p>
+<h2>El resultado</h2>
+<p>Casas de materiales que automatizan la cotización reportan responder el 100% de las listas en menos de un minuto — incluidas las de domingo en la noche. <a href="https://wa.me/5218342472640?text=DEMO">Mándale una lista de obra real al demo</a> y velo con tus propios materiales.</p>
+`,
+  },
+  {
+    slug: 'plantilla-lista-precios-excel',
+    title: 'Plantilla de lista de precios en Excel para tu negocio (gratis)',
+    description: 'Descarga una plantilla de lista de precios en Excel lista para usar, y aprende a estructurarla para que sirva también para cotizar automático.',
+    date: '2026-09-23',
+    readMin: 4,
+    content: `
+<p>Una lista de precios bien hecha es la base de todo: cotizar rápido, no equivocarte de precio, y — si algún día automatizas — que un bot pueda vender con ella. Aquí está la estructura correcta y una plantilla gratis.</p>
+<h2>Las 4 columnas que no pueden faltar</h2>
+<p><strong>Producto:</strong> nombre completo y sin ambigüedad. Incluye medida, calibre o presentación: "Cemento gris CPC 30 - 50 kg", "Canal listón cal 26". <strong>Precio:</strong> el precio de venta actual, sin símbolos ni texto. <strong>Unidad:</strong> pieza, metro, kg, bulto, millar. <strong>SKU o clave</strong> (opcional pero recomendado): tu código interno.</p>
+<h2>Errores que arruinan una lista de precios</h2>
+<p>Celdas combinadas y encabezados decorativos (rompen cualquier importación), precios con "$" o "c/u" escritos en la celda, productos repetidos con nombres distintos, precios en $0 como "pendiente" (si automatizas, el bot cotizaría gratis), y la peor: no actualizarla. Una lista de precios vieja es peor que no tener lista.</p>
+<h2>Descarga la plantilla</h2>
+<p>En nuestra página de <a href="/plantillas/cotizacion">plantillas gratuitas</a> encuentras el formato en Excel con las columnas correctas y fórmulas de IVA incluidas — la misma estructura que usa CotizaBot para importar catálogos.</p>
+<h2>El siguiente nivel: que tu lista trabaje sola</h2>
+<p>Con la lista bien estructurada, estás a un paso de que tu negocio cotice solo: subes el Excel a <a href="/registro">CotizaExpress</a>, conectas tu WhatsApp y cada "¿cuánto por 10 bultos de cemento y 5 varillas?" se contesta solo, con IVA y PDF. La lista que ya tienes se convierte en tu mejor vendedor.</p>
+`,
+  },
+  {
+    slug: 'chatbot-whatsapp-gratis-vs-pago',
+    title: '¿Chatbot de WhatsApp gratis o de pago? Cómo decidir sin equivocarte',
+    description: 'Los bots gratuitos de WhatsApp sirven para algunas cosas y fallan en otras. Los criterios claros para saber cuál necesita tu negocio en 2026.',
+    date: '2026-09-23',
+    readMin: 5,
+    content: `
+<p>"¿Para qué pagar si hay bots gratis?" Es la pregunta correcta — y tiene respuesta concreta: depende de qué tenga que hacer el bot.</p>
+<h2>Lo que un bot gratuito hace bien</h2>
+<p>Mensajes de bienvenida y ausencia (la app de WhatsApp Business los trae), respuestas rápidas a preguntas frecuentes, menús simples ("marca 1 para horarios"), y — desde 2026 — el <a href="/blog/meta-business-agent-vs-bot-cotizaciones">agente de IA de Meta</a> que responde preguntas generales del negocio. Si tus conversaciones son de este tipo, no pagues.</p>
+<h2>Donde lo gratis se rompe</h2>
+<p>Los bots gratuitos no tienen <em>tu</em> información a profundidad ni hacen <em>trabajo</em>: no leen una lista de 15 productos con errores de dedo, no buscan en un catálogo de 400 artículos con medidas y calibres, no calculan IVA ni generan PDF con folio, no te avisan cuando el cliente quiere un humano, y no te dicen qué te pidieron que no tienes. Cuando el mensaje del cliente es un pedido y no una pregunta, lo gratis contesta bonito pero no vende.</p>
+<h2>La cuenta que hay que hacer</h2>
+<p>Un bot de cotizaciones serio en México cuesta $1,000-3,000 MXN al mes. Se paga con la primera venta recuperada: si tu ticket promedio es de $800 y hoy pierdes aunque sea 2 ventas a la semana por contestar tarde, estás dejando ir más de $6,000 al mes. El bot no es un gasto de tecnología; es recuperar venta perdida.</p>
+<h2>Regla práctica</h2>
+<p>Cuenta tus mensajes de una semana. Si la mayoría son preguntas (horario, ubicación, "¿tienen?"), lo gratis basta. Si la mayoría son <strong>pedidos y listas de precios</strong>, necesitas un bot que cotice. <a href="https://wa.me/5218342472640?text=DEMO">Prueba el demo con una lista real</a> — la diferencia se ve en 5 segundos.</p>
+`,
+  },
+  {
+    slug: 'errores-atencion-whatsapp-negocios',
+    title: 'Los 7 errores que cometen los negocios al atender WhatsApp (y cómo corregirlos)',
+    description: 'Del visto sin respuesta a la lista de precios en foto: los errores más comunes de atención por WhatsApp en negocios mexicanos y su solución práctica.',
+    date: '2026-09-23',
+    readMin: 5,
+    content: `
+<p>Después de analizar miles de conversaciones de negocios con sus clientes, estos son los errores que más ventas cuestan — y todos tienen arreglo.</p>
+<h2>1. El visto sin respuesta</h2>
+<p>Peor que no contestar es dejar en visto. El cliente asume que no te interesa y le compra al de al lado. Si no puedes contestar completo, un "dame 10 minutos y te lo cotizo" mantiene la venta viva.</p>
+<h2>2. Contestar "¿qué necesitas?" a una lista</h2>
+<p>El cliente ya te dijo qué necesita — te mandó la lista. Pedirle que la repita o "que pase a la tienda" es regalar la venta. La lista se cotiza completa, renglón por renglón.</p>
+<h2>3. Mandar la lista de precios en foto</h2>
+<p>La foto del papel con 200 precios obliga al cliente a hacer las cuentas. El que gana manda la cotización hecha: sus productos, sus cantidades, su total con IVA.</p>
+<h2>4. Precio sin IVA "para que se vea barato"</h2>
+<p>El cliente compara tu precio sin IVA contra el precio con IVA del competidor, elige el tuyo, y se enoja al pagar. Cotiza siempre con IVA desglosado — profesionalismo que genera confianza.</p>
+<h2>5. No tener horario de respuesta claro</h2>
+<p>Si atiendes hasta las 7, dilo en tu perfil y en tu mensaje de ausencia — y de preferencia ten quien conteste después: el 40% de las consultas de contratistas llegan fuera de horario.</p>
+<h2>6. Cotizar de memoria</h2>
+<p>"Está como en $180" termina en pérdidas o en clientes molestos cuando el precio real es otro. La cotización sale de la lista de precios actualizada, no de la memoria.</p>
+<h2>7. No dar el siguiente paso</h2>
+<p>Cotización enviada sin pregunta final = conversación muerta. Cierra siempre: "¿Te lo aparto?", "¿Pasas por él o te lo enviamos?", con datos de pago listos.</p>
+<h2>El patrón común</h2>
+<p>Todos estos errores tienen la misma causa: atender WhatsApp a mano entre mil pendientes. Un <a href="/registro">bot de cotizaciones</a> elimina los siete de golpe: contesta al instante, cotiza la lista completa con IVA, PDF y botón de pago, 24/7. <a href="https://wa.me/5218342472640?text=DEMO">Míralo en acción</a>.</p>
+`,
+  },
+  {
+    slug: 'catalogo-whatsapp-business-como-hacerlo',
+    title: 'Catálogo de WhatsApp Business: cómo hacerlo bien y cuáles son sus límites',
+    description: 'Guía para crear el catálogo de WhatsApp Business paso a paso, qué tipo de negocio le saca provecho y en qué punto se queda corto para cotizar.',
+    date: '2026-09-23',
+    readMin: 5,
+    content: `
+<p>El catálogo de WhatsApp Business es gratis y hace que tu negocio se vea profesional. Aquí cómo armarlo bien — y en qué momento deja de ser suficiente.</p>
+<h2>Cómo crearlo paso a paso</h2>
+<p>En WhatsApp Business: Configuración → Herramientas para la empresa → Catálogo → Agregar producto. Por cada artículo: foto clara (fondo limpio, buena luz), nombre completo con presentación, precio y descripción corta. Los clientes lo ven desde tu perfil y tú puedes mandar productos individuales en el chat.</p>
+<h2>Consejos que marcan diferencia</h2>
+<p>Usa nombres que tus clientes buscan ("Impermeabilizante 5 años blanco 19L", no "Impermeabilizante premium"), agrupa con colecciones (por categoría o marca), mantén precios al día — un catálogo con precios viejos genera reclamos — y elimina lo descontinuado.</p>
+<h2>Para quién funciona muy bien</h2>
+<p>Negocios con pocas decenas de productos visuales: repostería, ropa, muebles, arreglos, servicios con paquetes. El cliente hojea, elige y pregunta. Ahí el catálogo brilla.</p>
+<h2>Donde se queda corto</h2>
+<p>Para negocios de mostrador con cientos de artículos técnicos — ferreterías, materiales, refacciones — el catálogo nativo tiene tres problemas: se captura producto por producto a mano (400 artículos = tardes enteras), el cliente no va a hojear 400 tarjetas para armar su lista de obra, y no cotiza: no suma cantidades, no calcula IVA, no genera documento.</p>
+<h2>El complemento natural</h2>
+<p>La solución para catálogos grandes es al revés: el cliente manda su lista como siempre lo ha hecho, y un <a href="/registro">bot con tu catálogo cargado desde Excel</a> la convierte en cotización formal en segundos. El catálogo de WhatsApp queda como aparador; el bot hace el trabajo de mostrador. <a href="https://wa.me/5218342472640?text=DEMO">Pruébalo con una lista real aquí</a>.</p>
+`,
+  },
+  {
+    slug: 'digitalizar-ferreteria-guia-2026',
+    title: 'Cómo digitalizar tu ferretería en 2026 (sin morir en el intento)',
+    description: 'La ruta realista para llevar una ferretería o casa de materiales a lo digital: qué hacer primero, qué herramientas usar y qué ignorar por ahora.',
+    date: '2026-09-23',
+    readMin: 6,
+    content: `
+<p>"Digitalizarse" suena a proyecto caro de meses. La realidad: una ferretería puede dar los pasos que importan en un par de semanas, con presupuesto de PyME. Esta es la ruta en orden correcto.</p>
+<h2>Paso 1: tu lista de precios en Excel (semana 1)</h2>
+<p>Todo lo digital se construye sobre esto. Productos con nombre completo, precio actual y unidad. Si hoy tus precios viven en una libreta o "en la cabeza de don Chuy", este paso es el 80% del valor. <a href="/blog/plantilla-lista-precios-excel">Aquí está la estructura correcta y una plantilla</a>.</p>
+<h2>Paso 2: WhatsApp Business bien montado (1 día)</h2>
+<p>Perfil completo con horario, dirección y ubicación; mensaje de bienvenida y de ausencia; respuestas rápidas para lo que preguntan siempre. Gratis y se hace en una tarde.</p>
+<h2>Paso 3: Google Business Profile (1 día)</h2>
+<p>Que aparezca tu ficha cuando busquen "ferretería cerca de mí": horario, fotos, teléfono con WhatsApp. Pide a tus buenos clientes una reseña — las estrellas mueven más clientes locales que cualquier anuncio.</p>
+<h2>Paso 4: cotización automática (semana 2)</h2>
+<p>Aquí está el salto grande: conectar tu lista de precios a un <a href="/ferreterias">bot de cotizaciones por WhatsApp</a>. El cliente manda su lista — con jerga, errores y calibres — y recibe cotización con IVA y PDF en segundos, a cualquier hora. Es la diferencia entre "estar en digital" y que lo digital te venda.</p>
+<h2>Paso 5: cobros sin fricción</h2>
+<p>Transferencia con datos listos para copiar y una liga de pago (Mercado Pago o similar) para tarjeta. Entre menos pasos entre el "va" y el pago, menos ventas se caen.</p>
+<h2>Lo que puedes ignorar por ahora</h2>
+<p>Página web cara con carrito (tu tienda en línea ya es WhatsApp), apps propias, y redes sociales de alta producción. Primero domina el canal donde ya están tus clientes.</p>
+<h2>Empieza hoy</h2>
+<p>Los pasos 1 y 4 son el corazón — y toman menos de lo que crees: <a href="/registro">crea tu cuenta</a>, sube tu Excel y prueba a tu propio bot el mismo día.</p>
+`,
+  },
 ];
 
 export default BLOG_POSTS;
