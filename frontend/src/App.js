@@ -11,6 +11,7 @@ import LandingPage from './pages/LandingPage';
 import Registro from './pages/Registro';
 import Login from './pages/Login';
 import { RecuperarContrasena, RestablecerContrasena } from './pages/RecuperarContrasena';
+import Simulador from './pages/Simulador';
 import Precios from './pages/Precios';
 import PagoExitoso from './pages/PagoExitoso';
 import Dashboard from './pages/Dashboard';
@@ -141,6 +142,18 @@ function AppRoutes() {
                     onClick={() => setActiveTab('conversaciones')}
                   >
                     Conversaciones
+                  </Link>
+                  <Link
+                    to="/simulador"
+                    data-testid="nav-simulador"
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      activeTab === 'simulador'
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : 'text-slate-600 hover:bg-slate-100'
+                    }`}
+                    onClick={() => setActiveTab('simulador')}
+                  >
+                    🧪 Probar mi bot
                   </Link>
                   <Link
                     to="/configuracion-whatsapp"
@@ -380,6 +393,14 @@ function AppRoutes() {
               element={
                 <ProtectedRoute>
                   <Conversaciones />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/simulador"
+              element={
+                <ProtectedRoute>
+                  <Simulador />
                 </ProtectedRoute>
               }
             />

@@ -619,6 +619,17 @@ export default function CargaProductos() {
                 </ul>
               </div>
             )}
+
+            {(resultado.productos_insertados > 0 || resultado.productos_actualizados > 0) && (
+              <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 flex items-center justify-between flex-wrap gap-3">
+                <p className="text-sm text-emerald-900">
+                  🧪 <strong>Tu catálogo está listo.</strong> Escríbele a tu bot como si fueras tu cliente y ve cómo cotiza.
+                </p>
+                <a href="/simulador" className="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg">
+                  Probar mi bot →
+                </a>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
