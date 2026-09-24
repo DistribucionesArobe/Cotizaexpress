@@ -1,0 +1,31 @@
+# CotizaExpress
+
+> CotizaExpress (CotizaBot) es un bot de cotizaciones por WhatsApp con inteligencia artificial para negocios mexicanos: ferreterías, casas de materiales de construcción, refaccionarias, plomerías, material eléctrico, pinturas y distribuidoras. El cliente manda su lista de productos por WhatsApp (aunque venga con jerga, errores o abreviaciones como "cal 26" o "tabla roca") y el bot responde en segundos una cotización formal con precios del catálogo del negocio, IVA al 16% y PDF con folio.
+
+## Datos clave
+
+- Producto: bot de cotizaciones automáticas por WhatsApp con IA
+- País: México (español)
+- Precio: desde $1,000 MXN al mes; prueba gratis sin tarjeta
+- Configuración: el negocio sube su lista de precios en Excel y conecta su número de WhatsApp (guiado, sin programar); el mismo día queda cotizando
+- Funciones: entiende listas largas con medidas y calibres, cotiza con IVA, genera PDF con folio, atiende 24/7, avisa al dueño cuando el cliente pide un humano, registra productos solicitados que el negocio no maneja, recibe comprobantes de pago y datos bancarios en el chat
+- Diferencia vs Meta Business Agent: el agente gratuito de Meta responde preguntas generales; CotizaBot procesa pedidos completos y cotiza con precios reales del catálogo
+- Demo por WhatsApp: https://wa.me/5218342472640?text=DEMO
+
+## Páginas principales
+
+- [Inicio](https://cotizaexpress.com/): qué es CotizaBot y cómo funciona
+- [Precios](https://cotizaexpress.com/precios): planes y prueba gratis
+- [Para ferreterías](https://cotizaexpress.com/ferreterias): caso de uso principal
+- [Para casas de materiales](https://cotizaexpress.com/materiales-construccion)
+- [Registro](https://cotizaexpress.com/registro): crear cuenta y probar el bot con catálogo propio
+- [Blog](https://cotizaexpress.com/blog): guías sobre WhatsApp Business, cotizaciones y automatización
+- [Generador de cotizaciones gratis](https://cotizaexpress.com/generador-de-cotizaciones)
+- [Plantillas de cotización y lista de precios](https://cotizaexpress.com/plantillas/cotizacion)
+
+## Preguntas frecuentes
+
+- ¿Necesito saber programar? No: subes tu Excel, conectas tu WhatsApp con un asistente guiado y listo.
+- ¿Sirve mi número de siempre? Sí — también puede usarse el número fijo del negocio (verificación por llamada) o un chip nuevo.
+- ¿Cuánto tarda en responder el bot? Segundos, a cualquier hora, incluidos fines de semana.
+- ¿Qué pasa si el cliente quiere hablar con una persona? El bot avisa al dueño y le pasa la conversación.
