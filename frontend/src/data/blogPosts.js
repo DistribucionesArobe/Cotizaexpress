@@ -86,8 +86,8 @@ const BLOG_POSTS = [
   },
   {
     slug: 'como-hacer-cotizacion-formal-con-iva',
-    title: 'Cómo hacer una cotización formal con IVA en México (con ejemplo)',
-    description: 'Qué debe llevar una cotización formal en México: requisitos, cálculo del IVA al 16%, folio, vigencia y cómo generarlas automáticamente.',
+    title: 'Cómo hacer una cotización formal con IVA — ejemplo listo para copiar',
+    description: 'Los 8 datos que no pueden faltar, el cálculo del IVA al 16% paso a paso, ejemplo real + generador gratuito para hacer la tuya en 2 minutos.',
     date: '2026-07-29',
     readMin: 5,
     content: `
@@ -126,8 +126,8 @@ const BLOG_POSTS = [
   },
   {
     slug: 'como-cobrar-por-whatsapp',
-    title: 'Cómo cobrar por WhatsApp en México: 5 formas que sí funcionan',
-    description: 'Guía para cobrar a tus clientes por WhatsApp: transferencia SPEI, links de pago con tarjeta, OXXO y más. Ventajas, comisiones y cómo automatizarlo.',
+    title: 'Cómo cobrar por WhatsApp en México (con o sin página web): 5 formas',
+    description: 'SPEI, links de pago con tarjeta y OXXO — no necesitas página web. Comisiones reales, cuál conviene según tu negocio y el mensaje exacto para pedir el pago sin enfriar la venta.',
     date: '2026-07-31',
     readMin: 5,
     content: `
