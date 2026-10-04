@@ -407,19 +407,6 @@ export default function Onboarding() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
-                    ¿Qué productos vendes principalmente? (Opcional)
-                  </label>
-                  <textarea
-                    value={businessData.descripcion}
-                    onChange={(e) => setBusinessData({ ...businessData, descripcion: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                    placeholder="Ej: Cemento, varilla, tornillería, refacciones..."
-                    rows={2}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
                     WhatsApp de tu negocio *
                   </label>
                   <p className="text-xs text-slate-500 mb-2">
