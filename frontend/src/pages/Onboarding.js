@@ -30,6 +30,11 @@ const GIROS = [
   'Otro',
 ];
 
+// GA4: eventos del funnel de onboarding
+const track = (evento, extra = {}) => {
+  try { window.gtag && window.gtag('event', evento, extra); } catch (e) {}
+};
+
 const STEPS = [
   { icon: Store, title: 'Tu Negocio', desc: 'Cuéntanos sobre tu empresa' },
   { icon: Package, title: 'Tus Productos', desc: 'Agrega tus primeros productos' },
@@ -41,6 +46,8 @@ export default function Onboarding() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [step, setStep] = useState(0);
+
+  useEffect(() => { track('wizard_inicio'); }, []);
   const [saving, setSaving] = useState(false);
 
   // Step 1: Business info
@@ -113,11 +120,12 @@ export default function Onboarding() {
     return () => window.removeEventListener('message', handleWAMessage);
   }, [handleWAMessage]);
 
-  const launchWhatsAppSignup = () => {
+  const launchWhatsAppSignup = (coexistencia = false) => {
     if (!fbReady || !window.FB) {
       toast.error('Cargando Facebook SDK, intenta en un momento...');
       return;
     }
+    track('wizard_wa_intento', { modo: coexistencia ? 'coexistencia' : 'nuevo' });
     setWaConnecting(true);
     window.__wa_signup_data = null;
 
@@ -135,15 +143,18 @@ export default function Onboarding() {
             .then((res) => {
               setWaConnected(true);
               setWaPhone(res.data?.phone_display || '');
+              track('wizard_wa_conectado');
               toast.success('¡WhatsApp conectado exitosamente!');
             })
             .catch((err) => {
               console.error('Embedded signup backend error:', err);
+              track('wizard_wa_error');
               toast.error(err?.response?.data?.detail || 'Error al conectar WhatsApp');
             })
             .finally(() => setWaConnecting(false));
         } else {
           console.log('User cancelled login');
+          track('wizard_wa_cancelado');
           toast.info('Conexión cancelada. Si te atoraste, revisa los problemas comunes aquí abajo o escríbenos — te ayudamos por videollamada en 15 minutos.');
           setWaConnecting(false);
         }
@@ -154,7 +165,7 @@ export default function Onboarding() {
         override_default_response_type: true,
         extras: {
           setup: {},
-          featureType: '',
+          featureType: coexistencia ? 'whatsapp_business_app_onboarding' : '',
           sessionInfoVersion: 3,
         },
       }
@@ -252,6 +263,7 @@ export default function Onboarding() {
     } catch (err) {
       console.warn('Onboarding complete:', err?.response?.status);
     }
+    track('wizard_completado');
     toast.success('¡Bienvenido a CotizaBot!');
     navigate('/dashboard');
   };
@@ -266,6 +278,7 @@ export default function Onboarding() {
       if (!ok) return;
     }
     if (step < STEPS.length - 1) {
+      track('wizard_paso', { paso: step + 2 });
       setStep(step + 1);
     }
   };
@@ -562,7 +575,7 @@ export default function Onboarding() {
                       <div className="space-y-2">
                         {[
                           ['Una cuenta de Facebook', 'La personal sirve. Solo se usa para autorizar la conexión.'],
-                          ['Un número para el bot — 3 opciones', '📞 El FIJO de tu negocio (recomendado: no tiene WhatsApp, se verifica por llamada y tus clientes ya lo conocen) · tu celular de siempre (eliminando antes su cuenta de WhatsApp en el teléfono) · o un chip nuevo.'],
+                          ['Un número para el bot — 3 opciones', '✨ Tu número de SIEMPRE sin perder la app (recomendado: el bot y tú conviven en el mismo número) · 📞 el FIJO del negocio (se verifica por llamada) · o un chip nuevo dedicado.'],
                           ['Poder recibir el código', 'Si es fijo, elige "Llamarme": te llama una grabación y te dicta el código. Si es celular, llega por SMS.'],
                         ].map(([t, d], i) => (
                           <div key={i} className="flex items-start gap-2">
@@ -592,8 +605,25 @@ export default function Onboarding() {
                         ))}
                       </div>
 
+                      <div className="bg-white border-2 border-emerald-300 rounded-xl p-4 max-w-md mx-auto text-left">
+                        <p className="text-sm font-bold text-slate-900">✨ ¿Ya usas WhatsApp Business en tu teléfono?</p>
+                        <p className="text-xs text-slate-600 mt-1 mb-3">
+                          Conecta tu número de siempre <strong>sin perder la app ni tus chats</strong>: el bot y tú atienden juntos el mismo número. (Requiere que el número lleve al menos 7 días usándose en la app de WhatsApp Business.)
+                        </p>
+                        <Button
+                          type="button"
+                          onClick={() => launchWhatsAppSignup(true)}
+                          disabled={waConnecting}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold w-full"
+                        >
+                          {waConnecting ? 'Conectando...' : 'Conectar manteniendo mi app ✅'}
+                        </Button>
+                      </div>
+
+                      <p className="text-sm text-slate-500">— o si prefieres un número nuevo o fijo dedicado al bot —</p>
+
                       <Button
-                        onClick={launchWhatsAppSignup}
+                        onClick={() => launchWhatsAppSignup(false)}
                         disabled={waConnecting}
                         size="lg"
                         className="bg-[#25D366] hover:bg-[#20BD5A] text-white font-bold px-8 py-6 text-base"
