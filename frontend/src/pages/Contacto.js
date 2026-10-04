@@ -58,7 +58,7 @@ export default function Contacto() {
 
             {/* WhatsApp - Primary CTA */}
             <a
-              href="https://wa.me/528130850381?text=Hola%2C%20me%20interesa%20CotizaBot%20para%20mi%20negocio"
+              href="https://wa.me/5218342472640?text=Hola%2C%20me%20interesa%20CotizaBot%20para%20mi%20negocio"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-4 p-5 bg-green-50 border-2 border-green-200 rounded-xl hover:bg-green-100 transition mb-4"
@@ -126,7 +126,7 @@ export default function Contacto() {
                 <p className="text-green-700 mb-4">Te contactamos en menos de 24 horas.</p>
                 <p className="text-sm text-green-600">
                   ¿Quieres respuesta más rápida?{" "}
-                  <a href="https://wa.me/528130850381?text=Hola%2C%20acabo%20de%20llenar%20el%20formulario%20de%20contacto" target="_blank" rel="noopener noreferrer" className="font-bold underline">
+                  <a href="https://wa.me/5218342472640?text=Hola%2C%20acabo%20de%20llenar%20el%20formulario%20de%20contacto" target="_blank" rel="noopener noreferrer" className="font-bold underline">
                     Escríbenos por WhatsApp
                   </a>
                 </p>

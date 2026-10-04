@@ -181,7 +181,7 @@ export default function ConfiguracionWhatsApp() {
                   Nuestro equipo te guía por videollamada para configurar tu WhatsApp en 15 minutos.
                 </p>
                 <a
-                  href="https://wa.me/528130850381?text=Hola%2C%20necesito%20ayuda%20configurando%20mi%20WhatsApp%20en%20CotizaBot"
+                  href="https://wa.me/5218342472640?text=Hola%2C%20necesito%20ayuda%20configurando%20mi%20WhatsApp%20en%20CotizaBot"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-4 py-2 bg-[#25D366] hover:bg-[#20BD5A] text-white text-sm font-medium rounded-lg transition-colors"

@@ -35,6 +35,23 @@ const track = (evento, extra = {}) => {
   try { window.gtag && window.gtag('event', evento, extra); } catch (e) {}
 };
 
+const CIUDADES_MX = [
+  'Aguascalientes, Ags.', 'Mexicali, B.C.', 'Tijuana, B.C.', 'Ensenada, B.C.', 'La Paz, B.C.S.',
+  'Campeche, Camp.', 'Tuxtla Gutiérrez, Chis.', 'Tapachula, Chis.', 'Chihuahua, Chih.', 'Ciudad Juárez, Chih.',
+  'Ciudad de México', 'Saltillo, Coah.', 'Torreón, Coah.', 'Monclova, Coah.', 'Piedras Negras, Coah.',
+  'Colima, Col.', 'Manzanillo, Col.', 'Durango, Dgo.', 'Gómez Palacio, Dgo.', 'León, Gto.',
+  'Irapuato, Gto.', 'Celaya, Gto.', 'Guanajuato, Gto.', 'Acapulco, Gro.', 'Chilpancingo, Gro.',
+  'Pachuca, Hgo.', 'Guadalajara, Jal.', 'Zapopan, Jal.', 'Puerto Vallarta, Jal.', 'Toluca, Edo. Méx.',
+  'Naucalpan, Edo. Méx.', 'Ecatepec, Edo. Méx.', 'Morelia, Mich.', 'Uruapan, Mich.', 'Cuernavaca, Mor.',
+  'Tepic, Nay.', 'Monterrey, N.L.', 'Guadalupe, N.L.', 'San Nicolás, N.L.', 'Apodaca, N.L.',
+  'San Pedro Garza García, N.L.', 'Oaxaca, Oax.', 'Puebla, Pue.', 'Tehuacán, Pue.', 'Querétaro, Qro.',
+  'Cancún, Q.R.', 'Playa del Carmen, Q.R.', 'Chetumal, Q.R.', 'San Luis Potosí, S.L.P.', 'Culiacán, Sin.',
+  'Mazatlán, Sin.', 'Los Mochis, Sin.', 'Hermosillo, Son.', 'Ciudad Obregón, Son.', 'Nogales, Son.',
+  'Villahermosa, Tab.', 'Ciudad Victoria, Tamps.', 'Tampico, Tamps.', 'Reynosa, Tamps.', 'Matamoros, Tamps.',
+  'Nuevo Laredo, Tamps.', 'Ciudad Madero, Tamps.', 'Altamira, Tamps.', 'Tlaxcala, Tlax.', 'Veracruz, Ver.',
+  'Xalapa, Ver.', 'Coatzacoalcos, Ver.', 'Poza Rica, Ver.', 'Córdoba, Ver.', 'Mérida, Yuc.', 'Zacatecas, Zac.',
+];
+
 const STEPS = [
   { icon: Store, title: 'Tu Negocio', desc: 'Cuéntanos sobre tu empresa' },
   { icon: Package, title: 'Tus Productos', desc: 'Agrega tus primeros productos' },
@@ -377,11 +394,15 @@ export default function Onboarding() {
                   </label>
                   <input
                     type="text"
+                    list="ciudades-mx"
                     value={businessData.ciudad}
                     onChange={(e) => setBusinessData({ ...businessData, ciudad: e.target.value })}
                     className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                    placeholder="Ej: Monterrey, NL"
+                    placeholder="Empieza a escribir: Monte..."
                   />
+                  <datalist id="ciudades-mx">
+                    {CIUDADES_MX.map((c) => <option key={c} value={c} />)}
+                  </datalist>
                 </div>
 
                 <div>
@@ -662,7 +683,7 @@ export default function Onboarding() {
                         Nuestro equipo te guía por videollamada para configurar tu WhatsApp en 15 minutos.
                       </p>
                       <a
-                        href="https://wa.me/528130850381?text=Hola%2C%20necesito%20ayuda%20configurando%20mi%20WhatsApp%20en%20CotizaBot"
+                        href="https://wa.me/5218342472640?text=Hola%2C%20necesito%20ayuda%20configurando%20mi%20WhatsApp%20en%20CotizaBot"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 px-4 py-2 bg-[#25D366] hover:bg-[#20BD5A] text-white text-sm font-medium rounded-lg transition-colors"
