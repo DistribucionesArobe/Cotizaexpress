@@ -606,6 +606,10 @@ export default function LandingPage() {
               <ul className="space-y-2 text-sm">
                 <li><Link to="/ferreterias" className="text-slate-400 hover:text-white">Ferreterías</Link></li>
                 <li><Link to="/materiales-construccion" className="text-slate-400 hover:text-white">Materiales de Construcción</Link></li>
+                <li><Link to="/tablaroca-plafones" className="text-slate-400 hover:text-white">Tablaroca y Plafones</Link></li>
+                <li><Link to="/cancelerias" className="text-slate-400 hover:text-white">Cancelerías</Link></li>
+                <li><Link to="/imprentas" className="text-slate-400 hover:text-white">Imprentas y Rotulación</Link></li>
+                <li><Link to="/climas" className="text-slate-400 hover:text-white">Climas y Refrigeración</Link></li>
                 <li><Link to="/refaccionarias" className="text-slate-400 hover:text-white">Refaccionarias</Link></li>
                 <li><Link to="/plomerias" className="text-slate-400 hover:text-white">Plomerías</Link></li>
                 <li><Link to="/material-electrico" className="text-slate-400 hover:text-white">Material Eléctrico</Link></li>

@@ -346,6 +346,10 @@ function AppRoutes() {
             <Route path="/muebleria" element={<GiroSEO slug="muebleria" />} />
             <Route path="/papelerias" element={<GiroSEO slug="papelerias" />} />
             <Route path="/abarrotes-mayoreo" element={<GiroSEO slug="abarrotes-mayoreo" />} />
+            <Route path="/tablaroca-plafones" element={<GiroSEO slug="tablaroca-plafones" />} />
+            <Route path="/cancelerias" element={<GiroSEO slug="cancelerias" />} />
+            <Route path="/imprentas" element={<GiroSEO slug="imprentas" />} />
+            <Route path="/climas" element={<GiroSEO slug="climas" />} />
 
             {/* Rutas protegidas */}
             <Route
