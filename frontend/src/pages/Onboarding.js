@@ -603,7 +603,7 @@ export default function Onboarding() {
                         <span className="absolute -top-3 left-4 bg-emerald-600 text-white text-xs font-bold px-3 py-0.5 rounded-full">Recomendado</span>
                         <p className="font-bold text-slate-900 mt-1">✨ Mi número de siempre</p>
                         <p className="text-sm text-slate-600 mt-1 flex-1">
-                          Conservas tu app y tus chats. El bot contesta solo, y tú entras cuando quieras — los dos en el mismo número.
+                          <strong>Todo lo sigues viendo en tu celular, como siempre.</strong> El bot contesta solo y sus respuestas aparecen en tu WhatsApp; tú entras a cualquier chat cuando quieras.
                         </p>
                         <Button
                           type="button"
