@@ -464,10 +464,25 @@ export default function Onboarding() {
                   <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <Package className="w-8 h-8 text-blue-600" />
                   </div>
-                  <h2 className="text-2xl font-bold text-slate-900">Agrega tus productos</h2>
+                  <h2 className="text-2xl font-bold text-slate-900">Agrega 3 productos</h2>
                   <p className="text-slate-600 mt-1">
-                    Solo nombre y precio. Después podrás editar todo desde el dashboard.
+                    Solo nombre y precio — los que más te piden. El catálogo completo lo subes después con tu Excel.
                   </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProducts([
+                        { nombre: 'Cemento gris 50 kg', precio: '245' },
+                        { nombre: 'Varilla 3/8 (pieza)', precio: '168' },
+                        { nombre: 'Block 15x20x40', precio: '18.50' },
+                      ]);
+                      track('wizard_productos_ejemplo');
+                      toast.success('Listo: 3 productos de ejemplo. Puedes cambiarlos o seguir.');
+                    }}
+                    className="mt-3 text-sm text-emerald-700 underline hover:text-emerald-800"
+                  >
+                    ¿Solo quieres ver cómo funciona? Usa productos de ejemplo →
+                  </button>
                 </div>
 
                 <div className="space-y-3">
@@ -704,6 +719,12 @@ export default function Onboarding() {
 
                 <div className="space-y-4">
                   {[
+                    {
+                      num: '0',
+                      title: 'Escríbele a tu bot AHORITA 🧪',
+                      desc: 'Prueba cómo cotiza con tus productos — sin conectar nada. Entra a la pestaña "Probar mi bot".',
+                      color: 'emerald',
+                    },
                     {
                       num: '1',
                       title: waConnected ? 'WhatsApp conectado' : 'Conecta tu WhatsApp',

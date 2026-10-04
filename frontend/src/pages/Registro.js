@@ -51,11 +51,13 @@ export default function Registro() {
     setLoading(true);
 
     // Validaciones
-    if (!formData.email || !formData.password || !formData.nombre || !formData.empresa_nombre || !formData.telefono) {
-      toast.error('Por favor completa todos los campos requeridos');
+    if (!formData.email || !formData.password || !formData.empresa_nombre) {
+      toast.error('Completa los 3 campos para crear tu bot');
       setLoading(false);
       return;
     }
+    // Nombre de contacto = nombre del negocio si no se capturó
+    if (!formData.nombre) formData.nombre = formData.empresa_nombre;
 
     if (formData.password.length < 6) {
       toast.error('La contraseña debe tener al menos 6 caracteres');
@@ -101,8 +103,8 @@ export default function Registro() {
               <span className="text-xs text-slate-500">by CotizaExpress.com</span>
             </div>
           </Link>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Crear Cuenta</h1>
-          <p className="text-slate-600">Automatiza tus cotizaciones por WhatsApp</p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Crea tu bot en 2 minutos</h1>
+          <p className="text-slate-600">Gratis · sin tarjeta · solo 3 datos</p>
           {referralCode && (
             <div className="mt-3 inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 text-sm font-medium px-4 py-2 rounded-full border border-emerald-200">
               <span>Referido por un afiliado</span>
@@ -111,30 +113,28 @@ export default function Registro() {
         </div>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Información de Registro</CardTitle>
-          </CardHeader>
+
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Nombre Completo *
+                  1. ¿Cómo se llama tu negocio?
                 </label>
                 <input
                   type="text"
-                  name="nombre"
-                  value={formData.nombre}
+                  name="empresa_nombre"
+                  value={formData.empresa_nombre}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  placeholder="Juan Pérez"
+                  className="w-full px-4 py-3 text-base border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="Ej: Ferretería López"
                   required
-                  data-testid="input-nombre"
+                  data-testid="input-empresa"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Email *
+                  2. Tu correo
                 </label>
                 <input
                   type="email"
@@ -150,7 +150,7 @@ export default function Registro() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Contraseña *
+                  3. Inventa una contraseña
                 </label>
                 <input
                   type="password"
@@ -165,44 +165,9 @@ export default function Registro() {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Nombre de tu Empresa *
-                </label>
-                <input
-                  type="text"
-                  name="empresa_nombre"
-                  value={formData.empresa_nombre}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  placeholder="Mi Negocio"
-                  required
-                  data-testid="input-empresa"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Teléfono (WhatsApp) *
-                </label>
-                <input
-                  type="tel"
-                  name="telefono"
-                  value={formData.telefono}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  placeholder="81 1234 5678"
-                  required
-                  data-testid="input-telefono"
-                />
-                <p className="text-xs text-slate-500 mt-1">Para poder ayudarte con la configuración</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Código Promocional (Opcional)
-                </label>
-                <div className="flex gap-2">
+              <details className="text-sm">
+                <summary className="text-emerald-700 cursor-pointer">¿Tienes un código promocional?</summary>
+                <div className="flex gap-2 mt-2">
                   <input
                     type="text"
                     name="promo_code"
@@ -216,7 +181,7 @@ export default function Registro() {
                     type="button"
                     onClick={validatePromo}
                     disabled={!formData.promo_code?.trim() || promoStatus === 'checking'}
-                    className="px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 disabled:opacity-50"
                   >
                     {promoStatus === 'checking' ? 'Validando...' : 'Validar'}
                   </button>
@@ -226,7 +191,7 @@ export default function Registro() {
                     {promoStatus.valid ? `✓ ${promoStatus.description}` : `✗ ${promoStatus.reason}`}
                   </p>
                 )}
-              </div>
+              </details>
 
               <Button
                 type="submit"
@@ -241,7 +206,7 @@ export default function Registro() {
                     Creando cuenta...
                   </>
                 ) : (
-                  'Crear Cuenta'
+                  'Crear mi bot gratis →'
                 )}
               </Button>
 
