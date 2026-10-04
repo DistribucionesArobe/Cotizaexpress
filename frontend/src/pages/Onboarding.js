@@ -584,90 +584,68 @@ export default function Onboarding() {
                   </div>
                 ) : (
                   <div className="text-center space-y-6">
-                    {/* Antes de empezar */}
-                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-left max-w-md mx-auto">
-                      <p className="text-sm font-bold text-emerald-900 mb-2">✅ Antes de empezar necesitas:</p>
-                      <div className="space-y-2">
-                        {[
-                          ['Una cuenta de Facebook', 'La personal sirve. Solo se usa para autorizar la conexión.'],
-                          ['Un número para el bot — 3 opciones', '✨ Tu número de SIEMPRE sin perder la app (recomendado: el bot y tú conviven en el mismo número) · 📞 el FIJO del negocio (se verifica por llamada) · o un chip nuevo dedicado.'],
-                          ['Poder recibir el código', 'Si es fijo, elige "Llamarme": te llama una grabación y te dicta el código. Si es celular, llega por SMS.'],
-                        ].map(([t, d], i) => (
-                          <div key={i} className="flex items-start gap-2">
-                            <Check className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
-                            <p className="text-xs text-slate-700"><strong>{t}.</strong> {d}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+                    {/* Elige tu número: UNA pregunta, DOS tarjetas */}
+                    <p className="text-sm text-slate-500">Ten a la mano tu Facebook y tu teléfono. Toma 2 minutos.</p>
 
-                    <div className="bg-slate-50 rounded-xl p-6 space-y-4">
-                      <p className="text-sm font-semibold text-slate-900 text-left max-w-sm mx-auto">Al picar el botón se abre una ventana de Facebook. Esto es lo que vas a ver:</p>
-                      <div className="space-y-3 text-left max-w-sm mx-auto">
-                        {[
-                          'Inicia sesión con tu Facebook. Verás "Distribuciones Arobe quiere acceder..." — es la empresa detrás de CotizaBot, es normal: pica Continuar.',
-                          'Escribe el nombre de tu negocio cuando te lo pida.',
-                          'Agrega el número que usará el bot (tu fijo, tu número o un chip nuevo).',
-                          'Verifícalo: elige "Llamarme" si es fijo (una grabación te dicta el código) o SMS si es celular. Escribe el código.',
-                          'Cierra la ventana — aquí verás "WhatsApp conectado". ✅',
-                        ].map((txt, i) => (
-                          <div key={i} className="flex items-start gap-3">
-                            <div className="w-6 h-6 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
-                              {i + 1}
-                            </div>
-                            <p className="text-sm text-slate-700">{txt}</p>
-                          </div>
-                        ))}
-                      </div>
+                    <p className="text-lg font-bold text-slate-900">¿Qué número va a usar tu bot?</p>
 
-                      <div className="bg-white border-2 border-emerald-300 rounded-xl p-4 max-w-md mx-auto text-left">
-                        <p className="text-sm font-bold text-slate-900">✨ ¿Ya usas WhatsApp Business en tu teléfono?</p>
-                        <p className="text-xs text-slate-600 mt-1 mb-3">
-                          Conecta tu número de siempre <strong>sin perder la app ni tus chats</strong>: el bot y tú atienden juntos el mismo número. (Requiere que el número lleve al menos 7 días usándose en la app de WhatsApp Business.)
+                    <div className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto text-left">
+                      {/* Opción A: coexistencia */}
+                      <div className="border-2 border-emerald-400 bg-emerald-50/60 rounded-xl p-5 flex flex-col relative">
+                        <span className="absolute -top-3 left-4 bg-emerald-600 text-white text-xs font-bold px-3 py-0.5 rounded-full">Recomendado</span>
+                        <p className="font-bold text-slate-900 mt-1">✨ Mi número de siempre</p>
+                        <p className="text-sm text-slate-600 mt-1 flex-1">
+                          Conservas tu app y tus chats. El bot contesta solo, y tú entras cuando quieras — los dos en el mismo número.
                         </p>
                         <Button
                           type="button"
                           onClick={() => launchWhatsAppSignup(true)}
                           disabled={waConnecting}
-                          className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold w-full"
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold w-full mt-3"
                         >
-                          {waConnecting ? 'Conectando...' : 'Conectar manteniendo mi app ✅'}
+                          {waConnecting ? 'Conectando...' : 'Conectar mi número ✅'}
                         </Button>
+                        <p className="text-[11px] text-slate-400 mt-2">Funciona si ese número ya usa la app de WhatsApp Business desde hace una semana o más.</p>
                       </div>
 
-                      <p className="text-sm text-slate-500">— o si prefieres un número nuevo o fijo dedicado al bot —</p>
-
-                      <Button
-                        onClick={() => launchWhatsAppSignup(false)}
-                        disabled={waConnecting}
-                        size="lg"
-                        className="bg-[#25D366] hover:bg-[#20BD5A] text-white font-bold px-8 py-6 text-base"
-                      >
-                        {waConnecting ? (
-                          <span className="flex items-center gap-2">
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                            Conectando...
-                          </span>
-                        ) : (
-                          <span className="flex items-center gap-2">
-                            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                              <path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.611.611l4.458-1.495A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.237 0-4.308-.744-5.977-1.998l-.418-.312-3.087 1.034 1.034-3.087-.312-.418A9.935 9.935 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
-                            </svg>
-                            Conectar mi WhatsApp
-                          </span>
-                        )}
-                      </Button>
+                      {/* Opción B: número dedicado */}
+                      <div className="border border-slate-200 bg-white rounded-xl p-5 flex flex-col">
+                        <p className="font-bold text-slate-900 mt-1">📞 Otro número (nuevo o fijo)</p>
+                        <p className="text-sm text-slate-600 mt-1 flex-1">
+                          Un número solo para el bot: un chip nuevo o el teléfono fijo del negocio. Ese número quedará dedicado al bot.
+                        </p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => launchWhatsAppSignup(false)}
+                          disabled={waConnecting}
+                          className="w-full mt-3 border-2"
+                        >
+                          {waConnecting ? 'Conectando...' : 'Conectar otro número'}
+                        </Button>
+                        <p className="text-[11px] text-slate-400 mt-2">Si es fijo, en la verificación elige "Llamarme": una grabación te dicta el código.</p>
+                      </div>
                     </div>
 
-                    {/* Atorones comunes */}
+                    {/* Qué va a pasar (colapsado) */}
+                    <details className="max-w-2xl mx-auto text-left text-sm bg-slate-50 rounded-lg px-4 py-3">
+                      <summary className="cursor-pointer font-medium text-slate-700">¿Qué voy a ver al picar el botón? (son 4 pantallas)</summary>
+                      <ol className="mt-2 space-y-1.5 text-slate-600 list-decimal list-inside">
+                        <li>Se abre una ventana de Facebook: inicia sesión y cuando diga "CotizaExpress quiere acceder", pica <strong>Continuar</strong>.</li>
+                        <li>Escribe el nombre de tu negocio.</li>
+                        <li>Escribe el número que elegiste y captura el código que te llega (SMS) o te dictan ("Llamarme").</li>
+                        <li>Se cierra la ventana y aquí verás <strong>"WhatsApp conectado" ✅</strong></li>
+                      </ol>
+                    </details>
+
+                                        {/* Atorones comunes */}
                     <div className="text-left max-w-md mx-auto space-y-2">
                       <p className="text-sm font-semibold text-slate-700">¿Te atoraste? Los 3 problemas más comunes:</p>
                       {[
                         ['"Este número ya está registrado en WhatsApp"', 'Ese número tiene WhatsApp activo en un teléfono. Si quieres usar ese mismo número para el bot: en el teléfono ve a WhatsApp → Ajustes → Cuenta → Eliminar cuenta, espera 5 minutos e intenta de nuevo (tus chats se pierden, respáldalos antes si los necesitas). Si prefieres conservarlo como está, conecta otro número.'],
                         ['No se abre la ventana de Facebook', 'Tu navegador bloqueó la ventana emergente. Busca el aviso de "popup bloqueado" en la barra de dirección y permítelo, o intenta desde Chrome.'],
                         ['No llega el código SMS', 'En la pantalla de verificación elige la opción "Llamarme" — a los números fijos siempre se les verifica por llamada. Ten el teléfono a la mano: la grabación dicta el código una vez.'],
-                        ['"¿Por qué dice Distribuciones Arobe?"', 'Es el nombre registrado en Meta de la empresa que opera CotizaExpress y CotizaBot. Facebook siempre muestra ese nombre al autorizar. Es normal y seguro — pica Continuar.'],
+                        ['¿Es seguro conectar mi Facebook?', 'Sí. Facebook solo se usa para autorizar la conexión de tu WhatsApp — no publicamos nada ni vemos tu cuenta personal. Cuando pida permiso para "CotizaExpress", pica Continuar.'],
                       ].map(([q, a], i) => (
                         <details key={i} className="bg-white border border-slate-200 rounded-lg px-4 py-2">
                           <summary className="text-sm font-medium text-slate-800 cursor-pointer">{q}</summary>
@@ -676,9 +654,6 @@ export default function Onboarding() {
                       ))}
                     </div>
 
-                    <p className="text-xs text-slate-400">
-                      Importante: el número que conectes quedará dedicado al bot — ya no podrás usarlo en la app de WhatsApp del teléfono.
-                    </p>
 
                     {/* Help CTA - Task #22 */}
                     <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-4 text-left">
