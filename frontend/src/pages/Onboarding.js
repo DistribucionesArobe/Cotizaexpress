@@ -613,7 +613,7 @@ export default function Onboarding() {
                         >
                           {waConnecting ? 'Conectando...' : 'Conectar mi número ✅'}
                         </Button>
-                        <p className="text-[11px] text-slate-400 mt-2">Funciona si ese número ya usa la app de WhatsApp Business desde hace una semana o más.</p>
+                        <p className="text-[11px] text-slate-400 mt-2">Funciona si ese número ya usa la app de WhatsApp Business (la verde) desde hace una semana o más.</p>
                       </div>
 
                       {/* Opción B: número dedicado */}
@@ -653,6 +653,7 @@ export default function Onboarding() {
                         ['"Este número ya está registrado en WhatsApp"', 'Ese número tiene WhatsApp activo en un teléfono. Si quieres usar ese mismo número para el bot: en el teléfono ve a WhatsApp → Ajustes → Cuenta → Eliminar cuenta, espera 5 minutos e intenta de nuevo (tus chats se pierden, respáldalos antes si los necesitas). Si prefieres conservarlo como está, conecta otro número.'],
                         ['No se abre la ventana de Facebook', 'Tu navegador bloqueó la ventana emergente. Busca el aviso de "popup bloqueado" en la barra de dirección y permítelo, o intenta desde Chrome.'],
                         ['No llega el código SMS', 'En la pantalla de verificación elige la opción "Llamarme" — a los números fijos siempre se les verifica por llamada. Ten el teléfono a la mano: la grabación dicta el código una vez.'],
+                        ['Uso WhatsApp normal, no el Business — ¿puedo?', 'Para conectar tu número de siempre necesitas la app de WhatsApp Business (la verde, gratis). Descárgala, migra tu número ahí (conservas tus chats, toma 10 minutos) y úsala unos 7 días. Después regresas aquí y conectas. Si no quieres esperar, conecta mientras tanto otro número (opción de la derecha).'],
                         ['¿Es seguro conectar mi Facebook?', 'Sí. Facebook solo se usa para autorizar la conexión de tu WhatsApp — no publicamos nada ni vemos tu cuenta personal. Cuando pida permiso para "CotizaExpress", pica Continuar.'],
                       ].map(([q, a], i) => (
                         <details key={i} className="bg-white border border-slate-200 rounded-lg px-4 py-2">
