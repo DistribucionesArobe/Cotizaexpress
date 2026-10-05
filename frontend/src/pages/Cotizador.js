@@ -17,6 +17,8 @@ export default function Cotizador() {
   const [cliente, setCliente] = useState('');
   const [guardando, setGuardando] = useState(false);
   const [resultado, setResultado] = useState(null); // {folio, total, link}
+  const [ivaPct, setIvaPct] = useState(16);
+  const [ivaIncluido, setIvaIncluido] = useState(true);
 
   const cotizarIA = async () => {
     if (!texto.trim()) { toast.error('Pega la lista del cliente'); return; }
@@ -46,13 +48,17 @@ export default function Cotizador() {
   const agregarRenglon = () => setItems(prev => [...prev, { name: '', qty: 1, unit: 'pza', price: '' }]);
   const quitarRenglon = (i) => setItems(prev => prev.filter((_, idx) => idx !== i));
 
-  const subtotal = items.reduce((s, it) => s + (parseFloat(it.price) || 0) * (parseInt(it.qty) || 0), 0);
-  const iva = subtotal * 0.16;
+  const suma = items.reduce((s, it) => s + (parseFloat(it.price) || 0) * (parseInt(it.qty) || 0), 0);
+  const pct = Math.max(0, parseFloat(ivaPct) || 0) / 100;
+  // Si los precios ya incluyen IVA: total = suma y el IVA se desglosa hacia atrás.
+  const subtotal = ivaIncluido ? suma / (1 + pct) : suma;
+  const iva = subtotal * pct;
+  const total = subtotal + iva;
 
   const guardar = async () => {
     setGuardando(true);
     try {
-      const r = await axios.post(`${API}/cotizador/guardar`, { items, cliente }, { withCredentials: true });
+      const r = await axios.post(`${API}/cotizador/guardar`, { items, cliente, vat_pct: parseFloat(ivaPct) || 0, vat_incluido: ivaIncluido }, { withCredentials: true });
       setResultado(r.data);
       toast.success(`Cotización ${r.data.folio} creada`);
     } catch (e) {
@@ -138,10 +144,29 @@ export default function Cotizador() {
             ))}
             <button onClick={agregarRenglon} className="text-sm text-violet-700 flex items-center gap-1"><Plus className="w-4 h-4" /> Agregar renglón</button>
 
-            <div className="border-t pt-3 text-sm text-slate-700 space-y-1">
+            <div className="border-t pt-3 text-sm text-slate-700 space-y-2">
+              <div className="flex flex-wrap items-center gap-3 justify-end text-xs text-slate-600">
+                <label className="flex items-center gap-1">
+                  IVA
+                  <input
+                    type="number" min="0" max="30" step="0.5"
+                    value={ivaPct}
+                    onChange={(e) => setIvaPct(e.target.value)}
+                    className="w-16 px-2 py-1 border border-slate-300 rounded text-right"
+                  />%
+                </label>
+                <label className="flex items-center gap-1 cursor-pointer">
+                  <input type="radio" checked={ivaIncluido} onChange={() => setIvaIncluido(true)} />
+                  Mis precios ya lo incluyen
+                </label>
+                <label className="flex items-center gap-1 cursor-pointer">
+                  <input type="radio" checked={!ivaIncluido} onChange={() => setIvaIncluido(false)} />
+                  Agregarlo al total
+                </label>
+              </div>
               <div className="flex justify-end gap-8"><span>Subtotal:</span><span className="w-28 text-right">${subtotal.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span></div>
-              <div className="flex justify-end gap-8"><span>IVA 16%:</span><span className="w-28 text-right">${iva.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span></div>
-              <div className="flex justify-end gap-8 font-bold text-slate-900"><span>TOTAL:</span><span className="w-28 text-right">${(subtotal + iva).toLocaleString('es-MX', {minimumFractionDigits: 2})}</span></div>
+              <div className="flex justify-end gap-8"><span>IVA {ivaPct || 0}%:</span><span className="w-28 text-right">${iva.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span></div>
+              <div className="flex justify-end gap-8 font-bold text-slate-900"><span>TOTAL:</span><span className="w-28 text-right">${total.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span></div>
             </div>
 
             <div className="flex flex-wrap gap-3 items-center pt-2">
