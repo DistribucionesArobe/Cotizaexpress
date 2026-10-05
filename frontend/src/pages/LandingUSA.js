@@ -3,6 +3,37 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
 const OFICIOS_US = ['Roofing', 'Landscaping', 'Painting', 'Remodeling', 'Drywall', 'Flooring', 'Handyman', 'Cleaning', 'Concrete', 'Fencing'];
+const OFICIOS_CON_PAGINA = { Roofing: 'roofing', Landscaping: 'landscaping', Painting: 'painting', Remodeling: 'remodeling', Drywall: 'drywall', Handyman: 'handyman' };
+
+const FAQ_USA = [
+  ['¿Cómo hago un estimate en español en Estados Unidos?', 'Con CotizaBot escribes el trabajo en tus palabras — "pintar sala y 2 cuartos con material" — y la IA lo convierte en un estimate profesional en dólares, con tax, labor y materiales separados y PDF con tu logo. Todo en español, desde tu celular.'],
+  ['¿El estimate sale en dólares y con el tax de mi estado?', 'Sí. Eliges modo USA 🇺🇸, pones el sales tax de tu estado (por ejemplo 8.25% en Texas) o lo dejas en cero, y el total sale exacto en USD.'],
+  ['¿Cuánto cuesta la app para hacer estimates?', 'El primer estimate es gratis y sin tarjeta. Después son $15 USD al mes con estimates ilimitados, tu logo, PDF y link para compartir.'],
+  ['¿Sirve para roofing, landscaping, painting o handyman?', 'Sí, está hecha para contratistas hispanos: roofing, landscaping, painting, remodeling, drywall, flooring, handyman, cleaning, concrete y fencing. Separas labor y materiales como lo piden los customers y los GCs.'],
+  ['¿Necesito computadora o saber inglés?', 'No. Todo es en español y desde tu celular — se instala como app. El estimate que recibe el customer se ve profesional, con números en formato de USA.'],
+  ['¿Cómo le mando el estimate al customer?', 'Cada estimate genera un PDF y un link: lo mandas por mensaje de texto, WhatsApp o email directo desde tu celular, en el momento, antes que la competencia.'],
+];
+
+const JSONLD_USA = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'CotizaBot — Estimates en español para contratistas hispanos en USA',
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Web, Android, iOS',
+    inLanguage: 'es',
+    offers: { '@type': 'Offer', price: '15', priceCurrency: 'USD' },
+    audience: { '@type': 'Audience', audienceType: 'Contratistas hispanos y latinos en Estados Unidos: roofing, landscaping, painting, remodeling, drywall, handyman' },
+    areaServed: 'US',
+    url: 'https://cotizaexpress.com/usa',
+    description: 'App en español para hacer estimates profesionales en dólares: describe el trabajo y la IA genera el estimate con tax, labor, materiales y PDF con tu logo.',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQ_USA.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
+  },
+];
 
 export default function LandingUSA() {
   return (
@@ -14,6 +45,7 @@ export default function LandingUSA() {
         <meta property="og:title" content="Estimates profesionales en español — para paisanos contratistas en USA" />
         <meta property="og:description" content="Describe el jale y la IA te arma el estimate en dólares con tax y PDF. Desde tu celular. $15 USD/mes." />
         <meta property="og:url" content="https://cotizaexpress.com/usa" />
+        <script type="application/ld+json">{JSON.stringify(JSONLD_USA)}</script>
       </Helmet>
 
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-slate-200">
@@ -66,7 +98,9 @@ export default function LandingUSA() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-slate-900 mb-6">Hecho para tu jale</h2>
           <div className="flex flex-wrap justify-center gap-3">
-            {OFICIOS_US.map(o => (
+            {OFICIOS_US.map(o => OFICIOS_CON_PAGINA[o] ? (
+              <Link key={o} to={`/usa/${OFICIOS_CON_PAGINA[o]}`} className="bg-blue-50 hover:bg-blue-100 text-blue-800 font-medium rounded-full px-4 py-2 text-sm border border-blue-200">{o} →</Link>
+            ) : (
               <span key={o} className="bg-slate-100 text-slate-700 font-medium rounded-full px-4 py-2 text-sm">{o}</span>
             ))}
           </div>
@@ -90,8 +124,23 @@ export default function LandingUSA() {
         </div>
       </section>
 
-      {/* Precio */}
+      {/* FAQ (SEO + respuestas de IA) */}
       <section className="py-14 bg-white">
+        <div className="max-w-3xl mx-auto px-4">
+          <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Preguntas de otros paisanos</h2>
+          <div className="space-y-3">
+            {FAQ_USA.map(([q, a]) => (
+              <details key={q} className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                <summary className="font-semibold text-slate-800 cursor-pointer">{q}</summary>
+                <p className="text-sm text-slate-600 mt-2">{a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Precio */}
+      <section className="py-14 bg-slate-50">
         <div className="max-w-xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-extrabold text-slate-900 mb-2">$15 dólares al mes</h2>
           <p className="text-slate-600 mb-6">Menos que una comida. Estimates ilimitados, con tu logo, labor + materiales, PDF y link para compartir. <strong>El primero es gratis, sin tarjeta.</strong></p>

@@ -29,3 +29,15 @@
 - ¿Sirve mi número de siempre? Sí — también puede usarse el número fijo del negocio (verificación por llamada) o un chip nuevo.
 - ¿Cuánto tarda en responder el bot? Segundos, a cualquier hora, incluidos fines de semana.
 - ¿Qué pasa si el cliente quiere hablar con una persona? El bot avisa al dueño y le pasa la conversación.
+
+## Para contratistas hispanos en Estados Unidos (USA)
+
+CotizaBot también sirve a contratistas hispanos y latinos en Estados Unidos ("paisanos"): roofing, landscaping, painting, remodeling, drywall, flooring, handyman, cleaning, concrete y fencing. La app genera estimates profesionales en español, en dólares (USD), con el sales tax del estado configurable, labor y materiales separados, y PDF con logo para mandar por mensaje de texto o WhatsApp. Precio: $15 USD al mes; el primer estimate es gratis.
+
+- [Estimates en español para paisanos en USA](https://cotizaexpress.com/usa)
+- [Estimates de roofing en español](https://cotizaexpress.com/usa/roofing)
+- [Estimates de landscaping en español](https://cotizaexpress.com/usa/landscaping)
+- [Estimates de painting en español](https://cotizaexpress.com/usa/painting)
+- [Estimates de remodeling en español](https://cotizaexpress.com/usa/remodeling)
+- [Estimates de drywall en español](https://cotizaexpress.com/usa/drywall)
+- [Estimates de handyman en español](https://cotizaexpress.com/usa/handyman)
