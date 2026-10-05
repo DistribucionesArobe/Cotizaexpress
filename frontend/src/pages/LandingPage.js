@@ -174,8 +174,29 @@ export default function LandingPage() {
     window.addEventListener('beforeinstallprompt', h);
     return () => window.removeEventListener('beforeinstallprompt', h);
   }, []);
+  // Detección de visitantes en USA (por zona horaria, sin APIs ni permisos)
+  const [showUsaBanner, setShowUsaBanner] = useState(false);
+  useEffect(() => {
+    try {
+      if (localStorage.getItem('region')) return; // ya eligió
+      if (sessionStorage.getItem('usa_banner_off')) return;
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      const US_TZ = ['America/New_York','America/Chicago','America/Denver','America/Phoenix','America/Los_Angeles','America/Anchorage','America/Detroit','America/Indiana/Indianapolis','America/Boise','Pacific/Honolulu','America/Kentucky/Louisville'];
+      if (US_TZ.includes(tz)) setShowUsaBanner(true);
+    } catch (e) { /* noop */ }
+  }, []);
+  const irUSA = () => { try { localStorage.setItem('region', 'US'); } catch (e) {} window.location.href = '/usa'; };
+  const cerrarUsaBanner = () => { try { sessionStorage.setItem('usa_banner_off', '1'); } catch (e) {} setShowUsaBanner(false); };
   return (
+
     <div className="min-h-screen" data-testid="landing-page">
+      {showUsaBanner && (
+        <div className="bg-blue-800 text-white text-sm px-4 py-2.5 flex items-center justify-center gap-3 relative z-[60]">
+          <span>🇺🇸 ¿Trabajas en Estados Unidos? Tenemos estimates en español, en dólares y con tax.</span>
+          <button onClick={irUSA} className="bg-yellow-400 text-slate-900 font-bold rounded-full px-4 py-1 hover:bg-yellow-300 whitespace-nowrap">Ver precios en USD →</button>
+          <button onClick={cerrarUsaBanner} aria-label="Cerrar" className="text-blue-200 hover:text-white font-bold px-1">✕</button>
+        </div>
+      )}
       <Helmet>
         <title>Cotiza por WhatsApp en Automático — Bot que Responde en 5 Segundos | CotizaExpress</title>
         <meta name="description" content="Tu cliente manda su lista por WhatsApp y recibe su cotización con IVA y PDF al instante, 24/7. Sube tu Excel, conecta tu número y pruébalo gratis hoy — sin tarjeta." />

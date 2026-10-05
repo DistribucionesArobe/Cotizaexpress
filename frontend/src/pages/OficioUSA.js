@@ -13,7 +13,7 @@ export const OFICIOS_USA = {
     metaDesc: 'Haz estimates de roofing en dólares desde tu celular, en español: materiales, labor y tax de tu estado en un PDF profesional. $15/mes, el primero gratis.',
     bullets: ['Cotiza por square con material y labor separados', 'Tax de tu estado configurable', 'PDF con tu logo que te hace ver como compañía grande'],
     faq: [
-      ['¿Cómo hago un estimate de roofing en español?', 'Escribe el jale en tus palabras — "reemplazo de techo 22 squares con tear-off" — y la IA lo convierte en un estimate en dólares con labor, materiales, tax y PDF profesional, todo en español.'],
+      ['¿Cómo hago un estimate de roofing en español?', 'Escribe el trabajo en tus palabras — "reemplazo de techo 22 squares con tear-off" — y la IA lo convierte en un estimate en dólares con labor, materiales, tax y PDF profesional, todo en español.'],
       ['¿Puedo separar labor y materiales en el estimate?', 'Sí. Cada línea se marca como material o labor (mano de obra) y el PDF muestra el desglose, que es lo que el customer y las aseguranzas quieren ver.'],
       ['¿Sirve para trabajos de aseguranza (insurance claims)?', 'El PDF trae folio, desglose de conceptos y totales con tax — el formato que piden los adjusters. Tú pones los precios de tu área.'],
     ],
@@ -22,11 +22,11 @@ export const OFICIOS_USA = {
     nombre: 'landscaping',
     emoji: '🌳',
     h1: 'Estimates de landscaping en español',
-    sub: 'Mowing, mulch, sod, irrigación y labor — manda el estimate en dólares desde la troca, en español, antes que los otros landscapers.',
+    sub: 'Mowing, mulch, sod, irrigación y labor — manda el estimate en dólares desde tu teléfono, en español, antes que los demás landscapers.',
     ejemplo: 'Instalar sod 1,200 sqft, 5 yardas de mulch, recortar 3 árboles, limpieza general',
     metaTitle: 'Estimates de Landscaping en Español — App para Landscapers Hispanos en USA',
     metaDesc: 'Haz estimates de landscaping y lawn care en dólares desde tu celular, en español: sod, mulch, labor y tax en un PDF profesional. $15/mes, el primero gratis.',
-    bullets: ['Cotiza por sqft, por yarda o por servicio', 'Estimates recurrentes en segundos (mowing semanal)', 'El primero que manda precio se queda el yard'],
+    bullets: ['Cotiza por sqft, por yarda o por servicio', 'Estimates recurrentes en segundos (mowing semanal)', 'El primero que manda precio se queda el trabajo'],
     faq: [
       ['¿Cómo hago un estimate de landscaping en español?', 'Describe el trabajo — "instalar sod 1,200 sqft y 5 yardas de mulch" — y la IA arma el estimate en dólares con materiales, labor y tax, en español y con PDF profesional.'],
       ['¿Puedo cotizar servicios recurrentes como mowing?', 'Sí, guardas tus precios una vez (por corte, por sqft, por visita) y cada estimate nuevo sale en segundos desde tu celular.'],
@@ -43,7 +43,7 @@ export const OFICIOS_USA = {
     metaDesc: 'Haz estimates de pintura en dólares desde tu celular, en español: sqft, pintura, labor y tax en un PDF profesional. $15/mes, el primero gratis.',
     bullets: ['Cotiza por sqft con material incluido o sin él', 'Labor y pintura separados, como lo pide el customer', 'PDF profesional que gana contra el estimate escrito a mano'],
     faq: [
-      ['¿Cómo hago un estimate de pintura en español?', 'Escribe el jale — "pintar interior 1,800 sqft, 2 manos con material" — y la IA lo convierte en estimate en dólares con desglose, tax y PDF en español.'],
+      ['¿Cómo hago un estimate de pintura en español?', 'Escribe el trabajo — "pintar interior 1,800 sqft, 2 manos con material" — y la IA lo convierte en estimate en dólares con desglose, tax y PDF en español.'],
       ['¿Cuánto cobrar por pintar en USA?', 'Los precios varían por ciudad y estado; tú guardas TUS precios por sqft o por cuarto una vez, y la app los usa en cada estimate nuevo.'],
       ['¿Puedo mandar el estimate por texto o WhatsApp?', 'Sí, cada estimate genera un link y un PDF que mandas por mensaje de texto, WhatsApp o email desde tu celular.'],
     ],
@@ -56,7 +56,7 @@ export const OFICIOS_USA = {
     ejemplo: 'Remodelación de baño completo: demolición, tile 120 sqft, vanity, plomería y labor',
     metaTitle: 'Estimates de Remodeling en Español — App para Remodeladores Hispanos en USA',
     metaDesc: 'Haz estimates de remodelación en dólares desde tu celular, en español: demolición, materiales, labor y tax en un PDF profesional. $15/mes, el primero gratis.',
-    bullets: ['Proyectos grandes con muchos conceptos, sin batallar', 'Desglose claro = menos regateo del customer', 'Te ves como general contractor aunque andes empezando'],
+    bullets: ['Proyectos grandes con muchos conceptos, sin complicarte', 'Desglose claro = menos regateo del customer', 'Te ves como general contractor aunque estés empezando'],
     faq: [
       ['¿Cómo hago un estimate de remodelación en español?', 'Pega la lista del proyecto — demolición, tile, vanity, labor — y la IA arma el estimate completo en dólares con tax y PDF profesional en español.'],
       ['¿Sirve para proyectos grandes con muchas líneas?', 'Sí, puedes meter todas las líneas que necesites, editarlas en una tabla y marcar cada una como material o labor antes de generar el PDF.'],
@@ -67,11 +67,11 @@ export const OFICIOS_USA = {
     nombre: 'handyman',
     emoji: '🔧',
     h1: 'Estimates de handyman en español',
-    sub: 'Jales chicos, muchos al día — haz cada estimate en 2 minutos en dólares, con tax, y mándalo antes de llegar al siguiente trabajo.',
+    sub: 'Trabajos chicos, muchos al día — haz cada estimate en 2 minutos en dólares, con tax, y mándalo antes de llegar al siguiente trabajo.',
     ejemplo: 'Instalar ceiling fan, reparar drywall 2 hoyos, pintar puerta, cambiar llave de cocina',
     metaTitle: 'Estimates de Handyman en Español — App para Handymen Hispanos en USA',
     metaDesc: 'Haz estimates de handyman en dólares desde tu celular, en español: lista de trabajos, labor, tax y PDF profesional en 2 minutos. $15/mes, el primero gratis.',
-    bullets: ['Varios jales en un mismo estimate', 'Rápido: lo haces entre trabajo y trabajo', 'Precio formal por escrito = te pagan lo justo'],
+    bullets: ['Varios trabajos en un mismo estimate', 'Rápido: lo haces entre un trabajo y el siguiente', 'Precio formal por escrito = te pagan lo justo'],
     faq: [
       ['¿Cómo hago un estimate de handyman en español?', 'Escribe la lista de trabajos — "instalar ceiling fan, reparar drywall, cambiar llave" — y la IA arma el estimate en dólares con cada concepto, tax y PDF en español.'],
       ['¿Me sirve si cobro por hora?', 'Sí, agregas una línea de labor con tus horas y tu rate, y el total con tax sale solo.'],
@@ -88,7 +88,7 @@ export const OFICIOS_USA = {
     metaDesc: 'Haz estimates de drywall en dólares desde tu celular, en español: sqft, material, labor y tax en un PDF profesional. $15/mes, el primero gratis.',
     bullets: ['Cotiza por sqft o por board', 'Hanging, taping y texture como líneas separadas', 'PDF con folio para builders y GCs'],
     faq: [
-      ['¿Cómo hago un estimate de drywall en español?', 'Describe el jale — "hang y finish 2,400 sqft nivel 4 con texture" — y la IA lo convierte en estimate en dólares con desglose, tax y PDF profesional.'],
+      ['¿Cómo hago un estimate de drywall en español?', 'Describe el trabajo — "hang y finish 2,400 sqft nivel 4 con texture" — y la IA lo convierte en estimate en dólares con desglose, tax y PDF profesional.'],
       ['¿Sirve para trabajar con builders y general contractors?', 'Sí, el PDF con folio y desglose por concepto es el formato que los GCs esperan — te toman más en serio que con un número hablado.'],
       ['¿Puedo cotizar solo labor sin material?', 'Sí, marcas cada línea como labor o material; si el GC pone el material, tu estimate sale solo con labor.'],
     ],
@@ -141,7 +141,7 @@ export default function OficioUSA({ slug }) {
             <div className="w-11 h-11 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center text-2xl shadow-md shadow-emerald-200 flex-shrink-0">🤖</div>
             <span className="font-extrabold text-lg bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">CotizaBot</span>
           </Link>
-          <Link to="/usa" className="text-sm text-slate-600 hover:text-blue-700">🇺🇸 Para paisanos en USA</Link>
+          <Link to="/usa" className="text-sm text-slate-600 hover:text-blue-700">🇺🇸 Contratistas hispanos en USA</Link>
         </div>
       </nav>
 
@@ -163,7 +163,7 @@ export default function OficioUSA({ slug }) {
         <p className="text-sm text-slate-400 mt-3">$15 USD/mes después del primero · en español · se instala como app 📲</p>
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-8 text-sm text-amber-900 max-w-xl mx-auto">
-          👷 <strong>Labor y materiales separados</strong> en el mismo estimate — el customer ve el desglose claro y tú cierras el jale sin regateos.
+          👷 <strong>Labor y materiales separados</strong> en el mismo estimate — el customer ve el desglose claro y tú cierras el trabajo sin regateos.
         </div>
 
         <div className="grid sm:grid-cols-3 gap-4 mt-8 text-left">
@@ -174,7 +174,7 @@ export default function OficioUSA({ slug }) {
 
         {/* FAQ visible (SEO + GEO) */}
         <section className="mt-14 text-left">
-          <h2 className="text-2xl font-bold text-slate-900 mb-5 text-center">Preguntas de otros paisanos</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-5 text-center">Preguntas frecuentes</h2>
           <div className="space-y-3">
             {o.faq.map(([q, a]) => (
               <details key={q} className="bg-white border border-slate-200 rounded-xl p-4">

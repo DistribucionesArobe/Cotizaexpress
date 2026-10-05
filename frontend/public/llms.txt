@@ -32,9 +32,9 @@
 
 ## Para contratistas hispanos en Estados Unidos (USA)
 
-CotizaBot también sirve a contratistas hispanos y latinos en Estados Unidos ("paisanos"): roofing, landscaping, painting, remodeling, drywall, flooring, handyman, cleaning, concrete y fencing. La app genera estimates profesionales en español, en dólares (USD), con el sales tax del estado configurable, labor y materiales separados, y PDF con logo para mandar por mensaje de texto o WhatsApp. Precio: $15 USD al mes; el primer estimate es gratis.
+CotizaBot también sirve a contratistas hispanos y latinos en Estados Unidos: roofing, landscaping, painting, remodeling, drywall, flooring, handyman, cleaning, concrete y fencing. La app genera estimates profesionales en español, en dólares (USD), con el sales tax del estado configurable, labor y materiales separados, y PDF con logo para mandar por mensaje de texto o WhatsApp. Precio: $15 USD al mes; el primer estimate es gratis.
 
-- [Estimates en español para paisanos en USA](https://cotizaexpress.com/usa)
+- [Estimates en español para contratistas hispanos en USA](https://cotizaexpress.com/usa)
 - [Estimates de roofing en español](https://cotizaexpress.com/usa/roofing)
 - [Estimates de landscaping en español](https://cotizaexpress.com/usa/landscaping)
 - [Estimates de painting en español](https://cotizaexpress.com/usa/painting)

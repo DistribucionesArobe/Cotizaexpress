@@ -39,11 +39,11 @@ export default function LandingUSA() {
   return (
     <div className="min-h-screen bg-white">
       <Helmet>
-        <title>Estimates Profesionales en Español — App para Paisanos Contratistas en USA | CotizaBot</title>
-        <meta name="description" content="Haz tus estimates en dólares desde tu celular, en español: describe el jale, la IA lo cotiza con tax y PDF profesional. Para roofing, landscaping, painting, remodeling. $15 USD/mes, el primero gratis." />
+        <title>Estimates Profesionales en Español — App para Contratistas Hispanos en USA | CotizaBot</title>
+        <meta name="description" content="Haz tus estimates en dólares desde tu celular, en español: describe el trabajo, la IA lo cotiza con tax y PDF profesional. Para roofing, landscaping, painting, remodeling. $15 USD/mes, el primero gratis." />
         <link rel="canonical" href="https://cotizaexpress.com/usa" />
-        <meta property="og:title" content="Estimates profesionales en español — para paisanos contratistas en USA" />
-        <meta property="og:description" content="Describe el jale y la IA te arma el estimate en dólares con tax y PDF. Desde tu celular. $15 USD/mes." />
+        <meta property="og:title" content="Estimates profesionales en español — para contratistas hispanos en USA" />
+        <meta property="og:description" content="Describe el trabajo y la IA te arma el estimate en dólares con tax y PDF. Desde tu celular. $15 USD/mes." />
         <meta property="og:url" content="https://cotizaexpress.com/usa" />
         <script type="application/ld+json">{JSON.stringify(JSONLD_USA)}</script>
       </Helmet>
@@ -62,13 +62,13 @@ export default function LandingUSA() {
       <section className="bg-gradient-to-br from-blue-700 via-blue-800 to-slate-900 text-white">
         <div className="max-w-5xl mx-auto px-4 py-14 sm:py-20 text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur rounded-full px-4 py-1.5 text-sm font-medium mb-5">
-            🇺🇸 Para paisanos que andan en el jale en USA 🇲🇽
+            🇺🇸 Para contratistas hispanos en Estados Unidos 🇲🇽
           </div>
           <h1 className="text-4xl sm:text-5xl font-extrabold mb-4 leading-tight">
             Manda estimates como los grandes,<br className="hidden sm:block"/> <span className="text-yellow-300">en español y en 2 minutos</span>
           </h1>
           <p className="text-blue-100 text-lg max-w-2xl mx-auto mb-7">
-            Describe el jale — "pintar 2 cuartos con material" — y la IA te arma el estimate en dólares,
+            Describe el trabajo — "pintar 2 cuartos con material" — y la IA te arma el estimate en dólares,
             con tax y PDF profesional con tu logo. Listo para mandarlo por WhatsApp o texto antes que la competencia.
           </p>
           <Link to="/registro?utm_source=usa">
@@ -96,7 +96,7 @@ export default function LandingUSA() {
       {/* Oficios */}
       <section className="py-14 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">Hecho para tu jale</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-6">Hecho para tu oficio</h2>
           <div className="flex flex-wrap justify-center gap-3">
             {OFICIOS_US.map(o => OFICIOS_CON_PAGINA[o] ? (
               <Link key={o} to={`/usa/${OFICIOS_CON_PAGINA[o]}`} className="bg-blue-50 hover:bg-blue-100 text-blue-800 font-medium rounded-full px-4 py-2 text-sm border border-blue-200">{o} →</Link>
@@ -112,7 +112,7 @@ export default function LandingUSA() {
         <div className="max-w-4xl mx-auto px-4 grid sm:grid-cols-3 gap-6">
           {[
             ['💵', 'En dólares, con tax', 'Pones el tax de tu estado (o sin tax) y el total sale exacto. Separa labor y materiales.'],
-            ['🏃', 'El primero que manda precio, gana', 'El customer pidió estimate a 3. Mándalo desde la troca antes de arrancar — te ves pro y cierras.'],
+            ['🏃', 'El primero que manda precio, gana', 'Tu cliente pidió precio a varios. Manda el tuyo desde tu teléfono antes de salir del lugar — te ves profesional y cierras.'],
             ['📲', 'Vive en tu celular', 'Se instala como app, en español. Nada de programas raros ni computadora.'],
           ].map(([e, t, d]) => (
             <div key={t} className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
@@ -127,7 +127,7 @@ export default function LandingUSA() {
       {/* FAQ (SEO + respuestas de IA) */}
       <section className="py-14 bg-white">
         <div className="max-w-3xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Preguntas de otros paisanos</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Preguntas frecuentes</h2>
           <div className="space-y-3">
             {FAQ_USA.map(([q, a]) => (
               <details key={q} className="bg-slate-50 border border-slate-200 rounded-xl p-4">
@@ -143,7 +143,7 @@ export default function LandingUSA() {
       <section className="py-14 bg-slate-50">
         <div className="max-w-xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-extrabold text-slate-900 mb-2">$15 dólares al mes</h2>
-          <p className="text-slate-600 mb-6">Menos que una comida. Estimates ilimitados, con tu logo, labor + materiales, PDF y link para compartir. <strong>El primero es gratis, sin tarjeta.</strong></p>
+          <p className="text-slate-600 mb-6">Estimates ilimitados, con tu logo, labor + materiales, PDF y link para compartir. <strong>El primero es gratis, sin tarjeta.</strong></p>
           <Link to="/registro?utm_source=usa">
             <Button size="lg" className="bg-blue-700 hover:bg-blue-800 text-lg font-bold px-8 py-6">Empezar gratis ahora →</Button>
           </Link>
