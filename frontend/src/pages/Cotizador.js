@@ -82,6 +82,7 @@ export default function Cotizador() {
       setDudas(r.data.dudas || []);
       setNoEnc(r.data.no_encontrados || []);
       setBuscado(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       if (sinPrecio.length > 0) {
         toast.info('Listo: ' + sinPrecio.length + ' renglones en la tabla — solo ponles precio.');
       }
@@ -160,6 +161,19 @@ export default function Cotizador() {
 
   return (
     <div className="space-y-6 max-w-4xl">
+      {(cargando || leyendoFoto) && (
+        <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl px-8 py-10 text-center max-w-sm w-full">
+            <div className="text-6xl animate-bounce mb-4">{leyendoFoto ? '📷' : '🪄'}</div>
+            <p className="text-xl font-bold text-slate-900 mb-1">{leyendoFoto ? 'Leyendo tu imagen...' : 'Cargando tus productos...'}</p>
+            <p className="text-sm text-slate-500">La IA está armando los renglones de tu cotización. Unos segunditos ⏳</p>
+            <div className="mt-5 h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div className="h-full w-1/2 bg-violet-500 rounded-full animate-pulse" style={{ animation: 'barrita 1.2s ease-in-out infinite' }} />
+            </div>
+            <style>{'@keyframes barrita { 0% { margin-left: -50%; } 100% { margin-left: 100%; } }'}</style>
+          </div>
+        </div>
+      )}
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 bg-violet-100 rounded-lg flex items-center justify-center">
           <Wand2 className="w-6 h-6 text-violet-600" />
