@@ -96,21 +96,9 @@ function AppRoutes() {
                     }`}
                     onClick={() => setActiveTab('dashboard')}
                   >
-                    Dashboard
+                    Inicio
                   </Link>
-                  <Link
-                    to="/cotizaciones"
-                    data-testid="nav-cotizaciones"
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      activeTab === 'cotizaciones'
-                        ? 'bg-emerald-50 text-emerald-700'
-                        : 'text-slate-600 hover:bg-slate-100'
-                    }`}
-                    onClick={() => setActiveTab('cotizaciones')}
-                  >
-                    Cotizaciones
-                  </Link>
-                  <Link
+                                    <Link
                     to="/productos"
                     data-testid="nav-productos"
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -122,31 +110,7 @@ function AppRoutes() {
                   >
                     Productos
                   </Link>
-                  <Link
-                    to="/carga-productos"
-                    data-testid="nav-carga-productos"
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      activeTab === 'carga-productos'
-                        ? 'bg-emerald-50 text-emerald-700'
-                        : 'text-slate-600 hover:bg-slate-100'
-                    }`}
-                    onClick={() => setActiveTab('carga-productos')}
-                  >
-                    Carga de Productos
-                  </Link>
-                  <Link
-                    to="/conversaciones"
-                    data-testid="nav-conversaciones"
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      activeTab === 'conversaciones'
-                        ? 'bg-emerald-50 text-emerald-700'
-                        : 'text-slate-600 hover:bg-slate-100'
-                    }`}
-                    onClick={() => setActiveTab('conversaciones')}
-                  >
-                    Conversaciones
-                  </Link>
-                  <Link
+                                                      <Link
                     to="/cotizador"
                     data-testid="nav-cotizador"
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -182,19 +146,7 @@ function AppRoutes() {
                   >
                     WhatsApp
                   </Link>
-                  <Link
-                    to="/config-cobros"
-                    data-testid="nav-cobros"
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      activeTab === 'cobros'
-                        ? 'bg-amber-50 text-amber-700'
-                        : 'text-slate-600 hover:bg-slate-100'
-                    }`}
-                    onClick={() => setActiveTab('cobros')}
-                  >
-                    💰 Cobros
-                  </Link>
-                  <Link
+                                    <Link
                     to="/perfil-empresa"
                     data-testid="nav-perfil"
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${

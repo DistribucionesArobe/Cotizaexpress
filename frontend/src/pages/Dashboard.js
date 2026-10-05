@@ -197,6 +197,29 @@ export default function Dashboard() {
         </p>
       </div>
 
+      {/* ─── GANCHO + ACCESOS RÁPIDOS ─── */}
+      <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-6 text-white flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p className="text-xl font-bold">¿Quieres que tus cotizaciones se contesten SOLAS por WhatsApp?</p>
+          <p className="text-emerald-100 text-sm mt-1">Primero míralo con tus productos — toma 1 minuto y no conectas nada.</p>
+        </div>
+        <div className="flex gap-3">
+          <Link to="/simulador">
+            <Button className="bg-white text-emerald-700 hover:bg-emerald-50 font-bold">🧪 Probar mi bot</Button>
+          </Link>
+          <Link to="/precios">
+            <Button variant="outline" className="border-white text-white hover:bg-white/10 font-bold">Ver planes →</Button>
+          </Link>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-3 text-sm">
+        <Link to="/cotizaciones" className="px-4 py-2 bg-white border border-slate-200 rounded-full text-slate-600 hover:border-emerald-400 hover:text-emerald-700">📄 Cotizaciones</Link>
+        <Link to="/conversaciones" className="px-4 py-2 bg-white border border-slate-200 rounded-full text-slate-600 hover:border-emerald-400 hover:text-emerald-700">💬 Conversaciones</Link>
+        <Link to="/config-cobros" className="px-4 py-2 bg-white border border-slate-200 rounded-full text-slate-600 hover:border-emerald-400 hover:text-emerald-700">💰 Cobros</Link>
+        <Link to="/carga-productos" className="px-4 py-2 bg-white border border-slate-200 rounded-full text-slate-600 hover:border-emerald-400 hover:text-emerald-700">📦 Subir catálogo (Excel)</Link>
+      </div>
+
       {/* ─── NEEDS PRICING ALERT ─── */}
       {needsPricing.length > 0 && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">

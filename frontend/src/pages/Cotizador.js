@@ -19,6 +19,7 @@ export default function Cotizador() {
   const [resultado, setResultado] = useState(null); // {folio, total, link}
   const [ivaPct, setIvaPct] = useState(16);
   const [ivaIncluido, setIvaIncluido] = useState(true);
+  const [buscado, setBuscado] = useState(false);
 
   const cotizarIA = async () => {
     if (!texto.trim()) { toast.error('Pega la lista del cliente'); return; }
@@ -28,8 +29,10 @@ export default function Cotizador() {
       setItems(r.data.encontrados || []);
       setDudas(r.data.dudas || []);
       setNoEnc(r.data.no_encontrados || []);
+      setBuscado(true);
       if ((r.data.encontrados || []).length === 0 && (r.data.dudas || []).length === 0) {
-        toast.info('No encontré esos productos en tu catálogo. Agrega renglones a mano o revisa tu catálogo.');
+        setItems([{ name: '', qty: 1, unit: 'pza', price: '' }]);
+        toast.info('No los encontré en tu catálogo — puedes escribirlos a mano aquí abajo.');
       }
     } catch (e) {
       toast.error(e?.response?.data?.detail || 'Error al cotizar');
@@ -122,11 +125,15 @@ export default function Cotizador() {
       )}
 
       {noEnc.length > 0 && noEnc[0] && (
-        <p className="text-sm text-slate-500">🚫 No están en tu catálogo: {noEnc.join(', ')} — agrégalos a mano abajo si los manejas.</p>
+        <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-900">
+          🔎 No encontré <strong>{noEnc.join(', ')}</strong> en tu catálogo.
+          Escríbelos a mano en la tabla de abajo (con su precio), o
+          <a href="/productos" className="underline font-medium ml-1">agrégalos a tu catálogo</a> para que la IA los encuentre la próxima vez.
+        </div>
       )}
 
       {/* Paso 2: tabla editable */}
-      {(items.length > 0 || dudas.length > 0) && (
+      {(items.length > 0 || dudas.length > 0 || buscado) && (
         <Card>
           <CardContent className="pt-6 space-y-3">
             <div className="grid grid-cols-12 gap-2 text-xs font-medium text-slate-500 px-1">
