@@ -13,7 +13,11 @@ export default function Cotizador() {
   const navigate = useNavigate();
   const [texto, setTexto] = useState('');
   const [cargando, setCargando] = useState(false);
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState([
+    { name: '', qty: 1, unit: 'pza', price: '', tipo: 'material' },
+    { name: '', qty: 1, unit: 'pza', price: '', tipo: 'material' },
+    { name: '', qty: 1, unit: 'pza', price: '', tipo: 'material' },
+  ]);
   const [dudas, setDudas] = useState([]);
   const [noEnc, setNoEnc] = useState([]);
   const [cliente, setCliente] = useState('');
@@ -63,13 +67,13 @@ export default function Cotizador() {
     try {
       const r = await axios.post(`${API}/cotizador/ia`, { texto: t }, { withCredentials: true });
       setCatalogoVacio(!!r.data.catalogo_vacio);
-      setItems(r.data.encontrados || []);
+      const encontrados = r.data.encontrados || [];
+      setItems(prev => [...prev.filter(it => (it.name || '').trim()), ...encontrados]);
       setDudas(r.data.dudas || []);
       setNoEnc(r.data.no_encontrados || []);
       setBuscado(true);
-      if ((r.data.encontrados || []).length === 0 && (r.data.dudas || []).length === 0) {
-        setItems([{ name: '', qty: 1, unit: 'pza', price: '', tipo: 'material' }]);
-        toast.info('No los encontré en tu catálogo — puedes escribirlos a mano aquí abajo.');
+      if (encontrados.length === 0 && (r.data.dudas || []).length === 0) {
+        toast.info('No los encontré en tu catálogo — escríbelos en la tabla de arriba con su precio.');
       }
     } catch (e) {
       if (!checarSesion(e)) toast.error(e?.response?.data?.detail || 'Error al cotizar');
@@ -152,49 +156,11 @@ export default function Cotizador() {
         </div>
         <div>
           <h2 className="text-2xl font-bold text-slate-900">Cotizador IA</h2>
-          <p className="text-slate-600 text-sm">Pega la lista de tu cliente tal como te la mandó — la IA la convierte en cotización con tu catálogo.</p>
+          <p className="text-slate-600 text-sm">Captura tu cotización como en Excel — o pega la lista del cliente (o un screenshot) y la IA la llena por ti.</p>
           <p className="text-xs text-violet-700 mt-1 font-medium">Plan Cotizador IA: cotizaciones ilimitadas por {esUS ? "$15 USD/mes" : "$299/mes"} · <a href="/precios" className="underline">ver planes</a></p>
 
         </div>
       </div>
-
-      {/* Paso 1: pegar lista */}
-      <Card>
-        <CardContent className="pt-6 space-y-3">
-          <label className="text-sm font-medium text-slate-700">Lista del cliente (como te la haya mandado)</label>
-          <textarea
-            value={texto}
-            onChange={(e) => setTexto(e.target.value)}
-            rows={4}
-            placeholder={'Ej:\n10 cemento gris\n5 varilla 3/8\n200 block'}
-            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 text-sm"
-          />
-          <div className="flex flex-wrap items-center gap-2">
-            <Button onClick={cotizarIA} disabled={cargando || leyendoFoto} className="bg-violet-600 hover:bg-violet-700">
-              {cargando ? 'Buscando en tu catálogo...' : '✨ Cotizar con IA'}
-            </Button>
-            <Button type="button" variant="outline" onClick={() => fotoRef.current && fotoRef.current.click()} disabled={cargando || leyendoFoto} className="border-violet-300 text-violet-700 hover:bg-violet-50">
-              {leyendoFoto ? '📷 Leyendo tu foto...' : '📷 O súbele una foto de la lista'}
-            </Button>
-            <input ref={fotoRef} type="file" accept="image/*" onChange={subirFoto} className="hidden" />
-            <button
-              type="button"
-              onClick={() => {
-                setItems([
-                  { name: '', qty: 1, unit: 'pza', price: '', tipo: 'material' },
-                  { name: '', qty: 1, unit: 'pza', price: '', tipo: 'material' },
-                  { name: '', qty: 1, unit: 'pza', price: '', tipo: 'material' },
-                ]);
-                setDudas([]); setNoEnc([]); setResultado(null); setBuscado(true);
-              }}
-              className="text-sm text-slate-600 border border-slate-300 rounded-md px-4 py-2 hover:bg-slate-50 font-medium"
-            >
-              📋 O captura directo (tipo Excel)
-            </button>
-          </div>
-          <p className="text-xs text-slate-400">Puede ser una lista escrita a mano, una captura de WhatsApp o una nota — la IA la convierte en renglones y tú solo revisas el precio.</p>
-        </CardContent>
-      </Card>
 
       {/* Dudas: elegir candidato */}
       {dudas.length > 0 && (
@@ -233,8 +199,8 @@ export default function Cotizador() {
         </div>
       )}
 
-      {/* Paso 2: tabla editable */}
-      {(items.length > 0 || dudas.length > 0 || buscado) && (
+      {/* La cotización — tabla tipo Excel, siempre visible */}
+      {(
         <Card>
           <CardContent className="pt-6 space-y-3">
             <div className="grid grid-cols-12 gap-2 text-xs font-medium text-slate-500 px-1">
@@ -322,6 +288,31 @@ export default function Cotizador() {
         </Card>
       )}
 
+      {/* ¿Te mandaron la lista? La IA la captura por ti */}
+      <Card>
+        <CardContent className="pt-6 space-y-3">
+          <label className="text-sm font-medium text-slate-700">🪄 ¿Te mandaron la lista? Pégala aquí y la IA llena la tabla por ti</label>
+          <textarea
+            value={texto}
+            onChange={(e) => setTexto(e.target.value)}
+            rows={4}
+            placeholder={'Ej:\n10 cemento gris\n5 varilla 3/8\n200 block'}
+            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 text-sm"
+          />
+          <div className="flex flex-wrap items-center gap-2">
+            <Button onClick={cotizarIA} disabled={cargando || leyendoFoto} className="bg-violet-600 hover:bg-violet-700">
+              {cargando ? 'Buscando en tu catálogo...' : '✨ Cotizar con IA'}
+            </Button>
+            <Button type="button" variant="outline" onClick={() => fotoRef.current && fotoRef.current.click()} disabled={cargando || leyendoFoto} className="border-violet-300 text-violet-700 hover:bg-violet-50">
+              {leyendoFoto ? '📷 Leyendo tu imagen...' : '📷 O súbele un screenshot / foto'}
+            </Button>
+            <input ref={fotoRef} type="file" accept="image/*" onChange={subirFoto} className="hidden" />
+          </div>
+          <p className="text-xs text-slate-400">Desde tu celular: toma screenshot del WhatsApp del cliente y súbelo — la IA lo convierte en renglones y tú solo revisas el precio.</p>
+        </CardContent>
+      </Card>
+
+
       {/* Instalar como app — explicado for dummies */}
       <div className="bg-slate-900 text-white rounded-2xl p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -396,7 +387,9 @@ export default function Cotizador() {
               ✨ Esto es el <strong>Plan Cotizador IA — {esUS ? "$15 USD/mes" : "$299/mes"}</strong>: {esUS ? "estimates ilimitados" : "cotizaciones ilimitadas"} con tu logo y folio.
               <a href="/precios" className="text-violet-700 underline font-medium ml-1">Activar mi plan</a>
             </div>
-            <p className="text-xs text-slate-500">🤖 ¿Y si se contestara solo cuando el cliente te escribe? Eso hace CotizaBot ($1,000/mes) al conectar tu WhatsApp.</p>
+            <a href="/precios" className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-full px-5 py-2.5 mt-1">
+              🤖 ¿Y si se contestara solo cuando el cliente te escribe? Ver CotizaBot — {esUS ? "$49 USD/mes" : "$1,000/mes"} →
+            </a>
           </CardContent>
         </Card>
       )}
