@@ -20,6 +20,17 @@ export default function Dashboard() {
     productos: 0, conversaciones: 0, perfilCompleto: false, waConectado: false, loading: true
   });
   const [loadingPlan, setLoadingPlan] = useState(null);
+  const [refLink, setRefLink] = useState(null);
+  const [refLoading, setRefLoading] = useState(false);
+  const obtenerRefLink = async () => {
+    setRefLoading(true);
+    try {
+      const r = await axios.get(`${API}/referidos/mi-link`, { withCredentials: true });
+      setRefLink(r.data.link);
+    } catch (e) {
+      toast.error('No se pudo generar tu link');
+    } finally { setRefLoading(false); }
+  };
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [needsPricing, setNeedsPricing] = useState([]);
@@ -219,6 +230,35 @@ export default function Dashboard() {
         <Link to="/config-cobros" className="px-4 py-2 bg-white border border-slate-200 rounded-full text-slate-600 hover:border-emerald-400 hover:text-emerald-700">💰 Cobros</Link>
         <Link to="/carga-productos" className="px-4 py-2 bg-white border border-slate-200 rounded-full text-slate-600 hover:border-emerald-400 hover:text-emerald-700">📦 Subir catálogo (Excel)</Link>
       </div>
+
+      {/* ─── REFIERE A UN AMIGO (clientes con plan) ─── */}
+      {stats.planCode && stats.planCode !== 'free' && (
+        <Card className="border-amber-300 bg-gradient-to-r from-amber-50 to-yellow-50">
+          <CardContent className="py-5 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="font-bold text-slate-900">🎁 Refiere a un amigo y gana 1 MES GRATIS</p>
+              <p className="text-sm text-slate-600 mt-0.5">Comparte tu link; cuando tu amigo pague su primer mes, te regalamos el tuyo.</p>
+              {refLink && (
+                <p className="text-xs text-amber-800 mt-2 font-mono bg-white border border-amber-200 rounded px-2 py-1 inline-block">{refLink}</p>
+              )}
+            </div>
+            <div className="flex gap-2">
+              {!refLink ? (
+                <Button onClick={obtenerRefLink} disabled={refLoading} className="bg-amber-500 hover:bg-amber-600 text-white">
+                  {refLoading ? 'Generando...' : 'Obtener mi link'}
+                </Button>
+              ) : (
+                <>
+                  <Button onClick={() => { navigator.clipboard.writeText(refLink); toast.success('Link copiado'); }} variant="outline">Copiar</Button>
+                  <a href={`https://wa.me/?text=${encodeURIComponent('Mira esto: un bot que cotiza solo por WhatsApp. Pruébalo gratis: ' + refLink)}`} target="_blank" rel="noopener noreferrer">
+                    <Button className="bg-[#25D366] hover:bg-[#1ebe57]">Compartir por WhatsApp</Button>
+                  </a>
+                </>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* ─── NEEDS PRICING ALERT ─── */}
       {needsPricing.length > 0 && (

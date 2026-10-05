@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -20,6 +20,12 @@ export default function Cotizador() {
   const [ivaPct, setIvaPct] = useState(16);
   const [ivaIncluido, setIvaIncluido] = useState(true);
   const [buscado, setBuscado] = useState(false);
+  const [paywall, setPaywall] = useState(false);
+  const resultRef = useRef(null);
+
+  useEffect(() => {
+    if (resultado || paywall) resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [resultado, paywall]);
 
   const cotizarIA = async () => {
     if (!texto.trim()) { toast.error('Pega la lista del cliente'); return; }
@@ -65,7 +71,11 @@ export default function Cotizador() {
       setResultado(r.data);
       toast.success(`Cotización ${r.data.folio} creada`);
     } catch (e) {
-      toast.error(e?.response?.data?.detail || 'Error al guardar');
+      if (e?.response?.status === 402) {
+        setPaywall(true);
+      } else {
+        toast.error(e?.response?.data?.detail || 'Error al guardar');
+      }
     } finally { setGuardando(false); }
   };
 
@@ -196,9 +206,27 @@ export default function Cotizador() {
         </Card>
       )}
 
+      {/* Paywall: ¿te gustó? */}
+      {paywall && (
+        <Card ref={resultRef} className="border-violet-300 bg-gradient-to-br from-violet-50 to-purple-50">
+          <CardContent className="pt-8 pb-8 text-center space-y-4">
+            <p className="text-3xl">🎉</p>
+            <p className="text-xl font-bold text-slate-900">¿Te gustó? Esa fue tu cotización gratis del mes.</p>
+            <p className="text-slate-600 max-w-md mx-auto">
+              Con el <strong>Plan Cotizador IA ($299/mes)</strong> haces cotizaciones ilimitadas
+              con tu logo, folio y PDF — y te ahorras horas cada semana.
+            </p>
+            <a href="/precios">
+              <Button size="lg" className="bg-violet-600 hover:bg-violet-700 text-lg px-8">Activar mi plan — $299/mes</Button>
+            </a>
+            <p className="text-xs text-slate-400">Se activa en 1 minuto con tarjeta o SPEI · factura disponible</p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Paso 3: resultado */}
       {resultado && (
-        <Card className="border-emerald-300 bg-emerald-50/50">
+        <Card ref={resultRef} className="border-emerald-300 bg-emerald-50/50">
           <CardContent className="pt-6 text-center space-y-3">
             <p className="text-lg font-bold text-slate-900">✅ Cotización <span className="text-emerald-700">{resultado.folio}</span> — ${resultado.total.toLocaleString('es-MX', {minimumFractionDigits: 2})} + IVA</p>
             <div className="flex flex-wrap gap-3 justify-center">

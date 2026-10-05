@@ -312,8 +312,8 @@ export default function Onboarding() {
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/logo-cotizabot.png" alt="CotizaBot" className="h-8 w-auto" />
-            <span className="font-bold text-slate-900">CotizaBot</span>
+            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center text-xl shadow-md shadow-emerald-200">🤖</div>
+            <span className="font-extrabold text-lg bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">CotizaBot</span>
           </div>
           <span className="text-sm text-slate-500">Configuración inicial</span>
         </div>
@@ -636,6 +636,15 @@ export default function Onboarding() {
                         <p className="text-[11px] text-slate-400 mt-2">Si es fijo, en la verificación elige "Llamarme": una grabación te dicta el código.</p>
                       </div>
                     </div>
+
+                    {/* Salida suave: solo quiero cotizar */}
+                    <button
+                      type="button"
+                      onClick={() => { track('wizard_salto_cotizador'); navigate('/cotizador'); }}
+                      className="max-w-2xl mx-auto w-full border-2 border-dashed border-violet-200 bg-violet-50/40 hover:bg-violet-50 rounded-xl px-5 py-3 text-sm text-violet-700 font-medium transition-all"
+                    >
+                      ✨ ¿Por ahora solo quieres HACER cotizaciones (sin bot)? Sáltate este paso →
+                    </button>
 
                     {/* Qué va a pasar (colapsado) */}
                     <details className="max-w-2xl mx-auto text-left text-sm bg-slate-50 rounded-lg px-4 py-3">

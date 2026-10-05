@@ -74,14 +74,10 @@ function AppRoutes() {
                   data-testid="header-logo-link"
                   onClick={() => setActiveTab('dashboard')}
                 >
-                  <img 
-                    src="/logo-cotizabot.png" 
-                    alt="CotizaBot by CotizaExpress.com" 
-                    className="h-10 w-auto pointer-events-none"
-                  />
+                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center text-xl shadow-md shadow-emerald-200">🤖</div>
                   <div className="pointer-events-none">
-                    <h1 className="text-lg font-bold text-slate-900">CotizaBot</h1>
-                    <p className="text-xs text-slate-500">{user?.empresa?.nombre || user?.usuario?.empresa_nombre}</p>
+                    <h1 className="text-lg font-extrabold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">CotizaBot</h1>
+                    <p className="text-xs text-slate-400">{user?.empresa?.nombre || user?.usuario?.empresa_nombre}</p>
                   </div>
                 </Link>
 
