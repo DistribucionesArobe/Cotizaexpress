@@ -93,14 +93,10 @@ export default function Registro() {
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-3 mb-6" data-testid="logo-link">
-            <img 
-              src="/logo-cotizaexpress.png" 
-              alt="CotizaBot by CotizaExpress.com" 
-              className="h-12 w-auto"
-            />
+            <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center text-3xl shadow-lg shadow-emerald-200">🤖</div>
             <div className="text-left">
               <span className="text-xl font-bold text-slate-900 block">CotizaBot</span>
-              <span className="text-xs text-slate-500">by CotizaExpress.com</span>
+              <span className="text-xs text-slate-400">by CotizaExpress</span>
             </div>
           </Link>
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Crea tu bot en 2 minutos</h1>

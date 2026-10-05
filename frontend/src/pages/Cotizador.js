@@ -21,6 +21,7 @@ export default function Cotizador() {
   const [ivaIncluido, setIvaIncluido] = useState(true);
   const [buscado, setBuscado] = useState(false);
   const [paywall, setPaywall] = useState(false);
+  const [catalogoVacio, setCatalogoVacio] = useState(false);
   const resultRef = useRef(null);
 
   useEffect(() => {
@@ -32,6 +33,7 @@ export default function Cotizador() {
     setCargando(true); setResultado(null);
     try {
       const r = await axios.post(`${API}/cotizador/ia`, { texto }, { withCredentials: true });
+      setCatalogoVacio(!!r.data.catalogo_vacio);
       setItems(r.data.encontrados || []);
       setDudas(r.data.dudas || []);
       setNoEnc(r.data.no_encontrados || []);
@@ -137,6 +139,13 @@ export default function Cotizador() {
             ))}
           </CardContent>
         </Card>
+      )}
+
+      {catalogoVacio && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl px-5 py-4 text-sm text-blue-900 flex flex-wrap items-center justify-between gap-3">
+          <span>📦 <strong>Tu catálogo está vacío</strong> — la IA busca en TUS productos con TUS precios. Agrégalos primero (o escribe los renglones a mano abajo).</span>
+          <a href="/carga-productos"><Button size="sm" className="bg-blue-600 hover:bg-blue-700">Subir mi catálogo</Button></a>
+        </div>
       )}
 
       {noEnc.length > 0 && noEnc[0] && (
