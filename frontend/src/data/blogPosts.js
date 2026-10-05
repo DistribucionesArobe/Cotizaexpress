@@ -343,7 +343,7 @@ const BLOG_POSTS = [
   },
   {
     slug: 'catalogo-whatsapp-business-como-hacerlo',
-    title: 'Catálogo de WhatsApp Business: cómo hacerlo bien y cuáles son sus límites',
+    title: 'Catálogo de WhatsApp Business: hazlo en 10 minutos (y lo que nadie te dice)',
     description: 'Guía para crear el catálogo de WhatsApp Business paso a paso, qué tipo de negocio le saca provecho y en qué punto se queda corto para cotizar.',
     date: '2026-09-23',
     readMin: 5,

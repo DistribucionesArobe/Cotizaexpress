@@ -12,6 +12,8 @@ import Registro from './pages/Registro';
 import Login from './pages/Login';
 import { RecuperarContrasena, RestablecerContrasena } from './pages/RecuperarContrasena';
 import Simulador from './pages/Simulador';
+import CotizacionFormal from './pages/CotizacionFormal';
+import CotizadorOficio from './pages/CotizadorOficio';
 import Precios from './pages/Precios';
 import PagoExitoso from './pages/PagoExitoso';
 import Dashboard from './pages/Dashboard';
@@ -350,6 +352,10 @@ function AppRoutes() {
             <Route path="/cancelerias" element={<GiroSEO slug="cancelerias" />} />
             <Route path="/imprentas" element={<GiroSEO slug="imprentas" />} />
             <Route path="/climas" element={<GiroSEO slug="climas" />} />
+            <Route path="/cotizacion-formal" element={<CotizacionFormal />} />
+            <Route path="/cotizador-para-contratistas" element={<CotizadorOficio slug="cotizador-para-contratistas" />} />
+            <Route path="/cotizador-para-techadores" element={<CotizadorOficio slug="cotizador-para-techadores" />} />
+            <Route path="/cotizador-para-pintores" element={<CotizadorOficio slug="cotizador-para-pintores" />} />
 
             {/* Rutas protegidas */}
             <Route
