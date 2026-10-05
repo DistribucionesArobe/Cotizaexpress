@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -9,6 +10,7 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL?.trim() || 'https://api.co
 const API = `${BACKEND_URL}/api`;
 
 export default function Cotizador() {
+  const navigate = useNavigate();
   const [texto, setTexto] = useState('');
   const [cargando, setCargando] = useState(false);
   const [items, setItems] = useState([]);
@@ -45,6 +47,15 @@ export default function Cotizador() {
     if (resultado || paywall) resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, [resultado, paywall]);
 
+  const checarSesion = (e) => {
+    if (e && e.response && e.response.status === 401) {
+      toast.error('Crea tu cuenta gratis para cotizar (1 minuto)');
+      navigate('/registro?next=/cotizador');
+      return true;
+    }
+    return false;
+  };
+
   const cotizarIA = async (textoDirecto) => {
     const t = (typeof textoDirecto === 'string' ? textoDirecto : texto).trim();
     if (!t) { toast.error('Pega la lista del cliente'); return; }
@@ -61,7 +72,7 @@ export default function Cotizador() {
         toast.info('No los encontré en tu catálogo — puedes escribirlos a mano aquí abajo.');
       }
     } catch (e) {
-      toast.error(e?.response?.data?.detail || 'Error al cotizar');
+      if (!checarSesion(e)) toast.error(e?.response?.data?.detail || 'Error al cotizar');
     } finally { setCargando(false); }
   };
 
@@ -80,7 +91,7 @@ export default function Cotizador() {
       toast.success('📷 Leí ' + r.data.renglones + ' renglones de tu foto');
       await cotizarIA(r.data.texto);
     } catch (err) {
-      toast.error((err && err.response && err.response.data && err.response.data.detail) || 'No pude leer la imagen');
+      if (!checarSesion(err)) toast.error((err && err.response && err.response.data && err.response.data.detail) || 'No pude leer la imagen');
     } finally { setLeyendoFoto(false); }
   };
 
@@ -120,7 +131,7 @@ export default function Cotizador() {
       if (e?.response?.status === 402) {
         setPaywall(true);
       } else {
-        toast.error(e?.response?.data?.detail || 'Error al guardar');
+        if (!checarSesion(e)) toast.error(e?.response?.data?.detail || 'Error al guardar');
       }
     } finally { setGuardando(false); }
   };
@@ -166,6 +177,20 @@ export default function Cotizador() {
               {leyendoFoto ? '📷 Leyendo tu foto...' : '📷 O súbele una foto de la lista'}
             </Button>
             <input ref={fotoRef} type="file" accept="image/*" onChange={subirFoto} className="hidden" />
+            <button
+              type="button"
+              onClick={() => {
+                setItems([
+                  { name: '', qty: 1, unit: 'pza', price: '', tipo: 'material' },
+                  { name: '', qty: 1, unit: 'pza', price: '', tipo: 'material' },
+                  { name: '', qty: 1, unit: 'pza', price: '', tipo: 'material' },
+                ]);
+                setDudas([]); setNoEnc([]); setResultado(null); setBuscado(true);
+              }}
+              className="text-sm text-slate-600 border border-slate-300 rounded-md px-4 py-2 hover:bg-slate-50 font-medium"
+            >
+              📋 O captura directo (tipo Excel)
+            </button>
           </div>
           <p className="text-xs text-slate-400">Puede ser una lista escrita a mano, una captura de WhatsApp o una nota — la IA la convierte en renglones y tú solo revisas el precio.</p>
         </CardContent>

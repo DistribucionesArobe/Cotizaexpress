@@ -42,6 +42,22 @@ const GIRO_EMOJI = {
   'Papelería': '✏️', 'Abarrotes / Mayoreo': '🛒', 'Servicios técnicos': '🔧', 'Otro': '✨',
 };
 
+const EJEMPLOS_GIRO = {
+  'Ferretería': [{ nombre: 'Cemento gris 50 kg', precio: '245' }, { nombre: 'Varilla 3/8 (pieza)', precio: '168' }, { nombre: 'Block 15x20x40', precio: '18.50' }],
+  'Materiales de construcción': [{ nombre: 'Cemento gris 50 kg', precio: '245' }, { nombre: 'Arena (m3)', precio: '420' }, { nombre: 'Block 15x20x40', precio: '18.50' }],
+  'Plomería': [{ nombre: 'Tubo PVC hidráulico 1/2" (tramo 6m)', precio: '95' }, { nombre: 'Llave de nariz 1/2"', precio: '85' }, { nombre: 'Codo cobre 1/2"', precio: '14' }],
+  'Material eléctrico': [{ nombre: 'Cable THW cal 12 (rollo 100m)', precio: '1150' }, { nombre: 'Contacto dúplex', precio: '38' }, { nombre: 'Pastilla termomagnética 1x20A', precio: '145' }],
+  'Pinturas': [{ nombre: 'Pintura vinílica blanca 19L', precio: '1290' }, { nombre: 'Sellador 5x1 (19L)', precio: '690' }, { nombre: 'Rodillo con maneral', precio: '85' }],
+  'Herrería': [{ nombre: 'PTR 2x2 cal 14 (tramo 6m)', precio: '485' }, { nombre: 'Electrodo 6013 (kg)', precio: '95' }, { nombre: 'Disco de corte 4.5"', precio: '32' }],
+  'Refaccionaria': [{ nombre: 'Balatas delanteras (juego)', precio: '650' }, { nombre: 'Filtro de aceite', precio: '120' }, { nombre: 'Bujía', precio: '95' }],
+  'Distribuidora': [{ nombre: 'Caja producto A (12 pzas)', precio: '480' }, { nombre: 'Caja producto B (24 pzas)', precio: '720' }, { nombre: 'Pieza suelta', precio: '45' }],
+  'Mueblería': [{ nombre: 'Colchón matrimonial', precio: '4990' }, { nombre: 'Sala 3 piezas', precio: '12900' }, { nombre: 'Mesa de centro', precio: '1890' }],
+  'Papelería': [{ nombre: 'Resma papel carta (500 hojas)', precio: '135' }, { nombre: 'Caja bolígrafos (12 pzas)', precio: '85' }, { nombre: 'Cuaderno profesional 100 hojas', precio: '32' }],
+  'Abarrotes / Mayoreo': [{ nombre: 'Caja aceite 1L (12 pzas)', precio: '540' }, { nombre: 'Bulto azúcar 25 kg', precio: '620' }, { nombre: 'Caja refresco 600ml (24 pzas)', precio: '310' }],
+  'Servicios técnicos': [{ nombre: 'Visita de diagnóstico', precio: '350' }, { nombre: 'Mano de obra (hora)', precio: '450' }, { nombre: 'Servicio de mantenimiento', precio: '850' }],
+  'Otro': [{ nombre: 'Producto o servicio 1', precio: '100' }, { nombre: 'Producto o servicio 2', precio: '250' }, { nombre: 'Producto o servicio 3', precio: '500' }],
+};
+
 const CIUDADES_MX = [
   'Aguascalientes, Ags.', 'Mexicali, B.C.', 'Tijuana, B.C.', 'Ensenada, B.C.', 'La Paz, B.C.S.',
   'Campeche, Camp.', 'Tuxtla Gutiérrez, Chis.', 'Tapachula, Chis.', 'Chihuahua, Chih.', 'Ciudad Juárez, Chih.',
@@ -486,11 +502,7 @@ export default function Onboarding() {
                   <button
                     type="button"
                     onClick={() => {
-                      setProducts([
-                        { nombre: 'Cemento gris 50 kg', precio: '245' },
-                        { nombre: 'Varilla 3/8 (pieza)', precio: '168' },
-                        { nombre: 'Block 15x20x40', precio: '18.50' },
-                      ]);
+                      setProducts((EJEMPLOS_GIRO[businessData.giro] || EJEMPLOS_GIRO['Otro']).map(x => ({ ...x })));
                       track('wizard_productos_ejemplo');
                       toast.success('Listo: 3 productos de ejemplo. Puedes cambiarlos o seguir.');
                     }}
