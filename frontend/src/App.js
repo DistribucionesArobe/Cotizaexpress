@@ -15,6 +15,7 @@ import Simulador from './pages/Simulador';
 import Cotizador from './pages/Cotizador';
 import CotizacionFormal from './pages/CotizacionFormal';
 import CotizadorOficio from './pages/CotizadorOficio';
+import LandingUSA from './pages/LandingUSA';
 import Precios from './pages/Precios';
 import PagoExitoso from './pages/PagoExitoso';
 import Dashboard from './pages/Dashboard';
@@ -317,6 +318,7 @@ function AppRoutes() {
             <Route path="/cotizador-para-contratistas" element={<CotizadorOficio slug="cotizador-para-contratistas" />} />
             <Route path="/cotizador-para-techadores" element={<CotizadorOficio slug="cotizador-para-techadores" />} />
             <Route path="/cotizador-para-pintores" element={<CotizadorOficio slug="cotizador-para-pintores" />} />
+            <Route path="/usa" element={<LandingUSA />} />
 
             {/* Rutas protegidas */}
             <Route

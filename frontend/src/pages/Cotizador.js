@@ -19,6 +19,15 @@ export default function Cotizador() {
   const [resultado, setResultado] = useState(null); // {folio, total, link}
   const [ivaPct, setIvaPct] = useState(16);
   const [ivaIncluido, setIvaIncluido] = useState(true);
+  const [region, setRegion] = useState(() => localStorage.getItem('cotizador_region') || 'MX');
+  const cambiarRegion = (r) => {
+    setRegion(r);
+    localStorage.setItem('cotizador_region', r);
+    if (r === 'US') { setIvaPct(8); setIvaIncluido(false); }
+    else { setIvaPct(16); setIvaIncluido(true); }
+  };
+  const esUS = region === 'US';
+  const etiquetaImpuesto = esUS ? 'Tax' : 'IVA';
   const [buscado, setBuscado] = useState(false);
   const [paywall, setPaywall] = useState(false);
   const [catalogoVacio, setCatalogoVacio] = useState(false);
@@ -82,7 +91,7 @@ export default function Cotizador() {
     try {
       const itemsPdf = items.map(it => it.tipo === 'mano_obra' && !/mano de obra/i.test(it.name)
         ? { ...it, name: `Mano de obra — ${it.name}` } : it);
-      const r = await axios.post(`${API}/cotizador/guardar`, { items: itemsPdf, cliente, vat_pct: parseFloat(ivaPct) || 0, vat_incluido: ivaIncluido }, { withCredentials: true });
+      const r = await axios.post(`${API}/cotizador/guardar`, { items: itemsPdf, cliente, vat_pct: parseFloat(ivaPct) || 0, vat_incluido: ivaIncluido, moneda: esUS ? 'USD' : 'MXN' }, { withCredentials: true });
       setResultado(r.data);
       toast.success(`Cotización ${r.data.folio} creada`);
     } catch (e) {
@@ -95,7 +104,7 @@ export default function Cotizador() {
   };
 
   const msgTexto = resultado
-    ? `Hola${cliente ? ' ' + cliente : ''}, aquí está tu cotización ${resultado.folio} por $${resultado.total.toLocaleString('es-MX', {minimumFractionDigits: 2})}: ${resultado.link}`
+    ? `Hola${cliente ? ' ' + cliente : ''}, aquí está tu cotización ${resultado.folio} por $${resultado.total.toLocaleString('es-MX', {minimumFractionDigits: 2})}${resultado.moneda === 'USD' ? ' USD' : ''}: ${resultado.link}`
     : '';
   const msgWhats = encodeURIComponent(msgTexto);
   const msgMail = resultado
@@ -202,8 +211,12 @@ export default function Cotizador() {
 
             <div className="border-t pt-3 text-sm text-slate-700 space-y-2">
               <div className="flex flex-wrap items-center gap-3 justify-end text-xs text-slate-600">
+                <div className="flex rounded-full border border-slate-200 overflow-hidden mr-2">
+                  <button type="button" onClick={() => cambiarRegion('MX')} className={`px-3 py-1 text-xs font-bold ${!esUS ? 'bg-emerald-600 text-white' : 'bg-white text-slate-500'}`}>🇲🇽 MXN</button>
+                  <button type="button" onClick={() => cambiarRegion('US')} className={`px-3 py-1 text-xs font-bold ${esUS ? 'bg-blue-600 text-white' : 'bg-white text-slate-500'}`}>🇺🇸 USD</button>
+                </div>
                 <label className="flex items-center gap-1">
-                  IVA
+                  {etiquetaImpuesto}
                   <input
                     type="number" min="0" max="30" step="0.5"
                     value={ivaPct}
@@ -227,7 +240,7 @@ export default function Cotizador() {
                 </>
               )}
               <div className="flex justify-end gap-8"><span>Subtotal:</span><span className="w-28 text-right">${subtotal.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span></div>
-              <div className="flex justify-end gap-8"><span>IVA {ivaPct || 0}%:</span><span className="w-28 text-right">${iva.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span></div>
+              <div className="flex justify-end gap-8"><span>{etiquetaImpuesto} {ivaPct || 0}%:</span><span className="w-28 text-right">${iva.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span></div>
               <div className="flex justify-end gap-8 font-bold text-slate-900"><span>TOTAL:</span><span className="w-28 text-right">${total.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span></div>
             </div>
 
