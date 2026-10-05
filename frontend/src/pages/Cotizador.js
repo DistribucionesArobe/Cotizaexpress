@@ -68,12 +68,22 @@ export default function Cotizador() {
       const r = await axios.post(`${API}/cotizador/ia`, { texto: t }, { withCredentials: true });
       setCatalogoVacio(!!r.data.catalogo_vacio);
       const encontrados = r.data.encontrados || [];
-      setItems(prev => [...prev.filter(it => (it.name || '').trim()), ...encontrados]);
+      // Los que no están en el catálogo también van a la tabla: solo falta el precio
+      const sinPrecio = (r.data.no_encontrados || [])
+        .map(x => (x || '').replace(/`/g, '').trim())
+        .filter(x => x.length > 1)
+        .map(x => {
+          const m = x.match(/^(\d+(?:[.,]\d+)?)\s+(.{2,})$/);
+          return m
+            ? { name: m[2].trim(), qty: m[1], unit: 'pza', price: '', tipo: 'material' }
+            : { name: x, qty: 1, unit: 'pza', price: '', tipo: 'material' };
+        });
+      setItems(prev => [...prev.filter(it => (it.name || '').trim()), ...encontrados, ...sinPrecio]);
       setDudas(r.data.dudas || []);
       setNoEnc(r.data.no_encontrados || []);
       setBuscado(true);
-      if (encontrados.length === 0 && (r.data.dudas || []).length === 0) {
-        toast.info('No los encontré en tu catálogo — escríbelos en la tabla de arriba con su precio.');
+      if (sinPrecio.length > 0) {
+        toast.info('Listo: ' + sinPrecio.length + ' renglones en la tabla — solo ponles precio.');
       }
     } catch (e) {
       if (!checarSesion(e)) toast.error(e?.response?.data?.detail || 'Error al cotizar');
@@ -193,9 +203,8 @@ export default function Cotizador() {
 
       {noEnc.length > 0 && noEnc[0] && (
         <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-900">
-          🔎 No encontré <strong>{noEnc.join(', ')}</strong> en tu catálogo.
-          Escríbelos a mano en la tabla de abajo (con su precio), o
-          <a href="/productos" className="underline font-medium ml-1">agrégalos a tu catálogo</a> para que la IA los encuentre la próxima vez.
+          ✍️ Ya puse en la tabla lo que no estaba en tu catálogo — <strong>solo ponles precio</strong>.
+          <a href="/productos" className="underline font-medium ml-1">Agrégalos a tu catálogo</a> y la próxima vez saldrán con precio solos.
         </div>
       )}
 
