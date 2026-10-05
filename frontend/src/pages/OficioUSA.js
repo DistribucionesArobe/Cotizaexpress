@@ -186,6 +186,18 @@ export default function OficioUSA({ slug }) {
           </div>
         </section>
 
+        {/* Paso 2: el bot (misma escalera que México) */}
+        <div className="mt-14 bg-slate-900 text-white rounded-2xl p-6 text-left">
+          <h2 className="text-xl font-bold mb-2">🤖 ¿Tus customers te escriben por WhatsApp?</h2>
+          <p className="text-blue-100 text-sm mb-4">
+            El paso 2 es CotizaBot: conecta tu número y contesta solo — lee lo que pide el customer,
+            usa tus precios de {o.nombre} y responde el estimate con PDF en segundos, 24/7, aunque estés en el trabajo.
+          </p>
+          <Link to={`/registro?utm_source=usa_${slug}_bot`}>
+            <Button className="bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-bold">Quiero que conteste solo →</Button>
+          </Link>
+        </div>
+
         {/* Internal links a los demás oficios */}
         <div className="mt-12">
           <p className="text-sm text-slate-500 mb-3">También hacemos estimates de:</p>

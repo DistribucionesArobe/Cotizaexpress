@@ -13,6 +13,7 @@ const FAQ_USA = [
   ['¿Necesito computadora o saber inglés?', 'No. Todo es en español y desde tu celular — se instala como app. El estimate que recibe el customer se ve profesional, con números en formato de USA.'],
   ['¿La IA inventa los precios?', 'No. Tú guardas tus precios una vez (por sqft, por hora, por servicio o por producto) y la IA los usa para armar cada estimate. Tú siempre tienes la última palabra: puedes editar cualquier línea antes de generar el PDF.'],
   ['¿Puedo entregar el estimate en inglés?', 'Sí. Tú trabajas en español y eliges el idioma del PDF: español o inglés (ESTIMATE, Qty, Unit Price, Total). Así tu customer americano lo recibe en su idioma.'],
+  ['¿Y si mis customers me escriben mucho por WhatsApp?', 'Ese es el paso 2: CotizaBot conecta tu WhatsApp y contesta solo — lee lo que pide el customer, busca en tus precios y responde el estimate con PDF en segundos, 24/7, aunque andes trabajando. Es el mismo sistema que ya usan negocios en México.'],
   ['¿Cómo le mando el estimate al customer?', 'Cada estimate genera un PDF y un link: lo mandas por mensaje de texto, WhatsApp o email directo desde tu celular, en el momento, antes que la competencia.'],
 ];
 
@@ -190,7 +191,28 @@ export default function LandingUSA() {
           <Link to="/registro?utm_source=usa">
             <Button size="lg" className="bg-blue-700 hover:bg-blue-800 text-lg font-bold px-8 py-6">Empezar gratis ahora →</Button>
           </Link>
-          <p className="text-xs text-slate-400 mt-4">¿Tienes negocio con WhatsApp de clientes? Pregunta por CotizaBot: contesta y cotiza solo, 24/7.</p>
+          <p className="text-xs text-slate-400 mt-4">Precio de lanzamiento. Cancela cuando quieras.</p>
+        </div>
+      </section>
+
+      {/* Paso 2: el bot */}
+      <section className="py-14 bg-gradient-to-br from-slate-900 to-blue-900 text-white">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5 text-sm font-medium mb-4">🤖 El paso 2, cuando tengas muchos customers</div>
+          <h2 className="text-3xl font-extrabold mb-3">Que tu WhatsApp conteste y cotice solo</h2>
+          <p className="text-blue-100 max-w-xl mx-auto mb-6">
+            Tus customers hispanos ya te escriben por WhatsApp. CotizaBot conecta tu número y responde solo:
+            lee lo que piden, usa tus precios y manda el estimate con PDF en segundos — 24/7, aunque estés arriba del techo.
+            Es el mismo sistema que ya usan negocios en México.
+          </p>
+          <div className="max-w-xs mx-auto bg-white rounded-2xl p-4 text-left text-sm mb-6">
+            <div className="bg-[#DCF8C6] rounded-xl rounded-tr-none px-3 py-2 text-slate-800 mb-2">"Cuánto por pintar 2 cuartos?"</div>
+            <div className="bg-slate-100 rounded-xl rounded-tl-none px-3 py-2 text-slate-800">🤖 Aquí está tu estimate CX-7K2M4 por $1,598.40 USD 📄 — responde en 5 segundos, solo.</div>
+          </div>
+          <Link to="/registro?utm_source=usa_bot">
+            <Button size="lg" className="bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-extrabold px-8 py-6">Quiero que conteste solo →</Button>
+          </Link>
+          <p className="text-sm text-blue-200 mt-3">Empieza con el plan de $15 y súbete al bot cuando lo necesites.</p>
         </div>
       </section>
     </div>

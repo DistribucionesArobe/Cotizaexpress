@@ -142,7 +142,7 @@ export default function Cotizador() {
         <div>
           <h2 className="text-2xl font-bold text-slate-900">Cotizador IA</h2>
           <p className="text-slate-600 text-sm">Pega la lista de tu cliente tal como te la mandó — la IA la convierte en cotización con tu catálogo.</p>
-          <p className="text-xs text-violet-700 mt-1 font-medium">Plan Cotizador IA: cotizaciones ilimitadas por $299/mes · <a href="/precios" className="underline">ver planes</a></p>
+          <p className="text-xs text-violet-700 mt-1 font-medium">Plan Cotizador IA: cotizaciones ilimitadas por {esUS ? "$15 USD/mes" : "$299/mes"} · <a href="/precios" className="underline">ver planes</a></p>
 
         </div>
       </div>
@@ -337,11 +337,11 @@ export default function Cotizador() {
             <p className="text-3xl">🎉</p>
             <p className="text-xl font-bold text-slate-900">¿Te gustó? Esa fue tu cotización gratis del mes.</p>
             <p className="text-slate-600 max-w-md mx-auto">
-              Con el <strong>Plan Cotizador IA ($299/mes)</strong> haces cotizaciones ilimitadas
+              Con el <strong>Plan Cotizador IA ({esUS ? "$15 USD/mes" : "$299/mes"})</strong> haces {esUS ? "estimates ilimitados" : "cotizaciones ilimitadas"}
               con tu logo, folio y PDF — y te ahorras horas cada semana.
             </p>
             <a href="/precios">
-              <Button size="lg" className="bg-violet-600 hover:bg-violet-700 text-lg px-8">Activar mi plan — $299/mes</Button>
+              <Button size="lg" className="bg-violet-600 hover:bg-violet-700 text-lg px-8">Activar mi plan — {esUS ? "$15 USD/mes" : "$299/mes"}</Button>
             </a>
             <p className="text-xs text-slate-400">Se activa en 1 minuto con tarjeta o SPEI · factura disponible</p>
           </CardContent>
@@ -368,7 +368,7 @@ export default function Cotizador() {
               </Button>
             </div>
             <div className="bg-white border border-violet-200 rounded-lg px-4 py-3 text-sm text-slate-700 max-w-lg mx-auto">
-              ✨ Esto es el <strong>Plan Cotizador IA — $299/mes</strong>: cotizaciones ilimitadas con tu logo y folio.
+              ✨ Esto es el <strong>Plan Cotizador IA — {esUS ? "$15 USD/mes" : "$299/mes"}</strong>: {esUS ? "estimates ilimitados" : "cotizaciones ilimitadas"} con tu logo y folio.
               <a href="/precios" className="text-violet-700 underline font-medium ml-1">Activar mi plan</a>
             </div>
             <p className="text-xs text-slate-500">🤖 ¿Y si se contestara solo cuando el cliente te escribe? Eso hace CotizaBot ($1,000/mes) al conectar tu WhatsApp.</p>
