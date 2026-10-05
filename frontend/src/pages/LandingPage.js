@@ -438,165 +438,13 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Trust Badges */}
-      <section className="py-10 bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex flex-wrap justify-center items-center gap-8 text-slate-500">
-            <div className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg><span className="text-sm">IVA automático</span></div>
-            <div className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg><span className="text-sm">Precios en MXN</span></div>
-            <div className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg><span className="text-sm">Soporte en español</span></div>
-            <div className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg><span className="text-sm">Factura CFDI</span></div>
-          </div>
-        </div>
-      </section>
-
-      {/* Social Proof */}
-      <section className="py-16 bg-gradient-to-r from-emerald-600 to-teal-600">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
-            <div>
-              <div className="text-4xl sm:text-5xl font-bold mb-1">3s</div>
-              <p className="text-emerald-100 text-sm">Tiempo promedio de respuesta</p>
-            </div>
-            <div>
-              <div className="text-4xl sm:text-5xl font-bold mb-1">24/7</div>
-              <p className="text-emerald-100 text-sm">Disponibilidad sin pausas</p>
-            </div>
-            <div>
-              <div className="text-4xl sm:text-5xl font-bold mb-1">500+</div>
-              <p className="text-emerald-100 text-sm">Productos por catálogo</p>
-            </div>
-            <div>
-              <div className="text-4xl sm:text-5xl font-bold mb-1">16%</div>
-              <p className="text-emerald-100 text-sm">IVA calculado automático</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Beneficios */}
-      <section className="py-20 bg-slate-50" id="beneficios">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center text-slate-900 mb-4">Beneficios de CotizaBot</h2>
-          <p className="text-center text-slate-600 mb-12 max-w-2xl mx-auto">Automatiza tu proceso de ventas y cotizaciones por WhatsApp</p>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="border-0 shadow-lg"><CardContent className="pt-6">
-              <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-              </div>
-              <h3 className="text-xl font-bold mb-2">Respuestas en 3 segundos</h3>
-              <p className="text-slate-600">Tu cliente pregunta precio, el bot responde al instante. No pierdas ventas por tardarte.</p>
-            </CardContent></Card>
-
-            <Card className="border-0 shadow-lg"><CardContent className="pt-6">
-              <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              </div>
-              <h3 className="text-xl font-bold mb-2">Disponible 24/7</h3>
-              <p className="text-slate-600">Atiende clientes a las 3am, domingos o festivos. Sin descanso, sin errores.</p>
-            </CardContent></Card>
-
-            <Card className="border-0 shadow-lg"><CardContent className="pt-6">
-              <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-              </div>
-              <h3 className="text-xl font-bold mb-2">IVA y totales exactos</h3>
-              <p className="text-slate-600">Cotizaciones profesionales con cálculos correctos. Sin errores de dedo.</p>
-            </CardContent></Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Cómo funciona */}
-      <section className="py-20 bg-white" id="como-funciona">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center text-slate-900 mb-4">¿Cómo funciona CotizaBot?</h2>
-          <p className="text-center text-slate-600 mb-12">En 3 simples pasos automatizas tu negocio</p>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-emerald-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">1</div>
-              <h3 className="text-xl font-bold mb-2">Sube tu catálogo</h3>
-              <p className="text-slate-600">Carga tus productos desde Excel o agrégalos manualmente. Precios, stock y SKU.</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-emerald-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">2</div>
-              <h3 className="text-xl font-bold mb-2">Comparte tu link</h3>
-              <p className="text-slate-600">Recibe un código único y link de WhatsApp para compartir con tus clientes.</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-emerald-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">3</div>
-              <h3 className="text-xl font-bold mb-2">El bot cotiza por ti</h3>
-              <p className="text-slate-600">Cuando un cliente escribe, CotizaBot responde con precios y genera la cotización.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Casos de uso */}
-      <section className="py-20 bg-slate-50" id="casos-de-uso">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center text-slate-900 mb-4">¿Para qué negocios es CotizaBot?</h2>
-          <p className="text-center text-slate-600 mb-12">Si vendes productos con catálogo, CotizaBot es para ti</p>
-          
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Link to="/ferreterias" className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition text-center">
-              <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-              </div>
-              <h3 className="font-bold text-slate-900 mb-2">Ferreterías</h3>
-              <p className="text-sm text-slate-600">Cotiza herramientas, tornillería, pinturas</p>
-            </Link>
-
-            <div className="bg-white rounded-xl p-6 shadow-md text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
-              </div>
-              <h3 className="font-bold text-slate-900 mb-2">Materiales de Construcción</h3>
-              <p className="text-sm text-slate-600">Cemento, varilla, block, tablaroca</p>
-            </div>
-
-            <Link to="/refaccionarias" className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition text-center">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-              </div>
-              <h3 className="font-bold text-slate-900 mb-2">Refaccionarias</h3>
-              <p className="text-sm text-slate-600">Autopartes, refacciones, aceites</p>
-            </Link>
-
-            <div className="bg-white rounded-xl p-6 shadow-md text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-              </div>
-              <h3 className="font-bold text-slate-900 mb-2">Material Eléctrico</h3>
-              <p className="text-sm text-slate-600">Cables, contactos, iluminación</p>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 shadow-md text-center">
-              <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-              </div>
-              <h3 className="font-bold text-slate-900 mb-2">Distribuidoras</h3>
-              <p className="text-sm text-slate-600">Alimentos, limpieza, papelería</p>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 shadow-md text-center">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-              </div>
-              <h3 className="font-bold text-slate-900 mb-2">Refaccionarias</h3>
-              <p className="text-sm text-slate-600">Autopartes, refacciones, aceites</p>
-            </div>
-
-            <Link to="/registro" className="bg-emerald-50 rounded-xl p-6 shadow-md hover:shadow-lg transition text-center border-2 border-dashed border-emerald-300">
-              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/></svg>
-              </div>
-              <h3 className="font-bold text-emerald-700 mb-2">¿Otro giro?</h3>
-              <p className="text-sm text-emerald-600">Si vendes con catálogo, funciona para ti</p>
-            </Link>
-          </div>
+      {/* Franja de confianza (una línea) */}
+      <section className="py-8 bg-white border-b">
+        <div className="max-w-5xl mx-auto px-4 flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm text-slate-600">
+          <span>✅ IVA automático</span>
+          <span>⚡ Responde en 3 segundos, 24/7</span>
+          <span>📲 Vive en tu celular, como app</span>
+          <span>🇲🇽 Soporte en español</span>
         </div>
       </section>
 
@@ -677,22 +525,6 @@ export default function LandingPage() {
               <h3 className="font-bold text-slate-900 mb-2">¿Puedo ver un demo antes de contratar?</h3>
               <p className="text-slate-600">Sí. Envía "DEMO" a nuestro WhatsApp y prueba cómo funciona CotizaBot con un catálogo real.</p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-20 bg-gradient-to-r from-emerald-600 to-teal-600">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">¿Listo para automatizar tu negocio?</h2>
-          <p className="text-xl text-emerald-50 mb-10">Envía "DEMO" por WhatsApp y ve CotizaBot en acción</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="https://wa.me/5218342472640?text=DEMO" target="_blank" rel="noopener noreferrer">
-              <Button size="lg" className="text-lg px-8 py-6 bg-white text-emerald-600 hover:bg-slate-50">Probar Demo en WhatsApp</Button>
-            </a>
-            <Link to="/registro">
-              <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-white text-white hover:bg-white/10">Crear Cuenta</Button>
-            </Link>
           </div>
         </div>
       </section>
