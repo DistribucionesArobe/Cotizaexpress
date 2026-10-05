@@ -23,6 +23,12 @@ export default function Cotizador() {
   const [paywall, setPaywall] = useState(false);
   const [catalogoVacio, setCatalogoVacio] = useState(false);
   const resultRef = useRef(null);
+  const [installEvt, setInstallEvt] = useState(null);
+  useEffect(() => {
+    const h = (e) => { e.preventDefault(); setInstallEvt(e); };
+    window.addEventListener('beforeinstallprompt', h);
+    return () => window.removeEventListener('beforeinstallprompt', h);
+  }, []);
 
   useEffect(() => {
     if (resultado || paywall) resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -39,7 +45,7 @@ export default function Cotizador() {
       setNoEnc(r.data.no_encontrados || []);
       setBuscado(true);
       if ((r.data.encontrados || []).length === 0 && (r.data.dudas || []).length === 0) {
-        setItems([{ name: '', qty: 1, unit: 'pza', price: '' }]);
+        setItems([{ name: '', qty: 1, unit: 'pza', price: '', tipo: 'material' }]);
         toast.info('No los encontré en tu catálogo — puedes escribirlos a mano aquí abajo.');
       }
     } catch (e) {
@@ -56,7 +62,12 @@ export default function Cotizador() {
     setItems(prev => prev.map((it, idx) => idx === i ? { ...it, [campo]: valor } : it));
   };
 
-  const agregarRenglon = () => setItems(prev => [...prev, { name: '', qty: 1, unit: 'pza', price: '' }]);
+  const agregarRenglon = (tipo = 'material') => setItems(prev => [...prev, {
+    name: '', qty: 1,
+    unit: tipo === 'mano_obra' ? 'servicio' : 'pza',
+    price: '', tipo,
+  }]);
+  const toggleTipo = (i) => setItems(prev => prev.map((it, idx) => idx === i ? { ...it, tipo: it.tipo === 'mano_obra' ? 'material' : 'mano_obra' } : it));
   const quitarRenglon = (i) => setItems(prev => prev.filter((_, idx) => idx !== i));
 
   const suma = items.reduce((s, it) => s + (parseFloat(it.price) || 0) * (parseInt(it.qty) || 0), 0);
@@ -69,7 +80,9 @@ export default function Cotizador() {
   const guardar = async () => {
     setGuardando(true);
     try {
-      const r = await axios.post(`${API}/cotizador/guardar`, { items, cliente, vat_pct: parseFloat(ivaPct) || 0, vat_incluido: ivaIncluido }, { withCredentials: true });
+      const itemsPdf = items.map(it => it.tipo === 'mano_obra' && !/mano de obra/i.test(it.name)
+        ? { ...it, name: `Mano de obra — ${it.name}` } : it);
+      const r = await axios.post(`${API}/cotizador/guardar`, { items: itemsPdf, cliente, vat_pct: parseFloat(ivaPct) || 0, vat_incluido: ivaIncluido }, { withCredentials: true });
       setResultado(r.data);
       toast.success(`Cotización ${r.data.folio} creada`);
     } catch (e) {
@@ -99,6 +112,14 @@ export default function Cotizador() {
           <h2 className="text-2xl font-bold text-slate-900">Cotizador IA</h2>
           <p className="text-slate-600 text-sm">Pega la lista de tu cliente tal como te la mandó — la IA la convierte en cotización con tu catálogo.</p>
           <p className="text-xs text-violet-700 mt-1 font-medium">Plan Cotizador IA: cotizaciones ilimitadas por $299/mes · <a href="/precios" className="underline">ver planes</a></p>
+          {installEvt && (
+            <button
+              onClick={async () => { installEvt.prompt(); setInstallEvt(null); }}
+              className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold bg-slate-900 text-white rounded-full px-3 py-1.5"
+            >
+              📲 Instalar CotizaBot en mi celular
+            </button>
+          )}
         </div>
       </div>
 
@@ -166,14 +187,25 @@ export default function Cotizador() {
             </div>
             {items.map((it, i) => (
               <div key={i} className="grid grid-cols-12 gap-2 items-center">
-                <input className="col-span-5 px-3 py-2 border border-slate-300 rounded-lg text-sm" value={it.name} onChange={(e) => setItem(i, 'name', e.target.value)} />
+                <button
+                  type="button"
+                  onClick={() => toggleTipo(i)}
+                  title="Cambiar entre material y mano de obra"
+                  className={`col-span-12 sm:col-span-2 text-[11px] font-bold rounded-full px-2 py-1.5 border ${it.tipo === 'mano_obra' ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-slate-100 text-slate-600 border-slate-200'}`}
+                >
+                  {it.tipo === 'mano_obra' ? '👷 M. de obra' : '📦 Material'}
+                </button>
+                <input className="col-span-12 sm:col-span-3 px-3 py-2 border border-slate-300 rounded-lg text-sm" placeholder={it.tipo === 'mano_obra' ? 'Ej: Instalación completa' : 'Producto'} value={it.name} onChange={(e) => setItem(i, 'name', e.target.value)} />
                 <input className="col-span-2 px-3 py-2 border border-slate-300 rounded-lg text-sm" type="number" min="1" value={it.qty} onChange={(e) => setItem(i, 'qty', e.target.value)} />
                 <input className="col-span-2 px-3 py-2 border border-slate-300 rounded-lg text-sm" value={it.unit} onChange={(e) => setItem(i, 'unit', e.target.value)} />
                 <input className="col-span-2 px-3 py-2 border border-slate-300 rounded-lg text-sm" type="number" step="0.01" value={it.price} onChange={(e) => setItem(i, 'price', e.target.value)} />
                 <button onClick={() => quitarRenglon(i)} className="text-slate-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
               </div>
             ))}
-            <button onClick={agregarRenglon} className="text-sm text-violet-700 flex items-center gap-1"><Plus className="w-4 h-4" /> Agregar renglón</button>
+            <div className="flex flex-wrap gap-3">
+              <button onClick={() => agregarRenglon('material')} className="text-sm text-violet-700 flex items-center gap-1 bg-violet-50 border border-violet-200 rounded-full px-3 py-1.5 hover:bg-violet-100"><Plus className="w-4 h-4" /> Material</button>
+              <button onClick={() => agregarRenglon('mano_obra')} className="text-sm text-amber-700 flex items-center gap-1 bg-amber-50 border border-amber-200 rounded-full px-3 py-1.5 hover:bg-amber-100"><Plus className="w-4 h-4" /> 👷 Mano de obra</button>
+            </div>
 
             <div className="border-t pt-3 text-sm text-slate-700 space-y-2">
               <div className="flex flex-wrap items-center gap-3 justify-end text-xs text-slate-600">
@@ -195,6 +227,12 @@ export default function Cotizador() {
                   Agregarlo al total
                 </label>
               </div>
+              {items.some(it => it.tipo === 'mano_obra') && items.some(it => it.tipo !== 'mano_obra') && (
+                <>
+                  <div className="flex justify-end gap-8 text-slate-500"><span>📦 Materiales:</span><span className="w-28 text-right">${items.filter(it => it.tipo !== 'mano_obra').reduce((t, it) => t + (parseFloat(it.price) || 0) * (parseInt(it.qty) || 0), 0).toLocaleString('es-MX', {minimumFractionDigits: 2})}</span></div>
+                  <div className="flex justify-end gap-8 text-slate-500"><span>👷 Mano de obra:</span><span className="w-28 text-right">${items.filter(it => it.tipo === 'mano_obra').reduce((t, it) => t + (parseFloat(it.price) || 0) * (parseInt(it.qty) || 0), 0).toLocaleString('es-MX', {minimumFractionDigits: 2})}</span></div>
+                </>
+              )}
               <div className="flex justify-end gap-8"><span>Subtotal:</span><span className="w-28 text-right">${subtotal.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span></div>
               <div className="flex justify-end gap-8"><span>IVA {ivaPct || 0}%:</span><span className="w-28 text-right">${iva.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span></div>
               <div className="flex justify-end gap-8 font-bold text-slate-900"><span>TOTAL:</span><span className="w-28 text-right">${total.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span></div>

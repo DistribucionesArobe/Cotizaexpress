@@ -1,6 +1,6 @@
 {
   "short_name": "CotizaBot",
-  "name": "CotizaBot — Cotizaciones Automáticas por WhatsApp",
+  "name": "CotizaBot — Cotizaciones en tu celular",
   "icons": [
     {
       "src": "logo-cotizabot.png",
@@ -8,11 +8,14 @@
       "type": "image/png"
     }
   ],
-  "start_url": ".",
+  "start_url": "/cotizador",
   "display": "standalone",
   "theme_color": "#10b981",
   "background_color": "#ffffff",
-  "description": "Automatiza las cotizaciones de tu ferretería por WhatsApp con IA.",
+  "description": "Haz cotizaciones profesionales (material y mano de obra) desde tu celular, con IVA, folio y PDF.",
   "lang": "es",
-  "categories": ["business", "productivity"]
+  "categories": [
+    "business",
+    "productivity"
+  ]
 }

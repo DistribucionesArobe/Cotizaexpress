@@ -115,6 +115,13 @@
     }
     </script>
     <meta name="msvalidate.01" content="472F0167E63DCD08FFAD420E71420AE4" />
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/sw.js').catch(function () {});
+        });
+      }
+    </script>
   </head>
   <body>
     <!-- Google Tag Manager (noscript) -->

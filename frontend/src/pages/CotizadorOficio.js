@@ -79,12 +79,16 @@ export default function CotizadorOficio({ slug }) {
           </div>
         </div>
 
-        <Link to="/generador-de-cotizaciones">
+        <Link to="/registro">
           <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-lg px-8 py-6">Hacer mi cotización gratis →</Button>
         </Link>
-        <p className="text-sm text-slate-400 mt-3">Sin registro · sin tarjeta · desde tu celular</p>
+        <p className="text-sm text-slate-400 mt-3">1 cotización gratis · sin tarjeta · se instala como app en tu celular 📲</p>
 
-        <div className="grid sm:grid-cols-3 gap-4 mt-12 text-left">
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-8 text-sm text-amber-900 max-w-xl mx-auto">
+          👷 <strong>Separa mano de obra y materiales</strong> en la misma cotización — tu cliente ve el desglose claro y tú cierras sin regateos.
+        </div>
+
+        <div className="grid sm:grid-cols-3 gap-4 mt-8 text-left">
           {o.bullets.map((b, i) => (
             <div key={i} className="bg-white border border-slate-200 rounded-xl p-4 text-sm text-slate-700">✅ {b}</div>
           ))}
