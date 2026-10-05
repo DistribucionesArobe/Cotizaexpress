@@ -35,6 +35,13 @@ const track = (evento, extra = {}) => {
   try { window.gtag && window.gtag('event', evento, extra); } catch (e) {}
 };
 
+const GIRO_EMOJI = {
+  'Ferretería': '🔨', 'Materiales de construcción': '🧱', 'Plomería': '🚰',
+  'Material eléctrico': '💡', 'Pinturas': '🎨', 'Herrería': '⚒️',
+  'Refaccionaria': '🚗', 'Distribuidora': '📦', 'Mueblería': '🛋️',
+  'Papelería': '✏️', 'Abarrotes / Mayoreo': '🛒', 'Servicios técnicos': '🔧', 'Otro': '✨',
+};
+
 const CIUDADES_MX = [
   'Aguascalientes, Ags.', 'Mexicali, B.C.', 'Tijuana, B.C.', 'Ensenada, B.C.', 'La Paz, B.C.S.',
   'Campeche, Camp.', 'Tuxtla Gutiérrez, Chis.', 'Tapachula, Chis.', 'Chihuahua, Chih.', 'Ciudad Juárez, Chih.',
@@ -376,28 +383,29 @@ export default function Onboarding() {
                         key={g}
                         type="button"
                         onClick={() => setBusinessData({ ...businessData, giro: g })}
-                        className={`px-3 py-2.5 rounded-lg text-sm font-medium border transition-all ${
+                        className={`flex items-center gap-2.5 px-4 py-3 rounded-2xl text-sm font-semibold border-2 transition-all ${
                           businessData.giro === g
-                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700 ring-1 ring-emerald-500'
-                            : 'border-slate-200 text-slate-600 hover:border-slate-300'
+                            ? 'border-emerald-500 bg-emerald-50 text-emerald-800 shadow-md shadow-emerald-100 scale-[1.02]'
+                            : 'border-slate-100 bg-white text-slate-600 hover:border-emerald-200 hover:bg-emerald-50/30'
                         }`}
                       >
-                        {g}
+                        <span className="text-xl">{GIRO_EMOJI[g] || '🏪'}</span>
+                        <span className="text-left leading-tight">{g}</span>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Ciudad o Estado
+                <div className="bg-slate-50 rounded-2xl p-4">
+                  <label className="block text-sm font-bold text-slate-800 mb-2">
+                    📍 ¿En qué ciudad estás?
                   </label>
                   <input
                     type="text"
                     list="ciudades-mx"
                     value={businessData.ciudad}
                     onChange={(e) => setBusinessData({ ...businessData, ciudad: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    className="w-full px-4 py-3 border-0 bg-white rounded-xl shadow-sm focus:ring-2 focus:ring-emerald-400 text-base"
                     placeholder="Empieza a escribir: Monte..."
                   />
                   <datalist id="ciudades-mx">
@@ -405,58 +413,56 @@ export default function Onboarding() {
                   </datalist>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    WhatsApp de tu negocio *
+                <div className="bg-emerald-50/60 border border-emerald-100 rounded-2xl p-4">
+                  <label className="block text-sm font-bold text-slate-800 mb-1">
+                    💬 El WhatsApp donde te escriben tus clientes *
                   </label>
-                  <p className="text-xs text-slate-500 mb-2">
-                    Este es el número donde tus clientes te escriben. Lo conectaremos al bot.
-                  </p>
+                  <p className="text-xs text-slate-500 mb-3">Solo para conocerlo — no se conecta nada todavía.</p>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-slate-500 bg-slate-100 px-3 py-2.5 rounded-lg border border-slate-300">+52</span>
+                    <span className="text-base font-bold text-emerald-700 bg-white px-4 py-3 rounded-xl shadow-sm">🇲🇽 +52</span>
                     <input
                       type="tel"
                       value={businessData.whatsapp}
                       onChange={(e) => setBusinessData({ ...businessData, whatsapp: e.target.value.replace(/\D/g, '').slice(0, 10) })}
-                      className="flex-1 px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      placeholder="10 dígitos (ej: 8112345678)"
+                      className="flex-1 px-4 py-3 border-0 bg-white rounded-xl shadow-sm focus:ring-2 focus:ring-emerald-400 text-base tracking-wider"
+                      placeholder="81 1234 5678"
                       maxLength={10}
                     />
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Horario de atención
+                <div className="bg-slate-50 rounded-2xl p-4">
+                  <label className="block text-sm font-bold text-slate-800 mb-3">
+                    🕗 ¿A qué hora atiendes?
                   </label>
                   <div className="grid grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-xs text-slate-500 mb-1">Lun - Vie</label>
+                      <label className="block text-xs font-semibold text-slate-600 mb-1.5">💼 Lun - Vie</label>
                       <input
                         type="text"
                         value={businessData.horario_semana}
                         onChange={(e) => setBusinessData({ ...businessData, horario_semana: e.target.value })}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        className="w-full px-3 py-3 border-0 bg-white rounded-xl shadow-sm text-sm text-center font-medium focus:ring-2 focus:ring-emerald-400"
                         placeholder="08:00-18:00"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-slate-500 mb-1">Sábado</label>
+                      <label className="block text-xs font-semibold text-slate-600 mb-1.5">🛠️ Sábado</label>
                       <input
                         type="text"
                         value={businessData.horario_sabado}
                         onChange={(e) => setBusinessData({ ...businessData, horario_sabado: e.target.value })}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        className="w-full px-3 py-3 border-0 bg-white rounded-xl shadow-sm text-sm text-center font-medium focus:ring-2 focus:ring-emerald-400"
                         placeholder="08:00-14:00"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-slate-500 mb-1">Domingo</label>
+                      <label className="block text-xs font-semibold text-slate-600 mb-1.5">🏖️ Domingo</label>
                       <input
                         type="text"
                         value={businessData.horario_domingo}
                         onChange={(e) => setBusinessData({ ...businessData, horario_domingo: e.target.value })}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        className="w-full px-3 py-3 border-0 bg-white rounded-xl shadow-sm text-sm text-center font-medium focus:ring-2 focus:ring-emerald-400"
                         placeholder="cerrado"
                       />
                     </div>
@@ -597,7 +603,29 @@ export default function Onboarding() {
                     {/* Elige tu número: UNA pregunta, DOS tarjetas */}
                     <p className="text-sm text-slate-500">Ten a la mano tu Facebook y tu teléfono. Toma 2 minutos.</p>
 
-                    <p className="text-lg font-bold text-slate-900">¿Qué número va a usar tu bot?</p>
+                    {/* OPCIÓN PRINCIPAL: entrada ligera */}
+                    <div className="max-w-2xl mx-auto bg-gradient-to-br from-violet-600 to-purple-600 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-violet-200">
+                      <p className="text-2xl font-extrabold">✨ Empieza haciendo tus cotizaciones</p>
+                      <p className="text-violet-100 mt-2 mb-5">
+                        Pega la lista de tu cliente y la IA te la cotiza — con IVA, folio y PDF. Sin conectar nada. Tu primera es gratis.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => { track('wizard_salto_cotizador'); navigate('/cotizador'); }}
+                        className="w-full sm:w-auto bg-white text-violet-700 font-extrabold text-lg rounded-full px-8 py-4 hover:bg-violet-50 transition-all shadow-lg"
+                      >
+                        Hacer mi primera cotización →
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-3 max-w-2xl mx-auto">
+                      <div className="flex-1 h-px bg-slate-200"></div>
+                      <p className="text-sm text-slate-400">¿O quieres el paquete completo?</p>
+                      <div className="flex-1 h-px bg-slate-200"></div>
+                    </div>
+
+                    <p className="text-lg font-bold text-slate-900">🤖 Que el bot responda y cobre solo en tu WhatsApp</p>
+                    <p className="text-sm text-slate-500 -mt-4">Elige qué número va a usar:</p>
 
                     <div className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto text-left">
                       {/* Opción A: coexistencia */}
@@ -636,15 +664,6 @@ export default function Onboarding() {
                         <p className="text-[11px] text-slate-400 mt-2">Si es fijo, en la verificación elige "Llamarme": una grabación te dicta el código.</p>
                       </div>
                     </div>
-
-                    {/* Salida suave: solo quiero cotizar */}
-                    <button
-                      type="button"
-                      onClick={() => { track('wizard_salto_cotizador'); navigate('/cotizador'); }}
-                      className="max-w-2xl mx-auto w-full border-2 border-dashed border-violet-200 bg-violet-50/40 hover:bg-violet-50 rounded-xl px-5 py-3 text-sm text-violet-700 font-medium transition-all"
-                    >
-                      ✨ ¿Por ahora solo quieres HACER cotizaciones (sin bot)? Sáltate este paso →
-                    </button>
 
                     {/* Qué va a pasar (colapsado) */}
                     <details className="max-w-2xl mx-auto text-left text-sm bg-slate-50 rounded-lg px-4 py-3">
