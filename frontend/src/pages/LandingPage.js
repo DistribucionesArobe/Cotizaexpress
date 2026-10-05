@@ -296,12 +296,12 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section — carrusel de 2 productos */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-teal-50 py-16 sm:py-20">
+      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-teal-50 py-10 sm:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
 
             {/* Texto del slide */}
-            <div className="text-center lg:text-left order-2 lg:order-1">
+            <div className="text-center lg:text-left order-1">
               {slide === 0 ? (
                 <>
                   <p className="text-sm font-bold text-emerald-700 mb-2">🤖 COTIZA AUTOMÁTICO</p>
@@ -330,15 +330,15 @@ export default function LandingPage() {
                   <Link to="/registro">
                     <Button size="lg" className="text-lg px-8 py-6 bg-violet-600 hover:bg-violet-700 shadow-xl">Empieza gratis →</Button>
                   </Link>
-                  <p className="text-sm text-slate-400 mt-3">Sin tarjeta · tu catálogo desde Excel · listo hoy</p>
+                  <p className="text-sm text-slate-400 mt-3">Sin tarjeta · se instala como app en tu celular 📲</p>
                 </>
               )}
             </div>
 
             {/* "Imagen" del slide (mockup) */}
-            <div className="order-1 lg:order-2">
+            <div className="order-2">
               {slide === 0 ? (
-                <div className="max-w-sm mx-auto bg-[#ECE5DD] rounded-3xl p-4 shadow-2xl border border-slate-200">
+                <div className="max-w-[300px] sm:max-w-sm mx-auto bg-[#ECE5DD] rounded-3xl p-3 sm:p-4 shadow-2xl border border-slate-200">
                   <div className="bg-[#075E54] text-white rounded-t-2xl px-4 py-2 text-sm font-semibold flex items-center gap-2">🤖 Ferretería La Esperanza</div>
                   <div className="space-y-2 p-3">
                     <div className="bg-white rounded-2xl rounded-tl-none px-3 py-2 text-sm shadow-sm max-w-[85%]">me das precio<br/>10 cemento<br/>5 varilla 3/8<br/>200 block</div>
@@ -354,7 +354,7 @@ export default function LandingPage() {
                   </div>
                 </div>
               ) : (
-                <div className="max-w-sm mx-auto bg-white rounded-3xl p-5 shadow-2xl border border-slate-200">
+                <div className="max-w-[300px] sm:max-w-sm mx-auto bg-white rounded-3xl p-4 sm:p-5 shadow-2xl border border-slate-200">
                   <p className="text-xs font-bold text-violet-700 mb-2">✨ Cotizador IA</p>
                   <div className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-500 mb-3">10 cemento, 5 varilla 3/8, 200 block…</div>
                   <div className="text-center text-violet-500 text-xl mb-3">⬇</div>
