@@ -5,7 +5,7 @@
 ## Datos clave
 
 - Producto: bot de cotizaciones automáticas por WhatsApp con IA
-- País: México (español)
+- Mercado: México y toda Latinoamérica (español); IVA/impuesto configurable por producto
 - Precio: desde $1,000 MXN al mes; prueba gratis sin tarjeta
 - Configuración: el negocio sube su lista de precios en Excel y conecta su número de WhatsApp (guiado, sin programar); el mismo día queda cotizando
 - Funciones: entiende listas largas con medidas y calibres, cotiza con IVA, genera PDF con folio, atiende 24/7, avisa al dueño cuando el cliente pide un humano, registra productos solicitados que el negocio no maneja, recibe comprobantes de pago y datos bancarios en el chat

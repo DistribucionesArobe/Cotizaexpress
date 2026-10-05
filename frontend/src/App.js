@@ -12,6 +12,7 @@ import Registro from './pages/Registro';
 import Login from './pages/Login';
 import { RecuperarContrasena, RestablecerContrasena } from './pages/RecuperarContrasena';
 import Simulador from './pages/Simulador';
+import Cotizador from './pages/Cotizador';
 import CotizacionFormal from './pages/CotizacionFormal';
 import CotizadorOficio from './pages/CotizadorOficio';
 import Precios from './pages/Precios';
@@ -144,6 +145,18 @@ function AppRoutes() {
                     onClick={() => setActiveTab('conversaciones')}
                   >
                     Conversaciones
+                  </Link>
+                  <Link
+                    to="/cotizador"
+                    data-testid="nav-cotizador"
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      activeTab === 'cotizador'
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : 'text-slate-600 hover:bg-slate-100'
+                    }`}
+                    onClick={() => setActiveTab('cotizador')}
+                  >
+                    ✨ Cotizador
                   </Link>
                   <Link
                     to="/simulador"
@@ -411,6 +424,14 @@ function AppRoutes() {
               element={
                 <ProtectedRoute>
                   <Simulador />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cotizador"
+              element={
+                <ProtectedRoute>
+                  <Cotizador />
                 </ProtectedRoute>
               }
             />

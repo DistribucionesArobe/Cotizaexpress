@@ -46,6 +46,22 @@ export default function Precios() {
 
   const planes = [
     {
+      id: 'cotizador',
+      nombre: 'Cotizador IA',
+      precio: 299,
+      descripcion: 'Haz tus cotizaciones en segundos — sin conectar WhatsApp',
+      features: [
+        { texto: 'Pega la lista del cliente y la IA la cotiza', incluido: true, destacado: true },
+        { texto: 'Tu catálogo desde Excel (ilimitado)', incluido: true },
+        { texto: 'PDF con folio, logo y color de tu marca', incluido: true },
+        { texto: 'Link para compartir por WhatsApp normal', incluido: true },
+        { texto: 'Historial de cotizaciones', incluido: true },
+        { texto: 'Bot que contesta solo en WhatsApp', incluido: false, nota: 'Disponible en CotizaBot' },
+      ],
+      popular: false,
+      btnTexto: 'Empezar con Cotizador',
+    },
+    {
       id: 'cotizabot',
       nombre: 'CotizaBot',
       precio: 1000,
@@ -150,7 +166,7 @@ export default function Precios() {
           </div>
 
           {/* Pricing Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {planes.map((plan) => {
               const esActual = planActual === plan.id;
               const esDestacado = plan.destacado;
