@@ -112,14 +112,7 @@ export default function Cotizador() {
           <h2 className="text-2xl font-bold text-slate-900">Cotizador IA</h2>
           <p className="text-slate-600 text-sm">Pega la lista de tu cliente tal como te la mandó — la IA la convierte en cotización con tu catálogo.</p>
           <p className="text-xs text-violet-700 mt-1 font-medium">Plan Cotizador IA: cotizaciones ilimitadas por $299/mes · <a href="/precios" className="underline">ver planes</a></p>
-          {installEvt && (
-            <button
-              onClick={async () => { installEvt.prompt(); setInstallEvt(null); }}
-              className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold bg-slate-900 text-white rounded-full px-3 py-1.5"
-            >
-              📲 Instalar CotizaBot en mi celular
-            </button>
-          )}
+
         </div>
       </div>
 
@@ -252,6 +245,39 @@ export default function Cotizador() {
           </CardContent>
         </Card>
       )}
+
+      {/* Instalar como app — explicado for dummies */}
+      <div className="bg-slate-900 text-white rounded-2xl p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="font-bold">📲 Ten CotizaBot como app en tu celular</p>
+            <p className="text-sm text-slate-300 mt-0.5">Con su propio ícono, junto a tu WhatsApp. Sin tiendas, sin descargas raras — gratis.</p>
+          </div>
+          {installEvt ? (
+            <button
+              onClick={async () => { installEvt.prompt(); setInstallEvt(null); }}
+              className="bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-full px-5 py-2.5"
+            >
+              Instalar ahora (1 toque)
+            </button>
+          ) : (
+            <details className="text-sm">
+              <summary className="cursor-pointer bg-white/10 hover:bg-white/20 rounded-full px-4 py-2 font-medium">¿Cómo le hago? 👆</summary>
+              <div className="mt-3 space-y-3 bg-white/5 rounded-xl p-4 max-w-md">
+                <div>
+                  <p className="font-bold text-emerald-300">Si tu celular es Android (Samsung, Motorola, Xiaomi...):</p>
+                  <p className="text-slate-300">1. Abre esta página en <strong>Chrome</strong> desde tu celular.<br/>2. Toca los <strong>3 puntitos</strong> de arriba a la derecha ⋮<br/>3. Toca <strong>"Agregar a pantalla principal"</strong> (o "Instalar app").<br/>4. Listo: busca el ícono 🤖 junto a tus demás apps.</p>
+                </div>
+                <div>
+                  <p className="font-bold text-emerald-300">Si es iPhone:</p>
+                  <p className="text-slate-300">1. Abre esta página en <strong>Safari</strong> desde tu iPhone.<br/>2. Toca el botón de <strong>compartir</strong> (el cuadrito con flecha ↑, abajo en medio).<br/>3. Desliza y toca <strong>"Agregar a pantalla de inicio"</strong>.<br/>4. Toca <strong>Agregar</strong> — y ya tienes tu app.</p>
+                </div>
+                <p className="text-xs text-slate-400">Tip: mándate este link por WhatsApp para abrirlo en el celular: cotizaexpress.com/cotizador</p>
+              </div>
+            </details>
+          )}
+        </div>
+      </div>
 
       {/* Paywall: ¿te gustó? */}
       {paywall && (
