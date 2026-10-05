@@ -449,82 +449,63 @@ export default function LandingPage() {
       </section>
 
       {/* Precios resumen */}
-      <section className="py-20 bg-white" id="planes">
+      <section className="py-16 bg-white" id="planes">
         <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center text-slate-900 mb-4">Planes y Precios</h2>
-          <p className="text-center text-slate-600 mb-12">Elige el plan que mejor se adapte a tu negocio</p>
-          
-          <div className="grid md:grid-cols-2 gap-8">
-            <Card className="border-2 border-amber-400 shadow-lg relative overflow-hidden">
-              <div className="bg-amber-400 text-white text-center py-2 text-sm font-bold tracking-wide">Recomendado</div>
-              <CardContent className="pt-6 pb-8 text-center">
-                <h3 className="text-2xl font-bold mb-1">CotizaBot</h3>
-                <p className="text-sm text-slate-500 mb-4">Para empresas en crecimiento</p>
-                <div className="text-5xl font-bold text-slate-800 mb-2">$1,000</div>
-                <p className="text-slate-500 mb-6">MXN/mes</p>
-                <ul className="text-left space-y-3 mb-8">
-                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Cotizaciones ilimitadas</li>
-                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>WhatsApp Business integrado</li>
-                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Código QR y link propio</li>
-                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Dashboard completo</li>
-                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Soporte prioritario</li>
-                </ul>
-                <Link to="/registro"><Button className="w-full bg-amber-500 hover:bg-amber-600 text-white" size="lg">Empezar Ahora</Button></Link>
+          <h2 className="text-3xl sm:text-4xl font-bold text-center text-slate-900 mb-10">Planes y Precios</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card className="border-2 border-violet-300 shadow-lg">
+              <CardContent className="pt-8 pb-8 text-center">
+                <p className="text-3xl mb-2">✨</p>
+                <h3 className="text-xl font-bold mb-1">Cotizador IA</h3>
+                <p className="text-sm text-slate-500 mb-4 min-h-[40px]">Haz tus cotizaciones en 2 minutos — sin conectar WhatsApp</p>
+                <div className="text-4xl font-bold text-violet-600 mb-1">$299</div>
+                <p className="text-slate-500 text-sm mb-6">MXN/mes · la primera gratis</p>
+                <Link to="/registro"><Button className="w-full bg-violet-600 hover:bg-violet-700" size="lg">Empezar gratis</Button></Link>
               </CardContent>
             </Card>
-
-            <Card className="border-2 border-orange-400 shadow-lg relative overflow-hidden">
-              <div className="bg-orange-400 text-white text-center py-2 text-sm font-bold tracking-wide flex items-center justify-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                COBRA A TUS CLIENTES
-              </div>
+            <Card className="border-2 border-amber-400 shadow-xl relative overflow-hidden">
+              <div className="bg-amber-400 text-white text-center py-1.5 text-xs font-bold tracking-wide">RECOMENDADO</div>
               <CardContent className="pt-6 pb-8 text-center">
-                <h3 className="text-2xl font-bold mb-1">CotizaBot Pro</h3>
-                <p className="text-sm text-slate-500 mb-4">¡Cobra directamente por WhatsApp!</p>
-                <div className="text-5xl font-bold text-orange-500 mb-2">$2,000</div>
-                <p className="text-slate-500 mb-6">MXN/mes</p>
-                <ul className="text-left space-y-3 mb-8">
-                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Todo de CotizaBot</li>
-                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg><strong className="text-orange-600">Link de pago Mercado Pago</strong></li>
-                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg><strong className="text-orange-600">Datos SPEI automáticos</strong></li>
-                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg><strong className="text-orange-600">Notificaciones de pago</strong></li>
-                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Configura tu CLABE</li>
-                  <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Recibe pagos 24/7</li>
-                </ul>
-                <Link to="/registro"><Button className="w-full bg-orange-500 hover:bg-orange-600 text-white" size="lg">Quiero Cobrar</Button></Link>
+                <p className="text-3xl mb-2">🤖</p>
+                <h3 className="text-xl font-bold mb-1">CotizaBot</h3>
+                <p className="text-sm text-slate-500 mb-4 min-h-[40px]">Tu WhatsApp contesta y cotiza solo, 24/7</p>
+                <div className="text-4xl font-bold text-slate-800 mb-1">$1,000</div>
+                <p className="text-slate-500 text-sm mb-6">MXN/mes</p>
+                <Link to="/registro"><Button className="w-full bg-amber-500 hover:bg-amber-600 text-white" size="lg">Empezar ahora</Button></Link>
+              </CardContent>
+            </Card>
+            <Card className="border-2 border-orange-300 shadow-lg">
+              <CardContent className="pt-8 pb-8 text-center">
+                <p className="text-3xl mb-2">💰</p>
+                <h3 className="text-xl font-bold mb-1">CotizaBot Pro</h3>
+                <p className="text-sm text-slate-500 mb-4 min-h-[40px]">Además cobra: links de pago y SPEI por WhatsApp</p>
+                <div className="text-4xl font-bold text-orange-500 mb-1">$2,000</div>
+                <p className="text-slate-500 text-sm mb-6">MXN/mes</p>
+                <Link to="/registro"><Button className="w-full bg-orange-500 hover:bg-orange-600 text-white" size="lg">Quiero cobrar</Button></Link>
               </CardContent>
             </Card>
           </div>
-          <p className="text-center text-slate-500 mt-6"><Link to="/precios" className="text-emerald-600 hover:underline">Ver todos los planes y comparativa completa →</Link></p>
+          <p className="text-center text-slate-500 mt-6 text-sm"><Link to="/precios" className="text-emerald-600 hover:underline">Ver comparativa completa →</Link></p>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="py-20 bg-slate-50" id="faq">
-        <div className="max-w-3xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-slate-900 mb-12">Preguntas Frecuentes</h2>
-          
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg p-6 shadow">
-              <h3 className="font-bold text-slate-900 mb-2">¿Necesito verificar mi número con Meta/WhatsApp?</h3>
-              <p className="text-slate-600">No. CotizaBot usa un número centralizado ya verificado. Solo compartes tu código único con tus clientes.</p>
-            </div>
-            <div className="bg-white rounded-lg p-6 shadow">
-              <h3 className="font-bold text-slate-900 mb-2">¿Cómo subo mis productos?</h3>
-              <p className="text-slate-600">Puedes cargar un archivo Excel con tus productos o agregarlos manualmente desde el dashboard.</p>
-            </div>
-            <div className="bg-white rounded-lg p-6 shadow">
-              <h3 className="font-bold text-slate-900 mb-2">¿El bot calcula el IVA correctamente?</h3>
-              <p className="text-slate-600">Sí. CotizaBot calcula automáticamente el 16% de IVA en todas las cotizaciones.</p>
-            </div>
-            <div className="bg-white rounded-lg p-6 shadow">
-              <h3 className="font-bold text-slate-900 mb-2">¿Puedo cobrar a mis clientes por WhatsApp?</h3>
-              <p className="text-slate-600">Sí, con el CotizaBot Pro puedes enviar links de pago de Mercado Pago o datos de transferencia SPEI automáticamente.</p>
-            </div>
-            <div className="bg-white rounded-lg p-6 shadow">
-              <h3 className="font-bold text-slate-900 mb-2">¿Puedo ver un demo antes de contratar?</h3>
-              <p className="text-slate-600">Sí. Envía "DEMO" a nuestro WhatsApp y prueba cómo funciona CotizaBot con un catálogo real.</p>
-            </div>
+      <section className="py-12 bg-slate-50" id="faq">
+        <div className="max-w-2xl mx-auto px-4">
+          <h2 className="text-xl font-bold text-center text-slate-900 mb-5">Preguntas frecuentes</h2>
+          <div className="space-y-2">
+            {[
+              ['¿Sirve mi número de WhatsApp de siempre?', 'Sí. Conectas tu número actual sin perder tu WhatsApp — o usas otro si prefieres.'],
+              ['¿Cómo subo mis productos?', 'Con tu Excel en 1 clic, o a mano desde el panel.'],
+              ['¿Calcula el IVA?', 'Sí, automático y configurable (incluido en tus precios o agregado al total).'],
+              ['¿Puedo cobrar por WhatsApp?', 'Sí, con CotizaBot Pro: links de Mercado Pago y datos SPEI automáticos.'],
+              ['¿Puedo probarlo antes?', 'Sí: tu primera cotización es gratis, y puedes probar el bot en el simulador sin conectar nada.'],
+            ].map(([q, a2]) => (
+              <details key={q} className="bg-white border border-slate-200 rounded-lg px-4 py-3">
+                <summary className="text-sm font-semibold text-slate-800 cursor-pointer">{q}</summary>
+                <p className="text-sm text-slate-600 mt-2">{a2}</p>
+              </details>
+            ))}
           </div>
         </div>
       </section>
@@ -544,8 +525,8 @@ export default function LandingPage() {
               <p className="text-slate-400 text-sm max-w-md">Sistema de IA para automatizar cotizaciones y ventas por WhatsApp. Diseñado para PYMEs mexicanas.</p>
             </div>
             <div>
-              <h4 className="text-white font-semibold mb-4">Producto</h4>
-              <ul className="space-y-2 text-sm">
+              <h4 className="text-white font-semibold mb-3 text-sm">Producto</h4>
+              <ul className="space-y-1 text-xs">
                 <li><Link to="/precios" className="text-slate-400 hover:text-white">Precios</Link></li>
                 <li><Link to="/demo" className="text-slate-400 hover:text-white">Demo</Link></li>
                 <li><Link to="/blog" className="text-slate-400 hover:text-white">Blog</Link></li>
@@ -558,8 +539,8 @@ export default function LandingPage() {
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-semibold mb-4">Soluciones por giro</h4>
-              <ul className="space-y-2 text-sm">
+              <h4 className="text-white font-semibold mb-3 text-sm">Soluciones por giro</h4>
+              <ul className="space-y-1 text-xs">
                 <li><Link to="/ferreterias" className="text-slate-400 hover:text-white">Ferreterías</Link></li>
                 <li><Link to="/materiales-construccion" className="text-slate-400 hover:text-white">Materiales de Construcción</Link></li>
                 <li><Link to="/tablaroca-plafones" className="text-slate-400 hover:text-white">Tablaroca y Plafones</Link></li>
@@ -579,8 +560,8 @@ export default function LandingPage() {
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-semibold mb-4">Contacto</h4>
-              <ul className="space-y-2 text-sm">
+              <h4 className="text-white font-semibold mb-3 text-sm">Contacto</h4>
+              <ul className="space-y-1 text-xs">
                 <li><a href="https://wa.me/5218342472640?text=Hola%2C%20me%20interesa%20CotizaBot" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-green-400 flex items-center gap-2">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.611.611l4.458-1.495A11.96 11.96 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.319 0-4.476-.693-6.283-1.882l-.438-.29-2.65.889.889-2.65-.29-.438A9.953 9.953 0 012 12C2 6.486 6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"/></svg>
                   WhatsApp Ventas
@@ -592,7 +573,7 @@ export default function LandingPage() {
                 <li><Link to="/contacto" className="text-slate-400 hover:text-white">Página de Contacto</Link></li>
               </ul>
               <h4 className="text-white font-semibold mb-4 mt-6">Legal</h4>
-              <ul className="space-y-2 text-sm">
+              <ul className="space-y-1 text-xs">
                 <li><Link to="/privacidad" className="text-slate-400 hover:text-white">Aviso de Privacidad</Link></li>
                 <li><Link to="/terminos" className="text-slate-400 hover:text-white">Términos y Condiciones</Link></li>
               </ul>
