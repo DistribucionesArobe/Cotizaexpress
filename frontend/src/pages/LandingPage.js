@@ -350,7 +350,7 @@ export default function LandingPage() {
                   <p className="text-lg text-slate-600 mb-7 max-w-xl mx-auto lg:mx-0">
                     El bot lee la lista que te mandan, busca en tu catálogo y responde la cotización con IVA y PDF en 5 segundos — 24/7.
                   </p>
-                  <a href="https://wa.me/5218342472640?text=DEMO" target="_blank" rel="noopener noreferrer">
+                  <a href="https://wa.me/5218342472640?text=DEMO" target="_blank" rel="noopener noreferrer" onClick={() => { if (window.fbq) { try { window.fbq('track', 'Lead'); } catch (e) {} } }}>
                     <Button size="lg" className="text-lg px-8 py-6 bg-green-600 hover:bg-green-700 shadow-xl">Pruébalo en tu WhatsApp →</Button>
                   </a>
                   <p className="text-sm text-slate-400 mt-3">Gratis · sin registro · es un chat, nada que instalar</p>

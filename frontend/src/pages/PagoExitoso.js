@@ -9,6 +9,7 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 export default function PagoExitoso() {
+  useEffect(() => { if (window.fbq) { try { window.fbq('track', 'Purchase', { currency: 'MXN' }); } catch (e) {} } }, []);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();

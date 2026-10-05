@@ -193,7 +193,7 @@ export default function GeneradorCotizaciones() {
                   Agregar IVA (16%)
                 </label>
 
-                <Button onClick={() => setShowUpsell(true)} className="w-full bg-emerald-600 hover:bg-emerald-700 text-lg py-6">
+                <Button onClick={() => { setShowUpsell(true); if (window.fbq) { try { window.fbq('track', 'Lead'); } catch (e) {} } }} className="w-full bg-emerald-600 hover:bg-emerald-700 text-lg py-6">
                   📄 Descargar mi cotización
                 </Button>
               </CardContent>

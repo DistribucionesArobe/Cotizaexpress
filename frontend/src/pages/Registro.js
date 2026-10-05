@@ -66,6 +66,7 @@ export default function Registro() {
     }
 
     const result = await registro({ ...formData, referral_code: referralCode });
+    if (result?.success && window.fbq) { try { window.fbq('track', 'CompleteRegistration'); } catch (e) {} }
 
     if (result.success) {
       toast.success('¡Registro exitoso! Bienvenido a CotizaBot');
