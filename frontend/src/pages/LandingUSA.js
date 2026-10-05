@@ -7,10 +7,12 @@ const OFICIOS_CON_PAGINA = { Roofing: 'roofing', Landscaping: 'landscaping', Pai
 
 const FAQ_USA = [
   ['¿Cómo hago un estimate en español en Estados Unidos?', 'Con CotizaBot escribes el trabajo en tus palabras — "pintar sala y 2 cuartos con material" — y la IA lo convierte en un estimate profesional en dólares, con tax, labor y materiales separados y PDF con tu logo. Todo en español, desde tu celular.'],
-  ['¿El estimate sale en dólares y con el tax de mi estado?', 'Sí. Eliges modo USA 🇺🇸, pones el sales tax de tu estado (por ejemplo 8.25% en Texas) o lo dejas en cero, y el total sale exacto en USD.'],
+  ['¿El estimate sale en dólares y con tax?', 'Sí. Eliges modo USA 🇺🇸 y pones la tasa de sales tax que aplica a tu caso — el tax varía por estado, localidad y tipo de trabajo (en Texas, por ejemplo, los trabajos residenciales y comerciales se manejan distinto) — o la dejas en cero. El total sale exacto en USD.'],
   ['¿Cuánto cuesta la app para hacer estimates?', 'El primer estimate es gratis y sin tarjeta. Después son $15 USD al mes con estimates ilimitados, tu logo, PDF y link para compartir.'],
   ['¿Sirve para roofing, landscaping, painting o handyman?', 'Sí, está hecha para contratistas hispanos: roofing, landscaping, painting, remodeling, drywall, flooring, handyman, cleaning, concrete y fencing. Separas labor y materiales como lo piden los customers y los GCs.'],
   ['¿Necesito computadora o saber inglés?', 'No. Todo es en español y desde tu celular — se instala como app. El estimate que recibe el customer se ve profesional, con números en formato de USA.'],
+  ['¿La IA inventa los precios?', 'No. Tú guardas tus precios una vez (por sqft, por hora, por servicio o por producto) y la IA los usa para armar cada estimate. Tú siempre tienes la última palabra: puedes editar cualquier línea antes de generar el PDF.'],
+  ['¿Puedo entregar el estimate en inglés?', 'Sí. Tú trabajas en español y eliges el idioma del PDF: español o inglés (ESTIMATE, Qty, Unit Price, Total). Así tu customer americano lo recibe en su idioma.'],
   ['¿Cómo le mando el estimate al customer?', 'Cada estimate genera un PDF y un link: lo mandas por mensaje de texto, WhatsApp o email directo desde tu celular, en el momento, antes que la competencia.'],
 ];
 
@@ -68,8 +70,9 @@ export default function LandingUSA() {
             Manda estimates como los grandes,<br className="hidden sm:block"/> <span className="text-yellow-300">en español y en 2 minutos</span>
           </h1>
           <p className="text-blue-100 text-lg max-w-2xl mx-auto mb-7">
-            Describe el trabajo — "pintar 2 cuartos con material" — y la IA te arma el estimate en dólares,
-            con tax y PDF profesional con tu logo. Listo para mandarlo por WhatsApp o texto antes que la competencia.
+            Describe el trabajo — "pintar 2 cuartos con material" — y la IA te arma el estimate en dólares
+            <strong className="text-white">con tus precios</strong> (los guardas una vez), con tax y PDF profesional con tu logo.
+            Listo para mandarlo por texto o WhatsApp antes que la competencia.
           </p>
           <Link to="/registro?utm_source=usa">
             <Button size="lg" className="bg-yellow-400 hover:bg-yellow-300 text-slate-900 text-lg font-extrabold px-8 py-6 shadow-xl">
@@ -107,11 +110,51 @@ export default function LandingUSA() {
         </div>
       </section>
 
-      {/* Por qué */}
+      {/* Cómo funciona — demo visual */}
       <section className="py-14 bg-slate-50">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">Así funciona 🤖</h2>
+          <div className="grid sm:grid-cols-3 gap-6 items-start">
+            <div className="text-center">
+              <div className="text-sm font-bold text-blue-700 mb-2">1 · Describe el trabajo</div>
+              <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm text-left">
+                <div className="bg-[#DCF8C6] rounded-xl px-3 py-2 text-sm text-slate-800">"Pintar sala y 2 cuartos, 850 sqft, con material, 2 manos"</div>
+                <p className="text-xs text-slate-400 mt-2">En tus palabras, en español.</p>
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm font-bold text-blue-700 mb-2">2 · La IA lo arma con TUS precios</div>
+              <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm text-left text-xs text-slate-700 space-y-1.5">
+                <div className="flex justify-between"><span>🎨 Paint &amp; materials</span><span className="font-semibold">$380.00</span></div>
+                <div className="flex justify-between"><span>👷 Labor — 850 sqft × $1.29</span><span className="font-semibold">$1,100.00</span></div>
+                <div className="flex justify-between text-slate-400"><span>Tax (tu tasa: 8%)</span><span>$118.40</span></div>
+                <p className="text-[11px] text-slate-400 pt-1">Tus tarifas se guardan una vez. Puedes editar cualquier línea.</p>
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm font-bold text-blue-700 mb-2">3 · Mandas el PDF</div>
+              <div className="bg-white rounded-2xl border-2 border-blue-200 p-4 shadow-md text-left text-xs">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="font-extrabold text-slate-800">García Painting LLC</span>
+                  <span className="text-right text-blue-700 font-bold">ESTIMATE<br/><span className="text-slate-400 font-normal">CX-7K2M4</span></span>
+                </div>
+                <div className="border-t border-slate-200 pt-1.5 text-slate-600">
+                  <div className="flex justify-between py-0.5"><span>Paint &amp; materials</span><span>$380.00</span></div>
+                  <div className="flex justify-between py-0.5"><span>Labor — 850 sqft</span><span>$1,100.00</span></div>
+                </div>
+                <div className="flex justify-between bg-blue-700 text-white font-bold rounded px-2 py-1.5 mt-1.5"><span>TOTAL (USD, tax incl.)</span><span>$1,598.40</span></div>
+                <p className="text-[11px] text-slate-400 mt-2">En español o inglés — como lo quiera tu customer. Por texto, WhatsApp o email.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Por qué */}
+      <section className="py-14 bg-white">
         <div className="max-w-4xl mx-auto px-4 grid sm:grid-cols-3 gap-6">
           {[
-            ['💵', 'En dólares, con tax', 'Pones el tax de tu estado (o sin tax) y el total sale exacto. Separa labor y materiales.'],
+            ['💵', 'En dólares, con tax', 'Pones la tasa de tax que aplica a tu trabajo — varía por estado, localidad y tipo de servicio — o la dejas en cero. Separa labor y materiales.'],
             ['🏃', 'El primero que manda precio, gana', 'Tu cliente pidió precio a varios. Manda el tuyo desde tu teléfono antes de salir del lugar — te ves profesional y cierras.'],
             ['📲', 'Vive en tu celular', 'Se instala como app, en español. Nada de programas raros ni computadora.'],
           ].map(([e, t, d]) => (

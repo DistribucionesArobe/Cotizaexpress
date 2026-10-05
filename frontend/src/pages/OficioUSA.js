@@ -10,8 +10,8 @@ export const OFICIOS_USA = {
     sub: 'Shingles, underlayment, flashing y labor — todo en un estimate profesional en dólares, con tax, listo para mandarlo por texto antes de bajarte del techo.',
     ejemplo: 'Reemplazo de techo 22 squares, shingles arquitectónicos, incluye tear-off y disposal',
     metaTitle: 'Estimates de Roofing en Español — App para Roofers Hispanos en USA',
-    metaDesc: 'Haz estimates de roofing en dólares desde tu celular, en español: materiales, labor y tax de tu estado en un PDF profesional. $15/mes, el primero gratis.',
-    bullets: ['Cotiza por square con material y labor separados', 'Tax de tu estado configurable', 'PDF con tu logo que te hace ver como compañía grande'],
+    metaDesc: 'Haz estimates de roofing en dólares desde tu celular, en español: materiales, labor y tax en un PDF profesional. $15/mes, el primero gratis.',
+    bullets: ['Cotiza por square con material y labor separados', 'Tax configurable según tu área y tipo de trabajo', 'PDF con tu logo que te hace ver como compañía grande'],
     faq: [
       ['¿Cómo hago un estimate de roofing en español?', 'Escribe el trabajo en tus palabras — "reemplazo de techo 22 squares con tear-off" — y la IA lo convierte en un estimate en dólares con labor, materiales, tax y PDF profesional, todo en español.'],
       ['¿Puedo separar labor y materiales en el estimate?', 'Sí. Cada línea se marca como material o labor (mano de obra) y el PDF muestra el desglose, que es lo que el customer y las aseguranzas quieren ver.'],
@@ -30,7 +30,7 @@ export const OFICIOS_USA = {
     faq: [
       ['¿Cómo hago un estimate de landscaping en español?', 'Describe el trabajo — "instalar sod 1,200 sqft y 5 yardas de mulch" — y la IA arma el estimate en dólares con materiales, labor y tax, en español y con PDF profesional.'],
       ['¿Puedo cotizar servicios recurrentes como mowing?', 'Sí, guardas tus precios una vez (por corte, por sqft, por visita) y cada estimate nuevo sale en segundos desde tu celular.'],
-      ['¿El estimate sale en dólares con tax?', 'Sí, todo en USD y tú pones el sales tax de tu estado (o lo dejas en cero si tu servicio no lleva tax).'],
+      ['¿El estimate sale en dólares con tax?', 'Sí, todo en USD y tú pones la tasa de sales tax que aplica a tu caso — varía por estado, localidad y tipo de servicio — o la dejas en cero.'],
     ],
   },
   painting: {
@@ -161,6 +161,7 @@ export default function OficioUSA({ slug }) {
           <Button size="lg" className="bg-blue-700 hover:bg-blue-800 text-lg px-8 py-6">Hacer mi primer estimate GRATIS →</Button>
         </Link>
         <p className="text-sm text-slate-400 mt-3">$15 USD/mes después del primero · en español · se instala como app 📲</p>
+        <p className="text-sm text-slate-500 mt-2">🔒 La IA usa <strong>tus precios</strong> (los guardas una vez) · el PDF puede ir en español o en inglés</p>
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-8 text-sm text-amber-900 max-w-xl mx-auto">
           👷 <strong>Labor y materiales separados</strong> en el mismo estimate — el customer ve el desglose claro y tú cierras el trabajo sin regateos.

@@ -178,14 +178,14 @@ export default function LandingPage() {
   const [showUsaBanner, setShowUsaBanner] = useState(false);
   useEffect(() => {
     try {
-      if (localStorage.getItem('region')) return; // ya eligió
+      if (localStorage.getItem('cotizador_region')) return; // ya eligió
       if (sessionStorage.getItem('usa_banner_off')) return;
       const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
       const US_TZ = ['America/New_York','America/Chicago','America/Denver','America/Phoenix','America/Los_Angeles','America/Anchorage','America/Detroit','America/Indiana/Indianapolis','America/Boise','Pacific/Honolulu','America/Kentucky/Louisville'];
       if (US_TZ.includes(tz)) setShowUsaBanner(true);
     } catch (e) { /* noop */ }
   }, []);
-  const irUSA = () => { try { localStorage.setItem('region', 'US'); } catch (e) {} window.location.href = '/usa'; };
+  const irUSA = () => { try { localStorage.setItem('cotizador_region', 'US'); } catch (e) {} window.location.href = '/usa'; };
   const cerrarUsaBanner = () => { try { sessionStorage.setItem('usa_banner_off', '1'); } catch (e) {} setShowUsaBanner(false); };
   return (
 

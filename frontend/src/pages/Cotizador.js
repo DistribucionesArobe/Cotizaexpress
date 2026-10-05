@@ -27,6 +27,8 @@ export default function Cotizador() {
     else { setIvaPct(16); setIvaIncluido(true); }
   };
   const esUS = region === 'US';
+  const [pdfLang, setPdfLang] = useState(() => localStorage.getItem('cotizador_pdf_lang') || 'es');
+  const cambiarPdfLang = (l) => { setPdfLang(l); localStorage.setItem('cotizador_pdf_lang', l); };
   const etiquetaImpuesto = esUS ? 'Tax' : 'IVA';
   const [buscado, setBuscado] = useState(false);
   const [paywall, setPaywall] = useState(false);
@@ -91,7 +93,7 @@ export default function Cotizador() {
     try {
       const itemsPdf = items.map(it => it.tipo === 'mano_obra' && !/mano de obra/i.test(it.name)
         ? { ...it, name: `Mano de obra — ${it.name}` } : it);
-      const r = await axios.post(`${API}/cotizador/guardar`, { items: itemsPdf, cliente, vat_pct: parseFloat(ivaPct) || 0, vat_incluido: ivaIncluido, moneda: esUS ? 'USD' : 'MXN' }, { withCredentials: true });
+      const r = await axios.post(`${API}/cotizador/guardar`, { items: itemsPdf, cliente, vat_pct: parseFloat(ivaPct) || 0, vat_incluido: ivaIncluido, moneda: esUS ? 'USD' : 'MXN', idioma: esUS ? pdfLang : 'es' }, { withCredentials: true });
       setResultado(r.data);
       toast.success(`Cotización ${r.data.folio} creada`);
     } catch (e) {
@@ -215,6 +217,15 @@ export default function Cotizador() {
                   <button type="button" onClick={() => cambiarRegion('MX')} className={`px-3 py-1 text-xs font-bold ${!esUS ? 'bg-emerald-600 text-white' : 'bg-white text-slate-500'}`}>🇲🇽 MXN</button>
                   <button type="button" onClick={() => cambiarRegion('US')} className={`px-3 py-1 text-xs font-bold ${esUS ? 'bg-blue-600 text-white' : 'bg-white text-slate-500'}`}>🇺🇸 USD</button>
                 </div>
+                {esUS && (
+                  <div className="flex items-center gap-1 mr-2">
+                    <span className="text-slate-500">PDF en:</span>
+                    <div className="flex rounded-full border border-slate-200 overflow-hidden">
+                      <button type="button" onClick={() => cambiarPdfLang('es')} className={`px-3 py-1 text-xs font-bold ${pdfLang === 'es' ? 'bg-blue-600 text-white' : 'bg-white text-slate-500'}`}>Español</button>
+                      <button type="button" onClick={() => cambiarPdfLang('en')} className={`px-3 py-1 text-xs font-bold ${pdfLang === 'en' ? 'bg-blue-600 text-white' : 'bg-white text-slate-500'}`}>English</button>
+                    </div>
+                  </div>
+                )}
                 <label className="flex items-center gap-1">
                   {etiquetaImpuesto}
                   <input

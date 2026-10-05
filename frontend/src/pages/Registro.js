@@ -12,6 +12,7 @@ export default function Registro() {
   const { registro } = useAuth();
   const [loading, setLoading] = useState(false);
   const referralCode = searchParams.get('ref') || '';
+  const esUSA = (searchParams.get('utm_source') || '').startsWith('usa');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -70,7 +71,12 @@ export default function Registro() {
 
     if (result.success) {
       toast.success('¡Registro exitoso! Bienvenido a CotizaBot');
-      navigate('/onboarding');
+      if (esUSA) {
+        try { localStorage.setItem('cotizador_region', 'US'); } catch (e) {}
+        navigate('/cotizador');
+      } else {
+        navigate('/onboarding');
+      }
     } else {
       toast.error(result.error);
     }
@@ -100,8 +106,8 @@ export default function Registro() {
               <span className="text-xs text-slate-400">by CotizaExpress</span>
             </div>
           </Link>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Crea tu bot en 2 minutos</h1>
-          <p className="text-slate-600">Gratis · sin tarjeta · solo 3 datos</p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">{esUSA ? 'Crea tu cuenta y haz tu primer estimate' : 'Crea tu bot en 2 minutos'}</h1>
+          <p className="text-slate-600">{esUSA ? 'Gratis · sin tarjeta · tu primer estimate en 2 minutos' : 'Gratis · sin tarjeta · solo 3 datos'}</p>
           {referralCode && (
             <div className="mt-3 inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 text-sm font-medium px-4 py-2 rounded-full border border-emerald-200">
               <span>Referido por un afiliado</span>
@@ -123,7 +129,7 @@ export default function Registro() {
                   value={formData.empresa_nombre}
                   onChange={handleChange}
                   className="w-full px-4 py-3 text-base border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  placeholder="Ej: Ferretería López"
+                  placeholder={esUSA ? "Ej: García Painting LLC" : "Ej: Ferretería López"}
                   required
                   data-testid="input-empresa"
                 />
@@ -203,7 +209,7 @@ export default function Registro() {
                     Creando cuenta...
                   </>
                 ) : (
-                  'Crear mi bot gratis →'
+                  esUSA ? 'Crear mi cuenta gratis →' : 'Crear mi bot gratis →'
                 )}
               </Button>
 
