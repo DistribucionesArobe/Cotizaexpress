@@ -119,7 +119,7 @@ export default function LandingUSA() {
               <div className="text-sm font-bold text-blue-700 mb-2">1 · Describe el trabajo</div>
               <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm text-left">
                 <div className="bg-[#DCF8C6] rounded-xl px-3 py-2 text-sm text-slate-800">"Pintar sala y 2 cuartos, 850 sqft, con material, 2 manos"</div>
-                <p className="text-xs text-slate-400 mt-2">En tus palabras, en español.</p>
+                <p className="text-xs text-slate-400 mt-2">En tus palabras, en español — o súbele una foto 📷 de tu lista y la IA la lee.</p>
               </div>
             </div>
             <div className="text-center">

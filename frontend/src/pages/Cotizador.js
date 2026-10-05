@@ -45,11 +45,12 @@ export default function Cotizador() {
     if (resultado || paywall) resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, [resultado, paywall]);
 
-  const cotizarIA = async () => {
-    if (!texto.trim()) { toast.error('Pega la lista del cliente'); return; }
+  const cotizarIA = async (textoDirecto) => {
+    const t = (typeof textoDirecto === 'string' ? textoDirecto : texto).trim();
+    if (!t) { toast.error('Pega la lista del cliente'); return; }
     setCargando(true); setResultado(null);
     try {
-      const r = await axios.post(`${API}/cotizador/ia`, { texto }, { withCredentials: true });
+      const r = await axios.post(`${API}/cotizador/ia`, { texto: t }, { withCredentials: true });
       setCatalogoVacio(!!r.data.catalogo_vacio);
       setItems(r.data.encontrados || []);
       setDudas(r.data.dudas || []);
@@ -62,6 +63,25 @@ export default function Cotizador() {
     } catch (e) {
       toast.error(e?.response?.data?.detail || 'Error al cotizar');
     } finally { setCargando(false); }
+  };
+
+  const [leyendoFoto, setLeyendoFoto] = useState(false);
+  const fotoRef = useRef(null);
+  const subirFoto = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    setLeyendoFoto(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const r = await axios.post(`${API}/cotizador/imagen`, fd, { withCredentials: true });
+      setTexto(r.data.texto);
+      toast.success('📷 Leí ' + r.data.renglones + ' renglones de tu foto');
+      await cotizarIA(r.data.texto);
+    } catch (err) {
+      toast.error((err && err.response && err.response.data && err.response.data.detail) || 'No pude leer la imagen');
+    } finally { setLeyendoFoto(false); }
   };
 
   const elegirCandidato = (duda, cand) => {
@@ -138,9 +158,16 @@ export default function Cotizador() {
             placeholder={'Ej:\n10 cemento gris\n5 varilla 3/8\n200 block'}
             className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 text-sm"
           />
-          <Button onClick={cotizarIA} disabled={cargando} className="bg-violet-600 hover:bg-violet-700">
-            {cargando ? 'Buscando en tu catálogo...' : '✨ Cotizar con IA'}
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button onClick={cotizarIA} disabled={cargando || leyendoFoto} className="bg-violet-600 hover:bg-violet-700">
+              {cargando ? 'Buscando en tu catálogo...' : '✨ Cotizar con IA'}
+            </Button>
+            <Button type="button" variant="outline" onClick={() => fotoRef.current && fotoRef.current.click()} disabled={cargando || leyendoFoto} className="border-violet-300 text-violet-700 hover:bg-violet-50">
+              {leyendoFoto ? '📷 Leyendo tu foto...' : '📷 O súbele una foto de la lista'}
+            </Button>
+            <input ref={fotoRef} type="file" accept="image/*" onChange={subirFoto} className="hidden" />
+          </div>
+          <p className="text-xs text-slate-400">Puede ser una lista escrita a mano, una captura de WhatsApp o una nota — la IA la convierte en renglones y tú solo revisas el precio.</p>
         </CardContent>
       </Card>
 
