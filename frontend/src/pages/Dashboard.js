@@ -200,15 +200,15 @@ export default function Dashboard() {
       {/* ─── GANCHO + ACCESOS RÁPIDOS ─── */}
       <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-6 text-white flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-xl font-bold">¿Quieres que tus cotizaciones se contesten SOLAS por WhatsApp?</p>
-          <p className="text-emerald-100 text-sm mt-1">Primero míralo con tus productos — toma 1 minuto y no conectas nada.</p>
+          <p className="text-xl font-bold">¿Qué quieres hacer hoy?</p>
+          <p className="text-emerald-100 text-sm mt-1">Elige tu camino — puedes cambiar cuando quieras.</p>
         </div>
-        <div className="flex gap-3">
-          <Link to="/simulador">
-            <Button className="bg-white text-emerald-700 hover:bg-emerald-50 font-bold">🧪 Probar mi bot</Button>
+        <div className="flex flex-wrap gap-3">
+          <Link to="/cotizador">
+            <Button className="bg-white text-violet-700 hover:bg-violet-50 font-bold">✨ Solo quiero hacer cotizaciones</Button>
           </Link>
-          <Link to="/precios">
-            <Button variant="outline" className="border-white text-white hover:bg-white/10 font-bold">Ver planes →</Button>
+          <Link to="/simulador">
+            <Button className="bg-white text-emerald-700 hover:bg-emerald-50 font-bold">🤖 Quiero que se contesten solas</Button>
           </Link>
         </div>
       </div>
@@ -402,7 +402,40 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {/* Plan Cotizador IA */}
+          {(() => {
+            const isCurrent = stats.planCode === 'cotizador';
+            return (
+              <Card className={`relative ${isCurrent ? 'border-slate-300 bg-slate-50 opacity-80' : 'border-violet-300 border-2'}`}>
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <Badge className={`${isCurrent ? 'bg-slate-500' : 'bg-violet-600'} text-white px-3 py-1`}>
+                    {isCurrent ? 'Plan Activo' : '✨ Solo cotizar'}
+                  </Badge>
+                </div>
+                <CardContent className="pt-6 pb-6">
+                  <h4 className={`text-lg font-bold ${isCurrent ? 'text-slate-500' : 'text-slate-900'}`}>Cotizador IA</h4>
+                  <p className="text-slate-500 text-sm mt-1">Haz tus cotizaciones — sin WhatsApp</p>
+                  <div className="mt-4 mb-1">
+                    <span className={`text-3xl font-bold ${isCurrent ? 'text-slate-400' : 'text-slate-900'}`}>$299</span>
+                    <span className="text-slate-500 text-sm"> MXN/mes</span>
+                  </div>
+                  <p className="text-xs text-slate-400 mb-6">Factura CFDI disponible</p>
+                  <ul className="space-y-2.5 mb-6">
+                    <PlanFeature incluido>Pega la lista y la IA la cotiza</PlanFeature>
+                    <PlanFeature incluido>PDF con folio y tu logo</PlanFeature>
+                    <PlanFeature incluido>Cotizaciones ilimitadas</PlanFeature>
+                    <PlanFeature incluido>Catálogo desde Excel</PlanFeature>
+                  </ul>
+                  {!isCurrent && (
+                    <Button onClick={() => handleUpgrade('cotizador')} disabled={loadingPlan === 'cotizador'} className="w-full bg-violet-600 hover:bg-violet-700">
+                      {loadingPlan === 'cotizador' ? 'Procesando...' : 'Activar Cotizador'}
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })()}
           {/* Plan Completo */}
           {(() => {
             const isCurrent = stats.planCode === 'cotizabot';

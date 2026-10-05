@@ -472,10 +472,11 @@ export default function Onboarding() {
                   <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <Package className="w-8 h-8 text-blue-600" />
                   </div>
-                  <h2 className="text-2xl font-bold text-slate-900">Agrega 3 productos</h2>
-                  <p className="text-slate-600 mt-1">
-                    Solo nombre y precio — los que más te piden. El catálogo completo lo subes después con tu Excel.
+                  <h2 className="text-3xl font-bold text-slate-900">¿Qué vendes? 🛒</h2>
+                  <p className="text-slate-600 mt-2 text-lg">
+                    Escribe <strong>3 productos</strong> — los que más te piden. Nada más.
                   </p>
+                  <p className="text-sm text-slate-400 mt-1">El catálogo completo lo subes después con tu Excel (1 clic).</p>
                   <button
                     type="button"
                     onClick={() => {
@@ -487,50 +488,51 @@ export default function Onboarding() {
                       track('wizard_productos_ejemplo');
                       toast.success('Listo: 3 productos de ejemplo. Puedes cambiarlos o seguir.');
                     }}
-                    className="mt-3 text-sm text-emerald-700 underline hover:text-emerald-800"
+                    className="mt-4 inline-flex items-center gap-2 bg-violet-50 border-2 border-violet-200 text-violet-700 font-semibold text-sm px-5 py-2.5 rounded-full hover:bg-violet-100 hover:border-violet-300 transition-all"
                   >
-                    ¿Solo quieres ver cómo funciona? Usa productos de ejemplo →
+                    ⚡ ¿Con prisa? Llénalo con productos de ejemplo
                   </button>
                 </div>
 
-                <div className="space-y-3">
-                  <div className="grid grid-cols-12 gap-2 text-xs font-medium text-slate-500 px-1">
-                    <span className="col-span-7">Nombre del producto</span>
-                    <span className="col-span-3">Precio (sin IVA)</span>
-                    <span className="col-span-2"></span>
-                  </div>
-
-                  {products.map((p, i) => (
-                    <div key={i} className="grid grid-cols-12 gap-2 items-center">
-                      <input
-                        type="text"
-                        value={p.nombre}
-                        onChange={(e) => updateProduct(i, 'nombre', e.target.value)}
-                        className="col-span-7 px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm"
-                        placeholder={`Producto ${i + 1}`}
-                      />
-                      <div className="col-span-3 relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">$</span>
+                <div className="space-y-3 max-w-xl mx-auto">
+                  {products.map((p, i) => {
+                    const ejemplos = ['Ej: Cemento gris 50 kg', 'Ej: Varilla 3/8', 'Ej: Block 15x20x40', 'Ej: Pintura vinílica 19L', 'Ej: Lámina galvanizada'];
+                    const colores = ['bg-emerald-500', 'bg-teal-500', 'bg-cyan-500', 'bg-violet-500', 'bg-pink-500'];
+                    return (
+                      <div key={i} className="flex items-center gap-3 bg-white border-2 border-slate-100 hover:border-emerald-200 rounded-2xl p-3 shadow-sm transition-all">
+                        <div className={`w-9 h-9 ${colores[i % colores.length]} text-white rounded-full flex items-center justify-center font-bold flex-shrink-0`}>
+                          {i + 1}
+                        </div>
                         <input
-                          type="number"
-                          value={p.precio}
-                          onChange={(e) => updateProduct(i, 'precio', e.target.value)}
-                          className="w-full pl-7 pr-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm"
-                          placeholder="0.00"
-                          min="0"
-                          step="0.01"
+                          type="text"
+                          value={p.nombre}
+                          onChange={(e) => updateProduct(i, 'nombre', e.target.value)}
+                          className="flex-1 px-3 py-3 border-0 bg-slate-50 rounded-xl focus:ring-2 focus:ring-emerald-400 text-base"
+                          placeholder={ejemplos[i % ejemplos.length]}
                         />
+                        <div className="relative w-32 flex-shrink-0">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600 font-bold">$</span>
+                          <input
+                            type="number"
+                            value={p.precio}
+                            onChange={(e) => updateProduct(i, 'precio', e.target.value)}
+                            className="w-full pl-7 pr-2 py-3 border-0 bg-emerald-50 rounded-xl focus:ring-2 focus:ring-emerald-400 text-base font-semibold text-slate-800"
+                            placeholder="precio"
+                            min="0"
+                            step="0.01"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeProduct(i)}
+                          className="p-2 text-slate-300 hover:text-red-500 transition-colors"
+                          disabled={products.length <= 1}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => removeProduct(i)}
-                        className="col-span-2 p-2 text-slate-400 hover:text-red-500 transition-colors flex justify-center"
-                        disabled={products.length <= 1}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {products.length < 10 && (

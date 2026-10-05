@@ -69,9 +69,13 @@ export default function Cotizador() {
     } finally { setGuardando(false); }
   };
 
-  const msgWhats = resultado
-    ? encodeURIComponent(`Hola${cliente ? ' ' + cliente : ''}, aquí está tu cotización ${resultado.folio} por $${resultado.total.toLocaleString('es-MX', {minimumFractionDigits: 2})}: ${resultado.link}`)
+  const msgTexto = resultado
+    ? `Hola${cliente ? ' ' + cliente : ''}, aquí está tu cotización ${resultado.folio} por $${resultado.total.toLocaleString('es-MX', {minimumFractionDigits: 2})}: ${resultado.link}`
     : '';
+  const msgWhats = encodeURIComponent(msgTexto);
+  const msgMail = resultado
+    ? `mailto:?subject=${encodeURIComponent('Cotización ' + resultado.folio)}&body=${encodeURIComponent(msgTexto)}`
+    : '#';
 
   return (
     <div className="space-y-6 max-w-4xl">
@@ -82,6 +86,7 @@ export default function Cotizador() {
         <div>
           <h2 className="text-2xl font-bold text-slate-900">Cotizador IA</h2>
           <p className="text-slate-600 text-sm">Pega la lista de tu cliente tal como te la mandó — la IA la convierte en cotización con tu catálogo.</p>
+          <p className="text-xs text-violet-700 mt-1 font-medium">Plan Cotizador IA: cotizaciones ilimitadas por $299/mes · <a href="/precios" className="underline">ver planes</a></p>
         </div>
       </div>
 
@@ -198,16 +203,23 @@ export default function Cotizador() {
             <p className="text-lg font-bold text-slate-900">✅ Cotización <span className="text-emerald-700">{resultado.folio}</span> — ${resultado.total.toLocaleString('es-MX', {minimumFractionDigits: 2})} + IVA</p>
             <div className="flex flex-wrap gap-3 justify-center">
               <a href={`https://wa.me/?text=${msgWhats}`} target="_blank" rel="noopener noreferrer">
-                <Button className="bg-[#25D366] hover:bg-[#1ebe57]">Enviar por WhatsApp</Button>
+                <Button className="bg-[#25D366] hover:bg-[#1ebe57]">📲 Enviar por WhatsApp</Button>
               </a>
-              <a href={resultado.link} target="_blank" rel="noopener noreferrer">
-                <Button variant="outline"><FileText className="w-4 h-4 mr-2" />Ver / descargar</Button>
+              <a href={msgMail}>
+                <Button variant="outline">✉️ Enviar por correo</Button>
+              </a>
+              <a href={`${resultado.link}?download=1`}>
+                <Button variant="outline"><FileText className="w-4 h-4 mr-2" />Descargar PDF</Button>
               </a>
               <Button variant="outline" onClick={() => { navigator.clipboard.writeText(resultado.link); toast.success('Link copiado'); }}>
                 <Copy className="w-4 h-4 mr-2" />Copiar link
               </Button>
             </div>
-            <p className="text-xs text-slate-500">💡 ¿Te imaginas que esto se contestara solo cuando el cliente escribe? Eso hace CotizaBot al conectar tu WhatsApp.</p>
+            <div className="bg-white border border-violet-200 rounded-lg px-4 py-3 text-sm text-slate-700 max-w-lg mx-auto">
+              ✨ Esto es el <strong>Plan Cotizador IA — $299/mes</strong>: cotizaciones ilimitadas con tu logo y folio.
+              <a href="/precios" className="text-violet-700 underline font-medium ml-1">Activar mi plan</a>
+            </div>
+            <p className="text-xs text-slate-500">🤖 ¿Y si se contestara solo cuando el cliente te escribe? Eso hace CotizaBot ($1,000/mes) al conectar tu WhatsApp.</p>
           </CardContent>
         </Card>
       )}
