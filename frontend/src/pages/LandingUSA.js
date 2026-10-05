@@ -61,7 +61,7 @@ export default function LandingUSA() {
         </div>
       </nav>
 
-      {/* Hero */}
+      {/* Hero — la página es esto */}
       <section className="bg-gradient-to-br from-blue-700 via-blue-800 to-slate-900 text-white">
         <div className="max-w-5xl mx-auto px-4 py-14 sm:py-20 text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur rounded-full px-4 py-1.5 text-sm font-medium mb-5">
@@ -70,128 +70,46 @@ export default function LandingUSA() {
           <h1 className="text-4xl sm:text-5xl font-extrabold mb-4 leading-tight">
             Manda estimates como los grandes,<br className="hidden sm:block"/> <span className="text-yellow-300">en español y en 2 minutos</span>
           </h1>
-          <p className="text-blue-100 text-lg max-w-2xl mx-auto mb-7">
-            Describe el trabajo — "pintar 2 cuartos con material" — y la IA te arma el estimate en dólares
-            <strong className="text-white">con tus precios</strong> (los guardas una vez), con tax y PDF profesional con tu logo.
-            Listo para mandarlo por texto o WhatsApp antes que la competencia.
+          <p className="text-blue-100 text-lg max-w-xl mx-auto mb-7">
+            Describe el trabajo y la IA arma el estimate en dólares <strong className="text-white">con tus precios</strong> — tax, PDF con tu logo, listo para mandar.
           </p>
           <Link to="/registro?utm_source=usa">
             <Button size="lg" className="bg-yellow-400 hover:bg-yellow-300 text-slate-900 text-lg font-extrabold px-8 py-6 shadow-xl">
               Hacer mi primer estimate GRATIS →
             </Button>
           </Link>
-          <p className="text-sm text-blue-200 mt-3">$15 USD al mes después del primero · se instala como app en tu cel 📲 · cancela cuando quieras</p>
+          <p className="text-sm text-blue-200 mt-3">$15 USD/mes después del primero · sin tarjeta · cancela cuando quieras</p>
 
-          {/* Mockup */}
+          {/* Mockup = el demo */}
           <div className="max-w-sm mx-auto mt-10 bg-white rounded-3xl p-5 shadow-2xl text-left">
-            <p className="text-xs font-bold text-blue-700 mb-2">✨ Tu estimate</p>
             <div className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-500 mb-3">"Pintar sala y 2 cuartos, 850 sqft, con material, 2 manos"</div>
             <div className="text-center text-blue-500 text-xl mb-3">⬇</div>
             <div className="border border-slate-200 rounded-xl overflow-hidden text-xs text-slate-700">
-              <div className="grid grid-cols-3 px-3 py-1.5 border-t"><span>Paint & materials</span><span className="text-center">1</span><span className="text-right">$380.00</span></div>
+              <div className="flex justify-between items-center px-3 py-1.5 bg-slate-50 border-b"><span className="font-extrabold text-slate-800">García Painting LLC</span><span className="text-blue-700 font-bold">ESTIMATE · CX-7K2M4</span></div>
+              <div className="grid grid-cols-3 px-3 py-1.5"><span>Paint & materials</span><span className="text-center">1</span><span className="text-right">$380.00</span></div>
               <div className="grid grid-cols-3 px-3 py-1.5 border-t bg-slate-50"><span>👷 Labor — 850 sqft</span><span className="text-center">1</span><span className="text-right">$1,100.00</span></div>
               <div className="flex justify-between px-3 py-2 border-t bg-blue-700 text-white font-bold"><span>TOTAL (USD, tax inc.)</span><span>$1,598.40</span></div>
             </div>
-            <p className="text-center text-[11px] text-slate-500 mt-3">📄 PDF con tu logo · folio · listo para WhatsApp o text</p>
+            <p className="text-center text-[11px] text-slate-500 mt-3">📄 PDF en español o inglés · por texto, WhatsApp o email · también lee fotos 📷 de tu lista</p>
+          </div>
+
+          {/* 3 puntos, una línea cada uno */}
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-8 text-sm text-blue-100">
+            <span>💵 Dólares, con el tax de tu área</span>
+            <span>🔒 Tus precios — la IA no inventa</span>
+            <span>📲 Vive en tu celular, en español</span>
           </div>
         </div>
       </section>
 
-      {/* Oficios */}
+      {/* Precio + CTA */}
       <section className="py-14 bg-white">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">Hecho para tu oficio</h2>
-          <div className="flex flex-wrap justify-center gap-3">
-            {OFICIOS_US.map(o => OFICIOS_CON_PAGINA[o] ? (
-              <Link key={o} to={`/usa/${OFICIOS_CON_PAGINA[o]}`} className="bg-blue-50 hover:bg-blue-100 text-blue-800 font-medium rounded-full px-4 py-2 text-sm border border-blue-200">{o} →</Link>
-            ) : (
-              <span key={o} className="bg-slate-100 text-slate-700 font-medium rounded-full px-4 py-2 text-sm">{o}</span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Cómo funciona — demo visual */}
-      <section className="py-14 bg-slate-50">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">Así funciona 🤖</h2>
-          <div className="grid sm:grid-cols-3 gap-6 items-start">
-            <div className="text-center">
-              <div className="text-sm font-bold text-blue-700 mb-2">1 · Describe el trabajo</div>
-              <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm text-left">
-                <div className="bg-[#DCF8C6] rounded-xl px-3 py-2 text-sm text-slate-800">"Pintar sala y 2 cuartos, 850 sqft, con material, 2 manos"</div>
-                <p className="text-xs text-slate-400 mt-2">En tus palabras, en español — o súbele una foto 📷 de tu lista y la IA la lee.</p>
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-sm font-bold text-blue-700 mb-2">2 · La IA lo arma con TUS precios</div>
-              <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm text-left text-xs text-slate-700 space-y-1.5">
-                <div className="flex justify-between"><span>🎨 Paint &amp; materials</span><span className="font-semibold">$380.00</span></div>
-                <div className="flex justify-between"><span>👷 Labor — 850 sqft × $1.29</span><span className="font-semibold">$1,100.00</span></div>
-                <div className="flex justify-between text-slate-400"><span>Tax (tu tasa: 8%)</span><span>$118.40</span></div>
-                <p className="text-[11px] text-slate-400 pt-1">Tus tarifas se guardan una vez. Puedes editar cualquier línea.</p>
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-sm font-bold text-blue-700 mb-2">3 · Mandas el PDF</div>
-              <div className="bg-white rounded-2xl border-2 border-blue-200 p-4 shadow-md text-left text-xs">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-extrabold text-slate-800">García Painting LLC</span>
-                  <span className="text-right text-blue-700 font-bold">ESTIMATE<br/><span className="text-slate-400 font-normal">CX-7K2M4</span></span>
-                </div>
-                <div className="border-t border-slate-200 pt-1.5 text-slate-600">
-                  <div className="flex justify-between py-0.5"><span>Paint &amp; materials</span><span>$380.00</span></div>
-                  <div className="flex justify-between py-0.5"><span>Labor — 850 sqft</span><span>$1,100.00</span></div>
-                </div>
-                <div className="flex justify-between bg-blue-700 text-white font-bold rounded px-2 py-1.5 mt-1.5"><span>TOTAL (USD, tax incl.)</span><span>$1,598.40</span></div>
-                <p className="text-[11px] text-slate-400 mt-2">En español o inglés — como lo quiera tu customer. Por texto, WhatsApp o email.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Por qué */}
-      <section className="py-14 bg-white">
-        <div className="max-w-4xl mx-auto px-4 grid sm:grid-cols-3 gap-6">
-          {[
-            ['💵', 'En dólares, con tax', 'Pones la tasa de tax que aplica a tu trabajo — varía por estado, localidad y tipo de servicio — o la dejas en cero. Separa labor y materiales.'],
-            ['🏃', 'El primero que manda precio, gana', 'Tu cliente pidió precio a varios. Manda el tuyo desde tu teléfono antes de salir del lugar — te ves profesional y cierras.'],
-            ['📲', 'Vive en tu celular', 'Se instala como app, en español. Nada de programas raros ni computadora.'],
-          ].map(([e, t, d]) => (
-            <div key={t} className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
-              <p className="text-3xl mb-2">{e}</p>
-              <p className="font-bold text-slate-900 mb-1">{t}</p>
-              <p className="text-sm text-slate-600">{d}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* FAQ (SEO + respuestas de IA) */}
-      <section className="py-14 bg-white">
-        <div className="max-w-3xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Preguntas frecuentes</h2>
-          <div className="space-y-3">
-            {FAQ_USA.map(([q, a]) => (
-              <details key={q} className="bg-slate-50 border border-slate-200 rounded-xl p-4">
-                <summary className="font-semibold text-slate-800 cursor-pointer">{q}</summary>
-                <p className="text-sm text-slate-600 mt-2">{a}</p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Precio */}
-      <section className="py-14 bg-slate-50">
         <div className="max-w-xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-extrabold text-slate-900 mb-2">$15 dólares al mes</h2>
-          <p className="text-slate-600 mb-6">Estimates ilimitados, con tu logo, labor + materiales, PDF y link para compartir. <strong>El primero es gratis, sin tarjeta.</strong></p>
+          <p className="text-slate-600 mb-6">Estimates ilimitados con tu logo, labor + materiales y PDF. <strong>El primero es gratis, sin tarjeta.</strong></p>
           <Link to="/registro?utm_source=usa">
             <Button size="lg" className="bg-blue-700 hover:bg-blue-800 text-lg font-bold px-8 py-6">Empezar gratis ahora →</Button>
           </Link>
-          <p className="text-xs text-slate-400 mt-4">Precio de lanzamiento. Cancela cuando quieras.</p>
         </div>
       </section>
 
@@ -200,19 +118,36 @@ export default function LandingUSA() {
         <div className="max-w-3xl mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5 text-sm font-medium mb-4">🤖 El paso 2, cuando tengas muchos customers</div>
           <h2 className="text-3xl font-extrabold mb-3">Que tu WhatsApp conteste y cotice solo</h2>
-          <p className="text-blue-100 max-w-xl mx-auto mb-6">
-            Tus customers hispanos ya te escriben por WhatsApp. CotizaBot conecta tu número y responde solo:
-            lee lo que piden, usa tus precios y manda el estimate con PDF en segundos — 24/7, aunque estés arriba del techo.
-            Es el mismo sistema que ya usan negocios en México.
-          </p>
           <div className="max-w-xs mx-auto bg-white rounded-2xl p-4 text-left text-sm mb-6">
             <div className="bg-[#DCF8C6] rounded-xl rounded-tr-none px-3 py-2 text-slate-800 mb-2">"Cuánto por pintar 2 cuartos?"</div>
-            <div className="bg-slate-100 rounded-xl rounded-tl-none px-3 py-2 text-slate-800">🤖 Aquí está tu estimate CX-7K2M4 por $1,598.40 USD 📄 — responde en 5 segundos, solo.</div>
+            <div className="bg-slate-100 rounded-xl rounded-tl-none px-3 py-2 text-slate-800">🤖 Aquí está tu estimate CX-7K2M4 por $1,598.40 USD 📄 — contesta solo, en 5 segundos, 24/7.</div>
           </div>
           <Link to="/registro?utm_source=usa_bot">
             <Button size="lg" className="bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-extrabold px-8 py-6">Quiero que conteste solo →</Button>
           </Link>
-          <p className="text-sm text-blue-200 mt-3">$49 USD al mes (o $99 con cobros automáticos). Empieza con el plan de $15 y súbete cuando lo necesites.</p>
+          <p className="text-sm text-blue-200 mt-3">$49 USD/mes (o $99 con cobros automáticos).</p>
+        </div>
+      </section>
+
+      {/* Footer: oficios + FAQ compactos (SEO) */}
+      <section className="py-10 bg-slate-50 border-t border-slate-200">
+        <div className="max-w-3xl mx-auto px-4">
+          <div className="flex flex-wrap justify-center gap-2 mb-8">
+            {OFICIOS_US.map(o => OFICIOS_CON_PAGINA[o] ? (
+              <Link key={o} to={`/usa/${OFICIOS_CON_PAGINA[o]}`} className="bg-white hover:bg-blue-50 text-blue-800 rounded-full px-3 py-1.5 text-xs font-medium border border-blue-200">{o} →</Link>
+            ) : (
+              <span key={o} className="bg-white text-slate-500 rounded-full px-3 py-1.5 text-xs border border-slate-200">{o}</span>
+            ))}
+          </div>
+          <h2 className="text-base font-bold text-slate-700 mb-3 text-center">Preguntas frecuentes</h2>
+          <div className="space-y-2">
+            {FAQ_USA.map(([q, a]) => (
+              <details key={q} className="bg-white border border-slate-200 rounded-lg px-3 py-2">
+                <summary className="text-sm font-medium text-slate-700 cursor-pointer">{q}</summary>
+                <p className="text-sm text-slate-600 mt-2">{a}</p>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
     </div>
