@@ -19,6 +19,7 @@ const FAQS = [
 const emptyItem = { desc: '', qty: 1, precio: '' };
 
 export default function GeneradorCotizaciones() {
+  const [showUpsell, setShowUpsell] = useState(false);
   const [negocio, setNegocio] = useState('');
   const [telefono, setTelefono] = useState('');
   const [cliente, setCliente] = useState('');
@@ -123,6 +124,30 @@ export default function GeneradorCotizaciones() {
         </div>
       </section>
 
+      {showUpsell && (
+        <div className="print:hidden fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-4" onClick={() => setShowUpsell(false)}>
+          <div className="bg-white rounded-3xl p-7 max-w-md w-full text-center" onClick={(e) => e.stopPropagation()}>
+            <p className="text-4xl mb-2">🎉</p>
+            <p className="text-2xl font-extrabold text-slate-900 mb-2">¡Tu cotización está lista!</p>
+            <p className="text-slate-600 mb-5">
+              Esto lo capturaste a mano. Con tu cuenta <strong>gratis</strong>, solo pegas la lista de tu cliente
+              y <strong>la IA la cotiza por ti</strong> — con folio, tu logo y PDF de verdad, lista para WhatsApp.
+            </p>
+            <a href="/registro?utm_source=generador">
+              <Button size="lg" className="w-full bg-emerald-600 hover:bg-emerald-700 text-lg font-bold py-6 mb-3">
+                Crear mi cuenta gratis → (30 segundos)
+              </Button>
+            </a>
+            <button
+              onClick={() => { setShowUpsell(false); setTimeout(() => window.print(), 200); }}
+              className="text-sm text-slate-400 underline hover:text-slate-600"
+            >
+              Solo quiero descargar mi PDF
+            </button>
+          </div>
+        </div>
+      )}
+
       <main id="herramienta" className="max-w-5xl mx-auto px-4 py-12">
         <div className="print:hidden text-center mb-8">
           <p className="text-sm font-bold text-emerald-700 uppercase tracking-wide">Paso 1 · Llena tus datos — la vista previa se arma sola 👉</p>
@@ -168,8 +193,8 @@ export default function GeneradorCotizaciones() {
                   Agregar IVA (16%)
                 </label>
 
-                <Button onClick={() => window.print()} className="w-full bg-emerald-600 hover:bg-emerald-700 text-lg py-6">
-                  📄 Descargar PDF / Imprimir
+                <Button onClick={() => setShowUpsell(true)} className="w-full bg-emerald-600 hover:bg-emerald-700 text-lg py-6">
+                  📄 Descargar mi cotización
                 </Button>
               </CardContent>
             </Card>
@@ -235,8 +260,10 @@ export default function GeneradorCotizaciones() {
         </div>
 
         {/* Contenido SEO */}
-        <section className="mt-16 print:hidden">
-          <h2 className="text-2xl font-bold text-slate-900 mb-3">Cómo hacer una cotización profesional</h2>
+        <details className="mt-16 print:hidden text-slate-400">
+          <summary className="text-xs cursor-pointer hover:text-slate-500">Más información sobre cotizaciones ▾</summary>
+        <section className="mt-6 text-slate-500">
+          <h2 className="text-2xl font-bold text-slate-700 mb-3">Cómo hacer una cotización profesional</h2>
           <p className="text-slate-600 mb-3 max-w-3xl">Una buena cotización incluye los datos de tu negocio, los del cliente, el detalle de productos con precios, el subtotal, el IVA desglosado al 16% y el total. Este generador arma todo automáticamente: tú solo capturas los productos y descargas el PDF listo para enviar por WhatsApp o correo.</p>
           <p className="text-slate-600 mb-8 max-w-3xl">¿Necesitas desglosar o agregar IVA a un monto suelto? Usa nuestra <Link to="/calculadora-iva" className="text-emerald-600 font-medium">calculadora de IVA gratis</Link>. Y si tu negocio cotiza todos los días, <Link to="/" className="text-emerald-600 font-medium">CotizaBot</Link> lo automatiza por WhatsApp.</p>
 
@@ -252,6 +279,7 @@ export default function GeneradorCotizaciones() {
             ))}
           </div>
         </section>
+        </details>
       </main>
     </div>
   );
