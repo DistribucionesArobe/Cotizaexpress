@@ -417,7 +417,7 @@ export default function PerfilEmpresa() {
                       finally { setLoadingPreview(false); }
                     }}
                   >
-                    <img src="/logo-cotizabot.png" alt="" className="w-5 h-5 mr-1.5 inline-block" />
+                    <span className="mr-1.5">🤖</span>
                     Combinar con CotizaBot
                   </Button>
                 </div>

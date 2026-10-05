@@ -39,9 +39,9 @@ export default function BlogPost() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link to="/" className="flex items-center gap-3">
-              <img src="/logo-cotizabot.png" alt="CotizaBot" className="h-14 w-auto" />
+              <div className="w-11 h-11 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center text-2xl shadow-md shadow-emerald-200 flex-shrink-0">🤖</div>
               <div className="hidden sm:block">
-                <span className="text-lg font-bold text-slate-900">CotizaBot</span>
+                <span className="text-lg font-extrabold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">CotizaBot</span>
                 <span className="text-xs text-slate-500 block -mt-1">by CotizaExpress.com</span>
               </div>
             </Link>

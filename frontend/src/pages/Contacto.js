@@ -30,9 +30,9 @@ export default function Contacto() {
       <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
-            <img src="/logo-cotizabot.png" alt="CotizaBot" className="h-10 w-auto" />
+            <div className="w-11 h-11 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center text-2xl shadow-md shadow-emerald-200 flex-shrink-0">🤖</div>
             <div>
-              <span className="text-lg font-bold text-slate-900">CotizaBot</span>
+              <span className="text-lg font-extrabold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">CotizaBot</span>
               <span className="text-xs text-slate-500 block">by CotizaExpress.com</span>
             </div>
           </Link>

@@ -167,6 +167,13 @@ export default function LandingPage() {
     const t = setInterval(() => setSlide((p) => (p + 1) % 2), 7000);
     return () => clearInterval(t);
   }, []);
+  const [installEvt, setInstallEvt] = useState(null);
+  const [installHelp, setInstallHelp] = useState(false);
+  useEffect(() => {
+    const h = (e) => { e.preventDefault(); setInstallEvt(e); };
+    window.addEventListener('beforeinstallprompt', h);
+    return () => window.removeEventListener('beforeinstallprompt', h);
+  }, []);
   return (
     <div className="min-h-screen" data-testid="landing-page">
       <Helmet>
@@ -278,9 +285,9 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link to="/" className="flex items-center gap-3">
-              <img src="/logo-cotizabot.png" alt="CotizaBot" className="h-14 w-auto" />
+              <div className="w-11 h-11 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center text-2xl shadow-md shadow-emerald-200 flex-shrink-0">🤖</div>
               <div className="hidden sm:block">
-                <span className="text-lg font-bold text-slate-900">CotizaBot</span>
+                <span className="text-lg font-extrabold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">CotizaBot</span>
                 <span className="text-xs text-slate-500 block -mt-1">by CotizaExpress.com</span>
               </div>
             </Link>
@@ -294,6 +301,37 @@ export default function LandingPage() {
           </div>
         </div>
       </nav>
+
+      {/* Botón flotante móvil: descargar app */}
+      <button
+        onClick={() => { if (installEvt) { installEvt.prompt(); setInstallEvt(null); } else { setInstallHelp(true); } }}
+        className="sm:hidden fixed bottom-5 left-4 z-40 bg-slate-900 text-white font-bold text-sm rounded-full px-4 py-3 shadow-2xl flex items-center gap-2"
+      >
+        📲 Descargar app
+      </button>
+
+      {installHelp && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-4" onClick={() => setInstallHelp(false)}>
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+            <div className="text-center mb-4">
+              <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-2">🤖</div>
+              <p className="font-bold text-lg text-slate-900">Agrega CotizaBot a tu pantalla</p>
+              <p className="text-sm text-slate-500">Queda como app, junto a tu WhatsApp. Gratis.</p>
+            </div>
+            <div className="space-y-4 text-sm">
+              <div className="bg-slate-50 rounded-xl p-4">
+                <p className="font-bold text-slate-900 mb-1">🍎 iPhone (Safari)</p>
+                <p className="text-slate-600">1. Toca el botón <strong>compartir</strong> ↑ (abajo en medio)<br/>2. Toca <strong>"Agregar a pantalla de inicio"</strong><br/>3. Toca <strong>Agregar</strong> — ¡listo!</p>
+              </div>
+              <div className="bg-slate-50 rounded-xl p-4">
+                <p className="font-bold text-slate-900 mb-1">🤖 Android (Chrome)</p>
+                <p className="text-slate-600">1. Toca los <strong>3 puntitos</strong> ⋮ (arriba a la derecha)<br/>2. Toca <strong>"Agregar a pantalla principal"</strong><br/>3. Confirma — ¡listo!</p>
+              </div>
+            </div>
+            <button onClick={() => setInstallHelp(false)} className="mt-4 w-full bg-slate-900 text-white font-bold rounded-full py-3">Entendido</button>
+          </div>
+        </div>
+      )}
 
       {/* Hero Section — carrusel de 2 productos */}
       <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-teal-50 py-10 sm:py-20">
@@ -644,7 +682,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div className="md:col-span-2">
               <Link to="/" className="flex items-center gap-3 mb-4">
-                <img src="/logo-cotizabot.png" alt="CotizaBot" className="h-14 w-auto brightness-0 invert"/>
+                <div className="w-11 h-11 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center text-2xl shadow-md shadow-emerald-200 flex-shrink-0">🤖</div>
                 <div>
                   <span className="text-lg font-bold text-white">CotizaBot</span>
                   <span className="text-xs text-slate-400 block">by CotizaExpress.com</span>

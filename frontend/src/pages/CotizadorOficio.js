@@ -61,8 +61,8 @@ export default function CotizadorOficio({ slug }) {
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-slate-200">
         <div className="max-w-5xl mx-auto px-4 h-16 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2">
-            <img src="/logo-cotizabot.png" alt="CotizaBot" className="h-12 w-auto" />
-            <span className="font-bold text-slate-900">CotizaBot</span>
+            <div className="w-11 h-11 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center text-2xl shadow-md shadow-emerald-200 flex-shrink-0">🤖</div>
+            <span className="font-extrabold text-lg bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">CotizaBot</span>
           </Link>
           <Link to="/cotizacion-formal" className="text-sm text-slate-600 hover:text-emerald-600">¿Qué lleva una cotización formal?</Link>
         </div>
