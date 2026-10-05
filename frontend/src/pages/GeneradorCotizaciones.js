@@ -98,16 +98,40 @@ export default function GeneradorCotizaciones() {
         </div>
       </nav>
 
-      <main className="max-w-5xl mx-auto px-4 py-12">
-        <div className="print:hidden">
-          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3">Generador de Cotizaciones Gratis</h1>
-          <p className="text-slate-600 mb-8">Crea una cotización profesional con IVA en un minuto y descárgala en PDF. Sin registro.</p>
+      {/* Hero para tráfico de anuncios */}
+      <section className="print:hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-700 text-white">
+        <div className="max-w-5xl mx-auto px-4 py-12 sm:py-16 text-center">
+          <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur rounded-full px-4 py-1.5 text-sm font-medium mb-5">
+            ⚡ 100% gratis · sin registro · sin tarjeta
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-extrabold mb-4 leading-tight">
+            Haz una cotización profesional<br className="hidden sm:block"/> en <span className="text-yellow-300">2 minutos</span>
+          </h1>
+          <p className="text-emerald-50 text-lg max-w-2xl mx-auto mb-6">
+            Con IVA calculado solo, lista para imprimir o mandar por WhatsApp. Deja de batallar con Excel.
+          </p>
+          <a href="#herramienta">
+            <Button size="lg" className="bg-white text-emerald-700 hover:bg-emerald-50 text-lg font-bold px-8 py-6 shadow-xl">
+              Empezar mi cotización ↓
+            </Button>
+          </a>
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-6 text-sm text-emerald-100">
+            <span>✅ IVA al 16% automático</span>
+            <span>✅ Se ve profesional</span>
+            <span>✅ Imprime o guarda en PDF</span>
+          </div>
+        </div>
+      </section>
+
+      <main id="herramienta" className="max-w-5xl mx-auto px-4 py-12">
+        <div className="print:hidden text-center mb-8">
+          <p className="text-sm font-bold text-emerald-700 uppercase tracking-wide">Paso 1 · Llena tus datos — la vista previa se arma sola 👉</p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Formulario */}
           <div className="print:hidden">
-            <Card>
+            <Card className="shadow-xl border-2 border-emerald-100 rounded-2xl">
               <CardContent className="pt-6 space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -162,7 +186,7 @@ export default function GeneradorCotizaciones() {
           {/* Vista previa */}
           <div>
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2 print:hidden">Vista previa</p>
-            <div id="cotizacion-preview" className="bg-white rounded-xl shadow-md border border-slate-200 p-8">
+            <div id="cotizacion-preview" className="bg-white rounded-2xl shadow-2xl border border-slate-200 p-8 ring-4 ring-emerald-100/50">
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <h2 className="text-xl font-bold text-slate-900">{negocio || 'Nombre de tu negocio'}</h2>
