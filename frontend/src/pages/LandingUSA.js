@@ -212,7 +212,7 @@ export default function LandingUSA() {
           <Link to="/registro?utm_source=usa_bot">
             <Button size="lg" className="bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-extrabold px-8 py-6">Quiero que conteste solo →</Button>
           </Link>
-          <p className="text-sm text-blue-200 mt-3">Empieza con el plan de $15 y súbete al bot cuando lo necesites.</p>
+          <p className="text-sm text-blue-200 mt-3">$49 USD al mes (o $99 con cobros automáticos). Empieza con el plan de $15 y súbete cuando lo necesites.</p>
         </div>
       </section>
     </div>

@@ -107,7 +107,7 @@ export default function Dashboard() {
     try {
       setLoadingPlan(planId);
       const response = await axios.post(`${API}/pagos/crear-checkout`, {
-        plan: planId,
+        plan: (localStorage.getItem('cotizador_region') === 'US' && ['cotizador','cotizabot','pro'].includes(planId)) ? planId + '_usa' : planId,
         success_url: `${window.location.origin}/pago-exitoso`,
         cancel_url: `${window.location.origin}/precios`,
       });

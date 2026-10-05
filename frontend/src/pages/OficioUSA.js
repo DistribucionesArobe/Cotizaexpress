@@ -191,7 +191,7 @@ export default function OficioUSA({ slug }) {
           <h2 className="text-xl font-bold mb-2">🤖 ¿Tus customers te escriben por WhatsApp?</h2>
           <p className="text-blue-100 text-sm mb-4">
             El paso 2 es CotizaBot: conecta tu número y contesta solo — lee lo que pide el customer,
-            usa tus precios de {o.nombre} y responde el estimate con PDF en segundos, 24/7, aunque estés en el trabajo.
+            usa tus precios de {o.nombre} y responde el estimate con PDF en segundos, 24/7, aunque estés en el trabajo. Desde $49 USD al mes.
           </p>
           <Link to={`/registro?utm_source=usa_${slug}_bot`}>
             <Button className="bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-bold">Quiero que conteste solo →</Button>

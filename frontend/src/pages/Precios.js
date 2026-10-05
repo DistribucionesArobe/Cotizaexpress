@@ -26,7 +26,7 @@ export default function Precios() {
       setLoading(planId);
       
       const response = await axios.post(`${API}/pagos/crear-checkout`, {
-        plan: planId,
+        plan: planCheckout(planId),
         success_url: `${window.location.origin}/pago-exitoso`,
         cancel_url: `${window.location.origin}/precios`,
       });
@@ -43,6 +43,10 @@ export default function Precios() {
   };
 
   const planActual = user?.empresa?.plan || user?.usuario?.plan || null;
+
+  const esUS = (typeof window !== 'undefined') && localStorage.getItem('cotizador_region') === 'US';
+  const USD_PRECIOS = { cotizador: 15, cotizabot: 49, pro: 99 };
+  const planCheckout = (planId) => (esUS && USD_PRECIOS[planId] ? planId + '_usa' : planId);
 
   const planes = [
     {
@@ -209,10 +213,10 @@ export default function Precios() {
                       <p className="text-sm text-slate-500 mb-4">{plan.descripcion}</p>
                       
                       <div className={`text-4xl font-bold mb-1 ${esDestacado ? 'text-amber-600' : 'text-emerald-600'}`}>
-                        ${plan.precio.toLocaleString()}
+                        ${esUS && USD_PRECIOS[plan.id] ? USD_PRECIOS[plan.id] : plan.precio.toLocaleString()}
                       </div>
                       {plan.precio > 0 ? (
-                        <p className="text-sm text-slate-500 mb-6">MXN/mes</p>
+                        <p className="text-sm text-slate-500 mb-6">{esUS && USD_PRECIOS[plan.id] ? 'USD/mes (se cobra el equivalente en MXN)' : 'MXN/mes'}</p>
                       ) : (
                         <p className="text-sm text-slate-500 mb-6">Para siempre</p>
                       )}
