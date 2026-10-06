@@ -153,8 +153,9 @@ export default function Cotizador() {
   const total = subtotal + iva;
 
   const costoTotal = items.reduce((c, it) => c + (parseFloat(it.costo) || 0) * (parseInt(it.qty) || 0), 0);
-  const ganancia = suma - costoTotal;
-  const margenPct = suma > 0 ? (ganancia / suma) * 100 : 0;
+  // Ganancia sobre la venta ANTES de impuesto (el IVA/tax cobrado no es tuyo)
+  const ganancia = subtotal - costoTotal;
+  const margenPct = subtotal > 0 ? (ganancia / subtotal) * 100 : 0;
 
   const guardar = async () => {
     setGuardando(true);
@@ -282,7 +283,7 @@ export default function Cotizador() {
               </button>
             </div>
             {modoGanancia && (
-              <p className="text-xs text-violet-600">🔒 Pon lo que a TI te cuesta cada renglón (material, cuadrilla, gasolina). Es privado: no sale en el PDF ni lo ve tu cliente.</p>
+              <p className="text-xs text-violet-600">🔒 Pon lo que a TI te cuesta cada renglón (material, cuadrilla, gasolina). Es privado: no sale en el PDF ni lo ve tu cliente. La ganancia se calcula sobre la venta antes de {etiquetaImpuesto} y es tan exacta como los costos que captures.</p>
             )}
 
             <div className="border-t pt-3 text-sm text-slate-700 space-y-2">
@@ -342,12 +343,13 @@ export default function Cotizador() {
                 <div className="bg-violet-50 border border-violet-200 rounded-xl px-4 py-2.5 mt-2 text-right space-y-1">
                   <div className="flex justify-end gap-8 text-violet-700"><span>🔒 Te cuesta:</span><span className="w-28 text-right">${costoTotal.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span></div>
                   <div className={`flex justify-end gap-8 font-bold ${ganancia >= 0 ? 'text-emerald-700' : 'text-red-600'}`}>
-                    <span>{ganancia >= 0 ? '💰 Te quedan:' : '⚠️ Pierdes:'}</span>
+                    <span>{ganancia >= 0 ? '💰 Ganancia estimada:' : '⚠️ Pérdida estimada:'}</span>
                     <span className="w-28 text-right">${Math.abs(ganancia).toLocaleString('es-MX', {minimumFractionDigits: 2})} ({margenPct.toFixed(0)}%)</span>
                   </div>
                   {ganancia >= 0 && margenPct < 20 && costoTotal > 0 && (
                     <p className="text-[11px] text-amber-700">⚠️ Margen abajo del 20% — revisa si contaste preparación, transporte, desperdicio y segunda visita.</p>
                   )}
+                  <p className="text-[11px] text-violet-500">Sobre la venta antes de {etiquetaImpuesto} (${subtotal.toLocaleString('es-MX', {minimumFractionDigits: 2})}) y según los costos que capturaste.</p>
                 </div>
               )}
             </div>

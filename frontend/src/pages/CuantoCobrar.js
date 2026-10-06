@@ -80,7 +80,7 @@ function MiniCalc({ unidad }) {
     <div className="bg-violet-50 border-2 border-violet-200 rounded-2xl p-5 my-8">
       <p className="font-bold text-slate-900 mb-3">💰 Calculadora rápida: ¿cuánto te queda?</p>
       <div className="grid sm:grid-cols-2 gap-3 mb-3">
-        <label className="text-sm text-slate-700">Lo que vas a cobrar (total)
+        <label className="text-sm text-slate-700">Lo que vas a cobrar (antes de IVA/tax)
           <input type="number" value={cobro} onChange={e => setCobro(e.target.value)} placeholder="Ej: 15000" className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg bg-white" />
         </label>
         <label className="text-sm text-slate-700">Lo que te cuesta (material + cuadrilla + extras)
@@ -89,11 +89,11 @@ function MiniCalc({ unidad }) {
       </div>
       {c > 0 && (
         <p className={`font-bold ${g >= 0 && m >= 20 ? 'text-emerald-700' : 'text-red-600'}`}>
-          {g >= 0 ? `Te quedan $${g.toLocaleString('es-MX')} (${m.toFixed(0)}% de margen)` : `⚠️ Pierdes $${Math.abs(g).toLocaleString('es-MX')}`}
+          {g >= 0 ? `Ganancia estimada: $${g.toLocaleString('es-MX')} (${m.toFixed(0)}% de margen)` : `⚠️ Pérdida estimada: $${Math.abs(g).toLocaleString('es-MX')}`}
           {g >= 0 && m < 20 && ' — ⚠️ abajo del 20%: revisa si contaste preparación, transporte, desperdicio y segunda visita.'}
         </p>
       )}
-      <p className="text-xs text-slate-500 mt-2">El Cotizador hace esto renglón por renglón, con tu PDF profesional incluido.</p>
+      <p className="text-xs text-slate-500 mt-2">Usa la venta antes de impuesto: el IVA o tax que cobras no es tuyo. El Cotizador hace esto renglón por renglón, con tu PDF profesional incluido.</p>
     </div>
   );
 }
