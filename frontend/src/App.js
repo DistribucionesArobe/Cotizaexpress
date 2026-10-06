@@ -331,6 +331,16 @@ function AppRoutes() {
             <Route path="/usa/remodeling" element={<OficioUSA slug="remodeling" />} />
             <Route path="/usa/drywall" element={<OficioUSA slug="drywall" />} />
             <Route path="/usa/handyman" element={<OficioUSA slug="handyman" />} />
+            <Route path="/usa/flooring" element={<OficioUSA slug="flooring" />} />
+            <Route path="/usa/cleaning" element={<OficioUSA slug="cleaning" />} />
+            <Route path="/usa/concrete" element={<OficioUSA slug="concrete" />} />
+            <Route path="/usa/fencing" element={<OficioUSA slug="fencing" />} />
+            <Route path="/usa/plumbing" element={<OficioUSA slug="plumbing" />} />
+            <Route path="/usa/electrical" element={<OficioUSA slug="electrical" />} />
+            <Route path="/usa/hvac" element={<OficioUSA slug="hvac" />} />
+            <Route path="/usa/tile" element={<OficioUSA slug="tile" />} />
+            <Route path="/usa/carpentry" element={<OficioUSA slug="carpentry" />} />
+            <Route path="/usa/pressure-washing" element={<OficioUSA slug="pressure-washing" />} />
 
             {/* Rutas protegidas */}
             <Route

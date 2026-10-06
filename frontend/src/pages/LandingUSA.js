@@ -3,8 +3,8 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
-const OFICIOS_US = ['Roofing', 'Landscaping', 'Painting', 'Remodeling', 'Drywall', 'Handyman'];
-const OFICIOS_CON_PAGINA = { Roofing: 'roofing', Landscaping: 'landscaping', Painting: 'painting', Remodeling: 'remodeling', Drywall: 'drywall', Handyman: 'handyman' };
+const OFICIOS_US = ['Roofing', 'Landscaping', 'Painting', 'Remodeling', 'Drywall', 'Flooring', 'Handyman', 'Cleaning', 'Concrete', 'Fencing', 'Plumbing', 'Electrical', 'HVAC', 'Tile', 'Carpentry', 'Pressure washing'];
+const OFICIOS_CON_PAGINA = { Roofing: 'roofing', Landscaping: 'landscaping', Painting: 'painting', Remodeling: 'remodeling', Drywall: 'drywall', Flooring: 'flooring', Handyman: 'handyman', Cleaning: 'cleaning', Concrete: 'concrete', Fencing: 'fencing', Plumbing: 'plumbing', Electrical: 'electrical', HVAC: 'hvac', Tile: 'tile', Carpentry: 'carpentry', 'Pressure washing': 'pressure-washing' };
 
 const FAQ_USA = [
   ['¿Cómo hago un estimate en español en Estados Unidos?', 'Con CotizaBot escribes el trabajo en tus palabras — "pintar sala y 2 cuartos con material" — y CotizaBot lo convierte en un estimate profesional en dólares, con tax, labor y materiales separados y PDF con tu logo. Todo en español, desde tu celular.'],

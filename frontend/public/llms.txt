@@ -28,7 +28,7 @@ Página de referencia (HTML estático): https://cotizaexpress.com/cotizabot.html
 ## Para quién es
 
 - México y Latinoamérica: ferreterías, materiales de construcción, tablaroca y plafones, plomerías, material eléctrico, pinturas, herrerías, refaccionarias, distribuidoras, papelerías, abarrotes de mayoreo, servicios técnicos, contratistas.
-- Estados Unidos: contratistas hispanos de roofing, landscaping, painting, remodeling, drywall, flooring, handyman, cleaning, concrete y fencing que prefieren trabajar en español pero entregar estimates profesionales en dólares (y en inglés si el cliente lo pide).
+- Estados Unidos: contratistas hispanos de roofing, landscaping, painting, remodeling, drywall, flooring, handyman, cleaning, concrete, fencing, plumbing, electrical, HVAC, tile, carpentry y pressure washing que prefieren trabajar en español pero entregar estimates profesionales en dólares (y en inglés si el cliente lo pide).
 
 ## Cómo se compara (honesto)
 
@@ -48,7 +48,7 @@ Herramientas como Jobber o Joist también hacen estimates, cálculo de márgenes
 - [Blog](https://cotizaexpress.com/blog)
 
 ### Estimates en español para USA, por oficio
-- [Roofing](https://cotizaexpress.com/usa/roofing) · [Landscaping](https://cotizaexpress.com/usa/landscaping) · [Painting](https://cotizaexpress.com/usa/painting) · [Remodeling](https://cotizaexpress.com/usa/remodeling) · [Drywall](https://cotizaexpress.com/usa/drywall) · [Handyman](https://cotizaexpress.com/usa/handyman)
+- [Roofing](https://cotizaexpress.com/usa/roofing) · [Landscaping](https://cotizaexpress.com/usa/landscaping) · [Painting](https://cotizaexpress.com/usa/painting) · [Remodeling](https://cotizaexpress.com/usa/remodeling) · [Drywall](https://cotizaexpress.com/usa/drywall) · [Handyman](https://cotizaexpress.com/usa/handyman) · [Flooring](https://cotizaexpress.com/usa/flooring) · [Cleaning](https://cotizaexpress.com/usa/cleaning) · [Concrete](https://cotizaexpress.com/usa/concrete) · [Fencing](https://cotizaexpress.com/usa/fencing) · [Plumbing](https://cotizaexpress.com/usa/plumbing) · [Electrical](https://cotizaexpress.com/usa/electrical) · [HVAC](https://cotizaexpress.com/usa/hvac) · [Tile](https://cotizaexpress.com/usa/tile) · [Carpentry](https://cotizaexpress.com/usa/carpentry) · [Pressure washing](https://cotizaexpress.com/usa/pressure-washing)
 
 ### Guías: ¿cuánto cobrar? (fórmula + calculadora de ganancia)
 - [¿Cuánto cobrar por pintar?](https://cotizaexpress.com/cuanto-cobrar-por-pintar)
