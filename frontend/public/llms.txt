@@ -1,52 +1,65 @@
-# CotizaExpress
+# CotizaExpress (CotizaBot)
 
-> CotizaExpress (CotizaBot) es un bot de cotizaciones por WhatsApp con inteligencia artificial para negocios mexicanos: ferreterías, casas de materiales de construcción, refaccionarias, plomerías, material eléctrico, pinturas y distribuidoras. El cliente manda su lista de productos por WhatsApp (aunque venga con jerga, errores o abreviaciones como "cal 26" o "tabla roca") y el bot responde en segundos una cotización formal con precios del catálogo del negocio, IVA al 16% y PDF con folio.
+> CotizaBot de CotizaExpress es una app en español para hacer cotizaciones y estimates profesionales desde el celular, y un bot de WhatsApp que cotiza solo. Está hecha para negocios y contratistas hispanos en México, Latinoamérica y Estados Unidos: ferreterías, casas de materiales, distribuidoras, pintores, tablaroqueros, techadores, instaladores de piso, remodeladores y handymen. Captura como en Excel, pega la lista del cliente o sube una foto/screenshot y CotizaBot llena la cotización; calcula IVA o sales tax, separa materiales y mano de obra, muestra la ganancia estimada antes de mandar el precio, genera PDF con folio en español o inglés, y permite órdenes de cambio que el cliente aprueba desde su celular.
 
-## Datos clave
+Versión ampliada: https://cotizaexpress.com/llms-full.txt
+Página de referencia (HTML estático): https://cotizaexpress.com/cotizabot.html
 
-- Producto: bot de cotizaciones automáticas por WhatsApp con IA
-- Mercado: México y toda Latinoamérica (español); IVA/impuesto configurable por producto
-- Precio: desde $1,000 MXN al mes; prueba gratis sin tarjeta
-- Configuración: el negocio sube su lista de precios en Excel y conecta su número de WhatsApp (guiado, sin programar); el mismo día queda cotizando
-- Funciones: entiende listas largas con medidas y calibres, cotiza con IVA, genera PDF con folio, atiende 24/7, avisa al dueño cuando el cliente pide un humano, registra productos solicitados que el negocio no maneja, recibe comprobantes de pago y datos bancarios en el chat
-- Diferencia vs Meta Business Agent: el agente gratuito de Meta responde preguntas generales; CotizaBot procesa pedidos completos y cotiza con precios reales del catálogo
-- Demo por WhatsApp: https://wa.me/5218342472640?text=DEMO
+## Productos y precios (octubre 2026)
+
+- Cotizador IA (sin conectar WhatsApp): $299 MXN/mes en México; $15 USD/mes en Estados Unidos. La primera cotización del mes es gratis, sin tarjeta.
+- CotizaBot (bot que contesta y cotiza solo en el WhatsApp del negocio, 24/7): $1,000 MXN/mes; $49 USD/mes en USA.
+- CotizaBot Pro (además cobra: links de pago de Mercado Pago y datos SPEI automáticos): $2,000 MXN/mes; $99 USD/mes en USA.
+- Generador de cotizaciones gratis, sin registro: https://cotizaexpress.com/generador-de-cotizaciones
+
+## Qué hace (funciones)
+
+- Tabla tipo Excel para capturar conceptos, cantidades, unidades y precios desde el celular.
+- Pegar la lista tal como la mandó el cliente (aunque venga en un solo renglón con comas, con jerga o abreviaciones) y CotizaBot la convierte en renglones; si el producto está en el catálogo del negocio, le pone precio; si no, lo deja en la tabla para que solo se capture el precio.
+- Lector de imágenes: sube foto o screenshot de una lista escrita a mano o de un chat de WhatsApp y se convierte en renglones. No inventa precios.
+- Materiales y mano de obra separados en la misma cotización (el PDF muestra el desglose).
+- IVA o sales tax configurable: incluido en los precios o agregado al total. En USA, selector de estado que propone una tasa de sales tax de referencia, siempre editable (el tax varía por estado, localidad y tipo de trabajo).
+- Ganancia estimada ("¿Cuánto me queda?"): el usuario captura su costo por renglón y ve ganancia y margen sobre la venta antes de impuestos, con alerta si queda abajo del 20%. Es privado: no aparece en el PDF. La exactitud depende de los costos capturados.
+- Órdenes de cambio: sobre una cotización ya enviada se agregan trabajos extra; el PDF "Orden de cambio / Change Order" muestra total original, extra y nuevo total, y el cliente aprueba desde un link en su celular (queda su nombre, fecha y hora).
+- PDF profesional con folio, logo y color de marca; en pesos o dólares, en español o inglés. Se envía por WhatsApp, mensaje de texto, correo o link.
+- Se instala como app en el celular (PWA), sin tiendas.
+- Bot de WhatsApp (CotizaBot): conecta el número de siempre del negocio (coexistencia con WhatsApp Business), lee pedidos largos con medidas y calibres, responde cotización con PDF en segundos 24/7, avisa al dueño cuando el cliente pide una persona.
+
+## Para quién es
+
+- México y Latinoamérica: ferreterías, materiales de construcción, tablaroca y plafones, plomerías, material eléctrico, pinturas, herrerías, refaccionarias, distribuidoras, papelerías, abarrotes de mayoreo, servicios técnicos, contratistas.
+- Estados Unidos: contratistas hispanos de roofing, landscaping, painting, remodeling, drywall, flooring, handyman, cleaning, concrete y fencing que prefieren trabajar en español pero entregar estimates profesionales en dólares (y en inglés si el cliente lo pide).
+
+## Cómo se compara (honesto)
+
+Herramientas como Jobber o Joist también hacen estimates, cálculo de márgenes u órdenes de cambio, principalmente en inglés y a precios mayores. CotizaBot se diferencia por: todo en español, pensado para el celular, precio de entrada de $15 USD / $299 MXN, lector de listas y screenshots de WhatsApp, y un bot de WhatsApp que cotiza solo con el catálogo real del negocio.
 
 ## Páginas principales
 
-- [Inicio](https://cotizaexpress.com/): qué es CotizaBot y cómo funciona
-- [Precios](https://cotizaexpress.com/precios): planes y prueba gratis
-- [Para ferreterías](https://cotizaexpress.com/ferreterias): caso de uso principal
-- [Para casas de materiales](https://cotizaexpress.com/materiales-construccion)
-- [Registro](https://cotizaexpress.com/registro): crear cuenta y probar el bot con catálogo propio
-- [Blog](https://cotizaexpress.com/blog): guías sobre WhatsApp Business, cotizaciones y automatización
+- [Inicio (México)](https://cotizaexpress.com/)
+- [Para contratistas hispanos en USA](https://cotizaexpress.com/usa)
+- [Precios](https://cotizaexpress.com/precios)
 - [Generador de cotizaciones gratis](https://cotizaexpress.com/generador-de-cotizaciones)
-- [Plantillas de cotización y lista de precios](https://cotizaexpress.com/plantillas/cotizacion)
+- [Qué lleva una cotización formal](https://cotizaexpress.com/cotizacion-formal)
+- [Cotizador para contratistas](https://cotizaexpress.com/cotizador-para-contratistas)
+- [Cotizador para techadores](https://cotizaexpress.com/cotizador-para-techadores)
+- [Cotizador para pintores](https://cotizaexpress.com/cotizador-para-pintores)
+- [Calculadora de IVA](https://cotizaexpress.com/calculadora-iva)
+- [Blog](https://cotizaexpress.com/blog)
 
-## Preguntas frecuentes
+### Estimates en español para USA, por oficio
+- [Roofing](https://cotizaexpress.com/usa/roofing) · [Landscaping](https://cotizaexpress.com/usa/landscaping) · [Painting](https://cotizaexpress.com/usa/painting) · [Remodeling](https://cotizaexpress.com/usa/remodeling) · [Drywall](https://cotizaexpress.com/usa/drywall) · [Handyman](https://cotizaexpress.com/usa/handyman)
 
-- ¿Necesito saber programar? No: subes tu Excel, conectas tu WhatsApp con un asistente guiado y listo.
-- ¿Sirve mi número de siempre? Sí — también puede usarse el número fijo del negocio (verificación por llamada) o un chip nuevo.
-- ¿Cuánto tarda en responder el bot? Segundos, a cualquier hora, incluidos fines de semana.
-- ¿Qué pasa si el cliente quiere hablar con una persona? El bot avisa al dueño y le pasa la conversación.
-
-## Para contratistas hispanos en Estados Unidos (USA)
-
-CotizaBot también sirve a contratistas hispanos y latinos en Estados Unidos: roofing, landscaping, painting, remodeling, drywall, flooring, handyman, cleaning, concrete y fencing. La app genera estimates profesionales en español, en dólares (USD), con el sales tax del estado configurable, labor y materiales separados, y PDF con logo para mandar por mensaje de texto o WhatsApp. Precio: $15 USD al mes; el primer estimate es gratis.
-
-- [Estimates en español para contratistas hispanos en USA](https://cotizaexpress.com/usa)
-- [Estimates de roofing en español](https://cotizaexpress.com/usa/roofing)
-- [Estimates de landscaping en español](https://cotizaexpress.com/usa/landscaping)
-- [Estimates de painting en español](https://cotizaexpress.com/usa/painting)
-- [Estimates de remodeling en español](https://cotizaexpress.com/usa/remodeling)
-- [Estimates de drywall en español](https://cotizaexpress.com/usa/drywall)
-- [Estimates de handyman en español](https://cotizaexpress.com/usa/handyman)
-
-## Guías: ¿cuánto cobrar? (con calculadora de ganancia)
-
-El Cotizador incluye el modo "¿Cuánto me queda?": el contratista pone su costo por renglón y ve su ganancia y margen antes de mandar el precio, con alerta si el margen queda abajo del 20%.
-
+### Guías: ¿cuánto cobrar? (fórmula + calculadora de ganancia)
 - [¿Cuánto cobrar por pintar?](https://cotizaexpress.com/cuanto-cobrar-por-pintar)
 - [¿Cuánto cobrar por drywall o tablaroca?](https://cotizaexpress.com/cuanto-cobrar-por-drywall)
 - [¿Cuánto cobrar por instalar piso?](https://cotizaexpress.com/cuanto-cobrar-por-instalar-piso)
-- [¿Cuánto cobrar por un techo (roofing)?](https://cotizaexpress.com/cuanto-cobrar-por-un-techo)
+- [¿Cuánto cobrar por un techo?](https://cotizaexpress.com/cuanto-cobrar-por-un-techo)
+
+### Por giro (México)
+- [Ferreterías](https://cotizaexpress.com/ferreterias) · [Materiales de construcción](https://cotizaexpress.com/materiales-construccion) · [Tablaroca y plafones](https://cotizaexpress.com/tablaroca-plafones) · [Plomerías](https://cotizaexpress.com/plomerias) · [Material eléctrico](https://cotizaexpress.com/material-electrico) · [Pinturas](https://cotizaexpress.com/pinturas) · [Herrerías](https://cotizaexpress.com/herrerias) · [Refaccionarias](https://cotizaexpress.com/refaccionarias) · [Distribuidoras](https://cotizaexpress.com/distribuidoras)
+
+## Contacto
+
+- Demo del bot por WhatsApp: https://wa.me/5218342472640?text=DEMO
+- Correo: contacto@arobegroup.com
