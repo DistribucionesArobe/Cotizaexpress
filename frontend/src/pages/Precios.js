@@ -45,7 +45,7 @@ export default function Precios() {
   const planActual = user?.empresa?.plan || user?.usuario?.plan || null;
 
   const esUS = (typeof window !== 'undefined') && localStorage.getItem('cotizador_region') === 'US';
-  const USD_PRECIOS = { cotizador: 15, cotizabot: 49, pro: 99 };
+  const USD_PRECIOS = { cotizador: 29, cotizabot: 49, pro: 99 };
   const planCheckout = (planId) => (esUS && USD_PRECIOS[planId] ? planId + '_usa' : planId);
 
   const planes = [

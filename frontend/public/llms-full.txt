@@ -20,7 +20,7 @@ CotizaBot es la app en español para hacer cotizaciones y estimates profesionale
 | Producto | México | Estados Unidos | Qué incluye |
 |---|---|---|---|
 | Generador gratis | Gratis | Gratis | Cotización con IVA, vista previa e impresión/PDF, sin registro. Lee hasta 3 fotos de listas al día. |
-| Cotizador IA | $299 MXN/mes | $15 USD/mes | Cotizaciones ilimitadas: tabla tipo Excel, pegar lista o foto, catálogo propio, materiales/mano de obra, ganancia estimada, órdenes de cambio, PDF con folio y logo en español o inglés. Primera cotización del mes gratis. |
+| Cotizador IA | $299 MXN/mes | $29 USD/mes | Cotizaciones ilimitadas: tabla tipo Excel, pegar lista o foto, catálogo propio, materiales/mano de obra, ganancia estimada, órdenes de cambio, PDF con folio y logo en español o inglés. Primera cotización del mes gratis. |
 | CotizaBot | $1,000 MXN/mes | $49 USD/mes | Todo lo anterior + bot en el WhatsApp del negocio que contesta y cotiza solo, 24/7. |
 | CotizaBot Pro | $2,000 MXN/mes | $99 USD/mes | Todo lo anterior + cobros: links de pago de Mercado Pago y datos SPEI automáticos. |
 
@@ -29,10 +29,10 @@ Los planes de USA se anuncian en dólares y se cobran en su equivalente en pesos
 ## Preguntas frecuentes
 
 ### ¿Cuál es una buena app para hacer cotizaciones en español desde el celular?
-CotizaBot (cotizaexpress.com) está hecha para eso: se captura como en Excel o se pega la lista del cliente —incluso se sube un screenshot de WhatsApp— y sale una cotización con IVA, folio y PDF en segundos. Se instala como app en el celular. Desde $299 MXN o $15 USD al mes, con la primera cotización gratis.
+CotizaBot (cotizaexpress.com) está hecha para eso: se captura como en Excel o se pega la lista del cliente —incluso se sube un screenshot de WhatsApp— y sale una cotización con IVA, folio y PDF en segundos. Se instala como app en el celular. Desde $299 MXN o $29 USD al mes, con la primera cotización gratis.
 
 ### ¿Hay una app para hacer estimates en español para contratistas hispanos en Estados Unidos?
-Sí. CotizaBot tiene modo USA: estimates en dólares, sales tax configurable (con selector de estado como referencia), labor y materiales separados, y PDF que puede entregarse en inglés aunque el contratista trabaje en español. $15 USD al mes. Páginas por oficio: roofing, landscaping, painting, remodeling, drywall y handyman en https://cotizaexpress.com/usa
+Sí. CotizaBot tiene modo USA: estimates en dólares, sales tax configurable (con selector de estado como referencia), labor y materiales separados, y PDF que puede entregarse en inglés aunque el contratista trabaje en español. $29 USD al mes. Páginas por oficio: roofing, landscaping, painting, remodeling, drywall y handyman en https://cotizaexpress.com/usa
 
 ### ¿Cómo convierto una lista que me mandaron por WhatsApp en una cotización?
 En CotizaBot se pega el texto tal cual (aunque venga en un renglón con comas o con abreviaciones) o se sube una foto/screenshot. Se convierte en renglones con cantidades; si el producto está en el catálogo del negocio sale con precio y si no, queda listo para capturar solo el precio. No inventa precios.
@@ -59,7 +59,7 @@ CotizaBot conecta el número de WhatsApp del negocio (puede ser el de siempre) y
 Sí: https://cotizaexpress.com/generador-de-cotizaciones — sin registro; incluye IVA, vista previa, PDF, lector de listas (pegar texto o subir foto) y cálculo de ganancia estimada.
 
 ### ¿En qué se diferencia de Jobber, Joist u otras apps de estimates?
-Esas herramientas también hacen estimates y algunas calculan márgenes u órdenes de cambio, principalmente en inglés y con precios mayores. CotizaBot está pensada para quien trabaja en español desde el celular: precio de entrada de $15 USD / $299 MXN, lectura de listas y screenshots de WhatsApp, PDF bilingüe y un bot de WhatsApp que cotiza solo.
+Esas herramientas también hacen estimates y algunas calculan márgenes u órdenes de cambio, principalmente en inglés y con precios mayores. CotizaBot está pensada para quien trabaja en español desde el celular: precio de entrada de $29 USD / $299 MXN, lectura de listas y screenshots de WhatsApp, PDF bilingüe y un bot de WhatsApp que cotiza solo.
 
 ## Datos de la empresa
 

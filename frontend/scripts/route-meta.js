@@ -42,7 +42,7 @@ const RUTAS = {
   },
   '/precios': {
     title: 'Precios CotizaBot — Cotizador desde $299 MXN · Bot de WhatsApp $1,000 MXN',
-    desc: 'Cotizador IA $299 MXN/mes (USA $15 USD). CotizaBot, el bot de WhatsApp que cotiza solo, $1,000 MXN/mes. CotizaBot Pro con cobros $2,000 MXN/mes. Primera cotización gratis.',
+    desc: 'Cotizador IA $299 MXN/mes (USA $29 USD). CotizaBot, el bot de WhatsApp que cotiza solo, $1,000 MXN/mes. CotizaBot Pro con cobros $2,000 MXN/mes. Primera cotización gratis.',
     h1: 'Planes y precios',
   },
 };

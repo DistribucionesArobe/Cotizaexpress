@@ -9,7 +9,7 @@ const OFICIOS_CON_PAGINA = { Roofing: 'roofing', Landscaping: 'landscaping', Pai
 const FAQ_USA = [
   ['¿Cómo hago un estimate en español en Estados Unidos?', 'Con CotizaBot escribes el trabajo en tus palabras — "pintar sala y 2 cuartos con material" — y CotizaBot lo convierte en un estimate profesional en dólares, con tax, labor y materiales separados y PDF con tu logo. Todo en español, desde tu celular.'],
   ['¿El estimate sale en dólares y con tax?', 'Sí. Tú pones la tasa de sales tax que te aplica y decides si se cobra solo a los materiales o también a la mano de obra: en muchos estados la labor no lleva sales tax o se trata distinto (en Texas, por ejemplo, depende de si el trabajo es residencial o comercial). CotizaBot no calcula la regla de cada estado por ti; te deja aplicarla bien y separada.'],
-  ['¿Cuánto cuesta la app para hacer estimates?', 'El primer estimate es gratis y sin tarjeta. Después son $15 USD al mes con estimates ilimitados, tu logo, PDF y link para compartir.'],
+  ['¿Cuánto cuesta la app para hacer estimates?', 'El primer estimate es gratis y sin tarjeta. Después son $29 USD al mes con estimates ilimitados, tu logo, PDF y link para compartir.'],
   ['¿Sirve para roofing, landscaping, painting o handyman?', 'Sí, está hecha para contratistas hispanos: roofing, landscaping, painting, remodeling, drywall, flooring, handyman, cleaning, concrete y fencing. Separas labor y materiales como lo piden los clientes y los contratistas generales.'],
   ['¿Necesito computadora o saber inglés?', 'No. Todo es en español y desde tu celular — se instala como app. El estimate que recibe el cliente se ve profesional, con números en formato de USA.'],
   ['¿Me dice cuánto le gano a cada trabajo?', 'Te muestra tu ganancia estimada: activas "¿Cuánto me queda?", pones lo que a ti te cuesta cada renglón (material, cuadrilla, gasolina) y ves tu margen antes de mandar el estimate — calculado sobre la venta antes de tax y tan exacto como los costos que captures. Te avisa si vas abajo del 20%. Tu cliente nunca lo ve.'],
@@ -27,7 +27,7 @@ const JSONLD_USA = [
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web, Android, iOS',
     inLanguage: 'es',
-    offers: { '@type': 'Offer', price: '15', priceCurrency: 'USD' },
+    offers: { '@type': 'Offer', price: '29', priceCurrency: 'USD' },
     audience: { '@type': 'Audience', audienceType: 'Contratistas hispanos y latinos en Estados Unidos: roofing, landscaping, painting, remodeling, drywall, handyman' },
     areaServed: 'US',
     url: 'https://cotizaexpress.com/usa',
@@ -50,10 +50,10 @@ export default function LandingUSA() {
     <div className="min-h-screen bg-white">
       <Helmet>
         <title>Estimates Profesionales en Español — App para Contratistas Hispanos en USA | CotizaBot</title>
-        <meta name="description" content="Haz tus estimates en dólares desde tu celular, en español: describe el trabajo y CotizaBot lo cotiza con tax y PDF profesional. Para roofing, landscaping, painting, remodeling. $15 USD/mes, el primero gratis." />
+        <meta name="description" content="Haz tus estimates en dólares desde tu celular, en español: describe el trabajo y CotizaBot lo cotiza con tax y PDF profesional. Para roofing, landscaping, painting, remodeling. $29 USD/mes, el primero gratis." />
         <link rel="canonical" href="https://cotizaexpress.com/usa" />
         <meta property="og:title" content="Estimates profesionales en español — para contratistas hispanos en USA" />
-        <meta property="og:description" content="Describe el trabajo y CotizaBot te arma el estimate en dólares con tax y PDF. Desde tu celular. $15 USD/mes." />
+        <meta property="og:description" content="Describe el trabajo y CotizaBot te arma el estimate en dólares con tax y PDF. Desde tu celular. $29 USD/mes." />
         <meta property="og:url" content="https://cotizaexpress.com/usa" />
         <script type="application/ld+json">{JSON.stringify(JSONLD_USA)}</script>
       </Helmet>
@@ -95,7 +95,7 @@ export default function LandingUSA() {
                       Hacer mi primer estimate GRATIS →
                     </Button>
                   </Link>
-                  <p className="text-sm text-slate-500 mt-3">$15 USD/mes después del primero · sin tarjeta · cancela cuando quieras</p>
+                  <p className="text-sm text-slate-500 mt-3">$29 USD/mes después del primero · sin tarjeta · cancela cuando quieras</p>
                 </>
               ) : (
                 <>
@@ -112,7 +112,7 @@ export default function LandingUSA() {
                       Quiero que conteste solo →
                     </Button>
                   </Link>
-                  <p className="text-sm text-slate-500 mt-3">$49 USD/mes · empieza con el plan de $15 y súbete cuando quieras</p>
+                  <p className="text-sm text-slate-500 mt-3">$49 USD/mes · empieza con el plan de $29 y súbete cuando quieras</p>
                 </>
               )}
             </div>
@@ -175,7 +175,7 @@ export default function LandingUSA() {
       {/* Precio + CTA */}
       <section className="py-14 bg-white">
         <div className="max-w-xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-extrabold text-slate-900 mb-2">$15 dólares al mes</h2>
+          <h2 className="text-3xl font-extrabold text-slate-900 mb-2">$29 dólares al mes</h2>
           <p className="text-slate-600 mb-6">Estimates ilimitados con tu logo, labor + materiales y PDF. <strong>El primero es gratis, sin tarjeta.</strong></p>
           <Link to="/registro?utm_source=usa">
             <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-lg font-bold px-8 py-6">Empezar gratis ahora →</Button>

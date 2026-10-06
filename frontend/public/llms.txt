@@ -7,7 +7,7 @@ Página de referencia (HTML estático): https://cotizaexpress.com/cotizabot.html
 
 ## Productos y precios (octubre 2026)
 
-- Cotizador IA (sin conectar WhatsApp): $299 MXN/mes en México; $15 USD/mes en Estados Unidos. La primera cotización del mes es gratis, sin tarjeta.
+- Cotizador IA (sin conectar WhatsApp): $299 MXN/mes en México; $29 USD/mes en Estados Unidos. La primera cotización del mes es gratis, sin tarjeta.
 - CotizaBot (bot que contesta y cotiza solo en el WhatsApp del negocio, 24/7): $1,000 MXN/mes; $49 USD/mes en USA.
 - CotizaBot Pro (además cobra: links de pago de Mercado Pago y datos SPEI automáticos): $2,000 MXN/mes; $99 USD/mes en USA.
 - Generador de cotizaciones gratis, sin registro: https://cotizaexpress.com/generador-de-cotizaciones
@@ -32,7 +32,7 @@ Página de referencia (HTML estático): https://cotizaexpress.com/cotizabot.html
 
 ## Cómo se compara (honesto)
 
-Herramientas como Jobber o Joist también hacen estimates, cálculo de márgenes u órdenes de cambio, principalmente en inglés y a precios mayores. CotizaBot se diferencia por: todo en español, pensado para el celular, precio de entrada de $15 USD / $299 MXN, lector de listas y screenshots de WhatsApp, y un bot de WhatsApp que cotiza solo con el catálogo real del negocio.
+Herramientas como Jobber o Joist también hacen estimates, cálculo de márgenes u órdenes de cambio, principalmente en inglés y a precios mayores. CotizaBot se diferencia por: todo en español, pensado para el celular, precio de entrada de $29 USD / $299 MXN, lector de listas y screenshots de WhatsApp, y un bot de WhatsApp que cotiza solo con el catálogo real del negocio.
 
 ## Páginas principales
 

@@ -10,7 +10,7 @@ export const OFICIOS_USA = {
     sub: 'Shingles, underlayment, flashing y labor — todo en un estimate profesional en dólares, con tax, listo para mandarlo por texto antes de bajarte del techo.',
     ejemplo: 'Reemplazo de techo 22 squares, shingles arquitectónicos, incluye tear-off y disposal',
     metaTitle: 'Estimates de Roofing en Español — App para Roofers Hispanos en USA',
-    metaDesc: 'Haz estimates de roofing en dólares desde tu celular, en español: materiales, labor y tax en un PDF profesional. $15/mes, el primero gratis.',
+    metaDesc: 'Haz estimates de roofing en dólares desde tu celular, en español: materiales, labor y tax en un PDF profesional. $29/mes, el primero gratis.',
     bullets: ['Cotiza por square con material y labor separados', 'Tax solo a lo que lo lleva: material, y labor si tu estado lo pide', 'PDF con tu logo que te hace ver como compañía grande'],
     faq: [
       ['¿Cómo hago un estimate de roofing en español?', 'Escribe el trabajo en tus palabras — "reemplazo de techo 22 squares con tear-off" — y CotizaBot lo convierte en un estimate en dólares con labor, materiales, tax y PDF profesional, todo en español.'],
@@ -25,7 +25,7 @@ export const OFICIOS_USA = {
     sub: 'Mowing, mulch, sod, irrigación y labor — manda el estimate en dólares desde tu teléfono, en español, antes que los demás landscapers.',
     ejemplo: 'Instalar sod 1,200 sqft, 5 yardas de mulch, recortar 3 árboles, limpieza general',
     metaTitle: 'Estimates de Landscaping en Español — App para Landscapers Hispanos en USA',
-    metaDesc: 'Haz estimates de landscaping y lawn care en dólares desde tu celular, en español: sod, mulch, labor y tax en un PDF profesional. $15/mes, el primero gratis.',
+    metaDesc: 'Haz estimates de landscaping y lawn care en dólares desde tu celular, en español: sod, mulch, labor y tax en un PDF profesional. $29/mes, el primero gratis.',
     bullets: ['Cotiza por sqft, por yarda o por servicio', 'Estimates recurrentes en segundos (mowing semanal)', 'El primero que manda precio se queda el trabajo'],
     faq: [
       ['¿Cómo hago un estimate de landscaping en español?', 'Describe el trabajo — "instalar sod 1,200 sqft y 5 yardas de mulch" — y CotizaBot arma el estimate en dólares con materiales, labor y tax, en español y con PDF profesional.'],
@@ -40,7 +40,7 @@ export const OFICIOS_USA = {
     sub: 'Por sqft o por cuarto, con pintura y labor desglosados — un estimate en dólares con tu logo, en español, en 2 minutos.',
     ejemplo: 'Pintar interior 1,800 sqft, 2 manos, incluye primer y material, paredes y techos',
     metaTitle: 'Estimates de Painting en Español — App para Pintores Hispanos en USA',
-    metaDesc: 'Haz estimates de pintura en dólares desde tu celular, en español: sqft, pintura, labor y tax en un PDF profesional. $15/mes, el primero gratis.',
+    metaDesc: 'Haz estimates de pintura en dólares desde tu celular, en español: sqft, pintura, labor y tax en un PDF profesional. $29/mes, el primero gratis.',
     bullets: ['Cotiza por sqft con material incluido o sin él', 'Labor y pintura separados, como lo pide el cliente', 'PDF profesional que gana contra el estimate escrito a mano'],
     faq: [
       ['¿Cómo hago un estimate de pintura en español?', 'Escribe el trabajo — "pintar interior 1,800 sqft, 2 manos con material" — y CotizaBot lo convierte en estimate en dólares con desglose, tax y PDF en español.'],
@@ -55,7 +55,7 @@ export const OFICIOS_USA = {
     sub: 'Kitchen, baño, basement o la casa entera — estimates en dólares con materiales y labor desglosados, en español y con PDF profesional.',
     ejemplo: 'Remodelación de baño completo: demolición, tile 120 sqft, vanity, plomería y labor',
     metaTitle: 'Estimates de Remodeling en Español — App para Remodeladores Hispanos en USA',
-    metaDesc: 'Haz estimates de remodelación en dólares desde tu celular, en español: demolición, materiales, labor y tax en un PDF profesional. $15/mes, el primero gratis.',
+    metaDesc: 'Haz estimates de remodelación en dólares desde tu celular, en español: demolición, materiales, labor y tax en un PDF profesional. $29/mes, el primero gratis.',
     bullets: ['Proyectos grandes con muchos conceptos, sin complicarte', 'Desglose claro = menos regateo del cliente', 'Te ves como contratista general aunque estés empezando'],
     faq: [
       ['¿Cómo hago un estimate de remodelación en español?', 'Pega la lista del proyecto — demolición, tile, vanity, labor — y CotizaBot arma el estimate completo en dólares con tax y PDF profesional en español.'],
@@ -70,7 +70,7 @@ export const OFICIOS_USA = {
     sub: 'Trabajos chicos, muchos al día — haz cada estimate en 2 minutos en dólares, con tax, y mándalo antes de llegar al siguiente trabajo.',
     ejemplo: 'Instalar ceiling fan, reparar drywall 2 hoyos, pintar puerta, cambiar llave de cocina',
     metaTitle: 'Estimates de Handyman en Español — App para Handymen Hispanos en USA',
-    metaDesc: 'Haz estimates de handyman en dólares desde tu celular, en español: lista de trabajos, labor, tax y PDF profesional en 2 minutos. $15/mes, el primero gratis.',
+    metaDesc: 'Haz estimates de handyman en dólares desde tu celular, en español: lista de trabajos, labor, tax y PDF profesional en 2 minutos. $29/mes, el primero gratis.',
     bullets: ['Varios trabajos en un mismo estimate', 'Rápido: lo haces entre un trabajo y el siguiente', 'Precio formal por escrito = te pagan lo justo'],
     faq: [
       ['¿Cómo hago un estimate de handyman en español?', 'Escribe la lista de trabajos — "instalar ceiling fan, reparar drywall, cambiar llave" — y CotizaBot arma el estimate en dólares con cada concepto, tax y PDF en español.'],
@@ -85,7 +85,7 @@ export const OFICIOS_USA = {
     sub: 'Hanging, taping, texture y labor por sqft — el estimate en dólares con tax sale en 2 minutos desde tu celular, en español.',
     ejemplo: 'Hang y finish de drywall 2,400 sqft, nivel 4, incluye material y texture knockdown',
     metaTitle: 'Estimates de Drywall en Español — App para Drywalleros Hispanos en USA',
-    metaDesc: 'Haz estimates de drywall en dólares desde tu celular, en español: sqft, material, labor y tax en un PDF profesional. $15/mes, el primero gratis.',
+    metaDesc: 'Haz estimates de drywall en dólares desde tu celular, en español: sqft, material, labor y tax en un PDF profesional. $29/mes, el primero gratis.',
     bullets: ['Cotiza por sqft o por board', 'Hanging, taping y texture como líneas separadas', 'PDF con folio para constructoras y contratistas generales'],
     faq: [
       ['¿Cómo hago un estimate de drywall en español?', 'Describe el trabajo — "hang y finish 2,400 sqft nivel 4 con texture" — y CotizaBot lo convierte en estimate en dólares con desglose, tax y PDF profesional.'],
@@ -258,7 +258,7 @@ export default function OficioUSA({ slug }) {
       applicationCategory: 'BusinessApplication',
       operatingSystem: 'Web, Android, iOS',
       inLanguage: 'es',
-      offers: { '@type': 'Offer', price: '15', priceCurrency: 'USD' },
+      offers: { '@type': 'Offer', price: '29', priceCurrency: 'USD' },
       audience: { '@type': 'Audience', audienceType: `Contratistas hispanos de ${o.nombre} en Estados Unidos` },
       url,
     },
@@ -310,7 +310,7 @@ export default function OficioUSA({ slug }) {
         <Link to={`/registro?utm_source=usa_${slug}`}>
           <Button size="lg" className="bg-blue-700 hover:bg-blue-800 text-lg px-8 py-6">Hacer mi primer estimate GRATIS →</Button>
         </Link>
-        <p className="text-sm text-slate-400 mt-3">$15 USD/mes después del primero · en español · se instala como app 📲</p>
+        <p className="text-sm text-slate-400 mt-3">$29 USD/mes después del primero · en español · se instala como app 📲</p>
         <p className="text-sm text-slate-500 mt-2">🔒 CotizaBot usa <strong>tus precios</strong> (los guardas una vez) · el PDF puede ir en español o en inglés</p>
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-8 text-sm text-amber-900 max-w-xl mx-auto">

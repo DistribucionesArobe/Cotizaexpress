@@ -226,7 +226,7 @@ export default function Cotizador() {
         <div>
           <h2 className="text-2xl font-bold text-slate-900">Cotizador IA</h2>
           <p className="text-slate-600 text-sm">Captura tu cotización como en Excel — o pega la lista del cliente (o un screenshot) y la IA la llena por ti.</p>
-          <p className="text-xs text-violet-700 mt-1 font-medium">Plan Cotizador IA: cotizaciones ilimitadas por {esUS ? "$15 USD/mes" : "$299/mes"} · <a href="/precios" className="underline">ver planes</a></p>
+          <p className="text-xs text-violet-700 mt-1 font-medium">Plan Cotizador IA: cotizaciones ilimitadas por {esUS ? "$29 USD/mes" : "$299/mes"} · <a href="/precios" className="underline">ver planes</a></p>
 
         </div>
       </div>
@@ -480,11 +480,11 @@ export default function Cotizador() {
             <p className="text-3xl">🎉</p>
             <p className="text-xl font-bold text-slate-900">¿Te gustó? Esa fue tu cotización gratis del mes.</p>
             <p className="text-slate-600 max-w-md mx-auto">
-              Con el <strong>Plan Cotizador IA ({esUS ? "$15 USD/mes" : "$299/mes"})</strong> haces {esUS ? "estimates ilimitados" : "cotizaciones ilimitadas"}
+              Con el <strong>Plan Cotizador IA ({esUS ? "$29 USD/mes" : "$299/mes"})</strong> haces {esUS ? "estimates ilimitados" : "cotizaciones ilimitadas"}
               con tu logo, folio y PDF — y te ahorras horas cada semana.
             </p>
             <a href="/precios">
-              <Button size="lg" className="bg-violet-600 hover:bg-violet-700 text-lg px-8">Activar mi plan — {esUS ? "$15 USD/mes" : "$299/mes"}</Button>
+              <Button size="lg" className="bg-violet-600 hover:bg-violet-700 text-lg px-8">Activar mi plan — {esUS ? "$29 USD/mes" : "$299/mes"}</Button>
             </a>
             <p className="text-xs text-slate-400">Se activa en 1 minuto con tarjeta o SPEI · factura disponible</p>
           </CardContent>
@@ -526,7 +526,7 @@ export default function Cotizador() {
               ➕ ¿Te pidieron algo extra? Haz una orden de cambio sobre {resultado.parent_folio || resultado.folio}
             </button>
             <div className="bg-white border border-violet-200 rounded-lg px-4 py-3 text-sm text-slate-700 max-w-lg mx-auto">
-              ✨ Esto es el <strong>Plan Cotizador IA — {esUS ? "$15 USD/mes" : "$299/mes"}</strong>: {esUS ? "estimates ilimitados" : "cotizaciones ilimitadas"} con tu logo y folio.
+              ✨ Esto es el <strong>Plan Cotizador IA — {esUS ? "$29 USD/mes" : "$299/mes"}</strong>: {esUS ? "estimates ilimitados" : "cotizaciones ilimitadas"} con tu logo y folio.
               <a href="/precios" className="text-violet-700 underline font-medium ml-1">Activar mi plan</a>
             </div>
             <a href="/precios" className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-full px-5 py-2.5 mt-1">
