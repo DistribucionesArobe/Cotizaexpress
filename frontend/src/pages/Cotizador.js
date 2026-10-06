@@ -48,6 +48,12 @@ export default function Cotizador() {
     localStorage.setItem('cotizador_us_estado', nombre);
     if (nombre && TAX_ESTADOS_US[nombre] !== undefined) setIvaPct(TAX_ESTADOS_US[nombre]);
   };
+  const [modoGanancia, setModoGanancia] = useState(() => localStorage.getItem('cotizador_ganancia') === '1');
+  const toggleGanancia = () => {
+    const v = !modoGanancia;
+    setModoGanancia(v);
+    localStorage.setItem('cotizador_ganancia', v ? '1' : '0');
+  };
   const [buscado, setBuscado] = useState(false);
   const [paywall, setPaywall] = useState(false);
   const [catalogoVacio, setCatalogoVacio] = useState(false);
@@ -146,6 +152,10 @@ export default function Cotizador() {
   const iva = subtotal * pct;
   const total = subtotal + iva;
 
+  const costoTotal = items.reduce((c, it) => c + (parseFloat(it.costo) || 0) * (parseInt(it.qty) || 0), 0);
+  const ganancia = suma - costoTotal;
+  const margenPct = suma > 0 ? (ganancia / suma) * 100 : 0;
+
   const guardar = async () => {
     setGuardando(true);
     try {
@@ -239,8 +249,9 @@ export default function Cotizador() {
         <Card>
           <CardContent className="pt-6 space-y-3">
             <div className="grid grid-cols-12 gap-2 text-xs font-medium text-slate-500 px-1">
-              <span className="col-span-5">Producto</span><span className="col-span-2">Cantidad</span>
-              <span className="col-span-2">Unidad</span><span className="col-span-2">Precio</span><span></span>
+              <span className="col-span-5">Producto</span><span className={modoGanancia ? 'col-span-1' : 'col-span-2'}>Cant.</span>
+              <span className={modoGanancia ? 'col-span-1' : 'col-span-2'}>Unidad</span><span className="col-span-2">Precio</span>
+              {modoGanancia && <span className="col-span-2 text-violet-600">Mi costo 🔒</span>}<span></span>
             </div>
             <p className="text-[11px] text-slate-400 px-1 -mt-1">👆 Toca la etiqueta 📦 Material para cambiarla a 👷 Mano de obra (y al revés) — el PDF separa los dos.</p>
             {items.map((it, i) => (
@@ -254,16 +265,25 @@ export default function Cotizador() {
                   {it.tipo === 'mano_obra' ? '👷 M. de obra' : '📦 Material'}
                 </button>
                 <input className="col-span-12 sm:col-span-3 px-3 py-2 border border-slate-300 rounded-lg text-sm" placeholder={it.tipo === 'mano_obra' ? 'Ej: Instalación completa' : 'Producto'} value={it.name} onChange={(e) => setItem(i, 'name', e.target.value)} />
-                <input className="col-span-2 px-3 py-2 border border-slate-300 rounded-lg text-sm" type="number" min="1" value={it.qty} onChange={(e) => setItem(i, 'qty', e.target.value)} />
-                <input className="col-span-2 px-3 py-2 border border-slate-300 rounded-lg text-sm" value={it.unit} onChange={(e) => setItem(i, 'unit', e.target.value)} />
+                <input className={`${modoGanancia ? 'col-span-1' : 'col-span-2'} px-2 py-2 border border-slate-300 rounded-lg text-sm`} type="number" min="1" value={it.qty} onChange={(e) => setItem(i, 'qty', e.target.value)} />
+                <input className={`${modoGanancia ? 'col-span-1' : 'col-span-2'} px-2 py-2 border border-slate-300 rounded-lg text-sm`} value={it.unit} onChange={(e) => setItem(i, 'unit', e.target.value)} />
                 <input className="col-span-2 px-3 py-2 border border-slate-300 rounded-lg text-sm" type="number" step="0.01" value={it.price} onChange={(e) => setItem(i, 'price', e.target.value)} />
+                {modoGanancia && (
+                  <input className="col-span-2 px-3 py-2 border border-violet-200 bg-violet-50/50 rounded-lg text-sm" type="number" step="0.01" placeholder="costo" value={it.costo || ''} onChange={(e) => setItem(i, 'costo', e.target.value)} />
+                )}
                 <button onClick={() => quitarRenglon(i)} className="text-slate-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
               </div>
             ))}
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 items-center">
               <button onClick={() => agregarRenglon('material')} className="text-sm text-violet-700 flex items-center gap-1 bg-violet-50 border border-violet-200 rounded-full px-3 py-1.5 hover:bg-violet-100"><Plus className="w-4 h-4" /> Material</button>
               <button onClick={() => agregarRenglon('mano_obra')} className="text-sm text-amber-700 flex items-center gap-1 bg-amber-50 border border-amber-200 rounded-full px-3 py-1.5 hover:bg-amber-100"><Plus className="w-4 h-4" /> 👷 Mano de obra</button>
+              <button onClick={toggleGanancia} className={`text-sm flex items-center gap-1 rounded-full px-3 py-1.5 border ml-auto ${modoGanancia ? 'bg-violet-600 text-white border-violet-600' : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-50'}`}>
+                💰 ¿Cuánto me queda?
+              </button>
             </div>
+            {modoGanancia && (
+              <p className="text-xs text-violet-600">🔒 Pon lo que a TI te cuesta cada renglón (material, cuadrilla, gasolina). Es privado: no sale en el PDF ni lo ve tu cliente.</p>
+            )}
 
             <div className="border-t pt-3 text-sm text-slate-700 space-y-2">
               <div className="flex flex-wrap items-center gap-3 justify-end text-xs text-slate-600">
@@ -318,6 +338,18 @@ export default function Cotizador() {
               <div className="flex justify-end gap-8"><span>Subtotal:</span><span className="w-28 text-right">${subtotal.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span></div>
               <div className="flex justify-end gap-8"><span>{etiquetaImpuesto} {ivaPct || 0}%:</span><span className="w-28 text-right">${iva.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span></div>
               <div className="flex justify-end gap-8 font-bold text-slate-900"><span>TOTAL:</span><span className="w-28 text-right">${total.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span></div>
+              {modoGanancia && (
+                <div className="bg-violet-50 border border-violet-200 rounded-xl px-4 py-2.5 mt-2 text-right space-y-1">
+                  <div className="flex justify-end gap-8 text-violet-700"><span>🔒 Te cuesta:</span><span className="w-28 text-right">${costoTotal.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span></div>
+                  <div className={`flex justify-end gap-8 font-bold ${ganancia >= 0 ? 'text-emerald-700' : 'text-red-600'}`}>
+                    <span>{ganancia >= 0 ? '💰 Te quedan:' : '⚠️ Pierdes:'}</span>
+                    <span className="w-28 text-right">${Math.abs(ganancia).toLocaleString('es-MX', {minimumFractionDigits: 2})} ({margenPct.toFixed(0)}%)</span>
+                  </div>
+                  {ganancia >= 0 && margenPct < 20 && costoTotal > 0 && (
+                    <p className="text-[11px] text-amber-700">⚠️ Margen abajo del 20% — revisa si contaste preparación, transporte, desperdicio y segunda visita.</p>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="flex flex-wrap gap-3 items-center pt-2">
