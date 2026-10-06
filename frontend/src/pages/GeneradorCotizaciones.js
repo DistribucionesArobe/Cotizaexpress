@@ -256,7 +256,7 @@ export default function GeneradorCotizaciones() {
             {/* Magia IA */}
             <Card className="mt-6 shadow-xl border-2 border-violet-200 rounded-2xl bg-violet-50/40">
               <CardContent className="pt-6 space-y-3">
-                <p className="font-bold text-slate-900">🪄 ¿Te mandaron la lista? La IA llena la tabla por ti</p>
+                <p className="font-bold text-slate-900">🤖 ¿Te mandaron la lista? CotizaBot la llena por ti</p>
                 <textarea
                   value={iaTexto}
                   onChange={e => setIaTexto(e.target.value)}
