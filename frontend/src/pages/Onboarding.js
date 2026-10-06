@@ -58,6 +58,50 @@ const EJEMPLOS_GIRO = {
   'Otro': [{ nombre: 'Producto o servicio 1', precio: '100' }, { nombre: 'Producto o servicio 2', precio: '250' }, { nombre: 'Producto o servicio 3', precio: '500' }],
 };
 
+const CIUDADES_US = [
+  'Houston, TX', 'Dallas, TX', 'Austin, TX', 'San Antonio, TX', 'Fort Worth, TX', 'El Paso, TX', 'McAllen, TX', 'Laredo, TX',
+  'Los Angeles, CA', 'San Diego, CA', 'San Jose, CA', 'Fresno, CA', 'Sacramento, CA', 'Bakersfield, CA', 'Riverside, CA', 'Santa Ana, CA',
+  'Phoenix, AZ', 'Tucson, AZ', 'Chicago, IL', 'Aurora, IL', 'Denver, CO', 'Las Vegas, NV', 'Reno, NV',
+  'Miami, FL', 'Orlando, FL', 'Tampa, FL', 'Jacksonville, FL', 'Atlanta, GA', 'Charlotte, NC', 'Raleigh, NC',
+  'Nashville, TN', 'Memphis, TN', 'Oklahoma City, OK', 'Tulsa, OK', 'Kansas City, MO', 'Seattle, WA', 'Portland, OR',
+  'Salt Lake City, UT', 'Albuquerque, NM', 'New York, NY', 'Newark, NJ', 'Indianapolis, IN', 'Columbus, OH', 'Milwaukee, WI',
+];
+
+const HORAS_DIA = [];
+for (let h = 6; h <= 22; h++) { HORAS_DIA.push(`${String(h).padStart(2, '0')}:00`); if (h < 22) HORAS_DIA.push(`${String(h).padStart(2, '0')}:30`); }
+
+function HorarioDia({ etiqueta, valor, onChange }) {
+  const cerrado = (valor || '').toLowerCase() === 'cerrado';
+  const partes = cerrado ? ['08:00', '18:00'] : (valor || '08:00-18:00').split('-');
+  const abre = partes[0] || '08:00';
+  const cierra = partes[1] || '18:00';
+  return (
+    <div className="bg-white rounded-xl shadow-sm p-3">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs font-semibold text-slate-600">{etiqueta}</span>
+        <button
+          type="button"
+          onClick={() => onChange(cerrado ? `${abre}-${cierra}` : 'cerrado')}
+          className={`text-[11px] font-bold rounded-full px-2.5 py-1 border transition-all ${cerrado ? 'bg-slate-200 text-slate-600 border-slate-300' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}
+        >
+          {cerrado ? '🔒 Cerrado' : '✅ Abierto'}
+        </button>
+      </div>
+      {!cerrado && (
+        <div className="flex items-center gap-1.5">
+          <select value={abre} onChange={(e) => onChange(`${e.target.value}-${cierra}`)} className="flex-1 text-sm border border-slate-200 rounded-lg px-1.5 py-2 bg-slate-50">
+            {HORAS_DIA.map((h) => <option key={h} value={h}>{h}</option>)}
+          </select>
+          <span className="text-slate-400 text-xs">a</span>
+          <select value={cierra} onChange={(e) => onChange(`${abre}-${e.target.value}`)} className="flex-1 text-sm border border-slate-200 rounded-lg px-1.5 py-2 bg-slate-50">
+            {HORAS_DIA.map((h) => <option key={h} value={h}>{h}</option>)}
+          </select>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const CIUDADES_MX = [
   'Aguascalientes, Ags.', 'Mexicali, B.C.', 'Tijuana, B.C.', 'Ensenada, B.C.', 'La Paz, B.C.S.',
   'Campeche, Camp.', 'Tuxtla Gutiérrez, Chis.', 'Tapachula, Chis.', 'Chihuahua, Chih.', 'Ciudad Juárez, Chih.',
@@ -99,6 +143,7 @@ export default function Onboarding() {
     horario_semana: '08:00-18:00',
     horario_sabado: '08:00-14:00',
     horario_domingo: 'cerrado',
+    pais: localStorage.getItem('cotizador_region') === 'US' ? 'US' : 'MX',
   });
 
   // WhatsApp Embedded Signup state
@@ -413,19 +458,28 @@ export default function Onboarding() {
                 </div>
 
                 <div className="bg-slate-50 rounded-2xl p-4">
-                  <label className="block text-sm font-bold text-slate-800 mb-2">
-                    📍 ¿En qué ciudad estás?
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-sm font-bold text-slate-800">
+                      📍 ¿En qué ciudad estás?
+                    </label>
+                    <div className="flex rounded-full border border-slate-200 overflow-hidden bg-white">
+                      <button type="button" onClick={() => { setBusinessData({ ...businessData, pais: 'MX' }); localStorage.setItem('cotizador_region', 'MX'); }} className={`px-3 py-1 text-xs font-bold ${businessData.pais !== 'US' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>🇲🇽 México</button>
+                      <button type="button" onClick={() => { setBusinessData({ ...businessData, pais: 'US' }); localStorage.setItem('cotizador_region', 'US'); }} className={`px-3 py-1 text-xs font-bold ${businessData.pais === 'US' ? 'bg-blue-600 text-white' : 'text-slate-500'}`}>🇺🇸 USA</button>
+                    </div>
+                  </div>
                   <input
                     type="text"
-                    list="ciudades-mx"
+                    list={businessData.pais === 'US' ? 'ciudades-us' : 'ciudades-mx'}
                     value={businessData.ciudad}
                     onChange={(e) => setBusinessData({ ...businessData, ciudad: e.target.value })}
                     className="w-full px-4 py-3 border-0 bg-white rounded-xl shadow-sm focus:ring-2 focus:ring-emerald-400 text-base"
-                    placeholder="Empieza a escribir: Monte..."
+                    placeholder={businessData.pais === 'US' ? 'Empieza a escribir: Hou...' : 'Empieza a escribir: Monte...'}
                   />
                   <datalist id="ciudades-mx">
                     {CIUDADES_MX.map((c) => <option key={c} value={c} />)}
+                  </datalist>
+                  <datalist id="ciudades-us">
+                    {CIUDADES_US.map((c) => <option key={c} value={c} />)}
                   </datalist>
                 </div>
 
@@ -435,13 +489,13 @@ export default function Onboarding() {
                   </label>
                   <p className="text-xs text-slate-500 mb-3">Solo para conocerlo — no se conecta nada todavía.</p>
                   <div className="flex items-center gap-2">
-                    <span className="text-base font-bold text-emerald-700 bg-white px-4 py-3 rounded-xl shadow-sm">🇲🇽 +52</span>
+                    <span className="text-base font-bold text-emerald-700 bg-white px-4 py-3 rounded-xl shadow-sm">{businessData.pais === 'US' ? '🇺🇸 +1' : '🇲🇽 +52'}</span>
                     <input
                       type="tel"
                       value={businessData.whatsapp}
                       onChange={(e) => setBusinessData({ ...businessData, whatsapp: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                       className="flex-1 px-4 py-3 border-0 bg-white rounded-xl shadow-sm focus:ring-2 focus:ring-emerald-400 text-base tracking-wider"
-                      placeholder="81 1234 5678"
+                      placeholder={businessData.pais === 'US' ? '512 123 4567' : '81 1234 5678'}
                       maxLength={10}
                     />
                   </div>
@@ -451,38 +505,12 @@ export default function Onboarding() {
                   <label className="block text-sm font-bold text-slate-800 mb-3">
                     🕗 ¿A qué hora atiendes?
                   </label>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-600 mb-1.5">💼 Lun - Vie</label>
-                      <input
-                        type="text"
-                        value={businessData.horario_semana}
-                        onChange={(e) => setBusinessData({ ...businessData, horario_semana: e.target.value })}
-                        className="w-full px-3 py-3 border-0 bg-white rounded-xl shadow-sm text-sm text-center font-medium focus:ring-2 focus:ring-emerald-400"
-                        placeholder="08:00-18:00"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-600 mb-1.5">🛠️ Sábado</label>
-                      <input
-                        type="text"
-                        value={businessData.horario_sabado}
-                        onChange={(e) => setBusinessData({ ...businessData, horario_sabado: e.target.value })}
-                        className="w-full px-3 py-3 border-0 bg-white rounded-xl shadow-sm text-sm text-center font-medium focus:ring-2 focus:ring-emerald-400"
-                        placeholder="08:00-14:00"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-600 mb-1.5">🏖️ Domingo</label>
-                      <input
-                        type="text"
-                        value={businessData.horario_domingo}
-                        onChange={(e) => setBusinessData({ ...businessData, horario_domingo: e.target.value })}
-                        className="w-full px-3 py-3 border-0 bg-white rounded-xl shadow-sm text-sm text-center font-medium focus:ring-2 focus:ring-emerald-400"
-                        placeholder="cerrado"
-                      />
-                    </div>
+                  <div className="grid sm:grid-cols-3 gap-3">
+                    <HorarioDia etiqueta="💼 Lun - Vie" valor={businessData.horario_semana} onChange={(v) => setBusinessData({ ...businessData, horario_semana: v })} />
+                    <HorarioDia etiqueta="🛠️ Sábado" valor={businessData.horario_sabado} onChange={(v) => setBusinessData({ ...businessData, horario_sabado: v })} />
+                    <HorarioDia etiqueta="🏖️ Domingo" valor={businessData.horario_domingo} onChange={(v) => setBusinessData({ ...businessData, horario_domingo: v })} />
                   </div>
+                  <p className="text-xs text-slate-400 mt-2">Solo pícale — nada que teclear. El bot avisa estos horarios a tus clientes.</p>
                 </div>
               </div>
             )}
