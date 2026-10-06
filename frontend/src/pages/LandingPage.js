@@ -429,7 +429,7 @@ export default function LandingPage() {
                     <div className="flex justify-between text-violet-700"><span>Venta sin IVA · te cuesta</span><span>$6,990 · $5,250</span></div>
                     <div className="flex justify-between font-bold text-emerald-700"><span>💰 Ganancia estimada</span><span>$1,740 (24.9%)</span></div>
                   </div>
-                  <p className="text-center text-[11px] text-slate-500 mt-3">📄 Folio CX-00457 · PDF con tu logo · listo para WhatsApp</p>
+                  <p className="text-center text-xs mt-3 font-semibold">📄 <a href="/ejemplos/cotizacion-ejemplo.pdf" target="_blank" rel="noopener noreferrer" className="text-violet-700 underline">Abre una cotización real de ejemplo (PDF)</a></p>
                 </div>
               )}
             </div>

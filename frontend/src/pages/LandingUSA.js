@@ -3,12 +3,12 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
-const OFICIOS_US = ['Roofing', 'Landscaping', 'Painting', 'Remodeling', 'Drywall', 'Flooring', 'Handyman', 'Cleaning', 'Concrete', 'Fencing'];
+const OFICIOS_US = ['Roofing', 'Landscaping', 'Painting', 'Remodeling', 'Drywall', 'Handyman'];
 const OFICIOS_CON_PAGINA = { Roofing: 'roofing', Landscaping: 'landscaping', Painting: 'painting', Remodeling: 'remodeling', Drywall: 'drywall', Handyman: 'handyman' };
 
 const FAQ_USA = [
   ['¿Cómo hago un estimate en español en Estados Unidos?', 'Con CotizaBot escribes el trabajo en tus palabras — "pintar sala y 2 cuartos con material" — y CotizaBot lo convierte en un estimate profesional en dólares, con tax, labor y materiales separados y PDF con tu logo. Todo en español, desde tu celular.'],
-  ['¿El estimate sale en dólares y con tax?', 'Sí. Eliges modo USA 🇺🇸 y pones la tasa de sales tax que aplica a tu caso — el tax varía por estado, localidad y tipo de trabajo (en Texas, por ejemplo, los trabajos residenciales y comerciales se manejan distinto) — o la dejas en cero. El total sale exacto en USD.'],
+  ['¿El estimate sale en dólares y con tax?', 'Sí. Tú pones la tasa de sales tax que te aplica y decides si se cobra solo a los materiales o también a la mano de obra: en muchos estados la labor no lleva sales tax o se trata distinto (en Texas, por ejemplo, depende de si el trabajo es residencial o comercial). CotizaBot no calcula la regla de cada estado por ti; te deja aplicarla bien y separada.'],
   ['¿Cuánto cuesta la app para hacer estimates?', 'El primer estimate es gratis y sin tarjeta. Después son $15 USD al mes con estimates ilimitados, tu logo, PDF y link para compartir.'],
   ['¿Sirve para roofing, landscaping, painting o handyman?', 'Sí, está hecha para contratistas hispanos: roofing, landscaping, painting, remodeling, drywall, flooring, handyman, cleaning, concrete y fencing. Separas labor y materiales como lo piden los clientes y los contratistas generales.'],
   ['¿Necesito computadora o saber inglés?', 'No. Todo es en español y desde tu celular — se instala como app. El estimate que recibe el cliente se ve profesional, con números en formato de USA.'],
@@ -127,15 +127,15 @@ export default function LandingUSA() {
                     <div className="flex justify-between items-center px-3 py-1.5 bg-slate-50 border-b"><span className="font-extrabold text-slate-800">García Painting LLC</span><span className="text-emerald-700 font-bold">ESTIMATE · CX-7K2M4</span></div>
                     <div className="grid grid-cols-3 px-3 py-1.5"><span>Paint & materials</span><span className="text-center">1</span><span className="text-right">$380.00</span></div>
                     <div className="grid grid-cols-3 px-3 py-1.5 border-t bg-slate-50"><span>👷 Labor — 850 sqft</span><span className="text-center">1</span><span className="text-right">$1,100.00</span></div>
-                    <div className="flex justify-between px-3 py-1 border-t text-slate-500"><span>Subtotal · Tax 8%</span><span>$1,480.00 · $118.40</span></div>
-                    <div className="flex justify-between px-3 py-2 border-t bg-emerald-600 text-white font-bold"><span>TOTAL (USD, tax inc.)</span><span>$1,598.40</span></div>
+                    <div className="flex justify-between px-3 py-1 border-t text-slate-500"><span>Subtotal · Tax 8% (solo material)</span><span>$1,480.00 · $30.40</span></div>
+                    <div className="flex justify-between px-3 py-2 border-t bg-emerald-600 text-white font-bold"><span>TOTAL (USD, tax inc.)</span><span>$1,510.40</span></div>
                   </div>
                   <div className="mt-3 bg-violet-50 border border-violet-200 rounded-xl px-3 py-2 text-xs">
                     <p className="text-violet-500 font-semibold mb-1">🔒 Solo tú lo ves (no sale en el PDF)</p>
                     <div className="flex justify-between text-violet-700"><span>Te cuesta (material + cuadrilla)</span><span>$980.00</span></div>
                     <div className="flex justify-between font-bold text-emerald-700"><span>💰 Ganancia estimada</span><span>$500.00 (33.8%)</span></div>
                   </div>
-                  <p className="text-center text-[11px] text-slate-500 mt-3">📄 PDF en español o inglés · por texto, WhatsApp o email · también lee fotos 📷</p>
+                  <p className="text-center text-xs mt-3 font-semibold">📄 Ábrelo, es real: <a href="/ejemplos/estimate-ejemplo-en.pdf" target="_blank" rel="noopener noreferrer" className="text-emerald-700 underline">estimate en inglés</a> · <a href="/ejemplos/estimate-ejemplo-es.pdf" target="_blank" rel="noopener noreferrer" className="text-emerald-700 underline">en español</a></p>
                 </div>
               ) : (
                 <div className="max-w-[300px] sm:max-w-sm mx-auto bg-[#ECE5DD] rounded-3xl p-3 sm:p-4 shadow-2xl border border-slate-200">
@@ -146,7 +146,7 @@ export default function LandingUSA() {
                       ✅ <strong>Estimate CX-7K2M4</strong><br/>
                       Paint & materials — $380.00<br/>
                       Labor 850 sqft — $1,100.00<br/>
-                      <strong>TOTAL (USD, tax inc.): $1,598.40</strong><br/>
+                      <strong>TOTAL (USD, tax inc.): $1,510.40</strong><br/>
                       📄 PDF adjunto
                     </div>
                     <p className="text-center text-[11px] text-slate-500">⚡ contestó solo en 5 segundos — 9:47 PM</p>
@@ -164,7 +164,7 @@ export default function LandingUSA() {
 
           {/* 3 puntos, una línea cada uno */}
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-8 text-sm text-slate-600">
-            <span>💵 Dólares, con el tax de tu área</span>
+            <span>💵 Dólares, tax solo donde aplica</span>
             <span>🔒 Tus precios — CotizaBot no inventa</span>
             <span>📲 Vive en tu celular, en español</span>
             <span>💰 Te dice cuánto te queda de ganancia</span>
@@ -190,7 +190,7 @@ export default function LandingUSA() {
           <h2 className="text-3xl font-extrabold mb-3">Que tu WhatsApp conteste y cotice solo</h2>
           <div className="max-w-xs mx-auto bg-white rounded-2xl p-4 text-left text-sm mb-6">
             <div className="bg-[#DCF8C6] rounded-xl rounded-tr-none px-3 py-2 text-slate-800 mb-2">"¿Cuánto por pintar 2 cuartos?"</div>
-            <div className="bg-slate-100 rounded-xl rounded-tl-none px-3 py-2 text-slate-800">🤖 Aquí está tu estimate CX-7K2M4 por $1,598.40 USD 📄 — CotizaBot contesta solo, en 5 segundos, 24/7.</div>
+            <div className="bg-slate-100 rounded-xl rounded-tl-none px-3 py-2 text-slate-800">🤖 Aquí está tu estimate CX-7K2M4 por $1,510.40 USD 📄 — CotizaBot contesta solo, en 5 segundos, 24/7.</div>
           </div>
           <Link to="/registro?utm_source=usa_bot">
             <Button size="lg" className="bg-white hover:bg-emerald-50 text-emerald-700 font-extrabold px-8 py-6">Quiero que conteste solo →</Button>

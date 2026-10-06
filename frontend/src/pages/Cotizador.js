@@ -26,11 +26,14 @@ export default function Cotizador() {
   const [ivaPct, setIvaPct] = useState(16);
   const [ivaIncluido, setIvaIncluido] = useState(true);
   const [region, setRegion] = useState(() => localStorage.getItem('cotizador_region') || 'MX');
+  // En USA la mano de obra muchas veces NO lleva sales tax (depende del estado y del tipo de trabajo)
+  const [taxLabor, setTaxLabor] = useState(() => (localStorage.getItem('cotizador_region') === 'US' ? localStorage.getItem('cotizador_tax_labor') === '1' : true));
+  const cambiarTaxLabor = (v) => { setTaxLabor(v); localStorage.setItem('cotizador_tax_labor', v ? '1' : '0'); };
   const cambiarRegion = (r) => {
     setRegion(r);
     localStorage.setItem('cotizador_region', r);
-    if (r === 'US') { setIvaPct(8); setIvaIncluido(false); }
-    else { setIvaPct(16); setIvaIncluido(true); }
+    if (r === 'US') { setIvaPct(8); setIvaIncluido(false); setTaxLabor(localStorage.getItem('cotizador_tax_labor') === '1'); }
+    else { setIvaPct(16); setIvaIncluido(true); setTaxLabor(true); }
   };
   const esUS = region === 'US';
   const [pdfLang, setPdfLang] = useState(() => localStorage.getItem('cotizador_pdf_lang') || 'es');
@@ -148,8 +151,12 @@ export default function Cotizador() {
   const suma = items.reduce((s, it) => s + (parseFloat(it.price) || 0) * (parseInt(it.qty) || 0), 0);
   const pct = Math.max(0, parseFloat(ivaPct) || 0) / 100;
   // Si los precios ya incluyen IVA: total = suma y el IVA se desglosa hacia atrás.
-  const subtotal = ivaIncluido ? suma / (1 + pct) : suma;
-  const iva = subtotal * pct;
+  const gravable = (it) => it.tipo !== 'mano_obra' || taxLabor;
+  const sumaGrav = items.filter(gravable).reduce((t, it) => t + (parseFloat(it.price) || 0) * (parseInt(it.qty) || 0), 0);
+  const sumaExenta = suma - sumaGrav;
+  const subGrav = ivaIncluido ? sumaGrav / (1 + pct) : sumaGrav;
+  const subtotal = subGrav + sumaExenta;
+  const iva = subGrav * pct;
   const total = subtotal + iva;
 
   const costoTotal = items.reduce((c, it) => c + (parseFloat(it.costo) || 0) * (parseInt(it.qty) || 0), 0);
@@ -173,7 +180,7 @@ export default function Cotizador() {
     setGuardando(true);
     try {
       const itemsPdf = items.map(it => it.tipo === 'mano_obra' && !/mano de obra/i.test(it.name)
-        ? { ...it, name: `Mano de obra — ${it.name}` } : it);
+        ? { ...it, name: `Mano de obra — ${it.name}` } : it).map(it => ({ ...it, gravable: gravable(it) }));
       const r = await axios.post(`${API}/cotizador/guardar`, { items: itemsPdf, cliente, vat_pct: parseFloat(ivaPct) || 0, vat_incluido: ivaIncluido, moneda: esUS ? 'USD' : 'MXN', idioma: esUS ? pdfLang : 'es', parent_folio: parentFolio }, { withCredentials: true });
       setResultado(r.data);
       toast.success(r.data.parent_folio ? `Orden de cambio ${r.data.folio} creada` : `Cotización ${r.data.folio} creada`);
@@ -331,7 +338,7 @@ export default function Cotizador() {
                     className="border border-slate-300 rounded-full px-2 py-1 text-xs bg-white mr-1"
                     title="El sales tax varía por estado (y a veces por ciudad y tipo de trabajo) — elige el tuyo y ajusta si hace falta"
                   >
-                    <option value="">📍 Tu estado...</option>
+                    <option value="">📍 Tasa de referencia por estado...</option>
                     {Object.keys(TAX_ESTADOS_US).map(n => <option key={n} value={n}>{n}</option>)}
                   </select>
                 )}
@@ -362,6 +369,13 @@ export default function Cotizador() {
                   Agregarlo al total
                 </label>
               </div>
+              {esUS && items.some(it => it.tipo === 'mano_obra') && (
+                <label className="flex items-center justify-end gap-2 text-xs text-slate-600 cursor-pointer">
+                  <input type="checkbox" checked={taxLabor} onChange={(e) => cambiarTaxLabor(e.target.checked)} />
+                  Cobrar tax también a la mano de obra
+                  <span className="text-slate-400">(en muchos estados la labor no lleva sales tax — revisa la regla de tu estado y tipo de trabajo)</span>
+                </label>
+              )}
               {items.some(it => it.tipo === 'mano_obra') && items.some(it => it.tipo !== 'mano_obra') && (
                 <>
                   <div className="flex justify-end gap-8 text-slate-500"><span>📦 Materiales:</span><span className="w-28 text-right">${items.filter(it => it.tipo !== 'mano_obra').reduce((t, it) => t + (parseFloat(it.price) || 0) * (parseInt(it.qty) || 0), 0).toLocaleString('es-MX', {minimumFractionDigits: 2})}</span></div>

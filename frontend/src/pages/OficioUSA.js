@@ -11,7 +11,7 @@ export const OFICIOS_USA = {
     ejemplo: 'Reemplazo de techo 22 squares, shingles arquitectónicos, incluye tear-off y disposal',
     metaTitle: 'Estimates de Roofing en Español — App para Roofers Hispanos en USA',
     metaDesc: 'Haz estimates de roofing en dólares desde tu celular, en español: materiales, labor y tax en un PDF profesional. $15/mes, el primero gratis.',
-    bullets: ['Cotiza por square con material y labor separados', 'Tax configurable según tu área y tipo de trabajo', 'PDF con tu logo que te hace ver como compañía grande'],
+    bullets: ['Cotiza por square con material y labor separados', 'Tax solo a lo que lo lleva: material, y labor si tu estado lo pide', 'PDF con tu logo que te hace ver como compañía grande'],
     faq: [
       ['¿Cómo hago un estimate de roofing en español?', 'Escribe el trabajo en tus palabras — "reemplazo de techo 22 squares con tear-off" — y CotizaBot lo convierte en un estimate en dólares con labor, materiales, tax y PDF profesional, todo en español.'],
       ['¿Puedo separar labor y materiales en el estimate?', 'Sí. Cada línea se marca como material o labor (mano de obra) y el PDF muestra el desglose, que es lo que el cliente y las aseguradoras quieren ver.'],
