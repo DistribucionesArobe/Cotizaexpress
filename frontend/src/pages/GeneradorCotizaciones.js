@@ -25,6 +25,7 @@ export default function GeneradorCotizaciones() {
   const [cliente, setCliente] = useState('');
   const [items, setItems] = useState([{ ...emptyItem }]);
   const [conIva, setConIva] = useState(true);
+  const [verGanancia, setVerGanancia] = useState(false);
   const [folio] = useState(genFolio);
 
   const [iaTexto, setIaTexto] = useState('');
@@ -85,6 +86,9 @@ export default function GeneradorCotizaciones() {
   const subtotal = lineas.reduce((s, it) => s + it.importe, 0);
   const iva = conIva ? subtotal * 0.16 : 0;
   const total = subtotal + iva;
+  const costoGen = items.reduce((c, it) => c + (parseFloat(it.costo) || 0) * (parseFloat(it.qty) || 0), 0);
+  const gananciaGen = subtotal - costoGen;
+  const margenGen = subtotal > 0 ? (gananciaGen / subtotal) * 100 : 0;
 
   const faqJsonLd = {
     '@context': 'https://schema.org',
@@ -164,6 +168,7 @@ export default function GeneradorCotizaciones() {
             <span>✅ IVA al 16% automático</span>
             <span>✅ Se ve profesional</span>
             <span>✅ Imprime o guarda en PDF</span>
+            <span>💰 Revisa cuánto te queda</span>
           </div>
         </div>
       </section>
@@ -235,6 +240,7 @@ export default function GeneradorCotizaciones() {
                         <Input className="flex-1" value={it.desc} onChange={e => setItem(i, 'desc', e.target.value)} placeholder="Descripción" />
                         <Input className="w-16" type="number" min="0" value={it.qty} onChange={e => setItem(i, 'qty', e.target.value)} placeholder="Cant" />
                         <Input className="w-24" type="number" min="0" value={it.precio} onChange={e => setItem(i, 'precio', e.target.value)} placeholder="Precio" />
+                        {verGanancia && <Input className="w-24 bg-violet-50 border-violet-200" type="number" min="0" value={it.costo || ''} onChange={e => setItem(i, 'costo', e.target.value)} placeholder="Tu costo" />}
                         <button type="button" onClick={() => removeItem(i)} className="text-slate-400 hover:text-red-500 px-1 text-lg">×</button>
                       </div>
                     ))}
@@ -246,6 +252,21 @@ export default function GeneradorCotizaciones() {
                   <input type="checkbox" checked={conIva} onChange={e => setConIva(e.target.checked)} className="w-4 h-4 accent-emerald-600" />
                   Agregar IVA (16%)
                 </label>
+
+                <button type="button" onClick={() => setVerGanancia(!verGanancia)} className={`w-full text-sm font-semibold rounded-xl px-4 py-2.5 border ${verGanancia ? 'bg-violet-600 text-white border-violet-600' : 'bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100'}`}>
+                  💰 ¿Cuánto me queda? {verGanancia ? '(activo)' : '— pon tu costo y revisa tu ganancia'}
+                </button>
+                {verGanancia && (
+                  <div className="bg-violet-50 border border-violet-200 rounded-xl px-4 py-3 text-sm">
+                    <p className="text-xs text-violet-500 mb-1">🔒 Solo tú lo ves — no sale en la cotización. Sobre la venta sin IVA ({fmt(subtotal)}).</p>
+                    <div className="flex justify-between text-violet-700"><span>Te cuesta:</span><span>{fmt(costoGen)}</span></div>
+                    <div className={`flex justify-between font-bold ${gananciaGen >= 0 ? 'text-emerald-700' : 'text-red-600'}`}>
+                      <span>{gananciaGen >= 0 ? '💰 Ganancia estimada:' : '⚠️ Pérdida estimada:'}</span>
+                      <span>{fmt(Math.abs(gananciaGen))} ({margenGen.toFixed(1)}%)</span>
+                    </div>
+                    {gananciaGen >= 0 && margenGen < 20 && costoGen > 0 && <p className="text-[11px] text-amber-700 mt-1">⚠️ Abajo del 20% — ¿contaste preparación, transporte, desperdicio y segunda visita?</p>}
+                  </div>
+                )}
 
                 <Button onClick={() => { setShowUpsell(true); if (window.fbq) { try { window.fbq('track', 'Lead'); } catch (e) {} } }} className="w-full bg-emerald-600 hover:bg-emerald-700 text-lg py-6">
                   📄 Descargar mi cotización

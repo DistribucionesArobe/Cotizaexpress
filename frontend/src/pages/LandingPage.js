@@ -384,7 +384,7 @@ export default function LandingPage() {
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-purple-600">La IA te la cotiza.</span>
                   </h1>
                   <p className="text-lg text-slate-600 mb-7 max-w-xl mx-auto lg:mx-0">
-                    Cotizador IA: tu catálogo en Excel + la lista tal como te la mandaron = cotización con IVA, folio y PDF en segundos. Desde $299/mes.
+                    Cotización con IVA, folio y PDF en segundos — y antes de mandarla, <strong className="text-violet-700">revisa cuánto te queda</strong>. Desde $299/mes.
                   </p>
                   <Link to="/registro">
                     <Button size="lg" className="text-lg px-8 py-6 bg-violet-600 hover:bg-violet-700 shadow-xl">Empieza gratis →</Button>
@@ -423,6 +423,11 @@ export default function LandingPage() {
                     <div className="grid grid-cols-3 px-3 py-1.5 border-t bg-slate-50"><span>Varilla 3/8</span><span className="text-center">5</span><span className="text-right">$840</span></div>
                     <div className="grid grid-cols-3 px-3 py-1.5 border-t"><span>Block 15x20</span><span className="text-center">200</span><span className="text-right">$3,700</span></div>
                     <div className="flex justify-between px-3 py-2 border-t bg-violet-600 text-white font-bold"><span>TOTAL (IVA inc.)</span><span>$8,108.40</span></div>
+                  </div>
+                  <div className="mt-3 bg-violet-50 border border-violet-200 rounded-xl px-3 py-2 text-xs">
+                    <p className="text-violet-500 font-semibold mb-1">🔒 Solo tú lo ves (no sale en el PDF)</p>
+                    <div className="flex justify-between text-violet-700"><span>Venta sin IVA · te cuesta</span><span>$6,990 · $5,250</span></div>
+                    <div className="flex justify-between font-bold text-emerald-700"><span>💰 Ganancia estimada</span><span>$1,740 (24.9%)</span></div>
                   </div>
                   <p className="text-center text-[11px] text-slate-500 mt-3">📄 Folio CX-00457 · PDF con tu logo · listo para WhatsApp</p>
                 </div>

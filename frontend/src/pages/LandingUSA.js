@@ -82,13 +82,13 @@ export default function LandingUSA() {
             <div className="text-center lg:text-left order-1">
               {slide === 0 ? (
                 <>
-                  <p className="text-sm font-bold text-emerald-700 mb-2">✨ MANDA ESTIMATES</p>
+                  <p className="text-sm font-bold text-emerald-700 mb-2">✨ ESTIMATES EN ESPAÑOL</p>
                   <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-5 leading-tight">
-                    Manda estimates como los grandes,<br/>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">en español y en 2 minutos</span>
+                    Haz tu estimate<br/>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">y revisa cuánto te queda</span>
                   </h1>
                   <p className="text-lg text-slate-600 mb-7 max-w-xl mx-auto lg:mx-0">
-                    Describe el trabajo y <strong className="text-emerald-700">CotizaBot</strong> arma el estimate en dólares con tus precios — tax, PDF con tu logo, listo para mandar.
+                    <strong className="text-emerald-700">CotizaBot</strong> arma el estimate en dólares con tus precios — tax, PDF con tu logo — y antes de mandarlo te enseña tu ganancia estimada. Solo tú la ves.
                   </p>
                   <Link to="/registro?utm_source=usa">
                     <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white text-lg font-extrabold px-8 py-6 shadow-xl">
@@ -127,7 +127,13 @@ export default function LandingUSA() {
                     <div className="flex justify-between items-center px-3 py-1.5 bg-slate-50 border-b"><span className="font-extrabold text-slate-800">García Painting LLC</span><span className="text-emerald-700 font-bold">ESTIMATE · CX-7K2M4</span></div>
                     <div className="grid grid-cols-3 px-3 py-1.5"><span>Paint & materials</span><span className="text-center">1</span><span className="text-right">$380.00</span></div>
                     <div className="grid grid-cols-3 px-3 py-1.5 border-t bg-slate-50"><span>👷 Labor — 850 sqft</span><span className="text-center">1</span><span className="text-right">$1,100.00</span></div>
+                    <div className="flex justify-between px-3 py-1 border-t text-slate-500"><span>Subtotal · Tax 8%</span><span>$1,480.00 · $118.40</span></div>
                     <div className="flex justify-between px-3 py-2 border-t bg-emerald-600 text-white font-bold"><span>TOTAL (USD, tax inc.)</span><span>$1,598.40</span></div>
+                  </div>
+                  <div className="mt-3 bg-violet-50 border border-violet-200 rounded-xl px-3 py-2 text-xs">
+                    <p className="text-violet-500 font-semibold mb-1">🔒 Solo tú lo ves (no sale en el PDF)</p>
+                    <div className="flex justify-between text-violet-700"><span>Te cuesta (material + cuadrilla)</span><span>$980.00</span></div>
+                    <div className="flex justify-between font-bold text-emerald-700"><span>💰 Ganancia estimada</span><span>$500.00 (33.8%)</span></div>
                   </div>
                   <p className="text-center text-[11px] text-slate-500 mt-3">📄 PDF en español o inglés · por texto, WhatsApp o email · también lee fotos 📷</p>
                 </div>

@@ -157,14 +157,27 @@ export default function Cotizador() {
   const ganancia = subtotal - costoTotal;
   const margenPct = subtotal > 0 ? (ganancia / subtotal) * 100 : 0;
 
+  const [parentFolio, setParentFolio] = useState('');
+  const iniciarCambio = (folio) => {
+    const f = (folio || '').trim().toUpperCase();
+    if (!f) return;
+    setParentFolio(f);
+    setResultado(null); setPaywall(false);
+    setItems([{ name: '', qty: 1, unit: 'pza', price: '', tipo: 'material' }, { name: '', qty: 1, unit: 'pza', price: '', tipo: 'material' }]);
+    setDudas([]); setNoEnc([]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    toast.info('Orden de cambio sobre ' + f + ': captura solo los extras');
+  };
+
   const guardar = async () => {
     setGuardando(true);
     try {
       const itemsPdf = items.map(it => it.tipo === 'mano_obra' && !/mano de obra/i.test(it.name)
         ? { ...it, name: `Mano de obra — ${it.name}` } : it);
-      const r = await axios.post(`${API}/cotizador/guardar`, { items: itemsPdf, cliente, vat_pct: parseFloat(ivaPct) || 0, vat_incluido: ivaIncluido, moneda: esUS ? 'USD' : 'MXN', idioma: esUS ? pdfLang : 'es' }, { withCredentials: true });
+      const r = await axios.post(`${API}/cotizador/guardar`, { items: itemsPdf, cliente, vat_pct: parseFloat(ivaPct) || 0, vat_incluido: ivaIncluido, moneda: esUS ? 'USD' : 'MXN', idioma: esUS ? pdfLang : 'es', parent_folio: parentFolio }, { withCredentials: true });
       setResultado(r.data);
-      toast.success(`Cotización ${r.data.folio} creada`);
+      toast.success(r.data.parent_folio ? `Orden de cambio ${r.data.folio} creada` : `Cotización ${r.data.folio} creada`);
+      setParentFolio('');
     } catch (e) {
       if (e?.response?.status === 402) {
         setPaywall(true);
@@ -174,9 +187,11 @@ export default function Cotizador() {
     } finally { setGuardando(false); }
   };
 
-  const msgTexto = resultado
-    ? `Hola${cliente ? ' ' + cliente : ''}, aquí está tu cotización ${resultado.folio} por $${resultado.total.toLocaleString('es-MX', {minimumFractionDigits: 2})}${resultado.moneda === 'USD' ? ' USD' : ''}: ${resultado.link}`
-    : '';
+  const esCambio = !!(resultado && resultado.parent_folio);
+  const montoTxt = resultado ? `$${resultado.total.toLocaleString('es-MX', {minimumFractionDigits: 2})}${resultado.moneda === 'USD' ? ' USD' : ''}` : '';
+  const msgTexto = !resultado ? '' : esCambio
+    ? `Hola${cliente ? ' ' + cliente : ''}, te mando la orden de cambio ${resultado.folio} por los trabajos extra (${montoTxt}) sobre la cotización ${resultado.parent_folio}. Revísala y apruébala aquí antes de que empecemos: ${resultado.aprobar_link}`
+    : `Hola${cliente ? ' ' + cliente : ''}, aquí está tu cotización ${resultado.folio} por ${montoTxt}: ${resultado.link}`;
   const msgWhats = encodeURIComponent(msgTexto);
   const msgMail = resultado
     ? `mailto:?subject=${encodeURIComponent('Cotización ' + resultado.folio)}&body=${encodeURIComponent(msgTexto)}`
@@ -242,6 +257,23 @@ export default function Cotizador() {
         <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-900">
           ✍️ Ya puse en la tabla lo que no estaba en tu catálogo — <strong>solo ponles precio</strong>.
           <a href="/productos" className="underline font-medium ml-1">Agrégalos a tu catálogo</a> y la próxima vez saldrán con precio solos.
+        </div>
+      )}
+
+      {parentFolio ? (
+        <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl px-5 py-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="font-bold text-amber-900">➕ Orden de cambio sobre {parentFolio}</p>
+            <p className="text-sm text-amber-800">Captura solo los trabajos extra. Tu cliente la aprueba desde su celular antes de que empieces — y queda registrado.</p>
+          </div>
+          <button onClick={() => setParentFolio('')} className="text-sm text-amber-700 underline">Cancelar</button>
+        </div>
+      ) : (
+        <div className="text-right -mb-3">
+          <button
+            onClick={() => { const f = window.prompt('¿Sobre qué cotización es el extra? Escribe su folio (ej: CX-7K2M4)'); if (f) iniciarCambio(f); }}
+            className="text-xs text-amber-700 hover:text-amber-800 font-medium"
+          >➕ ¿Te pidieron un extra en una obra? Haz una orden de cambio</button>
         </div>
       )}
 
@@ -449,7 +481,16 @@ export default function Cotizador() {
       {resultado && (
         <Card ref={resultRef} className="border-emerald-300 bg-emerald-50/50">
           <CardContent className="pt-6 text-center space-y-3">
-            <p className="text-lg font-bold text-slate-900">✅ Cotización <span className="text-emerald-700">{resultado.folio}</span> — ${resultado.total.toLocaleString('es-MX', {minimumFractionDigits: 2})} + IVA</p>
+            <p className="text-lg font-bold text-slate-900">✅ {esCambio ? 'Orden de cambio' : 'Cotización'} <span className="text-emerald-700">{resultado.folio}</span> — {montoTxt}{esCambio ? ` sobre ${resultado.parent_folio}` : ''}</p>
+            {esCambio && (
+              <div className="bg-white border border-amber-200 rounded-lg px-4 py-3 text-sm text-slate-700 max-w-lg mx-auto">
+                📝 Mándale a tu cliente el link para <strong>aprobar</strong> el cambio — guarda su nombre, fecha y hora:
+                <div className="flex gap-2 mt-2 justify-center">
+                  <code className="text-xs bg-slate-50 border rounded px-2 py-1 truncate max-w-[240px]">{resultado.aprobar_link}</code>
+                  <button onClick={() => { navigator.clipboard.writeText(resultado.aprobar_link); toast.success('Link de aprobación copiado'); }} className="text-xs text-amber-700 underline">Copiar</button>
+                </div>
+              </div>
+            )}
             <div className="flex flex-wrap gap-3 justify-center">
               <a href={`https://wa.me/?text=${msgWhats}`} target="_blank" rel="noopener noreferrer">
                 <Button className="bg-[#25D366] hover:bg-[#1ebe57]">📲 Enviar por WhatsApp</Button>
@@ -464,6 +505,12 @@ export default function Cotizador() {
                 <Copy className="w-4 h-4 mr-2" />Copiar link
               </Button>
             </div>
+            <button
+              onClick={() => iniciarCambio(resultado.parent_folio || resultado.folio)}
+              className="inline-flex items-center gap-2 bg-amber-100 hover:bg-amber-200 text-amber-900 text-sm font-semibold rounded-full px-5 py-2 border border-amber-300"
+            >
+              ➕ ¿Te pidieron algo extra? Haz una orden de cambio sobre {resultado.parent_folio || resultado.folio}
+            </button>
             <div className="bg-white border border-violet-200 rounded-lg px-4 py-3 text-sm text-slate-700 max-w-lg mx-auto">
               ✨ Esto es el <strong>Plan Cotizador IA — {esUS ? "$15 USD/mes" : "$299/mes"}</strong>: {esUS ? "estimates ilimitados" : "cotizaciones ilimitadas"} con tu logo y folio.
               <a href="/precios" className="text-violet-700 underline font-medium ml-1">Activar mi plan</a>
