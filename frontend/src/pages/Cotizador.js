@@ -36,6 +36,18 @@ export default function Cotizador() {
   const [pdfLang, setPdfLang] = useState(() => localStorage.getItem('cotizador_pdf_lang') || 'es');
   const cambiarPdfLang = (l) => { setPdfLang(l); localStorage.setItem('cotizador_pdf_lang', l); };
   const etiquetaImpuesto = esUS ? 'Tax' : 'IVA';
+  const TAX_ESTADOS_US = {
+    'Texas': 8.2, 'California': 8.85, 'Florida': 7.0, 'Illinois': 8.86, 'Arizona': 8.38,
+    'Georgia': 7.4, 'Carolina del Norte': 7.0, 'Nevada': 8.24, 'Colorado': 7.8, 'Washington': 9.4,
+    'Nueva York': 8.53, 'Nueva Jersey': 6.63, 'Tennessee': 9.55, 'Oklahoma': 9.0, 'Utah': 7.3,
+    'Carolina del Sur': 7.5, 'Indiana': 7.0, 'Nuevo México': 7.6, 'Kansas': 8.65, 'Oregón': 0,
+  };
+  const [estadoUS, setEstadoUS] = useState(() => localStorage.getItem('cotizador_us_estado') || '');
+  const elegirEstadoUS = (nombre) => {
+    setEstadoUS(nombre);
+    localStorage.setItem('cotizador_us_estado', nombre);
+    if (nombre && TAX_ESTADOS_US[nombre] !== undefined) setIvaPct(TAX_ESTADOS_US[nombre]);
+  };
   const [buscado, setBuscado] = useState(false);
   const [paywall, setPaywall] = useState(false);
   const [catalogoVacio, setCatalogoVacio] = useState(false);
@@ -230,6 +242,7 @@ export default function Cotizador() {
               <span className="col-span-5">Producto</span><span className="col-span-2">Cantidad</span>
               <span className="col-span-2">Unidad</span><span className="col-span-2">Precio</span><span></span>
             </div>
+            <p className="text-[11px] text-slate-400 px-1 -mt-1">👆 Toca la etiqueta 📦 Material para cambiarla a 👷 Mano de obra (y al revés) — el PDF separa los dos.</p>
             {items.map((it, i) => (
               <div key={i} className="grid grid-cols-12 gap-2 items-center">
                 <button
@@ -258,6 +271,17 @@ export default function Cotizador() {
                   <button type="button" onClick={() => cambiarRegion('MX')} className={`px-3 py-1 text-xs font-bold ${!esUS ? 'bg-emerald-600 text-white' : 'bg-white text-slate-500'}`}>🇲🇽 MXN</button>
                   <button type="button" onClick={() => cambiarRegion('US')} className={`px-3 py-1 text-xs font-bold ${esUS ? 'bg-blue-600 text-white' : 'bg-white text-slate-500'}`}>🇺🇸 USD</button>
                 </div>
+                {esUS && (
+                  <select
+                    value={estadoUS}
+                    onChange={(e) => elegirEstadoUS(e.target.value)}
+                    className="border border-slate-300 rounded-full px-2 py-1 text-xs bg-white mr-1"
+                    title="El sales tax varía por estado (y a veces por ciudad y tipo de trabajo) — elige el tuyo y ajusta si hace falta"
+                  >
+                    <option value="">📍 Tu estado...</option>
+                    {Object.keys(TAX_ESTADOS_US).map(n => <option key={n} value={n}>{n}</option>)}
+                  </select>
+                )}
                 {esUS && (
                   <div className="flex items-center gap-1 mr-2">
                     <span className="text-slate-500">PDF en:</span>
