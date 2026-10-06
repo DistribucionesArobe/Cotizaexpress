@@ -533,6 +533,10 @@ export default function LandingPage() {
                 <li><Link to="/generador-de-cotizaciones" className="text-slate-400 hover:text-white">Generador de Cotizaciones Gratis</Link></li>
                 <li><Link to="/cotizacion-formal" className="text-slate-400 hover:text-white">Cotización formal: ejemplo</Link></li>
                 <li><Link to="/cotizador-para-contratistas" className="text-slate-400 hover:text-white">Cotizador para contratistas</Link></li>
+                <li><Link to="/cuanto-cobrar-por-pintar" className="text-slate-400 hover:text-white">¿Cuánto cobrar por pintar?</Link></li>
+                <li><Link to="/cuanto-cobrar-por-drywall" className="text-slate-400 hover:text-white">¿Cuánto cobrar por drywall?</Link></li>
+                <li><Link to="/cuanto-cobrar-por-instalar-piso" className="text-slate-400 hover:text-white">¿Cuánto cobrar por instalar piso?</Link></li>
+                <li><Link to="/cuanto-cobrar-por-un-techo" className="text-slate-400 hover:text-white">¿Cuánto cobrar por un techo?</Link></li>
                 <li><Link to="/calculadora-iva" className="text-slate-400 hover:text-white">Calculadora de IVA</Link></li>
                 <li><Link to="/plantillas/cotizacion" className="text-slate-400 hover:text-white">Plantilla de Cotización</Link></li>
                 <li><Link to="/calculadoras" className="text-slate-400 hover:text-white">Calculadoras</Link></li>

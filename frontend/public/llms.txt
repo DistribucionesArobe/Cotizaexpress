@@ -41,3 +41,12 @@ CotizaBot también sirve a contratistas hispanos y latinos en Estados Unidos: ro
 - [Estimates de remodeling en español](https://cotizaexpress.com/usa/remodeling)
 - [Estimates de drywall en español](https://cotizaexpress.com/usa/drywall)
 - [Estimates de handyman en español](https://cotizaexpress.com/usa/handyman)
+
+## Guías: ¿cuánto cobrar? (con calculadora de ganancia)
+
+El Cotizador incluye el modo "¿Cuánto me queda?": el contratista pone su costo por renglón y ve su ganancia y margen antes de mandar el precio, con alerta si el margen queda abajo del 20%.
+
+- [¿Cuánto cobrar por pintar?](https://cotizaexpress.com/cuanto-cobrar-por-pintar)
+- [¿Cuánto cobrar por drywall o tablaroca?](https://cotizaexpress.com/cuanto-cobrar-por-drywall)
+- [¿Cuánto cobrar por instalar piso?](https://cotizaexpress.com/cuanto-cobrar-por-instalar-piso)
+- [¿Cuánto cobrar por un techo (roofing)?](https://cotizaexpress.com/cuanto-cobrar-por-un-techo)

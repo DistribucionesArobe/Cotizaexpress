@@ -16,6 +16,7 @@ import Cotizador from './pages/Cotizador';
 import CotizacionFormal from './pages/CotizacionFormal';
 import CotizadorOficio from './pages/CotizadorOficio';
 import OficioUSA from './pages/OficioUSA';
+import CuantoCobrar from './pages/CuantoCobrar';
 import LandingUSA from './pages/LandingUSA';
 import Precios from './pages/Precios';
 import PagoExitoso from './pages/PagoExitoso';
@@ -320,6 +321,10 @@ function AppRoutes() {
             <Route path="/cotizador-para-techadores" element={<CotizadorOficio slug="cotizador-para-techadores" />} />
             <Route path="/cotizador-para-pintores" element={<CotizadorOficio slug="cotizador-para-pintores" />} />
             <Route path="/usa" element={<LandingUSA />} />
+            <Route path="/cuanto-cobrar-por-pintar" element={<CuantoCobrar slug="cuanto-cobrar-por-pintar" />} />
+            <Route path="/cuanto-cobrar-por-drywall" element={<CuantoCobrar slug="cuanto-cobrar-por-drywall" />} />
+            <Route path="/cuanto-cobrar-por-instalar-piso" element={<CuantoCobrar slug="cuanto-cobrar-por-instalar-piso" />} />
+            <Route path="/cuanto-cobrar-por-un-techo" element={<CuantoCobrar slug="cuanto-cobrar-por-un-techo" />} />
             <Route path="/usa/roofing" element={<OficioUSA slug="roofing" />} />
             <Route path="/usa/landscaping" element={<OficioUSA slug="landscaping" />} />
             <Route path="/usa/painting" element={<OficioUSA slug="painting" />} />
