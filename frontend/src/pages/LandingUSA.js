@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -39,6 +40,11 @@ const JSONLD_USA = [
 ];
 
 export default function LandingUSA() {
+  const [slide, setSlide] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setSlide((p) => (p + 1) % 2), 7000);
+    return () => clearInterval(t);
+  }, []);
   return (
     <div className="min-h-screen bg-white">
       <Helmet>
@@ -61,36 +67,92 @@ export default function LandingUSA() {
         </div>
       </nav>
 
-      {/* Hero — la página es esto */}
-      <section className="bg-gradient-to-br from-emerald-50 via-white to-teal-50">
-        <div className="max-w-5xl mx-auto px-4 py-14 sm:py-20 text-center">
-          <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-800 rounded-full px-4 py-1.5 text-sm font-medium mb-5">
-            🇺🇸 Para contratistas hispanos en Estados Unidos 🇲🇽
-          </div>
-          <h1 className="text-4xl sm:text-5xl font-extrabold mb-4 leading-tight text-slate-900">
-            Manda estimates como los grandes,<br className="hidden sm:block"/> <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">en español y en 2 minutos</span>
-          </h1>
-          <p className="text-slate-600 text-lg max-w-xl mx-auto mb-7">
-            Describe el trabajo y <strong className="text-emerald-700">CotizaBot</strong> arma el estimate en dólares con tus precios — tax, PDF con tu logo, listo para mandar.
-          </p>
-          <Link to="/registro?utm_source=usa">
-            <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white text-lg font-extrabold px-8 py-6 shadow-xl">
-              Hacer mi primer estimate GRATIS →
-            </Button>
-          </Link>
-          <p className="text-sm text-slate-500 mt-3">$15 USD/mes después del primero · sin tarjeta · cancela cuando quieras</p>
-
-          {/* Mockup = el demo */}
-          <div className="max-w-sm mx-auto mt-10 bg-white rounded-3xl p-5 shadow-2xl border border-emerald-100 text-left">
-            <div className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-500 mb-3">"Pintar sala y 2 cuartos, 850 sqft, con material, 2 manos"</div>
-            <div className="text-center text-emerald-500 text-xl mb-3">⬇</div>
-            <div className="border border-slate-200 rounded-xl overflow-hidden text-xs text-slate-700">
-              <div className="flex justify-between items-center px-3 py-1.5 bg-slate-50 border-b"><span className="font-extrabold text-slate-800">García Painting LLC</span><span className="text-emerald-700 font-bold">ESTIMATE · CX-7K2M4</span></div>
-              <div className="grid grid-cols-3 px-3 py-1.5"><span>Paint & materials</span><span className="text-center">1</span><span className="text-right">$380.00</span></div>
-              <div className="grid grid-cols-3 px-3 py-1.5 border-t bg-slate-50"><span>👷 Labor — 850 sqft</span><span className="text-center">1</span><span className="text-right">$1,100.00</span></div>
-              <div className="flex justify-between px-3 py-2 border-t bg-emerald-600 text-white font-bold"><span>TOTAL (USD, tax inc.)</span><span>$1,598.40</span></div>
+      {/* Hero — carrusel de 2 productos (como México) */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-teal-50 py-10 sm:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-6">
+            <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-800 rounded-full px-4 py-1.5 text-sm font-medium">
+              🇺🇸 Para contratistas hispanos en Estados Unidos 🇲🇽
             </div>
-            <p className="text-center text-[11px] text-slate-500 mt-3">📄 PDF en español o inglés · por texto, WhatsApp o email · también lee fotos 📷 de tu lista</p>
+          </div>
+          <div className="grid lg:grid-cols-2 gap-10 items-center">
+
+            {/* Texto del slide */}
+            <div className="text-center lg:text-left order-1">
+              {slide === 0 ? (
+                <>
+                  <p className="text-sm font-bold text-emerald-700 mb-2">✨ MANDA ESTIMATES</p>
+                  <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-5 leading-tight">
+                    Manda estimates como los grandes,<br/>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">en español y en 2 minutos</span>
+                  </h1>
+                  <p className="text-lg text-slate-600 mb-7 max-w-xl mx-auto lg:mx-0">
+                    Describe el trabajo y <strong className="text-emerald-700">CotizaBot</strong> arma el estimate en dólares con tus precios — tax, PDF con tu logo, listo para mandar.
+                  </p>
+                  <Link to="/registro?utm_source=usa">
+                    <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white text-lg font-extrabold px-8 py-6 shadow-xl">
+                      Hacer mi primer estimate GRATIS →
+                    </Button>
+                  </Link>
+                  <p className="text-sm text-slate-500 mt-3">$15 USD/mes después del primero · sin tarjeta · cancela cuando quieras</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm font-bold text-green-700 mb-2">🤖 TU WHATSAPP CONTESTA SOLO</p>
+                  <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-5 leading-tight">
+                    Tu cliente pregunta precio.<br/>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600">Tu WhatsApp cotiza solo.</span>
+                  </h1>
+                  <p className="text-lg text-slate-600 mb-7 max-w-xl mx-auto lg:mx-0">
+                    CotizaBot conecta tu número: lee lo que pide el cliente, usa tus precios y responde el estimate con PDF en 5 segundos — 24/7, aunque andes en el trabajo.
+                  </p>
+                  <Link to="/registro?utm_source=usa_bot">
+                    <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white text-lg font-extrabold px-8 py-6 shadow-xl">
+                      Quiero que conteste solo →
+                    </Button>
+                  </Link>
+                  <p className="text-sm text-slate-500 mt-3">$49 USD/mes · empieza con el plan de $15 y súbete cuando quieras</p>
+                </>
+              )}
+            </div>
+
+            {/* Mockup del slide */}
+            <div className="order-2">
+              {slide === 0 ? (
+                <div className="max-w-[300px] sm:max-w-sm mx-auto bg-white rounded-3xl p-5 shadow-2xl border border-emerald-100 text-left">
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-500 mb-3">"Pintar sala y 2 cuartos, 850 sqft, con material, 2 manos"</div>
+                  <div className="text-center text-emerald-500 text-xl mb-3">⬇</div>
+                  <div className="border border-slate-200 rounded-xl overflow-hidden text-xs text-slate-700">
+                    <div className="flex justify-between items-center px-3 py-1.5 bg-slate-50 border-b"><span className="font-extrabold text-slate-800">García Painting LLC</span><span className="text-emerald-700 font-bold">ESTIMATE · CX-7K2M4</span></div>
+                    <div className="grid grid-cols-3 px-3 py-1.5"><span>Paint & materials</span><span className="text-center">1</span><span className="text-right">$380.00</span></div>
+                    <div className="grid grid-cols-3 px-3 py-1.5 border-t bg-slate-50"><span>👷 Labor — 850 sqft</span><span className="text-center">1</span><span className="text-right">$1,100.00</span></div>
+                    <div className="flex justify-between px-3 py-2 border-t bg-emerald-600 text-white font-bold"><span>TOTAL (USD, tax inc.)</span><span>$1,598.40</span></div>
+                  </div>
+                  <p className="text-center text-[11px] text-slate-500 mt-3">📄 PDF en español o inglés · por texto, WhatsApp o email · también lee fotos 📷</p>
+                </div>
+              ) : (
+                <div className="max-w-[300px] sm:max-w-sm mx-auto bg-[#ECE5DD] rounded-3xl p-3 sm:p-4 shadow-2xl border border-slate-200">
+                  <div className="bg-[#075E54] text-white rounded-t-2xl px-4 py-2 text-sm font-semibold flex items-center gap-2">🤖 García Painting LLC</div>
+                  <div className="space-y-2 p-3">
+                    <div className="bg-white rounded-2xl rounded-tl-none px-3 py-2 text-sm shadow-sm max-w-[85%]">¿Cuánto por pintar sala y 2 cuartos con material?</div>
+                    <div className="bg-[#DCF8C6] rounded-2xl rounded-tr-none px-3 py-2 text-sm shadow-sm ml-auto max-w-[90%]">
+                      ✅ <strong>Estimate CX-7K2M4</strong><br/>
+                      Paint & materials — $380.00<br/>
+                      Labor 850 sqft — $1,100.00<br/>
+                      <strong>TOTAL (USD, tax inc.): $1,598.40</strong><br/>
+                      📄 PDF adjunto
+                    </div>
+                    <p className="text-center text-[11px] text-slate-500">⚡ contestó solo en 5 segundos — 9:47 PM</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Controles del carrusel */}
+          <div className="flex justify-center gap-3 mt-10">
+            <button onClick={() => setSlide(0)} className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${slide === 0 ? 'bg-emerald-600 text-white' : 'bg-white border border-slate-300 text-slate-600'}`}>✨ Manda estimates</button>
+            <button onClick={() => setSlide(1)} className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${slide === 1 ? 'bg-green-600 text-white' : 'bg-white border border-slate-300 text-slate-600'}`}>🤖 WhatsApp que contesta solo</button>
           </div>
 
           {/* 3 puntos, una línea cada uno */}
