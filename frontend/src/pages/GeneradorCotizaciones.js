@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -26,6 +26,50 @@ export default function GeneradorCotizaciones() {
   const [items, setItems] = useState([{ ...emptyItem }]);
   const [conIva, setConIva] = useState(true);
   const [folio] = useState(genFolio);
+
+  const [iaTexto, setIaTexto] = useState('');
+  const [leyendoFoto, setLeyendoFoto] = useState(false);
+  const fotoRef = useRef(null);
+
+  const parseLista = (texto) => {
+    const crudas = [];
+    (texto || '').split('\n').forEach(l => {
+      l = l.replace(/`/g, '').trim();
+      if (!l) return;
+      if ((l.match(/,/g) || []).length >= 2 || (l.match(/;/g) || []).length >= 2) {
+        l.split(/[,;]/).forEach(p2 => { if (p2.trim().length > 2) crudas.push(p2.trim()); });
+      } else crudas.push(l);
+    });
+    return crudas.slice(0, 40).map(l => {
+      const m = l.match(/^(\d+(?:[.,]\d+)?)\s*(?:x|\*)?\s+(.{2,})$/i);
+      return m ? { desc: m[2].trim(), qty: m[1], precio: '' } : { desc: l, qty: 1, precio: '' };
+    });
+  };
+
+  const llenarTabla = (texto) => {
+    const filas = parseLista(texto);
+    if (filas.length === 0) return;
+    setItems(prev => [...prev.filter(r => (r.desc || '').trim()), ...filas]);
+    if (window.fbq) { try { window.fbq('trackCustom', 'GeneradorIA'); } catch (e) {} }
+    document.getElementById('herramienta')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const subirFotoGen = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    setLeyendoFoto(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const r = await fetch('https://api.cotizaexpress.com/api/generador/imagen', { method: 'POST', body: fd });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.detail || 'No pude leer la imagen');
+      llenarTabla(data.texto);
+    } catch (err) {
+      alert(err.message || 'No pude leer la imagen, intenta con una foto más clara');
+    } finally { setLeyendoFoto(false); }
+  };
 
   const setItem = (i, field, value) => {
     const next = items.slice();
@@ -109,7 +153,7 @@ export default function GeneradorCotizaciones() {
             Haz una cotización profesional<br className="hidden sm:block"/> en <span className="text-yellow-300">2 minutos</span>
           </h1>
           <p className="text-emerald-50 text-lg max-w-2xl mx-auto mb-6">
-            Con IVA calculado solo, lista para imprimir o mandar por WhatsApp. Deja de batallar con Excel.
+            Captura como en Excel, pega la lista de tu cliente o <strong className="text-white">súbele una foto 📷</strong> — el IVA y el formato salen solos.
           </p>
           <a href="#herramienta">
             <Button size="lg" className="bg-white text-emerald-700 hover:bg-emerald-50 text-lg font-bold px-8 py-6 shadow-xl">
@@ -123,6 +167,16 @@ export default function GeneradorCotizaciones() {
           </div>
         </div>
       </section>
+
+      {leyendoFoto && (
+        <div className="print:hidden fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl px-8 py-10 text-center max-w-sm w-full">
+            <div className="text-6xl animate-bounce mb-4">📷</div>
+            <p className="text-xl font-bold text-slate-900 mb-1">Leyendo tu imagen...</p>
+            <p className="text-sm text-slate-500">La IA está convirtiendo tu foto en renglones. Unos segunditos ⏳</p>
+          </div>
+        </div>
+      )}
 
       {showUpsell && (
         <div className="print:hidden fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-4" onClick={() => setShowUpsell(false)}>
@@ -196,6 +250,28 @@ export default function GeneradorCotizaciones() {
                 <Button onClick={() => { setShowUpsell(true); if (window.fbq) { try { window.fbq('track', 'Lead'); } catch (e) {} } }} className="w-full bg-emerald-600 hover:bg-emerald-700 text-lg py-6">
                   📄 Descargar mi cotización
                 </Button>
+              </CardContent>
+            </Card>
+
+            {/* Magia IA */}
+            <Card className="mt-6 shadow-xl border-2 border-violet-200 rounded-2xl bg-violet-50/40">
+              <CardContent className="pt-6 space-y-3">
+                <p className="font-bold text-slate-900">🪄 ¿Te mandaron la lista? La IA llena la tabla por ti</p>
+                <textarea
+                  value={iaTexto}
+                  onChange={e => setIaTexto(e.target.value)}
+                  rows={3}
+                  placeholder={'Pega la lista tal como te la mandaron:\n10 cemento gris\n5 varilla 3/8, 200 block...'}
+                  className="w-full px-4 py-3 border border-violet-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 text-sm bg-white"
+                />
+                <div className="flex flex-wrap gap-2">
+                  <Button onClick={() => llenarTabla(iaTexto)} disabled={leyendoFoto} className="bg-violet-600 hover:bg-violet-700">✨ Llenar la tabla</Button>
+                  <Button type="button" variant="outline" onClick={() => fotoRef.current && fotoRef.current.click()} disabled={leyendoFoto} className="border-violet-300 text-violet-700 hover:bg-violet-100 bg-white">
+                    {leyendoFoto ? '📷 Leyendo tu imagen...' : '📷 O súbele un screenshot / foto'}
+                  </Button>
+                  <input ref={fotoRef} type="file" accept="image/*" onChange={subirFotoGen} className="hidden" />
+                </div>
+                <p className="text-xs text-slate-500">Desde tu celular: toma screenshot del WhatsApp del cliente y súbelo — tú solo pones los precios.</p>
               </CardContent>
             </Card>
 
