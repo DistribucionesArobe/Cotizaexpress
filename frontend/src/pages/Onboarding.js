@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { evento } from '@/lib/evento';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
@@ -31,8 +32,12 @@ const GIROS = [
 ];
 
 // GA4: eventos del funnel de onboarding
-const track = (evento, extra = {}) => {
-  try { window.gtag && window.gtag('event', evento, extra); } catch (e) {}
+const WIZ_SERVIDOR = { wizard_paso: null, wizard_salto_cotizador: 'wizard_salto_cotizador', wizard_wa_intento: 'wizard_whatsapp' };
+const track = (ev, extra = {}) => {
+  try { window.gtag && window.gtag('event', ev, extra); } catch (e) {}
+  let srv = WIZ_SERVIDOR[ev];
+  if (ev === 'wizard_paso') srv = ({ 2: 'wizard_productos', 3: 'wizard_whatsapp' })[extra.paso] || null;
+  if (srv) evento(srv);
 };
 
 const GIRO_EMOJI = {

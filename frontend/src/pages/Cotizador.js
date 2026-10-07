@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { evento } from '@/lib/evento';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -55,6 +56,7 @@ export default function Cotizador() {
   const toggleGanancia = () => {
     const v = !modoGanancia;
     setModoGanancia(v);
+    if (v) evento('ganancia_activada');
     localStorage.setItem('cotizador_ganancia', v ? '1' : '0');
   };
   const [buscado, setBuscado] = useState(false);
@@ -67,6 +69,8 @@ export default function Cotizador() {
     window.addEventListener('beforeinstallprompt', h);
     return () => window.removeEventListener('beforeinstallprompt', h);
   }, []);
+
+  useEffect(() => { evento('cotizador_visto'); }, []);
 
   useEffect(() => {
     if (resultado || paywall) resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -85,6 +89,7 @@ export default function Cotizador() {
     const t = (typeof textoDirecto === 'string' ? textoDirecto : texto).trim();
     if (!t) { toast.error('Pega la lista del cliente'); return; }
     setCargando(true); setResultado(null);
+    evento('ia_usada');
     try {
       const r = await axios.post(`${API}/cotizador/ia`, { texto: t }, { withCredentials: true });
       setCatalogoVacio(!!r.data.catalogo_vacio);
@@ -119,6 +124,7 @@ export default function Cotizador() {
     e.target.value = '';
     if (!file) return;
     setLeyendoFoto(true);
+    evento('foto_usada');
     try {
       const fd = new FormData();
       fd.append('file', file);
@@ -185,6 +191,7 @@ export default function Cotizador() {
     const f = (folio || '').trim().toUpperCase();
     if (!f) return;
     setParentFolio(f);
+    evento('orden_cambio_iniciada');
     setResultado(null); setPaywall(false);
     setItems([{ name: '', qty: 1, unit: 'pza', price: '', tipo: 'material' }, { name: '', qty: 1, unit: 'pza', price: '', tipo: 'material' }]);
     setDudas([]); setNoEnc([]);

@@ -392,6 +392,11 @@ export default function AdminDashboard() {
                           {company.owner_email || 'Sin email'}
                           {company.owner_phone ? ` · ${company.owner_phone}` : ''}
                         </p>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {company.signup_source && <span className="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded">📣 {company.signup_source}</span>}
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded ${company.num_quotes > 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>🧾 {company.num_quotes || 0} cotizaciones</span>
+                          {company.feedback && <span className="text-[10px] bg-amber-50 text-amber-800 px-1.5 py-0.5 rounded">💬 respondió</span>}
+                        </div>
                       </div>
 
                       {/* Stats chips */}
@@ -475,6 +480,18 @@ export default function AdminDashboard() {
                           <div>
                             <p className="text-slate-500 text-xs uppercase tracking-wide mb-2">Actividad</p>
                             <div className="space-y-1.5">
+                              <p className="text-slate-700">
+                                <span className="font-medium">{company.num_quotes || 0}</span> cotizaciones generadas
+                              </p>
+                              <p className="text-slate-700 text-xs">
+                                Pasos: {company.eventos || <span className="text-slate-400">ninguno registrado todavía</span>}
+                              </p>
+                              {company.ultima_actividad && (
+                                <p className="text-slate-500 text-xs">Última actividad: {new Date(company.ultima_actividad).toLocaleString('es-MX')}</p>
+                              )}
+                              {company.feedback && (
+                                <p className="text-amber-800 bg-amber-50 rounded px-2 py-1 text-xs">💬 Por qué: {company.feedback}</p>
+                              )}
                               <p className="text-slate-700">
                                 <span className="font-medium">{company.num_products || 0}</span> productos cargados
                               </p>

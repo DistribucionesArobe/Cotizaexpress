@@ -13,6 +13,22 @@ export default function Registro() {
   const [loading, setLoading] = useState(false);
   const referralCode = searchParams.get('ref') || '';
   const esUSA = (searchParams.get('utm_source') || '').startsWith('usa');
+  // Corrige dominios mal escritos (gamail.com, hotmial.com...)
+  const sugerenciaCorreo = (() => {
+    const e = (formData.email || '').trim().toLowerCase();
+    const m = e.match(/^([^@\s]+)@([^@\s]+)$/);
+    if (!m) return null;
+    const FIX = {
+      'gamail.com': 'gmail.com', 'gmial.com': 'gmail.com', 'gmal.com': 'gmail.com', 'gmai.com': 'gmail.com', 'gmail.co': 'gmail.com',
+      'gmail.con': 'gmail.com', 'gmail.cm': 'gmail.com', 'gnail.com': 'gmail.com', 'gmaill.com': 'gmail.com', 'gmail.om': 'gmail.com',
+      'hotmial.com': 'hotmail.com', 'hotmal.com': 'hotmail.com', 'hotmai.com': 'hotmail.com', 'hotmail.con': 'hotmail.com', 'homail.com': 'hotmail.com', 'hotmail.co': 'hotmail.com', 'hotamil.com': 'hotmail.com',
+      'outlok.com': 'outlook.com', 'outlook.con': 'outlook.com', 'outllok.com': 'outlook.com',
+      'yahooo.com': 'yahoo.com', 'yaho.com': 'yahoo.com', 'yahoo.con': 'yahoo.com', 'yahoo.com.mx.': 'yahoo.com.mx',
+      'icloud.con': 'icloud.com', 'iclod.com': 'icloud.com',
+    };
+    const d = FIX[m[2]];
+    return d ? `${m[1]}@${d}` : null;
+  })();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -66,7 +82,7 @@ export default function Registro() {
       return;
     }
 
-    const result = await registro({ ...formData, referral_code: referralCode });
+    const result = await registro({ ...formData, referral_code: referralCode, signup_source: searchParams.get('utm_source') || (referralCode ? 'referido' : 'directo') });
     if (result?.success && window.fbq) { try { window.fbq('track', 'CompleteRegistration'); } catch (e) {} }
 
     if (result.success) {
@@ -149,6 +165,11 @@ export default function Registro() {
                   required
                   data-testid="input-email"
                 />
+                {sugerenciaCorreo && (
+                  <button type="button" onClick={() => setFormData({ ...formData, email: sugerenciaCorreo })} className="mt-1.5 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-1.5 w-full text-left">
+                    ⚠️ ¿Quisiste decir <strong>{sugerenciaCorreo}</strong>? Toca para corregir
+                  </button>
+                )}
               </div>
 
               <div>

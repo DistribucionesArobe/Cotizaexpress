@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
+import { evento } from '@/lib/evento';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -16,7 +17,10 @@ export default function Precios() {
   const { isAuthenticated, user } = useAuth();
   const [loading, setLoading] = useState(null);
 
+  useEffect(() => { evento('precios_visto'); }, []);
+
   const handleUpgrade = async (planId) => {
+    evento('checkout_iniciado');
     if (!isAuthenticated) {
       toast.info('Primero necesitas crear una cuenta');
       return;
