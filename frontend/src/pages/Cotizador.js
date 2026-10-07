@@ -164,6 +164,22 @@ export default function Cotizador() {
   const ganancia = subtotal - costoTotal;
   const margenPct = subtotal > 0 ? (ganancia / subtotal) * 100 : 0;
 
+  // Condiciones que salen en el PDF (las de siempre se recuerdan)
+  const [cond, setCond] = useState(() => {
+    const us = localStorage.getItem('cotizador_region') === 'US';
+    return {
+      validez_dias: localStorage.getItem('cond_validez') || (us ? '30' : '15'),
+      anticipo_pct: localStorage.getItem('cond_anticipo') ?? (us ? '50' : '0'),
+      licencia: localStorage.getItem('cond_licencia') || '',
+      incluye: '', no_incluye: '', notas: '',
+    };
+  });
+  const setC = (k, v) => {
+    setCond(prev => ({ ...prev, [k]: v }));
+    if (k === 'validez_dias') localStorage.setItem('cond_validez', v);
+    if (k === 'anticipo_pct') localStorage.setItem('cond_anticipo', v);
+    if (k === 'licencia') localStorage.setItem('cond_licencia', v);
+  };
   const [parentFolio, setParentFolio] = useState('');
   const iniciarCambio = (folio) => {
     const f = (folio || '').trim().toUpperCase();
@@ -181,7 +197,7 @@ export default function Cotizador() {
     try {
       const itemsPdf = items.map(it => it.tipo === 'mano_obra' && !/mano de obra/i.test(it.name)
         ? { ...it, name: `Mano de obra — ${it.name}` } : it).map(it => ({ ...it, gravable: gravable(it) }));
-      const r = await axios.post(`${API}/cotizador/guardar`, { items: itemsPdf, cliente, vat_pct: parseFloat(ivaPct) || 0, vat_incluido: ivaIncluido, moneda: esUS ? 'USD' : 'MXN', idioma: esUS ? pdfLang : 'es', parent_folio: parentFolio }, { withCredentials: true });
+      const r = await axios.post(`${API}/cotizador/guardar`, { items: itemsPdf, cliente, vat_pct: parseFloat(ivaPct) || 0, vat_incluido: ivaIncluido, moneda: esUS ? 'USD' : 'MXN', idioma: esUS ? pdfLang : 'es', parent_folio: parentFolio, condiciones: cond }, { withCredentials: true });
       setResultado(r.data);
       toast.success(r.data.parent_folio ? `Orden de cambio ${r.data.folio} creada` : `Cotización ${r.data.folio} creada`);
       setParentFolio('');
@@ -399,6 +415,37 @@ export default function Cotizador() {
                 </div>
               )}
             </div>
+
+            <details className="border border-slate-200 rounded-xl px-4 py-3 bg-slate-50/60">
+              <summary className="cursor-pointer text-sm font-semibold text-slate-700">
+                📋 Condiciones del {esUS ? 'estimate' : 'cotización'} <span className="font-normal text-slate-500">— válido {cond.validez_dias} días{parseInt(cond.anticipo_pct) > 0 ? ` · anticipo ${cond.anticipo_pct}%` : ''} · firma de aceptación</span>
+              </summary>
+              <div className="grid sm:grid-cols-3 gap-3 mt-3 text-sm">
+                <label className="text-slate-600">Válido por
+                  <select value={cond.validez_dias} onChange={(e) => setC('validez_dias', e.target.value)} className="w-full mt-1 border border-slate-300 rounded-lg px-2 py-2 bg-white">
+                    {['7', '15', '30', '60'].map(d => <option key={d} value={d}>{d} días</option>)}
+                  </select>
+                </label>
+                <label className="text-slate-600">Anticipo
+                  <select value={cond.anticipo_pct} onChange={(e) => setC('anticipo_pct', e.target.value)} className="w-full mt-1 border border-slate-300 rounded-lg px-2 py-2 bg-white">
+                    {['0', '25', '30', '50', '100'].map(a => <option key={a} value={a}>{a === '0' ? 'Sin anticipo' : `${a}% al iniciar`}</option>)}
+                  </select>
+                </label>
+                <label className="text-slate-600">{esUS ? 'Licencia # (si aplica)' : 'Licencia / registro (opcional)'}
+                  <input value={cond.licencia} onChange={(e) => setC('licencia', e.target.value)} placeholder={esUS ? 'Ej: TX-123456' : ''} className="w-full mt-1 border border-slate-300 rounded-lg px-2 py-2 bg-white" />
+                </label>
+                <label className="text-slate-600 sm:col-span-3">✅ Qué incluye <span className="text-slate-400">(uno por renglón)</span>
+                  <textarea rows={2} value={cond.incluye} onChange={(e) => setC('incluye', e.target.value)} placeholder={esUS ? 'Preparación de paredes\nPrimer + 2 manos\nLimpieza al terminar' : 'Material y mano de obra\nLimpieza al terminar'} className="w-full mt-1 border border-slate-300 rounded-lg px-2 py-2 bg-white" />
+                </label>
+                <label className="text-slate-600 sm:col-span-3">🚫 Qué NO incluye
+                  <textarea rows={2} value={cond.no_incluye} onChange={(e) => setC('no_incluye', e.target.value)} placeholder={esUS ? 'Reparaciones de drywall mayores\nPuertas y trim' : 'Permisos\nTrabajos no listados'} className="w-full mt-1 border border-slate-300 rounded-lg px-2 py-2 bg-white" />
+                </label>
+                <label className="text-slate-600 sm:col-span-3">Notas
+                  <textarea rows={2} value={cond.notas} onChange={(e) => setC('notas', e.target.value)} className="w-full mt-1 border border-slate-300 rounded-lg px-2 py-2 bg-white" />
+                </label>
+              </div>
+              <p className="text-[11px] text-slate-400 mt-2">El PDF {esUS && pdfLang === 'en' ? 'traduce los títulos al inglés; lo que escribas aquí sale tal cual.' : 'incluye una línea para que tu cliente firme de aceptado.'}</p>
+            </details>
 
             <div className="flex flex-wrap gap-3 items-center pt-2">
               <input
