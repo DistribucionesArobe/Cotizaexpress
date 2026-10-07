@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -247,6 +248,16 @@ export const OFICIOS_USA = {
 
 export default function OficioUSA({ slug }) {
   const o = OFICIOS_USA[slug];
+
+  // Meta Pixel: Lead al picar cualquier botón que lleve a registro
+  useEffect(() => {
+    const h = (e) => {
+      const a = e.target.closest && e.target.closest('a[href*="/registro"]');
+      if (a && window.fbq) { try { window.fbq('track', 'Lead', { content_name: window.location.pathname }); } catch (err) {} }
+    };
+    document.addEventListener('click', h);
+    return () => document.removeEventListener('click', h);
+  }, []);
   if (!o) return <Navigate to="/usa" replace />;
   const url = `https://cotizaexpress.com/usa/${slug}`;
 

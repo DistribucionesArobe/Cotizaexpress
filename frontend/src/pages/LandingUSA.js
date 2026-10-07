@@ -42,6 +42,16 @@ const JSONLD_USA = [
 
 export default function LandingUSA() {
   const [slide, setSlide] = useState(0);
+  // Meta Pixel: Lead al picar cualquier botón que lleve a registro
+  useEffect(() => {
+    const h = (e) => {
+      const a = e.target.closest && e.target.closest('a[href*="/registro"]');
+      if (a && window.fbq) { try { window.fbq('track', 'Lead', { content_name: window.location.pathname }); } catch (err) {} }
+    };
+    document.addEventListener('click', h);
+    return () => document.removeEventListener('click', h);
+  }, []);
+
   useEffect(() => {
     const t = setInterval(() => setSlide((p) => (p + 1) % 2), 7000);
     return () => clearInterval(t);
