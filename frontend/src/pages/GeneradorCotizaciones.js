@@ -26,6 +26,13 @@ export default function GeneradorCotizaciones() {
   const [items, setItems] = useState([{ ...emptyItem }]);
   const [conIva, setConIva] = useState(true);
   const [verGanancia, setVerGanancia] = useState(false);
+  // Lo capturado aquí se pasa al Cotizador después del registro
+  const guardarBorrador = () => {
+    try {
+      const filas = items.filter(it => (it.desc || '').trim()).map(it => ({ name: it.desc.trim(), qty: it.qty || 1, price: it.precio || '', costo: it.costo || '' }));
+      if (filas.length) localStorage.setItem('generador_borrador', JSON.stringify({ filas, cliente, negocio, conIva, at: Date.now() }));
+    } catch (e) {}
+  };
   const [folio] = useState(genFolio);
 
   const [iaTexto, setIaTexto] = useState('');
@@ -268,7 +275,7 @@ export default function GeneradorCotizaciones() {
                   </div>
                 )}
 
-                <Button onClick={() => { setShowUpsell(true); if (window.fbq) { try { window.fbq('track', 'Lead'); } catch (e) {} } }} className="w-full bg-emerald-600 hover:bg-emerald-700 text-lg py-6">
+                <Button onClick={() => { guardarBorrador(); setShowUpsell(true); if (window.fbq) { try { window.fbq('track', 'Lead'); } catch (e) {} } }} className="w-full bg-emerald-600 hover:bg-emerald-700 text-lg py-6">
                   📄 Descargar mi cotización
                 </Button>
               </CardContent>

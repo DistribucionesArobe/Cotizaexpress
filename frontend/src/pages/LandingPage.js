@@ -476,7 +476,7 @@ export default function LandingPage() {
                 <p className="text-sm text-slate-500 mb-4 min-h-[40px]">Tu WhatsApp contesta y cotiza solo, 24/7</p>
                 <div className="text-4xl font-bold text-slate-800 mb-1">$1,000</div>
                 <p className="text-slate-500 text-sm mb-6">MXN/mes</p>
-                <Link to="/registro"><Button className="w-full bg-amber-500 hover:bg-amber-600 text-white" size="lg">Empezar ahora</Button></Link>
+                <Link to="/registro?intent=bot"><Button className="w-full bg-amber-500 hover:bg-amber-600 text-white" size="lg">Empezar ahora</Button></Link>
               </CardContent>
             </Card>
             <Card className="border-2 border-orange-300 shadow-lg">
@@ -486,7 +486,7 @@ export default function LandingPage() {
                 <p className="text-sm text-slate-500 mb-4 min-h-[40px]">Además cobra: links de pago y SPEI por WhatsApp</p>
                 <div className="text-4xl font-bold text-orange-500 mb-1">$2,000</div>
                 <p className="text-slate-500 text-sm mb-6">MXN/mes</p>
-                <Link to="/registro"><Button className="w-full bg-orange-500 hover:bg-orange-600 text-white" size="lg">Quiero cobrar</Button></Link>
+                <Link to="/registro?intent=bot"><Button className="w-full bg-orange-500 hover:bg-orange-600 text-white" size="lg">Quiero cobrar</Button></Link>
               </CardContent>
             </Card>
           </div>

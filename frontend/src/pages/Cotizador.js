@@ -72,6 +72,24 @@ export default function Cotizador() {
 
   useEffect(() => { evento('cotizador_visto'); }, []);
 
+  // Si viene del generador, su cotización ya está lista en la tabla
+  const [vieneDelGenerador, setVieneDelGenerador] = useState(false);
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('generador_borrador');
+      if (!raw) return;
+      const b = JSON.parse(raw);
+      localStorage.removeItem('generador_borrador');
+      if (!b || !Array.isArray(b.filas) || !b.filas.length || Date.now() - (b.at || 0) > 7 * 24 * 3600 * 1000) return;
+      setItems(b.filas.map(f => ({ name: f.name, qty: f.qty || 1, unit: 'pza', price: f.price, costo: f.costo || '', tipo: 'material' })));
+      if (b.cliente) setCliente(b.cliente);
+      // En el generador los precios van SIN IVA y el IVA se agrega
+      if (b.conIva) { setIvaPct(16); setIvaIncluido(false); } else { setIvaPct(0); }
+      setVieneDelGenerador(true);
+      evento('borrador_generador');
+    } catch (e) {}
+  }, []);
+
   useEffect(() => {
     if (resultado || paywall) resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, [resultado, paywall]);
@@ -304,6 +322,16 @@ export default function Cotizador() {
             onClick={() => { const f = window.prompt('¿Sobre qué cotización es el extra? Escribe su folio (ej: CX-7K2M4)'); if (f) iniciarCambio(f); }}
             className="text-xs text-amber-700 hover:text-amber-800 font-medium"
           >➕ ¿Te pidieron un extra en una obra? Haz una orden de cambio</button>
+        </div>
+      )}
+
+      {vieneDelGenerador && !resultado && (
+        <div className="bg-emerald-50 border-2 border-emerald-300 rounded-2xl px-5 py-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="font-bold text-emerald-900">🎉 Tu cotización ya está aquí</p>
+            <p className="text-sm text-emerald-800">La que armaste en el generador. Revisa los precios y genera tu PDF con folio.</p>
+          </div>
+          <Button onClick={guardar} disabled={guardando} className="bg-emerald-600 hover:bg-emerald-700">{guardando ? 'Generando...' : 'Generar mi PDF →'}</Button>
         </div>
       )}
 

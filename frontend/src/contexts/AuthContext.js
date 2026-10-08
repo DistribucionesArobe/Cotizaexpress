@@ -40,12 +40,13 @@ export const AuthProvider = ({ children }) => {
   };
 
   // ✅ Registro (backend: /api/auth/register)
-  const registro = async ({ email, password, promo_code, referral_code, signup_source }) => {
+  const registro = async ({ email, password, promo_code, referral_code, signup_source, empresa_nombre }) => {
     try {
       const payload = { email, password };
       if (promo_code && promo_code.trim()) payload.promo_code = promo_code.trim();
       if (referral_code && referral_code.trim()) payload.referral_code = referral_code.trim();
       if (signup_source) payload.signup_source = signup_source;
+      if (empresa_nombre && empresa_nombre.trim()) payload.empresa_nombre = empresa_nombre.trim();
       await axios.post(
         `${API}/auth/register`,
         payload,
