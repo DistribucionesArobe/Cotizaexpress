@@ -4,7 +4,7 @@
 const BLOG_POSTS = [
   {
     slug: 'como-automatizar-cotizaciones-whatsapp',
-    title: 'Cómo automatizar las cotizaciones de tu negocio por WhatsApp (guía 2026)',
+    title: 'Cómo cotizar por WhatsApp automáticamente: guía paso a paso (2026)',
     description: 'Guía práctica para automatizar cotizaciones por WhatsApp en México: qué necesitas, cuánto cuesta, y cómo empezar hoy sin conocimientos técnicos.',
     date: '2026-07-29',
     readMin: 6,
@@ -186,7 +186,7 @@ const BLOG_POSTS = [
   },
   {
     slug: 'mensajes-para-atender-clientes-whatsapp',
-    title: '25 mensajes listos para atender clientes por WhatsApp (con ejemplos)',
+    title: 'Mensajes para clientes por WhatsApp: 25 ejemplos para copiar y pegar',
     description: 'Ejemplos de mensajes profesionales para WhatsApp Business: bienvenida, cotización, seguimiento, cobro y recuperación de clientes. Copia y pega.',
     date: '2026-07-31',
     readMin: 6,
@@ -343,7 +343,7 @@ const BLOG_POSTS = [
   },
   {
     slug: 'catalogo-whatsapp-business-como-hacerlo',
-    title: 'Catálogo de WhatsApp Business: hazlo en 10 minutos (y lo que nadie te dice)',
+    title: 'Catálogo de WhatsApp Business: cómo hacerlo en 10 minutos (2026)',
     description: 'Guía para crear el catálogo de WhatsApp Business paso a paso, qué tipo de negocio le saca provecho y en qué punto se queda corto para cotizar.',
     date: '2026-09-23',
     readMin: 5,

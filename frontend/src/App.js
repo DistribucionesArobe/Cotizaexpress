@@ -17,6 +17,7 @@ import CotizacionFormal from './pages/CotizacionFormal';
 import CotizadorOficio from './pages/CotizadorOficio';
 import OficioUSA from './pages/OficioUSA';
 import CuantoCobrar from './pages/CuantoCobrar';
+import MensajesWhatsApp from './pages/MensajesWhatsApp';
 import LandingUSA from './pages/LandingUSA';
 import Precios from './pages/Precios';
 import PagoExitoso from './pages/PagoExitoso';
@@ -321,6 +322,10 @@ function AppRoutes() {
             <Route path="/cotizador-para-techadores" element={<CotizadorOficio slug="cotizador-para-techadores" />} />
             <Route path="/cotizador-para-pintores" element={<CotizadorOficio slug="cotizador-para-pintores" />} />
             <Route path="/usa" element={<LandingUSA />} />
+            <Route path="/mensajes-para-clientes-whatsapp" element={<MensajesWhatsApp slug="mensajes-para-clientes-whatsapp" />} />
+            <Route path="/mensajes-para-recuperar-clientes-whatsapp" element={<MensajesWhatsApp slug="mensajes-para-recuperar-clientes-whatsapp" />} />
+            <Route path="/mensajes-de-seguimiento-a-clientes-whatsapp" element={<MensajesWhatsApp slug="mensajes-de-seguimiento-a-clientes-whatsapp" />} />
+            <Route path="/saludos-para-clientes-whatsapp" element={<MensajesWhatsApp slug="saludos-para-clientes-whatsapp" />} />
             <Route path="/cuanto-cobrar-por-pintar" element={<CuantoCobrar slug="cuanto-cobrar-por-pintar" />} />
             <Route path="/cuanto-cobrar-por-drywall" element={<CuantoCobrar slug="cuanto-cobrar-por-drywall" />} />
             <Route path="/cuanto-cobrar-por-instalar-piso" element={<CuantoCobrar slug="cuanto-cobrar-por-instalar-piso" />} />

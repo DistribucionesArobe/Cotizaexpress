@@ -51,6 +51,8 @@ const usa = extraer('OficioUSA.js');
 for (const [slug, d] of Object.entries(usa)) RUTAS[`/usa/${slug}`] = { title: `${d.title} | CotizaBot`, desc: d.desc, locale: 'es_US', h1: d.h1 };
 const cobrar = extraer('CuantoCobrar.js');
 for (const [slug, d] of Object.entries(cobrar)) RUTAS[`/${slug}`] = { title: `${d.title} | CotizaExpress`, desc: d.desc, h1: d.h1 };
+const mensajes = extraer('MensajesWhatsApp.js');
+for (const [slug, d] of Object.entries(mensajes)) RUTAS[`/${slug}`] = { title: `${d.title} | CotizaExpress`, desc: d.desc, h1: d.h1 };
 const oficioMx = extraer('CotizadorOficio.js');
 for (const [slug, d] of Object.entries(oficioMx)) RUTAS[`/${slug}`] = { title: `${d.title} | CotizaExpress`, desc: d.desc, h1: d.h1 };
 

@@ -538,6 +538,8 @@ export default function LandingPage() {
                 <li><Link to="/generador-de-cotizaciones" className="text-slate-400 hover:text-white">Generador de Cotizaciones Gratis</Link></li>
                 <li><Link to="/cotizacion-formal" className="text-slate-400 hover:text-white">Cotización formal: ejemplo</Link></li>
                 <li><Link to="/cotizador-para-contratistas" className="text-slate-400 hover:text-white">Cotizador para contratistas</Link></li>
+                <li><Link to="/mensajes-para-clientes-whatsapp" className="text-slate-400 hover:text-white">Mensajes para clientes por WhatsApp</Link></li>
+                <li><Link to="/mensajes-para-recuperar-clientes-whatsapp" className="text-slate-400 hover:text-white">Mensajes para recuperar clientes</Link></li>
                 <li><Link to="/cuanto-cobrar-por-pintar" className="text-slate-400 hover:text-white">¿Cuánto cobrar por pintar?</Link></li>
                 <li><Link to="/cuanto-cobrar-por-drywall" className="text-slate-400 hover:text-white">¿Cuánto cobrar por drywall?</Link></li>
                 <li><Link to="/cuanto-cobrar-por-instalar-piso" className="text-slate-400 hover:text-white">¿Cuánto cobrar por instalar piso?</Link></li>
