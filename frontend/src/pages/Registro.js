@@ -15,6 +15,14 @@ export default function Registro() {
   const esUSA = (searchParams.get('utm_source') || '').startsWith('usa');
   // ¿Viene a buscar el bot de WhatsApp? Solo entonces va al wizard
   const quiereBot = /bot/.test((searchParams.get('utm_source') || '') + (searchParams.get('utm_campaign') || '')) || searchParams.get('intent') === 'bot';
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    nombre: '',
+    empresa_nombre: '',
+    telefono: '',
+    promo_code: ''
+  });
   // Corrige dominios mal escritos (gamail.com, hotmial.com...)
   const sugerenciaCorreo = (() => {
     const e = (formData.email || '').trim().toLowerCase();
@@ -31,14 +39,6 @@ export default function Registro() {
     const d = FIX[m[2]];
     return d ? `${m[1]}@${d}` : null;
   })();
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    nombre: '',
-    empresa_nombre: '',
-    telefono: '',
-    promo_code: ''
-  });
   const [promoStatus, setPromoStatus] = useState(null); // null | {valid, description} | 'checking'
 
   const handleChange = (e) => {
