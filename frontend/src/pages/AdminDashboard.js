@@ -43,6 +43,41 @@ function PlanBadge({ plan }) {
   return <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${c.cls}`}>{c.label}</span>;
 }
 
+function LeadsGenerador() {
+  const [leads, setLeads] = useState(null);
+  useEffect(() => {
+    fetch('https://api.cotizaexpress.com/api/admin/generador-leads', { credentials: 'include' })
+      .then(r => r.ok ? r.json() : { leads: [] }).then(d => setLeads(d.leads || [])).catch(() => setLeads([]));
+  }, []);
+  if (!leads) return null;
+  return (
+    <div className="bg-white border border-slate-200 rounded-2xl p-5 mb-6">
+      <p className="font-bold text-slate-900 mb-1">📩 Contactos del generador ({leads.length})</p>
+      <p className="text-xs text-slate-500 mb-3">Gente que pidió su PDF por correo. ✅ = ya creó cuenta.</p>
+      {leads.length === 0 ? <p className="text-sm text-slate-400">Todavía nadie.</p> : (
+        <div className="overflow-x-auto max-h-80 overflow-y-auto">
+          <table className="w-full text-xs">
+            <thead><tr className="text-left text-slate-500"><th className="py-1 pr-3">Fecha</th><th className="pr-3">Correo</th><th className="pr-3">WhatsApp</th><th className="pr-3">Negocio</th><th className="pr-3">Conceptos</th><th className="pr-3">Fuente</th><th></th></tr></thead>
+            <tbody>
+              {leads.map((l, i) => (
+                <tr key={i} className="border-t border-slate-100">
+                  <td className="py-1 pr-3 whitespace-nowrap">{new Date(l.fecha).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' })}</td>
+                  <td className="pr-3">{l.email}</td>
+                  <td className="pr-3">{l.whatsapp ? <a className="text-emerald-700 underline" href={`https://wa.me/${l.whatsapp.length === 10 ? '52' + l.whatsapp : l.whatsapp}`} target="_blank" rel="noopener noreferrer">{l.whatsapp}</a> : '—'}</td>
+                  <td className="pr-3">{l.negocio || '—'}</td>
+                  <td className="pr-3">{l.conceptos}</td>
+                  <td className="pr-3">{l.fuente}</td>
+                  <td>{l.se_registro ? '✅' : ''}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AdminDashboard() {
   const { user } = useAuth();
   const [stats, setStats] = useState(null);
@@ -291,6 +326,8 @@ export default function AdminDashboard() {
           </div>
         </CardContent>
       </Card>
+
+      <LeadsGenerador />
 
       {/* Companies Section */}
       <div>

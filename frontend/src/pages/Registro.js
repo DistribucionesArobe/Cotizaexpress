@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,6 +23,12 @@ export default function Registro() {
     telefono: '',
     promo_code: ''
   });
+  useEffect(() => {
+    try {
+      const e = localStorage.getItem('generador_email');
+      if (e && !formData.email) setFormData(f => ({ ...f, email: e }));
+    } catch (err) {}
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   // Corrige dominios mal escritos (gamail.com, hotmial.com...)
   const sugerenciaCorreo = (() => {
     const e = (formData.email || '').trim().toLowerCase();

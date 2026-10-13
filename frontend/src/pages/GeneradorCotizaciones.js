@@ -26,6 +26,32 @@ export default function GeneradorCotizaciones() {
   const [items, setItems] = useState([{ ...emptyItem }]);
   const [conIva, setConIva] = useState(true);
   const [verGanancia, setVerGanancia] = useState(false);
+  const [leadEmail, setLeadEmail] = useState('');
+  const [leadWa, setLeadWa] = useState('');
+  const [leadEnviando, setLeadEnviando] = useState(false);
+  const [leadLink, setLeadLink] = useState('');
+  const [leadError, setLeadError] = useState('');
+  const mandarCotizacion = async (e) => {
+    e.preventDefault();
+    setLeadError(''); setLeadEnviando(true);
+    try {
+      const r = await fetch('https://api.cotizaexpress.com/api/generador/lead', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: leadEmail, whatsapp: leadWa, negocio, telefono, cliente, con_iva: conIva,
+          items: items.filter(it => (it.desc || '').trim()).map(it => ({ desc: it.desc, qty: it.qty, precio: it.precio })),
+          fuente: new URLSearchParams(window.location.search).get('utm_source') || 'generador',
+        }),
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.detail || 'No se pudo enviar');
+      setLeadLink(d.link);
+      if (window.fbq) { try { window.fbq('track', 'Lead', { content_name: 'generador_pdf' }); } catch (err) {} }
+      try { localStorage.setItem('generador_email', leadEmail); } catch (err) {}
+    } catch (err) {
+      setLeadError(err.message || 'No se pudo enviar');
+    } finally { setLeadEnviando(false); }
+  };
   // Lo capturado aquí se pasa al Cotizador después del registro
   const guardarBorrador = () => {
     try {
@@ -199,17 +225,43 @@ export default function GeneradorCotizaciones() {
               Esto lo capturaste a mano. Con tu cuenta <strong>gratis</strong>, solo pegas la lista de tu cliente
               y <strong>la IA la cotiza por ti</strong> — con folio, tu logo y PDF de verdad, lista para WhatsApp.
             </p>
-            <a href="/registro?utm_source=generador">
-              <Button size="lg" className="w-full bg-emerald-600 hover:bg-emerald-700 text-lg font-bold py-6 mb-3">
-                Crear mi cuenta gratis → (30 segundos)
-              </Button>
-            </a>
-            <button
-              onClick={() => { setShowUpsell(false); setTimeout(() => window.print(), 200); }}
-              className="text-sm text-slate-400 underline hover:text-slate-600"
-            >
-              Solo quiero descargar mi PDF
-            </button>
+            {!leadLink ? (
+              <>
+                <form onSubmit={mandarCotizacion} className="text-left bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-4">
+                  <p className="font-bold text-slate-900 mb-2">📩 ¿A dónde te mando tu PDF?</p>
+                  <input type="email" required value={leadEmail} onChange={(e) => setLeadEmail(e.target.value)} placeholder="tu@correo.com"
+                    className="w-full px-4 py-3 border border-slate-300 rounded-xl text-base mb-2" />
+                  <input type="tel" value={leadWa} onChange={(e) => setLeadWa(e.target.value)} placeholder="Tu WhatsApp (opcional)"
+                    className="w-full px-4 py-3 border border-slate-300 rounded-xl text-base mb-3" />
+                  {leadError && <p className="text-sm text-red-600 mb-2">{leadError}</p>}
+                  <Button type="submit" disabled={leadEnviando} className="w-full bg-slate-900 hover:bg-slate-800 py-5 font-bold">
+                    {leadEnviando ? 'Enviando...' : 'Mándame mi cotización →'}
+                  </Button>
+                  <p className="text-[11px] text-slate-400 mt-2 text-center">Te llega al correo con link para descargarla o mandarla por WhatsApp.</p>
+                </form>
+                <a href="/registro?utm_source=generador" onClick={() => { try { if (leadEmail) localStorage.setItem('generador_email', leadEmail); } catch (e) {} }}>
+                  <Button size="lg" variant="outline" className="w-full border-emerald-600 text-emerald-700 font-bold py-5">
+                    O crea tu cuenta gratis y guárdala con folio →
+                  </Button>
+                </a>
+              </>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-emerald-700 font-semibold">✅ Te la mandamos a {leadEmail}</p>
+                <a href={leadLink} target="_blank" rel="noopener noreferrer">
+                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 py-5 font-bold">📄 Abrir mi PDF</Button>
+                </a>
+                <a href={`https://wa.me/?text=${encodeURIComponent('Te comparto la cotización: ' + leadLink)}`} target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" className="w-full py-5 font-bold mt-3">📲 Mandársela a mi cliente por WhatsApp</Button>
+                </a>
+                <div className="bg-emerald-50 rounded-2xl p-4 mt-2">
+                  <p className="text-sm text-slate-700 mb-3">La próxima, pega la lista de tu cliente o súbele un screenshot y se llena sola — con tu cuenta gratis.</p>
+                  <a href="/registro?utm_source=generador_post_pdf">
+                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 font-bold">Crear mi cuenta gratis →</Button>
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
