@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
+import { trackGoogleAdsConversion } from '../lib/googleAdsConversions';
 
 export default function Registro() {
   const navigate = useNavigate();
@@ -94,6 +95,7 @@ export default function Registro() {
     if (result?.success && window.fbq) { try { window.fbq('track', 'CompleteRegistration'); } catch (e) {} }
 
     if (result.success) {
+      trackGoogleAdsConversion('registration');
       toast.success('¡Registro exitoso! Bienvenido a CotizaBot');
       if (esUSA) {
         try { localStorage.setItem('cotizador_region', 'US'); } catch (e) {}

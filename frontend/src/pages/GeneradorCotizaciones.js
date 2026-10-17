@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
+import { trackGoogleAdsConversion } from '../lib/googleAdsConversions';
 
 const fmt = (n) => (isNaN(n) ? '$0.00' : n.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' }));
 const hoy = () => new Date().toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' });
@@ -46,6 +47,7 @@ export default function GeneradorCotizaciones() {
       const d = await r.json();
       if (!r.ok) throw new Error(d.detail || 'No se pudo enviar');
       setLeadLink(d.link);
+      trackGoogleAdsConversion('lead');
       if (window.fbq) { try { window.fbq('track', 'Lead', { content_name: 'generador_pdf' }); } catch (err) {} }
       try { localStorage.setItem('generador_email', leadEmail); } catch (err) {}
     } catch (err) {
