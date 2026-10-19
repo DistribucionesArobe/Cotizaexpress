@@ -61,6 +61,26 @@ export default function Cotizador() {
   };
   const [buscado, setBuscado] = useState(false);
   const [paywall, setPaywall] = useState(false);
+  const [ofertaIntro, setOfertaIntro] = useState(null);
+  const [pagando, setPagando] = useState(false);
+  useEffect(() => {
+    if (!paywall) return;
+    axios.get(`${API}/pagos/oferta-intro`, { withCredentials: true }).then(r => setOfertaIntro(r.data)).catch(() => setOfertaIntro(null));
+  }, [paywall]);
+  const pagarIntro = async () => {
+    setPagando(true);
+    evento('checkout_iniciado');
+    try {
+      const plan = esUS ? 'cotizador_usa_intro' : 'cotizador_intro';
+      const r = await axios.post(`${API}/pagos/crear-checkout`, {
+        plan, success_url: `${window.location.origin}/pago-exitoso`, cancel_url: `${window.location.origin}/cotizador`,
+      }, { withCredentials: true });
+      if (r.data.checkout_url) window.location.href = r.data.checkout_url;
+      else if (r.data.activated) window.location.reload();
+    } catch (e) {
+      toast.error(e?.response?.data?.detail || 'No se pudo abrir el pago');
+    } finally { setPagando(false); }
+  };
   const [catalogoVacio, setCatalogoVacio] = useState(false);
   const resultRef = useRef(null);
   const [installEvt, setInstallEvt] = useState(null);
@@ -565,10 +585,25 @@ export default function Cotizador() {
               Con el <strong>Plan Cotizador IA ({esUS ? "$29 USD/mes" : "$299/mes"})</strong> haces {esUS ? "estimates ilimitados" : "cotizaciones ilimitadas"}
               con tu logo, folio y PDF — y te ahorras horas cada semana.
             </p>
-            <a href="/precios">
-              <Button size="lg" className="bg-violet-600 hover:bg-violet-700 text-lg px-8">Activar mi plan — {esUS ? "$29 USD/mes" : "$299/mes"}</Button>
-            </a>
-            <p className="text-xs text-slate-400">Se activa en 1 minuto con tarjeta o SPEI · factura disponible</p>
+            {ofertaIntro?.disponible ? (
+              <>
+                <div className="inline-block bg-amber-100 text-amber-900 text-sm font-bold rounded-full px-4 py-1">🎁 Oferta de bienvenida</div>
+                <p className="text-2xl font-extrabold text-slate-900">
+                  Tu primer mes a {esUS ? '$9 USD' : '$99'} <span className="text-base font-normal text-slate-500 line-through">{esUS ? '$29' : '$299'}</span>
+                </p>
+                <Button size="lg" onClick={pagarIntro} disabled={pagando} className="bg-violet-600 hover:bg-violet-700 text-lg px-8">
+                  {pagando ? 'Abriendo pago…' : `Activar por ${esUS ? '$9 USD' : '$99'} →`}
+                </Button>
+                <p className="text-xs text-slate-400">Cotizaciones ilimitadas por 30 días. Después {esUS ? '$29 USD' : '$299'}/mes solo si quieres seguir — sin cargos automáticos.</p>
+              </>
+            ) : (
+              <>
+                <a href="/precios">
+                  <Button size="lg" className="bg-violet-600 hover:bg-violet-700 text-lg px-8">Activar mi plan — {esUS ? "$29 USD/mes" : "$299/mes"}</Button>
+                </a>
+                <p className="text-xs text-slate-400">Se activa en 1 minuto con tarjeta o SPEI · factura disponible</p>
+              </>
+            )}
           </CardContent>
         </Card>
       )}

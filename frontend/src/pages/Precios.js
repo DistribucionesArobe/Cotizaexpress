@@ -18,6 +18,11 @@ export default function Precios() {
   const [loading, setLoading] = useState(null);
 
   useEffect(() => { evento('precios_visto'); }, []);
+  const [ofertaIntro, setOfertaIntro] = useState(false);
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    axios.get(`${API}/pagos/oferta-intro`, { withCredentials: true }).then(r => setOfertaIntro(!!r.data.disponible)).catch(() => {});
+  }, [isAuthenticated]);
 
   const handleUpgrade = async (planId) => {
     evento('checkout_iniciado');
@@ -172,6 +177,17 @@ export default function Precios() {
               Precios claros, sin sorpresas. <strong>Cobra a tus clientes</strong> con CotizaBot Pro.
             </p>
           </div>
+
+          {ofertaIntro && (
+            <div className="max-w-2xl mx-auto mb-10 bg-amber-50 border-2 border-amber-300 rounded-2xl p-5 text-center">
+              <p className="text-sm font-bold text-amber-800">🎁 Oferta de bienvenida para tu cuenta</p>
+              <p className="text-2xl font-extrabold text-slate-900 mt-1">Cotizador IA: tu primer mes a {esUS ? '$9 USD' : '$99'}</p>
+              <p className="text-sm text-slate-600 mb-4">Cotizaciones ilimitadas por 30 días. Después {esUS ? '$29 USD' : '$299'}/mes solo si quieres seguir — sin cargos automáticos.</p>
+              <Button size="lg" onClick={() => handleUpgrade(esUS ? 'cotizador_usa_intro' : 'cotizador_intro')} disabled={loading !== null} className="bg-violet-600 hover:bg-violet-700 font-bold">
+                Activar por {esUS ? '$9 USD' : '$99'} →
+              </Button>
+            </div>
+          )}
 
           {/* Pricing Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">

@@ -32,6 +32,7 @@ export default function GeneradorCotizaciones() {
   const [leadEnviando, setLeadEnviando] = useState(false);
   const [leadLink, setLeadLink] = useState('');
   const [leadError, setLeadError] = useState('');
+  const [limiteGen, setLimiteGen] = useState(false);
   const mandarCotizacion = async (e) => {
     e.preventDefault();
     setLeadError(''); setLeadEnviando(true);
@@ -45,6 +46,7 @@ export default function GeneradorCotizaciones() {
         }),
       });
       const d = await r.json();
+      if (r.status === 402) { setLimiteGen(true); return; }
       if (!r.ok) throw new Error(d.detail || 'No se pudo enviar');
       setLeadLink(d.link);
       trackGoogleAdsConversion('lead');
@@ -227,7 +229,16 @@ export default function GeneradorCotizaciones() {
               Esto lo capturaste a mano. Con tu cuenta <strong>gratis</strong>, solo pegas la lista de tu cliente
               y <strong>la IA la cotiza por ti</strong> — con folio, tu logo y PDF de verdad, lista para WhatsApp.
             </p>
-            {!leadLink ? (
+            {limiteGen ? (
+              <div className="space-y-3">
+                <p className="text-lg font-bold text-slate-900">Ya usaste tus 3 cotizaciones gratis de este mes 🙌</p>
+                <p className="text-slate-600 text-sm">Crea tu cuenta gratis y sigue cotizando con folio, tu logo y la lista que te manda tu cliente llenándose sola.</p>
+                <a href={`/registro?utm_source=generador_limite${leadEmail ? '' : ''}`} onClick={() => { try { if (leadEmail) localStorage.setItem('generador_email', leadEmail); } catch (e) {} }}>
+                  <Button size="lg" className="w-full bg-emerald-600 hover:bg-emerald-700 font-bold py-5">Crear mi cuenta gratis →</Button>
+                </a>
+                <p className="text-xs text-slate-400">🎁 Con tu cuenta, el primer mes ilimitado cuesta solo $99.</p>
+              </div>
+            ) : !leadLink ? (
               <>
                 <form onSubmit={mandarCotizacion} className="text-left bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-4">
                   <p className="font-bold text-slate-900 mb-2">📩 ¿A dónde te mando tu PDF?</p>
