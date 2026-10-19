@@ -91,7 +91,7 @@ export default function Registro() {
       return;
     }
 
-    const result = await registro({ ...formData, referral_code: referralCode, signup_source: searchParams.get('utm_source') || (referralCode ? 'referido' : 'directo') });
+    const result = await registro({ ...formData, referral_code: referralCode, signup_source: searchParams.get('utm_source') || (referralCode ? 'referido' : 'directo'), whatsapp: (esUSA && formData.telefono.replace(/\D/g, '').length === 10 ? '1' : '') + formData.telefono });
     if (result?.success && window.fbq) { try { window.fbq('track', 'CompleteRegistration'); } catch (e) {} }
 
     if (result.success) {
@@ -196,6 +196,22 @@ export default function Registro() {
                   minLength={6}
                   data-testid="input-password"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  4. Tu WhatsApp <span className="font-normal text-slate-400">(opcional)</span>
+                </label>
+                <input
+                  type="tel"
+                  name="telefono"
+                  value={formData.telefono}
+                  onChange={(e) => setFormData({ ...formData, telefono: e.target.value.replace(/[^\d+ ]/g, '').slice(0, 16) })}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder={esUSA ? 'Ej: 512 123 4567' : 'Ej: 81 1234 5678'}
+                  data-testid="input-whatsapp"
+                />
+                <p className="text-xs text-slate-400 mt-1">Para ayudarte si te atoras. Nada de spam.</p>
               </div>
 
               <details className="text-sm">
