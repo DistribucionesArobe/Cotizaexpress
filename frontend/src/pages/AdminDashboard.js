@@ -43,6 +43,48 @@ function PlanBadge({ plan }) {
   return <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${c.cls}`}>{c.label}</span>;
 }
 
+function SeguimientoWA() {
+  const [lista, setLista] = useState(null);
+  useEffect(() => {
+    fetch('https://api.cotizaexpress.com/api/admin/wa-seguimiento/lista', { credentials: 'include' })
+      .then(r => r.ok ? r.json() : { contactos: [] }).then(d => setLista(d.contactos || [])).catch(() => setLista([]));
+  }, []);
+  if (!lista) return null;
+  const etiqueta = (c) => {
+    if (c.respuesta) return <span className="text-emerald-700 font-semibold">💬 "{c.respuesta}"</span>;
+    if (c.entrega === 'read') return <span className="text-blue-700">👀 Lo leyó</span>;
+    if (c.entrega === 'delivered') return <span className="text-slate-700">✅ Le llegó</span>;
+    if (c.entrega === 'failed') return <span className="text-red-600">⚠️ No se entregó</span>;
+    if (c.entrega === 'sent') return <span className="text-amber-600">📤 Enviado (sin llegar aún)</span>;
+    return <span className="text-slate-400">📤 Enviado</span>;
+  };
+  return (
+    <div className="bg-white border border-slate-200 rounded-2xl p-5 mb-6">
+      <p className="font-bold text-slate-900 mb-1">📲 Seguimiento por WhatsApp ({lista.length})</p>
+      <p className="text-xs text-slate-500 mb-3">A quién le escribió el bot desde tu número de ventas. Estos mensajes no aparecen en tu app hasta que la persona contesta.</p>
+      {lista.length === 0 ? <p className="text-sm text-slate-400">Todavía nadie.</p> : (
+        <div className="overflow-x-auto max-h-80 overflow-y-auto">
+          <table className="w-full text-xs">
+            <thead><tr className="text-left text-slate-500"><th className="py-1 pr-3">Enviado</th><th className="pr-3">Contacto</th><th className="pr-3">Origen</th><th className="pr-3">Estado</th><th className="pr-3">2º toque</th><th></th></tr></thead>
+            <tbody>
+              {lista.map((c, i) => (
+                <tr key={i} className="border-t border-slate-100">
+                  <td className="py-1.5 pr-3 whitespace-nowrap">{c.enviado ? new Date(c.enviado).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' }) : '—'}</td>
+                  <td className="pr-3">{c.nombre}<div className="text-slate-400">{c.tel}</div></td>
+                  <td className="pr-3">{c.origen}</td>
+                  <td className="pr-3">{etiqueta(c)}</td>
+                  <td className="pr-3">{c.segundo ? 'Sí' : '—'}</td>
+                  <td><a className="text-emerald-700 underline whitespace-nowrap" href={`https://wa.me/52${c.tel}`} target="_blank" rel="noopener noreferrer">Escribirle</a></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function LeadsGenerador() {
   const [leads, setLeads] = useState(null);
   useEffect(() => {
@@ -327,6 +369,7 @@ export default function AdminDashboard() {
         </CardContent>
       </Card>
 
+      <SeguimientoWA />
       <LeadsGenerador />
 
       {/* Companies Section */}
