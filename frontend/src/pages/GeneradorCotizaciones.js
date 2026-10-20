@@ -35,6 +35,8 @@ export default function GeneradorCotizaciones() {
   const [limiteGen, setLimiteGen] = useState(false);
   const mandarCotizacion = async (e) => {
     e.preventDefault();
+    const digitos = (leadWa || '').replace(/\D/g, '');
+    if (!leadEmail && digitos.length < 10) { setLeadError('Escribe tu WhatsApp a 10 dígitos'); return; }
     setLeadError(''); setLeadEnviando(true);
     try {
       const r = await fetch('https://api.cotizaexpress.com/api/generador/lead', {
@@ -241,16 +243,18 @@ export default function GeneradorCotizaciones() {
             ) : !leadLink ? (
               <>
                 <form onSubmit={mandarCotizacion} className="text-left bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-4">
-                  <p className="font-bold text-slate-900 mb-2">📩 ¿A dónde te mando tu PDF?</p>
-                  <input type="email" required value={leadEmail} onChange={(e) => setLeadEmail(e.target.value)} placeholder="tu@correo.com"
-                    className="w-full px-4 py-3 border border-slate-300 rounded-xl text-base mb-2" />
-                  <input type="tel" value={leadWa} onChange={(e) => setLeadWa(e.target.value)} placeholder="Tu WhatsApp (opcional)"
-                    className="w-full px-4 py-3 border border-slate-300 rounded-xl text-base mb-3" />
+                  <p className="font-bold text-slate-900 mb-1">📲 ¿A qué WhatsApp te la mando?</p>
+                  <p className="text-xs text-slate-500 mb-2">Ahí te llega el link de tu PDF y te ayudamos si te atoras.</p>
+                  <input type="tel" inputMode="numeric" value={leadWa} onChange={(e) => setLeadWa(e.target.value.replace(/[^\d+ ]/g, '').slice(0, 16))}
+                    placeholder="Ej: 81 1234 5678" required={!leadEmail}
+                    className="w-full px-4 py-3 border-2 border-emerald-300 rounded-xl text-lg mb-2 focus:border-emerald-500" />
+                  <input type="email" value={leadEmail} onChange={(e) => setLeadEmail(e.target.value)} placeholder="Correo (opcional, para una copia)"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm mb-3" />
                   {leadError && <p className="text-sm text-red-600 mb-2">{leadError}</p>}
-                  <Button type="submit" disabled={leadEnviando} className="w-full bg-slate-900 hover:bg-slate-800 py-5 font-bold">
-                    {leadEnviando ? 'Enviando...' : 'Mándame mi cotización →'}
+                  <Button type="submit" disabled={leadEnviando} className="w-full bg-[#25D366] hover:bg-[#1ebe57] py-5 font-bold text-base">
+                    {leadEnviando ? 'Preparando...' : 'Ver mi cotización en PDF →'}
                   </Button>
-                  <p className="text-[11px] text-slate-400 mt-2 text-center">Te llega al correo con link para descargarla o mandarla por WhatsApp.</p>
+                  <p className="text-[11px] text-slate-400 mt-2 text-center">Sin spam. Solo tu cotización y ayuda si la necesitas.</p>
                 </form>
                 <a href="/registro?utm_source=generador" onClick={() => { try { if (leadEmail) localStorage.setItem('generador_email', leadEmail); } catch (e) {} }}>
                   <Button size="lg" variant="outline" className="w-full border-emerald-600 text-emerald-700 font-bold py-5">
@@ -260,7 +264,7 @@ export default function GeneradorCotizaciones() {
               </>
             ) : (
               <div className="space-y-3">
-                <p className="text-emerald-700 font-semibold">✅ Te la mandamos a {leadEmail}</p>
+                <p className="text-emerald-700 font-semibold">✅ ¡Lista tu cotización!{leadEmail ? ` Te mandamos copia a ${leadEmail}` : ''}</p>
                 <a href={leadLink} target="_blank" rel="noopener noreferrer">
                   <Button className="w-full bg-emerald-600 hover:bg-emerald-700 py-5 font-bold">📄 Abrir mi PDF</Button>
                 </a>
