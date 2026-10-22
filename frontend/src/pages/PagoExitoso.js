@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '../contexts/AuthContext';
+import { trackGoogleAdsPurchase } from '../lib/googleAdsConversions';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -70,6 +71,7 @@ export default function PagoExitoso() {
         const data = response.data;
 
         if (data.paid) {
+          trackGoogleAdsPurchase(externalReference, paymentId || collectionId || sessionId);
           setStatus('success');
           setMensaje(data.mensaje || '¡Pago exitoso! Tu plan está activo.');
         } else if (data.status === 'pending' || data.status === 'in_process') {
