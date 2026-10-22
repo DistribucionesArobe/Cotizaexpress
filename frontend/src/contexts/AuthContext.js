@@ -81,6 +81,7 @@ export const AuthProvider = ({ children }) => {
 
       // ✅ Ahora trae el usuario usando cookie
       await cargarUsuario();
+      try { localStorage.setItem('cx_tiene_cuenta', '1'); } catch (e) {}
 
       return { success: true };
     } catch (error) {

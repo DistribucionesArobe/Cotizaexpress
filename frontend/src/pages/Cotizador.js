@@ -116,8 +116,15 @@ export default function Cotizador() {
 
   const checarSesion = (e) => {
     if (e && e.response && e.response.status === 401) {
-      toast.error('Crea tu cuenta gratis para cotizar (1 minuto)');
-      navigate('/registro?next=/cotizador');
+      let tiene = false;
+      try { tiene = !!localStorage.getItem('cx_tiene_cuenta'); } catch (er) {}
+      if (tiene) {
+        toast.error('Tu sesión se cerró. Entra de nuevo para seguir cotizando.');
+        navigate('/login?next=/cotizador');
+      } else {
+        toast.error('Crea tu cuenta gratis para cotizar (1 minuto)');
+        navigate('/registro?next=/cotizador');
+      }
       return true;
     }
     return false;
@@ -242,7 +249,8 @@ export default function Cotizador() {
     try {
       const itemsPdf = items.map(it => it.tipo === 'mano_obra' && !/mano de obra/i.test(it.name)
         ? { ...it, name: `Mano de obra — ${it.name}` } : it).map(it => ({ ...it, gravable: gravable(it) }));
-      const r = await axios.post(`${API}/cotizador/guardar`, { items: itemsPdf, cliente, vat_pct: parseFloat(ivaPct) || 0, vat_incluido: ivaIncluido, moneda: esUS ? 'USD' : 'MXN', idioma: esUS ? pdfLang : 'es', parent_folio: parentFolio, condiciones: cond }, { withCredentials: true });
+      const r = await axios.post(`${API}/cotizador/guardar`, { items: itemsPdf, cliente, vat_pct: parseFloat(ivaPct) || 0, vat_incluido: ivaIncluido, moneda: esUS ? 'USD' : 'MXN', idioma: esUS ? pdfLang : 'es', parent_folio: parentFolio, condiciones: cond, desde_generador: vieneDelGenerador }, { withCredentials: true });
+      setVieneDelGenerador(false);
       setResultado(r.data);
       toast.success(r.data.parent_folio ? `Orden de cambio ${r.data.folio} creada` : `Cotización ${r.data.folio} creada`);
       setParentFolio('');

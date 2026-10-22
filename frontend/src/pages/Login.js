@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,8 +10,10 @@ export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [searchParams] = useSearchParams();
+  const nextUrl = (searchParams.get('next') || '').startsWith('/') ? searchParams.get('next') : '';
   const [formData, setFormData] = useState({
-    email: '',
+    email: searchParams.get('email') || '',
     password: ''
   });
 
@@ -34,9 +36,10 @@ export default function Login() {
       try {
         const meRes = await axios.get(`${process.env.REACT_APP_BACKEND_URL?.trim() || 'https://api.cotizaexpress.com'}/api/auth/me`, { withCredentials: true });
         const onboardingDone = meRes.data?.user?.onboarding_completed;
-        navigate(onboardingDone ? '/dashboard' : '/onboarding');
+        // Quien ya configuró su bot va al panel; los demás, al Cotizador (no al wizard del bot)
+        navigate(nextUrl || (onboardingDone ? '/dashboard' : '/cotizador'));
       } catch {
-        navigate('/dashboard');
+        navigate(nextUrl || '/cotizador');
       }
     } else {
       toast.error(result.error);

@@ -12,6 +12,7 @@ export default function Registro() {
   const [searchParams] = useSearchParams();
   const { registro } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [yaExiste, setYaExiste] = useState('');
   const referralCode = searchParams.get('ref') || '';
   const esUSA = (searchParams.get('utm_source') || '').startsWith('usa');
   // ¿Viene a buscar el bot de WhatsApp? Solo entonces va al wizard
@@ -102,6 +103,8 @@ export default function Registro() {
       }
       // Por defecto: directo al Cotizador (primer valor en un clic). El wizard es solo para el bot.
       navigate(quiereBot ? '/onboarding' : '/cotizador');
+    } else if (/ya registrado/i.test(result.error || '')) {
+      setYaExiste(formData.email.trim());
     } else {
       toast.error(result.error);
     }
@@ -143,6 +146,16 @@ export default function Registro() {
         <Card>
 
           <CardContent>
+            {yaExiste && (
+              <div className="mb-4 rounded-xl border-2 border-amber-300 bg-amber-50 p-4 text-center">
+                <p className="font-bold text-slate-900">Ya tienes cuenta con {yaExiste} 🙌</p>
+                <p className="text-sm text-slate-600 mt-1">No necesitas otra. Entra con tu correo y contraseña; tus cotizaciones siguen ahí.</p>
+                <Link to={`/login?email=${encodeURIComponent(yaExiste)}&next=/cotizador`}>
+                  <Button className="w-full mt-3 bg-emerald-600 hover:bg-emerald-700 font-bold">Entrar a mi cuenta →</Button>
+                </Link>
+                <Link to="/recuperar-contrasena" className="block text-xs text-slate-500 underline mt-2">¿Olvidaste tu contraseña?</Link>
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
