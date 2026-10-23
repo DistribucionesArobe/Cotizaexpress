@@ -186,11 +186,16 @@ export default function GeneradorCotizaciones() {
         </div>
       </nav>
 
+      {/* Franja de oferta (coincide con los anuncios de Google) */}
+      <a href="/precios?utm_source=generador_franja" className="print:hidden block bg-amber-400 hover:bg-amber-300 text-slate-900 text-center text-sm sm:text-base font-semibold px-4 py-2">
+        🎁 ¿Cotizas seguido? <strong>Primer mes ilimitado a $99</strong> · después $299/mes, sin cargos automáticos →
+      </a>
+
       {/* Hero para tráfico de anuncios */}
       <section className="print:hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-700 text-white">
         <div className="max-w-5xl mx-auto px-4 py-12 sm:py-16 text-center">
           <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur rounded-full px-4 py-1.5 text-sm font-medium mb-5">
-            ⚡ 100% gratis · sin registro · sin tarjeta
+            ⚡ 3 cotizaciones gratis al mes · sin registro · sin tarjeta
           </div>
           <h1 className="text-4xl sm:text-5xl font-extrabold mb-4 leading-tight">
             Haz una cotización profesional<br className="hidden sm:block"/> en <span className="text-yellow-300">2 minutos</span>
