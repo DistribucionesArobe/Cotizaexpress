@@ -29,3 +29,12 @@ export function acquisitionRegion(acquisition, fallback) {
   if (/^(MX_|busqueda_generador$|bot_prueba$)/.test(acquisition.utm_campaign || '')) return 'MX';
   return fallback || 'MX';
 }
+
+export function registrationTrialPlan(search = window.location.search) {
+  const params = new URLSearchParams(search);
+  const explicit = (params.get('plan') || '').toLowerCase();
+  if (['cotizador', 'cotizabot', 'pro'].includes(explicit)) return explicit;
+  const acquisition = getAcquisition(search);
+  return params.get('intent') === 'bot' || /bot/.test((acquisition.utm_source || '') + (acquisition.utm_campaign || ''))
+    ? 'cotizabot' : 'cotizador';
+}
