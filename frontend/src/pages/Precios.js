@@ -98,7 +98,7 @@ export default function Precios() {
       id: 'cotizabot',
       nombre: 'CotizaBot',
       precio: 1000,
-      descripcion: 'Para empresas en crecimiento',
+      descripcion: 'Responde pedidos y cotiza por WhatsApp con tu catálogo',
       features: [
         { texto: 'Cotizaciones ilimitadas', incluido: true },
         { texto: 'WhatsApp Business integrado', incluido: true },
