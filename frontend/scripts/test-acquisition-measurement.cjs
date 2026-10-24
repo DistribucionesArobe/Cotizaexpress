@@ -11,7 +11,7 @@ function load(name, exports, globals) {
 }
 
 const storage = new Map();
-const acquisition = load('acquisition.js', 'getAcquisition,rememberAcquisition,trialRegistrationUrl,acquisitionRegion', {
+const acquisition = load('acquisition.js', 'getAcquisition,rememberAcquisition,trialRegistrationUrl,acquisitionRegion,registrationTrialPlan', {
   URLSearchParams,
   window: { location: { search: '?utm_source=google&utm_medium=cpc&utm_campaign=bot_prueba' } },
   sessionStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value) },
@@ -26,6 +26,9 @@ assert.equal(url.searchParams.get('intent'), 'bot');
 assert.equal(acquisition.getAcquisition('?utm_source=generador_post_pdf').utm_source, 'google');
 assert.equal(acquisition.acquisitionRegion({ utm_campaign: 'bot_prueba' }, 'US'), 'MX');
 assert.equal(acquisition.acquisitionRegion({ utm_source: 'usa_google' }, 'MX'), 'US');
+assert.equal(acquisition.registrationTrialPlan('?utm_campaign=bot_prueba&plan=cotizador'), 'cotizador');
+assert.equal(acquisition.registrationTrialPlan('?utm_source=google&utm_campaign=bot_prueba&plan=pro'), 'pro');
+assert.equal(acquisition.registrationTrialPlan(''), 'cotizabot');
 acquisition.rememberAcquisition('?utm_source=bing&utm_campaign=otra');
 assert.equal(acquisition.getAcquisition('').utm_source, 'bing');
 
