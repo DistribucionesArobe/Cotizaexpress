@@ -10,7 +10,6 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 export default function PagoExitoso() {
-  useEffect(() => { if (window.fbq) { try { window.fbq('track', 'Purchase', { currency: 'MXN' }); } catch (e) {} } }, []);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -71,7 +70,10 @@ export default function PagoExitoso() {
         const data = response.data;
 
         if (data.paid) {
-          trackGoogleAdsPurchase(externalReference, paymentId || collectionId || sessionId);
+          trackGoogleAdsPurchase(data);
+          if (data.verified && data.payment_id && Number(data.value) > 0 && window.fbq) {
+            try { window.fbq('track', 'Purchase', { value: Number(data.value), currency: data.currency }, { eventID: String(data.payment_id) }); } catch (_) {}
+          }
           setStatus('success');
           setMensaje(data.mensaje || '¡Pago exitoso! Tu plan está activo.');
         } else if (data.status === 'pending' || data.status === 'in_process') {

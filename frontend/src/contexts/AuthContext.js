@@ -40,16 +40,17 @@ export const AuthProvider = ({ children }) => {
   };
 
   // ✅ Registro (backend: /api/auth/register)
-  const registro = async ({ email, password, promo_code, referral_code, signup_source, empresa_nombre, whatsapp, plan_prueba }) => {
+  const registro = async ({ email, password, promo_code, referral_code, signup_source, signup_campaign, empresa_nombre, whatsapp, plan_prueba }) => {
     try {
       const payload = { email, password };
       if (promo_code && promo_code.trim()) payload.promo_code = promo_code.trim();
       if (referral_code && referral_code.trim()) payload.referral_code = referral_code.trim();
       if (signup_source) payload.signup_source = signup_source;
+      if (signup_campaign) payload.signup_campaign = signup_campaign;
       if (empresa_nombre && empresa_nombre.trim()) payload.empresa_nombre = empresa_nombre.trim();
       if (whatsapp && whatsapp.replace(/\D/g, '').length >= 10) payload.whatsapp = whatsapp;
       if (plan_prueba) payload.plan_prueba = plan_prueba;
-      await axios.post(
+      const response = await axios.post(
         `${API}/auth/register`,
         payload,
         { withCredentials: true }
@@ -59,7 +60,7 @@ export const AuthProvider = ({ children }) => {
       // si quieres auto-login, hacemos login aquí:
       await login(email, password);
 
-      return { success: true };
+      return { success: true, trial: response.data?.trial };
     } catch (error) {
       return {
         success: false,

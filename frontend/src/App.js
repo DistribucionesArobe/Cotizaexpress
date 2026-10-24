@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { rememberAcquisition } from './lib/acquisition';
 import '@/App.css';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
@@ -63,6 +64,7 @@ function AppRoutes() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logout, isAuthenticated } = useAuth();
   const location = useLocation();
+  useEffect(() => { rememberAcquisition(location.search); }, [location.search]);
   const isOnboarding = location.pathname.startsWith('/onboarding');
 
   return (
