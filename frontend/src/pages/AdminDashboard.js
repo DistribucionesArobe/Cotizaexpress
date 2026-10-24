@@ -175,7 +175,7 @@ export default function AdminDashboard() {
   const filtered = companies.filter(c => {
     if (filter === 'paid' && (!c.plan_code || c.plan_code === 'free')) return false;
     if (filter === 'free' && c.plan_code && c.plan_code !== 'free') return false;
-    if (filter === 'trial' && !c.trial_end) return false;
+    if (filter === 'trial' && (!c.trial_end || new Date(c.trial_end) <= new Date())) return false;
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       return (
@@ -232,7 +232,7 @@ export default function AdminDashboard() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">{stats?.suscripciones_activas || 0}</p>
-                <p className="text-xs text-slate-500">Pagando</p>
+                <p className="text-xs text-slate-500">Con plan asignado</p>
               </div>
             </div>
           </CardContent>
@@ -395,7 +395,7 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-0.5">
               {[
                 { key: 'all', label: 'Todas' },
-                { key: 'paid', label: `Pagando (${paidCount})` },
+                { key: 'paid', label: `Con plan asignado (${paidCount})` },
                 { key: 'trial', label: `Trial (${trialCount})` },
                 { key: 'free', label: 'Free' },
               ].map(f => (
