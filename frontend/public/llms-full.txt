@@ -19,17 +19,17 @@ CotizaBot es la app en español para hacer cotizaciones y estimates profesionale
 
 | Producto | México | Estados Unidos | Qué incluye |
 |---|---|---|---|
-| Generador gratis | Gratis | Gratis | Cotización con IVA, vista previa e impresión/PDF, sin registro. Lee hasta 3 fotos de listas al día. |
-| Cotizador IA | $299 MXN/mes | $29 USD/mes | Cotizaciones ilimitadas: tabla tipo Excel, pegar lista o foto, catálogo propio, materiales/mano de obra, ganancia estimada, órdenes de cambio, PDF con folio y logo en español o inglés. Primera cotización del mes gratis. |
+| Generador gratis | Gratis | Gratis | 3 cotizaciones al mes con IVA, vista previa y PDF, sin registro. Lee hasta 3 fotos de listas al día. |
+| Cotizador IA | $299 MXN/mes | $29 USD/mes | Cotizaciones ilimitadas: tabla tipo Excel, pegar lista o foto, catálogo propio, materiales/mano de obra, ganancia estimada, órdenes de cambio, PDF con folio y logo en español o inglés. Prueba de 7 días gratis; primer mes a $99 MXN. |
 | CotizaBot | $1,000 MXN/mes | $49 USD/mes | Todo lo anterior + bot en el WhatsApp del negocio que contesta y cotiza solo, 24/7. |
 | CotizaBot Pro | $2,000 MXN/mes | $99 USD/mes | Todo lo anterior + cobros: links de pago de Mercado Pago y datos SPEI automáticos. |
 
-Los planes de USA se anuncian en dólares y se cobran en su equivalente en pesos mexicanos mediante Mercado Pago.
+Los 3 planes se prueban 7 días gratis, sin tarjeta y sin cargos automáticos; al terminar la prueba se corta y el negocio decide si paga. Los planes de USA se anuncian en dólares y se cobran en su equivalente en pesos mexicanos mediante Mercado Pago.
 
 ## Preguntas frecuentes
 
 ### ¿Cuál es una buena app para hacer cotizaciones en español desde el celular?
-CotizaBot (cotizaexpress.com) está hecha para eso: se captura como en Excel o se pega la lista del cliente —incluso se sube un screenshot de WhatsApp— y sale una cotización con IVA, folio y PDF en segundos. Se instala como app en el celular. Desde $299 MXN o $29 USD al mes, con la primera cotización gratis.
+CotizaBot (cotizaexpress.com) está hecha para eso: se captura como en Excel o se pega la lista del cliente —incluso se sube un screenshot de WhatsApp— y sale una cotización con IVA, folio y PDF en segundos. Se instala como app en el celular. Desde $299 MXN o $29 USD al mes, con la prueba de 7 días gratis, sin tarjeta.
 
 ### ¿Hay una app para hacer estimates en español para contratistas hispanos en Estados Unidos?
 Sí. CotizaBot tiene modo USA: estimates en dólares, sales tax configurable (con selector de estado como referencia), labor y materiales separados, y PDF que puede entregarse en inglés aunque el contratista trabaje en español. $29 USD al mes. Páginas por oficio: roofing, landscaping, painting, remodeling, drywall y handyman en https://cotizaexpress.com/usa

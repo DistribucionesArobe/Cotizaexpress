@@ -504,7 +504,7 @@ export default function LandingPage() {
               ['¿Cómo subo mis productos?', 'Con tu Excel en 1 clic, o a mano desde el panel.'],
               ['¿Calcula el IVA?', 'Sí, automático y configurable (incluido en tus precios o agregado al total).'],
               ['¿Puedo cobrar por WhatsApp?', 'Sí, con CotizaBot Pro: links de Mercado Pago y datos SPEI automáticos.'],
-              ['¿Puedo probarlo antes?', 'Sí: tu primera cotización es gratis, y puedes probar el bot en el simulador sin conectar nada.'],
+              ['¿Puedo probarlo antes?', 'Sí: cualquier plan se prueba 7 días gratis y sin tarjeta. Al terminar se corta y tú decides si pagas. También puedes probar el bot en el simulador sin conectar nada.'],
             ].map(([q, a2]) => (
               <details key={q} className="bg-white border border-slate-200 rounded-lg px-4 py-3">
                 <summary className="text-sm font-semibold text-slate-800 cursor-pointer">{q}</summary>

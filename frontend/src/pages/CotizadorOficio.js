@@ -82,7 +82,7 @@ export default function CotizadorOficio({ slug }) {
         <Link to="/registro">
           <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-lg px-8 py-6">Hacer mi cotización gratis →</Button>
         </Link>
-        <p className="text-sm text-slate-400 mt-3">1 cotización gratis · sin tarjeta · se instala como app en tu celular 📲</p>
+        <p className="text-sm text-slate-400 mt-3">7 días ilimitado gratis · sin tarjeta · se instala como app en tu celular 📲</p>
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-8 text-sm text-amber-900 max-w-xl mx-auto">
           👷 <strong>Separa mano de obra y materiales</strong> en la misma cotización — tu cliente ve el desglose claro y tú cierras sin regateos.

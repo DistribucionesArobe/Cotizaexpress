@@ -130,8 +130,8 @@ export default function Precios() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <Helmet>
-        <title>Precios y Planes - CotizaBot | Desde $1,000 MXN/mes</title>
-        <meta name="description" content="Planes de CotizaBot para automatizar cotizaciones por WhatsApp. CotizaBot $1,000 MXN/mes y CotizaBot Pro con cobros automáticos $2,000 MXN/mes. Factura CFDI disponible." />
+        <title>Precios CotizaBot — Prueba 7 días gratis · Cotizador desde $299 MXN</title>
+        <meta name="description" content="Prueba cualquier plan 7 días gratis, sin tarjeta. Cotizador IA $299 MXN/mes (primer mes $99), CotizaBot $1,000 MXN/mes y CotizaBot Pro con cobros $2,000 MXN/mes." />
         <link rel="canonical" href="https://cotizaexpress.com/precios" />
         <meta property="og:title" content="Precios CotizaBot - Planes desde $1,000 MXN/mes" />
         <meta property="og:description" content="Automatiza cotizaciones por WhatsApp con CotizaBot. CotizaBot y CotizaBot Pro con cobros integrados." />
