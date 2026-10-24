@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 import { evento } from '@/lib/evento';
+import { getAcquisition, acquisitionRegion, trialRegistrationUrl } from '@/lib/acquisition';
+import { trackTrialStarted } from '@/lib/googleAdsConversions';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -33,6 +35,7 @@ export default function Precios() {
     setLoading(planId);
     try {
       const r = await axios.post(`${API}/pagos/iniciar-prueba`, { plan: planCheckout(planId) }, { withCredentials: true });
+      if (r.data.started === true) trackTrialStarted({ started: true, plan: r.data.plan, ends_at: r.data.termina });
       evento('prueba_iniciada');
       toast.success(`¡Listo! Tienes ${r.data.dias} días gratis de ${planId === 'cotizador' ? 'Cotizador IA' : 'CotizaBot'}`);
       window.location.href = planId === 'cotizador' ? '/cotizador' : '/onboarding';
@@ -70,7 +73,7 @@ export default function Precios() {
 
   const planActual = user?.empresa?.plan || user?.usuario?.plan || null;
 
-  const esUS = (typeof window !== 'undefined') && localStorage.getItem('cotizador_region') === 'US';
+  const esUS = acquisitionRegion(getAcquisition(), localStorage.getItem('cotizador_region')) === 'US';
   const USD_PRECIOS = { cotizador: 29, cotizabot: 49, pro: 99 };
   const planCheckout = (planId) => (esUS && USD_PRECIOS[planId] ? planId + '_usa' : planId);
 
@@ -326,7 +329,7 @@ export default function Precios() {
                             )}
                           </Button>
                         ) : (
-                          <Link to={`/registro?plan=${plan.id}`} className="block">
+                          <Link to={trialRegistrationUrl(plan.id)} className="block">
                             <Button className={`w-full ${esDestacado ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-600 hover:bg-emerald-700'}`}>
                               Probar 7 días gratis
                             </Button>

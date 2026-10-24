@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
-import { trackGoogleAdsConversion } from '../lib/googleAdsConversions';
+import { trackGoogleAdsConversion, trackTrialStarted } from '../lib/googleAdsConversions';
+import { getAcquisition, acquisitionRegion } from '../lib/acquisition';
 
 export default function Registro() {
   const navigate = useNavigate();
@@ -14,7 +15,8 @@ export default function Registro() {
   const [loading, setLoading] = useState(false);
   const [yaExiste, setYaExiste] = useState('');
   const referralCode = searchParams.get('ref') || '';
-  const esUSA = (searchParams.get('utm_source') || '').startsWith('usa');
+  const acquisition = getAcquisition();
+  const esUSA = acquisitionRegion(acquisition, (searchParams.get('utm_source') || '').startsWith('usa') ? 'US' : 'MX') === 'US';
   // ¿Viene a buscar el bot de WhatsApp? Solo entonces va al wizard
   const planUrl = (searchParams.get('plan') || '').toLowerCase();
   const quiereBot = /bot/.test((searchParams.get('utm_source') || '') + (searchParams.get('utm_campaign') || '')) || searchParams.get('intent') === 'bot' || planUrl === 'cotizabot' || planUrl === 'pro';
@@ -93,11 +95,12 @@ export default function Registro() {
       return;
     }
 
-    const result = await registro({ ...formData, referral_code: referralCode, signup_source: searchParams.get('utm_source') || (referralCode ? 'referido' : 'directo'), plan_prueba: (['cotizabot','pro'].includes(planUrl) ? planUrl : (quiereBot ? 'cotizabot' : 'cotizador')) + (esUSA ? '_usa' : ''), whatsapp: (esUSA && formData.telefono.replace(/\D/g, '').length === 10 ? '1' : '') + formData.telefono });
+    const result = await registro({ ...formData, referral_code: referralCode, signup_source: acquisition.utm_source || (referralCode ? 'referido' : 'directo'), signup_campaign: acquisition.utm_campaign || '', plan_prueba: (['cotizabot','pro'].includes(planUrl) ? planUrl : (quiereBot ? 'cotizabot' : 'cotizador')) + (esUSA ? '_usa' : ''), whatsapp: (esUSA && formData.telefono.replace(/\D/g, '').length === 10 ? '1' : '') + formData.telefono });
     if (result?.success && window.fbq) { try { window.fbq('track', 'CompleteRegistration'); } catch (e) {} }
 
     if (result.success) {
       trackGoogleAdsConversion('registration');
+      trackTrialStarted(result.trial);
       toast.success('¡Registro exitoso! Bienvenido a CotizaBot');
       if (esUSA) {
         try { localStorage.setItem('cotizador_region', 'US'); } catch (e) {}
