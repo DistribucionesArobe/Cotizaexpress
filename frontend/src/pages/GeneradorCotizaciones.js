@@ -276,11 +276,18 @@ export default function GeneradorCotizaciones() {
                 <a href={`https://wa.me/?text=${encodeURIComponent('Te comparto la cotización: ' + leadLink)}`} target="_blank" rel="noopener noreferrer">
                   <Button variant="outline" className="w-full py-5 font-bold mt-3">📲 Mandársela a mi cliente por WhatsApp</Button>
                 </a>
-                <div className="bg-emerald-50 rounded-2xl p-4 mt-2">
-                  <p className="text-sm text-slate-700 mb-3">La próxima, pega la lista de tu cliente o súbele un screenshot y se llena sola. Crea tu cuenta y pruébalo 7 días ilimitado, gratis.</p>
-                  <a href="/registro?utm_source=generador_post_pdf">
-                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 font-bold">Crear mi cuenta gratis →</Button>
+                <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mt-2 text-left">
+                  <p className="font-bold text-slate-900 mb-2">💾 ¿La vas a volver a usar?</p>
+                  <ul className="text-sm text-slate-700 space-y-1 mb-3">
+                    <li>✅ <strong>Guarda esta cotización</strong> con folio en tu cuenta</li>
+                    <li>✅ <strong>Reutilízala</strong>: cambia cliente o cantidades y mándala otra vez</li>
+                    <li>✅ Sale con <strong>tu logo</strong> y tus precios guardados</li>
+                    <li>✅ La próxima, pega la lista del cliente y se llena sola</li>
+                  </ul>
+                  <a href="/registro?utm_source=generador_post_pdf" onClick={() => { guardarBorrador(); try { if (leadEmail) localStorage.setItem('generador_email', leadEmail); } catch (e) {} }}>
+                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 font-bold">Guardar esta cotización en mi cuenta →</Button>
                   </a>
+                  <p className="text-[11px] text-slate-500 text-center mt-2">Gratis 7 días con todo ilimitado · sin tarjeta</p>
                 </div>
               </div>
             )}
