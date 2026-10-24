@@ -17,6 +17,10 @@ export function trackGoogleAdsPurchase(externalReference, transactionId) {
     const plan = parts[1] || '';
     const intro = parts[2] === 'intro';
     const value = intro ? (plan === 'cotizador_usa' ? 169 : 99) : (PLAN_MXN[plan] || 299);
+    window.gtag('event', 'purchase', {
+      transaction_id: String(transactionId || ''), value, currency: 'MXN',
+      items: [{ item_id: plan || 'cotizador', item_name: plan || 'cotizador', price: value, quantity: 1 }],
+    });
     window.gtag('event', 'conversion', {
       send_to: destinations.purchase,
       value,
@@ -32,6 +36,8 @@ export function trackGoogleAdsPurchase(externalReference, transactionId) {
 export function trackGoogleAdsConversion(action) {
   const sendTo = destinations[action];
   if (!sendTo || typeof window.gtag !== 'function') return;
+  // Evento equivalente para GA4 (para poder marcarlo como evento clave)
+  try { window.gtag('event', action === 'lead' ? 'generate_lead' : 'sign_up', { currency: 'MXN', value: 0 }); } catch (e) {}
   try {
     window.gtag('event', 'conversion', {
       send_to: sendTo,
