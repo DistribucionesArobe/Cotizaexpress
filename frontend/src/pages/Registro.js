@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 import { trackGoogleAdsConversion, trackTrialStarted } from '../lib/googleAdsConversions';
-import { getAcquisition, acquisitionRegion } from '../lib/acquisition';
+import { getAcquisition, acquisitionRegion, registrationTrialPlan } from '../lib/acquisition';
 
 export default function Registro() {
   const navigate = useNavigate();
@@ -18,8 +18,8 @@ export default function Registro() {
   const acquisition = getAcquisition();
   const esUSA = acquisitionRegion(acquisition, (searchParams.get('utm_source') || '').startsWith('usa') ? 'US' : 'MX') === 'US';
   // ¿Viene a buscar el bot de WhatsApp? Solo entonces va al wizard
-  const planUrl = (searchParams.get('plan') || '').toLowerCase();
-  const quiereBot = /bot/.test((searchParams.get('utm_source') || '') + (searchParams.get('utm_campaign') || '')) || searchParams.get('intent') === 'bot' || planUrl === 'cotizabot' || planUrl === 'pro';
+  const planUrl = registrationTrialPlan();
+  const quiereBot = planUrl === 'cotizabot' || planUrl === 'pro';
   const [formData, setFormData] = useState({
     email: '',
     password: '',
