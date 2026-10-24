@@ -67,6 +67,11 @@ export default function Cotizador() {
     if (!paywall) return;
     axios.get(`${API}/pagos/oferta-intro`, { withCredentials: true }).then(r => setOfertaIntro(r.data)).catch(() => setOfertaIntro(null));
   }, [paywall]);
+  const [prueba, setPrueba] = useState(null);
+  useEffect(() => {
+    axios.get(`${API}/pagos/prueba`, { withCredentials: true }).then(r => setPrueba(r.data)).catch(() => {});
+    axios.get(`${API}/pagos/oferta-intro`, { withCredentials: true }).then(r => setOfertaIntro(r.data)).catch(() => {});
+  }, []);
   const pagarIntro = async () => {
     setPagando(true);
     evento('checkout_iniciado');
@@ -296,6 +301,18 @@ export default function Cotizador() {
           <h2 className="text-2xl font-bold text-slate-900">Cotizador IA</h2>
           <p className="text-slate-600 text-sm">Captura tu cotización como en Excel — o pega la lista del cliente (o un screenshot) y la IA la llena por ti.</p>
           <p className="text-xs text-violet-700 mt-1 font-medium">Plan Cotizador IA: cotizaciones ilimitadas por {esUS ? "$29 USD/mes" : "$299/mes"} · <a href="/precios" className="underline">ver planes</a></p>
+          {prueba?.activa && (
+            <div className="mt-3 flex flex-wrap items-center gap-2 bg-amber-50 border border-amber-300 rounded-xl px-3 py-2 text-sm">
+              <span>🧪 <strong>Prueba gratis:</strong> te quedan <strong>{prueba.dias_restantes} día(s)</strong> de cotizaciones ilimitadas. Al terminar se corta.</span>
+              {ofertaIntro?.disponible ? (
+                <button onClick={pagarIntro} disabled={pagando} className="ml-auto bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-lg px-3 py-1">
+                  {pagando ? 'Abriendo…' : `Seguir por ${esUS ? '$9 USD' : '$99'} el 1er mes`}
+                </button>
+              ) : (
+                <a href="/precios" className="ml-auto underline font-semibold text-violet-700">Activar mi plan</a>
+              )}
+            </div>
+          )}
 
         </div>
       </div>
@@ -588,7 +605,7 @@ export default function Cotizador() {
         <Card ref={resultRef} className="border-violet-300 bg-gradient-to-br from-violet-50 to-purple-50">
           <CardContent className="pt-8 pb-8 text-center space-y-4">
             <p className="text-3xl">🎉</p>
-            <p className="text-xl font-bold text-slate-900">¿Te gustó? Esa fue tu cotización gratis del mes.</p>
+            <p className="text-xl font-bold text-slate-900">{prueba?.usada ? 'Terminó tu prueba de 7 días.' : '¿Te gustó? Esa fue tu cotización gratis del mes.'}</p>
             <p className="text-slate-600 max-w-md mx-auto">
               Con el <strong>Plan Cotizador IA ({esUS ? "$29 USD/mes" : "$299/mes"})</strong> haces {esUS ? "estimates ilimitados" : "cotizaciones ilimitadas"}
               con tu logo, folio y PDF — y te ahorras horas cada semana.

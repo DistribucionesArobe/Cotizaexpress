@@ -24,6 +24,23 @@ export default function Precios() {
     axios.get(`${API}/pagos/oferta-intro`, { withCredentials: true }).then(r => setOfertaIntro(!!r.data.disponible)).catch(() => {});
   }, [isAuthenticated]);
 
+  const [prueba, setPrueba] = useState(null);
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    axios.get(`${API}/pagos/prueba`, { withCredentials: true }).then(r => setPrueba(r.data)).catch(() => {});
+  }, [isAuthenticated]);
+  const iniciarPrueba = async (planId) => {
+    setLoading(planId);
+    try {
+      const r = await axios.post(`${API}/pagos/iniciar-prueba`, { plan: planCheckout(planId) }, { withCredentials: true });
+      evento('prueba_iniciada');
+      toast.success(`¡Listo! Tienes ${r.data.dias} días gratis de ${planId === 'cotizador' ? 'Cotizador IA' : 'CotizaBot'}`);
+      window.location.href = planId === 'cotizador' ? '/cotizador' : '/onboarding';
+    } catch (e) {
+      toast.error(e?.response?.data?.detail || 'No se pudo activar la prueba');
+    } finally { setLoading(null); }
+  };
+
   const handleUpgrade = async (planId) => {
     evento('checkout_iniciado');
     if (!isAuthenticated) {
@@ -178,6 +195,13 @@ export default function Precios() {
             </p>
           </div>
 
+          <p className="text-center -mt-8 mb-10 text-emerald-700 font-semibold">✅ Prueba cualquier plan 7 días gratis · sin tarjeta · al terminar se corta y decides si pagas</p>
+          {prueba?.activa && (
+            <div className="max-w-2xl mx-auto mb-6 bg-emerald-50 border-2 border-emerald-300 rounded-2xl p-4 text-center">
+              <p className="font-bold text-slate-900">🧪 Estás probando {prueba.plan?.startsWith('cotizador') ? 'Cotizador IA' : 'CotizaBot'} — te quedan {prueba.dias_restantes} día(s)</p>
+              <p className="text-sm text-slate-600">Al terminar, tu cuenta pasa al plan gratis. Actívalo antes para no cortar.</p>
+            </div>
+          )}
           {ofertaIntro && (
             <div className="max-w-2xl mx-auto mb-10 bg-amber-50 border-2 border-amber-300 rounded-2xl p-5 text-center">
               <p className="text-sm font-bold text-amber-800">🎁 Oferta de bienvenida para tu cuenta</p>
@@ -192,7 +216,7 @@ export default function Precios() {
           {/* Pricing Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {planes.map((plan) => {
-              const esActual = planActual === plan.id;
+              const esActual = planActual === plan.id && !prueba?.activa;
               const esDestacado = plan.destacado;
               const esPopular = plan.popular;
               
@@ -272,7 +296,18 @@ export default function Precios() {
                           Plan Activo
                         </Button>
                       ) : (
-                        isAuthenticated ? (
+                        isAuthenticated && prueba?.disponible && !(prueba?.activa && planActual === plan.id) ? (
+                          <div className="space-y-2">
+                            <Button
+                              className={`w-full ${esDestacado ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-600 hover:bg-emerald-700'}`}
+                              onClick={() => iniciarPrueba(plan.id)}
+                              disabled={loading === plan.id}
+                            >
+                              {loading === plan.id ? 'Activando…' : (prueba?.activa ? `Cambiar mi prueba a este plan` : 'Probar 7 días gratis')}
+                            </Button>
+                            <button onClick={() => handleUpgrade(plan.id)} className="w-full text-xs text-slate-500 underline">o actívalo ya</button>
+                          </div>
+                        ) : isAuthenticated ? (
                           <Button 
                             className={`w-full ${esDestacado ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-600 hover:bg-emerald-700'}`}
                             onClick={() => handleUpgrade(plan.id)}
@@ -291,10 +326,11 @@ export default function Precios() {
                             )}
                           </Button>
                         ) : (
-                          <Link to="/registro" className="block">
+                          <Link to={`/registro?plan=${plan.id}`} className="block">
                             <Button className={`w-full ${esDestacado ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-600 hover:bg-emerald-700'}`}>
-                              {plan.btnTexto}
+                              Probar 7 días gratis
                             </Button>
+                            <p className="text-[11px] text-slate-400 mt-1 text-center">Sin tarjeta · al terminar se corta, pagas solo si quieres seguir</p>
                           </Link>
                         )
                       )}

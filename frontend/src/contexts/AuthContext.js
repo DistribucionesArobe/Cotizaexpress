@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   // ✅ Registro (backend: /api/auth/register)
-  const registro = async ({ email, password, promo_code, referral_code, signup_source, empresa_nombre, whatsapp }) => {
+  const registro = async ({ email, password, promo_code, referral_code, signup_source, empresa_nombre, whatsapp, plan_prueba }) => {
     try {
       const payload = { email, password };
       if (promo_code && promo_code.trim()) payload.promo_code = promo_code.trim();
@@ -48,6 +48,7 @@ export const AuthProvider = ({ children }) => {
       if (signup_source) payload.signup_source = signup_source;
       if (empresa_nombre && empresa_nombre.trim()) payload.empresa_nombre = empresa_nombre.trim();
       if (whatsapp && whatsapp.replace(/\D/g, '').length >= 10) payload.whatsapp = whatsapp;
+      if (plan_prueba) payload.plan_prueba = plan_prueba;
       await axios.post(
         `${API}/auth/register`,
         payload,

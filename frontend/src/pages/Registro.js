@@ -16,7 +16,8 @@ export default function Registro() {
   const referralCode = searchParams.get('ref') || '';
   const esUSA = (searchParams.get('utm_source') || '').startsWith('usa');
   // ¿Viene a buscar el bot de WhatsApp? Solo entonces va al wizard
-  const quiereBot = /bot/.test((searchParams.get('utm_source') || '') + (searchParams.get('utm_campaign') || '')) || searchParams.get('intent') === 'bot';
+  const planUrl = (searchParams.get('plan') || '').toLowerCase();
+  const quiereBot = /bot/.test((searchParams.get('utm_source') || '') + (searchParams.get('utm_campaign') || '')) || searchParams.get('intent') === 'bot' || planUrl === 'cotizabot' || planUrl === 'pro';
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -92,7 +93,7 @@ export default function Registro() {
       return;
     }
 
-    const result = await registro({ ...formData, referral_code: referralCode, signup_source: searchParams.get('utm_source') || (referralCode ? 'referido' : 'directo'), whatsapp: (esUSA && formData.telefono.replace(/\D/g, '').length === 10 ? '1' : '') + formData.telefono });
+    const result = await registro({ ...formData, referral_code: referralCode, signup_source: searchParams.get('utm_source') || (referralCode ? 'referido' : 'directo'), plan_prueba: (['cotizabot','pro'].includes(planUrl) ? planUrl : (quiereBot ? 'cotizabot' : 'cotizador')) + (esUSA ? '_usa' : ''), whatsapp: (esUSA && formData.telefono.replace(/\D/g, '').length === 10 ? '1' : '') + formData.telefono });
     if (result?.success && window.fbq) { try { window.fbq('track', 'CompleteRegistration'); } catch (e) {} }
 
     if (result.success) {
@@ -135,7 +136,7 @@ export default function Registro() {
             </div>
           </Link>
           <h1 className="text-3xl font-bold text-slate-900 mb-2">{esUSA ? 'Crea tu cuenta y haz tu primer estimate' : (quiereBot ? 'Crea tu bot en 2 minutos' : 'Crea tu cuenta y haz tu cotización')}</h1>
-          <p className="text-slate-600">{esUSA ? 'Gratis · sin tarjeta · tu primer estimate en 2 minutos' : 'Gratis · sin tarjeta · solo 3 datos'}</p>
+          <p className="text-slate-600">{esUSA ? '7 días gratis ilimitado · sin tarjeta · tu primer estimate en 2 minutos' : `🎁 7 días gratis de ${quiereBot ? 'CotizaBot' : 'Cotizador IA'} ilimitado · sin tarjeta · solo 3 datos`}</p>
           {referralCode && (
             <div className="mt-3 inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 text-sm font-medium px-4 py-2 rounded-full border border-emerald-200">
               <span>Referido por un afiliado</span>

@@ -187,8 +187,8 @@ export default function GeneradorCotizaciones() {
       </nav>
 
       {/* Franja de oferta (coincide con los anuncios de Google) */}
-      <a href="/precios?utm_source=generador_franja" className="print:hidden block bg-amber-400 hover:bg-amber-300 text-slate-900 text-center text-sm sm:text-base font-semibold px-4 py-2">
-        🎁 ¿Cotizas seguido? <strong>Primer mes ilimitado a $99</strong> · después $299/mes, sin cargos automáticos →
+      <a href="/registro?utm_source=generador_franja" className="print:hidden block bg-amber-400 hover:bg-amber-300 text-slate-900 text-center text-sm sm:text-base font-semibold px-4 py-2">
+        🎁 ¿Cotizas seguido? <strong>Prueba 7 días ilimitado gratis</strong> · después primer mes a $99, sin cargos automáticos →
       </a>
 
       {/* Hero para tráfico de anuncios */}
@@ -239,11 +239,11 @@ export default function GeneradorCotizaciones() {
             {limiteGen ? (
               <div className="space-y-3">
                 <p className="text-lg font-bold text-slate-900">Ya usaste tus 3 cotizaciones gratis de este mes 🙌</p>
-                <p className="text-slate-600 text-sm">Crea tu cuenta gratis y sigue cotizando con folio, tu logo y la lista que te manda tu cliente llenándose sola.</p>
+                <p className="text-slate-600 text-sm">Crea tu cuenta y tienes 7 días de cotizaciones ilimitadas gratis: folio, tu logo y la lista de tu cliente llenándose sola.</p>
                 <a href={`/registro?utm_source=generador_limite${leadEmail ? '' : ''}`} onClick={() => { try { if (leadEmail) localStorage.setItem('generador_email', leadEmail); } catch (e) {} }}>
                   <Button size="lg" className="w-full bg-emerald-600 hover:bg-emerald-700 font-bold py-5">Crear mi cuenta gratis →</Button>
                 </a>
-                <p className="text-xs text-slate-400">🎁 Con tu cuenta, el primer mes ilimitado cuesta solo $99.</p>
+                <p className="text-xs text-slate-400">🎁 7 días gratis sin tarjeta. Después, tu primer mes cuesta solo $99.</p>
               </div>
             ) : !leadLink ? (
               <>
@@ -263,7 +263,7 @@ export default function GeneradorCotizaciones() {
                 </form>
                 <a href="/registro?utm_source=generador" onClick={() => { try { if (leadEmail) localStorage.setItem('generador_email', leadEmail); } catch (e) {} }}>
                   <Button size="lg" variant="outline" className="w-full border-emerald-600 text-emerald-700 font-bold py-5">
-                    O crea tu cuenta gratis y guárdala con folio →
+                    O crea tu cuenta: 7 días ilimitado gratis →
                   </Button>
                 </a>
               </>
@@ -277,7 +277,7 @@ export default function GeneradorCotizaciones() {
                   <Button variant="outline" className="w-full py-5 font-bold mt-3">📲 Mandársela a mi cliente por WhatsApp</Button>
                 </a>
                 <div className="bg-emerald-50 rounded-2xl p-4 mt-2">
-                  <p className="text-sm text-slate-700 mb-3">La próxima, pega la lista de tu cliente o súbele un screenshot y se llena sola — con tu cuenta gratis.</p>
+                  <p className="text-sm text-slate-700 mb-3">La próxima, pega la lista de tu cliente o súbele un screenshot y se llena sola. Crea tu cuenta y pruébalo 7 días ilimitado, gratis.</p>
                   <a href="/registro?utm_source=generador_post_pdf">
                     <Button className="w-full bg-emerald-600 hover:bg-emerald-700 font-bold">Crear mi cuenta gratis →</Button>
                   </a>
