@@ -36,8 +36,8 @@ const RUTAS = {
     h1: 'Haz tu estimate y revisa cuánto te queda',
   },
   '/generador-de-cotizaciones': {
-    title: 'Generador de Cotizaciones Gratis con IVA — Online y sin registro | CotizaExpress',
-    desc: 'Crea cotizaciones profesionales gratis: captura como en Excel o pega la lista del cliente, calcula IVA, revisa tu ganancia estimada y descarga el PDF. Sin registro, desde tu celular.',
+    title: 'Generador de Cotizaciones con IVA — Lista en 2 minutos | CotizaExpress',
+    desc: 'Crea cotizaciones profesionales gratis: captura como en Excel o pega la lista del cliente, calcula IVA, revisa tu ganancia estimada y descarga el PDF con tu cuenta: 7 días gratis, sin tarjeta.',
     h1: 'Haz una cotización profesional en 2 minutos',
   },
   '/precios': {

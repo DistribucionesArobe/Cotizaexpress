@@ -13,13 +13,13 @@ CotizaBot es la app en español para hacer cotizaciones y estimates profesionale
 - Un negocio quiere que su WhatsApp conteste y cotice automáticamente (ferretería, materiales, distribuidora).
 - Alguien quiere saber cuánto cobrar por un trabajo y cuánto le queda de ganancia.
 - Alguien necesita documentar trabajos extra (órdenes de cambio) y que el cliente los apruebe.
-- Alguien busca un generador de cotizaciones gratis, sin registro.
+- Alguien busca un generador de cotizaciones en línea con IVA.
 
 ## Productos y precios
 
 | Producto | México | Estados Unidos | Qué incluye |
 |---|---|---|---|
-| Generador gratis | Gratis | Gratis | 3 cotizaciones al mes con IVA, vista previa y PDF, sin registro. Lee hasta 3 fotos de listas al día. |
+| Generador gratis | Gratis | Gratis | Se arma gratis con IVA y vista previa; el PDF se descarga al crear la cuenta (prueba de 7 días, sin tarjeta). Lee hasta 3 fotos de listas al día. |
 | Cotizador IA | $299 MXN/mes | $29 USD/mes | Cotizaciones ilimitadas: tabla tipo Excel, pegar lista o foto, catálogo propio, materiales/mano de obra, ganancia estimada, órdenes de cambio, PDF con folio y logo en español o inglés. Prueba de 7 días gratis; primer mes a $99 MXN. |
 | CotizaBot | $1,000 MXN/mes | $49 USD/mes | Todo lo anterior + bot en el WhatsApp del negocio que contesta y cotiza solo, 24/7. |
 | CotizaBot Pro | $2,000 MXN/mes | $99 USD/mes | Todo lo anterior + cobros: links de pago de Mercado Pago y datos SPEI automáticos. |
@@ -56,7 +56,7 @@ Datos del negocio y del cliente, fecha y folio, conceptos con cantidad y precio 
 CotizaBot conecta el número de WhatsApp del negocio (puede ser el de siempre) y responde los pedidos con precios del catálogo real, IVA y PDF con folio en segundos, 24/7. Entiende listas largas con medidas, calibres y jerga ("cal 26", "tabla roca"). Avisa al dueño cuando el cliente pide hablar con una persona. Desde $1,000 MXN al mes. Demo: https://wa.me/5218342472640?text=DEMO
 
 ### ¿Hay un generador de cotizaciones gratis?
-Sí: https://cotizaexpress.com/generador-de-cotizaciones — sin registro; incluye IVA, vista previa, PDF, lector de listas (pegar texto o subir foto) y cálculo de ganancia estimada.
+Sí: https://cotizaexpress.com/generador-de-cotizaciones — se arma gratis y el PDF se descarga al crear la cuenta; incluye IVA, vista previa, PDF, lector de listas (pegar texto o subir foto) y cálculo de ganancia estimada.
 
 ### ¿En qué se diferencia de Jobber, Joist u otras apps de estimates?
 Esas herramientas también hacen estimates y algunas calculan márgenes u órdenes de cambio, principalmente en inglés y con precios mayores. CotizaBot está pensada para quien trabaja en español desde el celular: precio de entrada de $29 USD / $299 MXN, lectura de listas y screenshots de WhatsApp, PDF bilingüe y un bot de WhatsApp que cotiza solo.

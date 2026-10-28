@@ -20,6 +20,7 @@ export default function Registro() {
   // ¿Viene a buscar el bot de WhatsApp? Solo entonces va al wizard
   const planUrl = registrationTrialPlan();
   const quiereBot = planUrl === 'cotizabot' || planUrl === 'pro';
+  const vieneDePdf = (searchParams.get('utm_source') || '') === 'generador_pdf';
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -138,7 +139,8 @@ export default function Registro() {
               <span className="text-xs text-slate-400">by CotizaExpress</span>
             </div>
           </Link>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">{esUSA ? 'Crea tu cuenta y haz tu primer estimate' : (quiereBot ? 'Prueba tu bot de cotizaciones' : 'Crea tu cuenta y haz tu cotización')}</h1>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">{esUSA ? 'Crea tu cuenta y haz tu primer estimate' : (quiereBot ? 'Prueba tu bot de cotizaciones' : (vieneDePdf ? '📄 Tu cotización está lista' : 'Crea tu cuenta y haz tu cotización'))}</h1>
+          {vieneDePdf && <p className="text-slate-700 font-medium mb-1">Crea tu cuenta y la descargas en PDF con folio. Ya quedó guardada.</p>}
           <p className="text-slate-600">{esUSA ? '7 días gratis ilimitado · sin tarjeta · tu primer estimate en 2 minutos' : `🎁 7 días gratis de ${quiereBot ? 'CotizaBot' : 'Cotizador IA'} ilimitado · sin tarjeta · solo 3 datos`}</p>
           {referralCode && (
             <div className="mt-3 inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 text-sm font-medium px-4 py-2 rounded-full border border-emerald-200">

@@ -1,3 +1,4 @@
+import { evento } from '@/lib/evento';
 import { useState, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
@@ -11,9 +12,9 @@ const hoy = () => new Date().toLocaleDateString('es-MX', { day: '2-digit', month
 const genFolio = () => 'COT-' + Math.random().toString(36).slice(2, 8).toUpperCase();
 
 const FAQS = [
-  { q: '¿Este generador de cotizaciones es gratis?', a: 'Sí, totalmente gratis y sin registro. Llenas los datos, agregas tus productos y descargas o imprimes tu cotización en PDF al momento.' },
+  { q: '¿Este generador de cotizaciones es gratis?', a: 'Sí. Armas tu cotización gratis y, para descargarla en PDF, creas tu cuenta en 30 segundos: tienes 7 días ilimitados gratis, sin tarjeta.' },
   { q: '¿Qué debe llevar una cotización?', a: 'Los datos de tu negocio, los del cliente, la fecha, el detalle de productos con cantidades y precios, el subtotal, el IVA desglosado, el total y una vigencia. Este generador incluye todo eso automáticamente.' },
-  { q: '¿Cómo descargo la cotización en PDF?', a: 'Haz clic en "Descargar PDF". Se abre la vista de impresión de tu navegador: elige "Guardar como PDF" como destino y listo.' },
+  { q: '¿Cómo descargo la cotización en PDF?', a: 'Haz clic en "Descargar mi cotización" y crea tu cuenta. Tu cotización pasa a tu cuenta con folio y la descargas o la mandas por WhatsApp.' },
   { q: '¿Puedo automatizar mis cotizaciones por WhatsApp?', a: 'Sí. Si haces cotizaciones todos los días, CotizaBot las genera automáticamente en tu WhatsApp: el cliente manda su lista y recibe la cotización con IVA y PDF en 3 segundos, las 24 horas.' },
 ];
 
@@ -150,11 +151,11 @@ export default function GeneradorCotizaciones() {
   return (
     <div className="min-h-screen bg-slate-50">
       <Helmet>
-        <title>Generador de Cotizaciones Gratis con IVA — Online y sin registro | CotizaExpress</title>
-        <meta name="description" content="Crea cotizaciones profesionales gratis: agrega tus productos, calcula IVA al 16% automáticamente y descarga el PDF. Sin registro, desde tu celular o computadora." />
+        <title>Generador de Cotizaciones con IVA — Hazla en 2 minutos | CotizaExpress</title>
+        <meta name="description" content="Crea cotizaciones profesionales gratis: agrega tus productos, calcula IVA al 16% automáticamente y descarga el PDF con tu cuenta (7 días gratis, sin tarjeta), desde tu celular." />
         <link rel="canonical" href="https://cotizaexpress.com/generador-de-cotizaciones" />
         <meta property="og:title" content="Generador de Cotizaciones Gratis con IVA" />
-        <meta property="og:description" content="Crea una cotización profesional con IVA y descárgala en PDF. Gratis y sin registro." />
+        <meta property="og:description" content="Crea una cotización profesional con IVA y descárgala en PDF. 7 días gratis, sin tarjeta." />
         <meta property="og:url" content="https://cotizaexpress.com/generador-de-cotizaciones" />
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(appJsonLd)}</script>
@@ -195,7 +196,7 @@ export default function GeneradorCotizaciones() {
       <section className="print:hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-700 text-white">
         <div className="max-w-5xl mx-auto px-4 py-12 sm:py-16 text-center">
           <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur rounded-full px-4 py-1.5 text-sm font-medium mb-5">
-            ⚡ 3 cotizaciones gratis al mes · sin registro · sin tarjeta
+            ⚡ Gratis 7 días · sin tarjeta · lista en 2 minutos
           </div>
           <h1 className="text-4xl sm:text-5xl font-extrabold mb-4 leading-tight">
             Haz una cotización profesional<br className="hidden sm:block"/> en <span className="text-yellow-300">2 minutos</span>
@@ -211,7 +212,7 @@ export default function GeneradorCotizaciones() {
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-6 text-sm text-emerald-100">
             <span>✅ IVA al 16% automático</span>
             <span>✅ Se ve profesional</span>
-            <span>✅ Imprime o guarda en PDF</span>
+            <span>✅ PDF con folio para WhatsApp</span>
             <span>💰 Revisa cuánto te queda</span>
           </div>
         </div>
@@ -232,65 +233,19 @@ export default function GeneradorCotizaciones() {
           <div className="bg-white rounded-3xl p-7 max-w-md w-full text-center" onClick={(e) => e.stopPropagation()}>
             <p className="text-4xl mb-2">🎉</p>
             <p className="text-2xl font-extrabold text-slate-900 mb-2">¡Tu cotización está lista!</p>
-            <p className="text-slate-600 mb-5">
-              Esto lo capturaste a mano. Con tu cuenta <strong>gratis</strong>, solo pegas la lista de tu cliente
-              y <strong>la IA la cotiza por ti</strong> — con folio, tu logo y PDF de verdad, lista para WhatsApp.
+            <p className="text-slate-600 mb-4">
+              Crea tu cuenta para <strong>descargarla en PDF</strong> y mandarla por WhatsApp. Toma 30 segundos.
             </p>
-            {limiteGen ? (
-              <div className="space-y-3">
-                <p className="text-lg font-bold text-slate-900">Ya usaste tus 3 cotizaciones gratis de este mes 🙌</p>
-                <p className="text-slate-600 text-sm">Crea tu cuenta y tienes 7 días de cotizaciones ilimitadas gratis: folio, tu logo y la lista de tu cliente llenándose sola.</p>
-                <a href={`/registro?utm_source=generador_limite${leadEmail ? '' : ''}`} onClick={() => { try { if (leadEmail) localStorage.setItem('generador_email', leadEmail); } catch (e) {} }}>
-                  <Button size="lg" className="w-full bg-emerald-600 hover:bg-emerald-700 font-bold py-5">Crear mi cuenta gratis →</Button>
-                </a>
-                <p className="text-xs text-slate-400">🎁 7 días gratis sin tarjeta. Después, tu primer mes cuesta solo $99.</p>
-              </div>
-            ) : !leadLink ? (
-              <>
-                <form onSubmit={mandarCotizacion} className="text-left bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-4">
-                  <p className="font-bold text-slate-900 mb-1">📲 ¿A qué WhatsApp te la mando?</p>
-                  <p className="text-xs text-slate-500 mb-2">Ahí te llega el link de tu PDF y te ayudamos si te atoras.</p>
-                  <input type="tel" inputMode="numeric" value={leadWa} onChange={(e) => setLeadWa(e.target.value.replace(/[^\d+ ]/g, '').slice(0, 16))}
-                    placeholder="Ej: 81 1234 5678" required={!leadEmail}
-                    className="w-full px-4 py-3 border-2 border-emerald-300 rounded-xl text-lg mb-2 focus:border-emerald-500" />
-                  <input type="email" value={leadEmail} onChange={(e) => setLeadEmail(e.target.value)} placeholder="Correo (opcional, para una copia)"
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm mb-3" />
-                  {leadError && <p className="text-sm text-red-600 mb-2">{leadError}</p>}
-                  <Button type="submit" disabled={leadEnviando} className="w-full bg-[#25D366] hover:bg-[#1ebe57] py-5 font-bold text-base">
-                    {leadEnviando ? 'Preparando...' : 'Ver mi cotización en PDF →'}
-                  </Button>
-                  <p className="text-[11px] text-slate-400 mt-2 text-center">Sin spam. Solo tu cotización y ayuda si la necesitas.</p>
-                </form>
-                <a href="/registro?utm_source=generador" onClick={() => { try { if (leadEmail) localStorage.setItem('generador_email', leadEmail); } catch (e) {} }}>
-                  <Button size="lg" variant="outline" className="w-full border-emerald-600 text-emerald-700 font-bold py-5">
-                    O crea tu cuenta: 7 días ilimitado gratis →
-                  </Button>
-                </a>
-              </>
-            ) : (
-              <div className="space-y-3">
-                <p className="text-emerald-700 font-semibold">✅ ¡Lista tu cotización!{leadEmail ? ` Te mandamos copia a ${leadEmail}` : ''}</p>
-                <a href={leadLink} target="_blank" rel="noopener noreferrer">
-                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 py-5 font-bold">📄 Abrir mi PDF</Button>
-                </a>
-                <a href={`https://wa.me/?text=${encodeURIComponent('Te comparto la cotización: ' + leadLink)}`} target="_blank" rel="noopener noreferrer">
-                  <Button variant="outline" className="w-full py-5 font-bold mt-3">📲 Mandársela a mi cliente por WhatsApp</Button>
-                </a>
-                <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mt-2 text-left">
-                  <p className="font-bold text-slate-900 mb-2">💾 ¿La vas a volver a usar?</p>
-                  <ul className="text-sm text-slate-700 space-y-1 mb-3">
-                    <li>✅ <strong>Guarda esta cotización</strong> con folio en tu cuenta</li>
-                    <li>✅ <strong>Reutilízala</strong>: cambia cliente o cantidades y mándala otra vez</li>
-                    <li>✅ Sale con <strong>tu logo</strong> y tus precios guardados</li>
-                    <li>✅ La próxima, pega la lista del cliente y se llena sola</li>
-                  </ul>
-                  <a href="/registro?utm_source=generador_post_pdf" onClick={() => { guardarBorrador(); try { if (leadEmail) localStorage.setItem('generador_email', leadEmail); } catch (e) {} }}>
-                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 font-bold">Guardar esta cotización en mi cuenta →</Button>
-                  </a>
-                  <p className="text-[11px] text-slate-500 text-center mt-2">Gratis 7 días con todo ilimitado · sin tarjeta</p>
-                </div>
-              </div>
-            )}
+            <ul className="text-left text-sm text-slate-700 space-y-1.5 mb-5 bg-emerald-50 border border-emerald-200 rounded-2xl p-4">
+              <li>✅ Tu PDF con <strong>folio y tu logo</strong>, listo para el cliente</li>
+              <li>✅ Queda <strong>guardada</strong>: la reutilizas con otro cliente</li>
+              <li>✅ La próxima, pega la lista o una foto y <strong>se llena sola</strong></li>
+              <li>🎁 <strong>7 días ilimitado gratis</strong>, sin tarjeta</li>
+            </ul>
+            <a href="/registro?utm_source=generador_pdf" onClick={() => { guardarBorrador(); evento('generador_a_registro'); }}>
+              <Button size="lg" className="w-full bg-emerald-600 hover:bg-emerald-700 font-bold py-6 text-base">Crear mi cuenta y descargar mi PDF →</Button>
+            </a>
+            <a href="/login?next=/cotizador" onClick={() => guardarBorrador()} className="block text-sm text-slate-500 underline mt-3">¿Ya tienes cuenta? Entra y descárgala</a>
           </div>
         </div>
       )}
