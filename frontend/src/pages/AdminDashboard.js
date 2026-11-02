@@ -43,6 +43,63 @@ function PlanBadge({ plan }) {
   return <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${c.cls}`}>{c.label}</span>;
 }
 
+function ProspectosCorreo() {
+  const [lista, setLista] = useState([]);
+  const [resumen, setResumen] = useState({});
+  const [sel, setSel] = useState({});
+  const [abierto, setAbierto] = useState(null);
+  const [enviando, setEnviando] = useState(false);
+  const cargar = () => axios.get(`${API}/admin/prospectos?estado=pendiente`, { withCredentials: true })
+    .then(r => { setLista(r.data.prospectos || []); setResumen(r.data.resumen || {}); setSel({}); }).catch(() => {});
+  useEffect(() => { cargar(); }, []);
+  const ids = Object.keys(sel).filter(k => sel[k]).map(Number);
+  const accion = async (accion, lista_ids) => {
+    if (!lista_ids.length) return;
+    if (accion === 'enviar' && !window.confirm(`¿Mandar ${lista_ids.length} correo(s) desde contacto@arobegroup.com?`)) return;
+    setEnviando(true);
+    try {
+      const r = await axios.post(`${API}/admin/prospectos/accion`, { ids: lista_ids, accion }, { withCredentials: true });
+      toast.success(accion === 'enviar' ? `Enviados: ${r.data.enviados}${r.data.fallidos ? ` · fallaron ${r.data.fallidos}` : ''}` : 'Descartados');
+      cargar();
+    } catch (e) { toast.error(e?.response?.data?.detail || 'Error'); } finally { setEnviando(false); }
+  };
+  return (
+    <Card className="mb-6">
+      <CardHeader><CardTitle>✉️ Prospectos por correo — ferreterías y distribuidoras</CardTitle></CardHeader>
+      <CardContent>
+        <p className="text-sm text-slate-600 mb-3">
+          Cada mañana se agregan borradores nuevos. Revísalos y manda los que te gusten (salen de contacto@arobegroup.com, con link para darse de baja).
+          {' '}Pendientes: <b>{resumen.pendiente || 0}</b> · Enviados: <b>{resumen.enviado || 0}</b> · Bajas: <b>{resumen.baja || 0}</b> · Descartados: <b>{resumen.descartado || 0}</b>
+        </p>
+        {lista.length === 0 ? <p className="text-sm text-slate-500">No hay borradores pendientes.</p> : (
+          <>
+            <div className="flex flex-wrap gap-2 mb-3">
+              <Button size="sm" variant="outline" onClick={() => setSel(Object.fromEntries(lista.map(p => [p.id, true])))}>Seleccionar todos</Button>
+              <Button size="sm" disabled={enviando || !ids.length} className="bg-emerald-600 hover:bg-emerald-700" onClick={() => accion('enviar', ids)}>Mandar seleccionados ({ids.length})</Button>
+              <Button size="sm" variant="outline" disabled={enviando || !ids.length} onClick={() => accion('descartar', ids)}>Descartar seleccionados</Button>
+            </div>
+            <div className="space-y-2">
+              {lista.map(p => (
+                <div key={p.id} className="border rounded-lg p-3 text-sm">
+                  <div className="flex items-start gap-3">
+                    <input type="checkbox" className="mt-1" checked={!!sel[p.id]} onChange={e => setSel({ ...sel, [p.id]: e.target.checked })} />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold">{p.empresa} <span className="font-normal text-slate-500">· {p.ciudad} · {p.giro}</span></div>
+                      <div className="text-slate-600 truncate">{p.correo} {p.fuente_url && <a href={p.fuente_url} target="_blank" rel="noopener noreferrer" className="underline ml-1">fuente</a>}</div>
+                      <button className="text-violet-700 underline text-xs mt-1" onClick={() => setAbierto(abierto === p.id ? null : p.id)}>{abierto === p.id ? 'Ocultar' : 'Ver correo'}: {p.asunto}</button>
+                      {abierto === p.id && <pre className="whitespace-pre-wrap bg-slate-50 rounded p-2 mt-2 text-xs font-sans">{p.cuerpo}</pre>}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 function SeguimientoWA() {
   const [lista, setLista] = useState(null);
   useEffect(() => {
@@ -369,6 +426,7 @@ export default function AdminDashboard() {
         </CardContent>
       </Card>
 
+      <ProspectosCorreo />
       <SeguimientoWA />
       <LeadsGenerador />
 
