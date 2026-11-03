@@ -52,6 +52,23 @@ function ProspectosCorreo() {
   const cargar = () => axios.get(`${API}/admin/prospectos?estado=pendiente`, { withCredentials: true })
     .then(r => { setLista(r.data.prospectos || []); setResumen(r.data.resumen || {}); setSel({}); }).catch(() => {});
   useEffect(() => { cargar(); }, []);
+  const [buscando, setBuscando] = useState(false);
+  const generar = async () => {
+    setBuscando(true);
+    try {
+      await axios.post(`${API}/admin/prospectos/generar`, {}, { withCredentials: true });
+      toast.info('Buscando negocios y verificando sus correos… tarda 2 a 5 minutos');
+      for (let i = 0; i < 40; i++) {
+        await new Promise(r => setTimeout(r, 10000));
+        const r = await axios.get(`${API}/admin/prospectos/generar`, { withCredentials: true });
+        if (!r.data.corriendo) {
+          toast.success(`Listo: ${r.data.ultimo?.nuevos || 0} borradores nuevos`);
+          break;
+        }
+      }
+      cargar();
+    } catch (e) { toast.error(e?.response?.data?.detail || 'No se pudo buscar'); } finally { setBuscando(false); }
+  };
   const ids = Object.keys(sel).filter(k => sel[k]).map(Number);
   const accion = async (accion, lista_ids) => {
     if (!lista_ids.length) return;
@@ -71,6 +88,10 @@ function ProspectosCorreo() {
           Cada mañana se agregan borradores nuevos. Revísalos y manda los que te gusten (salen de contacto@arobegroup.com, con link para darse de baja).
           {' '}Pendientes: <b>{resumen.pendiente || 0}</b> · Enviados: <b>{resumen.enviado || 0}</b> · Bajas: <b>{resumen.baja || 0}</b> · Descartados: <b>{resumen.descartado || 0}</b>
         </p>
+        <Button size="sm" className="mb-3 bg-violet-600 hover:bg-violet-700" disabled={buscando} onClick={generar}>
+          {buscando ? 'Buscando negocios… (2 a 5 min)' : '🔎 Buscar 15 prospectos más'}
+        </Button>
+        <p className="text-xs text-slate-500 mb-3">También se buscan 15 nuevos solos cada mañana (lunes a viernes). Solo se guardan correos que aparecen escritos en la página del negocio.</p>
         {lista.length === 0 ? <p className="text-sm text-slate-500">No hay borradores pendientes.</p> : (
           <>
             <div className="flex flex-wrap gap-2 mb-3">
