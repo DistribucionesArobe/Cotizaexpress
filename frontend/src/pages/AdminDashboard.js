@@ -265,7 +265,7 @@ export default function AdminDashboard() {
     return true;
   });
 
-  const paidCount = companies.filter(c => c.plan_code && c.plan_code !== 'free').length;
+  const paidCount = companies.filter(c => c.plan_code && !['free', 'owner'].includes(c.plan_code) && c.mp_payment_id).length;
   const trialCount = companies.filter(c => c.trial_end && new Date(c.trial_end) > new Date()).length;
 
   return (
@@ -310,7 +310,7 @@ export default function AdminDashboard() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">{stats?.suscripciones_activas || 0}</p>
-                <p className="text-xs text-slate-500">Con plan asignado</p>
+                <p className="text-xs text-slate-500">Clientes que pagaron</p>
               </div>
             </div>
           </CardContent>
@@ -474,7 +474,7 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-0.5">
               {[
                 { key: 'all', label: 'Todas' },
-                { key: 'paid', label: `Con plan asignado (${paidCount})` },
+                { key: 'paid', label: `Clientes que pagaron (${paidCount})` },
                 { key: 'trial', label: `Trial (${trialCount})` },
                 { key: 'free', label: 'Free' },
               ].map(f => (
