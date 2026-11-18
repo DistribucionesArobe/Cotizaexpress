@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
 import LandingPage from './pages/LandingPage';
+import Distribuidoras from './pages/Distribuidoras';
 import Registro from './pages/Registro';
 import Login from './pages/Login';
 import { RecuperarContrasena, RestablecerContrasena } from './pages/RecuperarContrasena';
@@ -283,6 +284,7 @@ function AppRoutes() {
           <Routes>
             {/* Rutas p\u00fablicas */}
             <Route path="/" element={<LandingPage />} />
+            <Route path="/distribuidoras" element={<Distribuidoras />} />
             <Route path="/registro" element={<Registro />} />
             <Route path="/login" element={<Login />} />
             <Route path="/recuperar-contrasena" element={<RecuperarContrasena />} />
