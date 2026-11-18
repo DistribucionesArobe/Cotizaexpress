@@ -40,6 +40,11 @@ const RUTAS = {
     desc: 'Crea cotizaciones profesionales gratis: captura como en Excel o pega la lista del cliente, calcula IVA, revisa tu ganancia estimada y descarga el PDF con tu cuenta: 7 días gratis, sin tarjeta.',
     h1: 'Haz una cotización profesional en 2 minutos',
   },
+  '/distribuidoras': {
+    title: 'CotizaBot para distribuidoras — Tus vendedores cotizan en segundos',
+    desc: 'Para distribuidoras de acero, tubería, eléctrico y ferretería industrial: el vendedor pega el pedido de WhatsApp y sale la cotización con tus precios, IVA y PDF en segundos. Tu cliente no habla con un robot.',
+    h1: 'Tus vendedores cotizan en segundos, no en horas',
+  },
   '/precios': {
     title: 'Precios CotizaBot — Cotizador desde $299 MXN · Bot de WhatsApp $1,000 MXN',
     desc: 'Cotizador IA $299 MXN/mes (USA $29 USD). CotizaBot, el bot de WhatsApp que cotiza solo, $1,000 MXN/mes. CotizaBot Pro con cobros $2,000 MXN/mes. Prueba cualquier plan 7 días gratis, sin tarjeta.',
