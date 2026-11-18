@@ -357,24 +357,39 @@ export default function LandingPage() {
       {/* Hero Section — carrusel de 2 productos */}
       <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-teal-50 py-10 sm:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Dos caminos: distribuidora con vendedores / contratista */}
+          <div className="grid sm:grid-cols-2 gap-4 mb-10 max-w-4xl mx-auto">
+            <Link to="/distribuidoras" className="block rounded-2xl border-2 border-emerald-500 bg-white p-5 shadow-sm hover:shadow-md transition">
+              <p className="text-xs font-bold text-emerald-700 mb-1">🏭 DISTRIBUIDORA O FERRETERÍA CON VENDEDORES</p>
+              <p className="font-extrabold text-slate-900 text-lg leading-snug">Tus vendedores cotizan en segundos</p>
+              <p className="text-sm text-slate-600 mt-1">Pegan el pedido de WhatsApp y sale la cotización con tus precios. El cliente sigue tratando con su vendedor.</p>
+              <p className="text-sm font-bold text-emerald-700 mt-2">Ver cómo funciona →</p>
+            </Link>
+            <Link to="/generador-de-cotizaciones" className="block rounded-2xl border-2 border-violet-400 bg-white p-5 shadow-sm hover:shadow-md transition">
+              <p className="text-xs font-bold text-violet-700 mb-1">🔧 CONTRATISTA U OFICIO</p>
+              <p className="font-extrabold text-slate-900 text-lg leading-snug">Haz tu cotización en 2 minutos</p>
+              <p className="text-sm text-slate-600 mt-1">Con IVA, folio y PDF desde tu celular. Pega la lista de tu cliente o súbele una foto.</p>
+              <p className="text-sm font-bold text-violet-700 mt-2">Hacer mi cotización →</p>
+            </Link>
+          </div>
           <div className="grid lg:grid-cols-2 gap-10 items-center">
 
             {/* Texto del slide */}
             <div className="text-center lg:text-left order-1">
               {slide === 0 ? (
                 <>
-                  <p className="text-sm font-bold text-emerald-700 mb-2">🤖 COTIZA AUTOMÁTICO</p>
+                  <p className="text-sm font-bold text-emerald-700 mb-2">🏭 PARA DISTRIBUIDORAS</p>
                   <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-5 leading-tight">
-                    Tu cliente pregunta precio.<br/>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">Tu WhatsApp cotiza solo.</span>
+                    Tu cliente pide por WhatsApp.<br/>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">Tu vendedor cotiza en segundos.</span>
                   </h1>
                   <p className="text-lg text-slate-600 mb-7 max-w-xl mx-auto lg:mx-0">
-                    El bot lee la lista que te mandan, busca en tu catálogo y responde la cotización con IVA y PDF en 5 segundos — 24/7.
+                    Tu vendedor pega el pedido y sale la cotización con tus precios, IVA y PDF. La revisa y la manda con su nombre: tu cliente nunca habla con un robot.
                   </p>
-                  <a href="https://wa.me/5218342472640?text=DEMO" target="_blank" rel="noopener noreferrer" onClick={() => { if (window.fbq) { try { window.fbq('track', 'Lead'); } catch (e) {} } }}>
-                    <Button size="lg" className="text-lg px-8 py-6 bg-green-600 hover:bg-green-700 shadow-xl">Pruébalo en tu WhatsApp →</Button>
-                  </a>
-                  <p className="text-sm text-slate-400 mt-3">Gratis · sin registro · es un chat, nada que instalar</p>
+                  <Link to="/distribuidoras">
+                    <Button size="lg" className="text-lg px-8 py-6 bg-green-600 hover:bg-green-700 shadow-xl">Mándanos un pedido real →</Button>
+                  </Link>
+                  <p className="text-sm text-slate-400 mt-3">Te lo regresamos cotizado con tus precios · sin compromiso</p>
                 </>
               ) : (
                 <>
