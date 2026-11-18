@@ -43,6 +43,12 @@ export default function Distribuidoras() {
     const texto = `Hola Alejandro, soy de ${empresa || '(mi empresa)'}. Quiero ver cómo CotizaBot cotiza este pedido real:\n\n${(pedido || EJEMPLO).slice(0, 1500)}`;
     evento('distribuidora_demo');
     if (window.fbq) { try { window.fbq('track', 'Lead'); } catch (e) {} }
+    if (window.gtag) {
+      try {
+        window.gtag('event', 'conversion', { send_to: 'AW-18501694620/NDzpCJ-lgbsdEJzppfZE' });
+        window.gtag('event', 'generate_lead', { method: 'whatsapp_demo' });
+      } catch (e) {}
+    }
     window.open(`https://wa.me/${WA_VENTAS}?text=${encodeURIComponent(texto)}`, '_blank', 'noopener');
   };
 
