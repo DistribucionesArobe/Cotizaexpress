@@ -198,8 +198,8 @@ export default function LandingPage() {
         </div>
       )}
       <Helmet>
-        <title>Cotiza por WhatsApp en Automático — Bot que Responde en 5 Segundos | CotizaExpress</title>
-        <meta name="description" content="Tu cliente manda su lista por WhatsApp y recibe su cotización con IVA y PDF al instante, 24/7. Sube tu Excel, conecta tu número y pruébalo gratis hoy — sin tarjeta." />
+        <title>Cotiza por WhatsApp en Segundos: Cotizaciones con IVA y PDF | CotizaBot</title>
+        <meta name="description" content="Pega el pedido que te llegó por WhatsApp y sale la cotización con tus precios, IVA, folio y PDF en segundos. Para distribuidoras, ferreterías y contratistas. Pruébalo 7 días gratis, sin tarjeta." />
         <link rel="canonical" href="https://cotizaexpress.com/" />
         <meta property="og:title" content="CotizaBot - Tu negocio cotiza solo por WhatsApp" />
         <meta property="og:description" content="Tus clientes preguntan precio por WhatsApp y reciben cotizacion con IVA en 3 segundos. Sin empleado. Sin errores. 24/7." />

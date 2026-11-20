@@ -7,8 +7,8 @@ export const MENSAJES = {
   'mensajes-para-clientes-whatsapp': {
     emoji: '💬',
     h1: 'Mensajes para clientes por WhatsApp: ejemplos para copiar',
-    metaTitle: 'Mensajes para Clientes por WhatsApp: Ejemplos para Copiar y Pegar (2026)',
-    metaDesc: 'Ejemplos de mensajes para enviar a clientes por WhatsApp: saludo, cotización, seguimiento, cobro, agradecimiento y recuperar clientes. Cópialos con un clic o mándalos directo.',
+    metaTitle: '14 Mensajes para Clientes por WhatsApp: Ejemplos para Copiar (2026)',
+    metaDesc: 'Mensajes listos para mandar a tus clientes por WhatsApp: saludo, cotización, seguimiento, cobro de anticipo y agradecimiento. Toca uno, se copia y lo mandas. Gratis.',
     intro: 'Mensajes listos para tu negocio: cópialos con un toque o mándalos directo por WhatsApp. Cambia lo que está entre [corchetes] por tus datos.',
     grupos: [
       ['👋 Saludo y bienvenida', [
