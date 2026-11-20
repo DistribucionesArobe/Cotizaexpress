@@ -86,8 +86,8 @@ const BLOG_POSTS = [
   },
   {
     slug: 'como-hacer-cotizacion-formal-con-iva',
-    title: 'Cómo hacer una cotización formal con IVA — ejemplo listo para copiar',
-    description: 'Los 8 datos que no pueden faltar, el cálculo del IVA al 16% paso a paso, ejemplo real + generador gratuito para hacer la tuya en 2 minutos.',
+    title: 'Cómo hacer una cotización formal con IVA: ejemplo y formato (2026)',
+    description: 'Los 8 datos que debe llevar una cotización formal, cómo calcular el IVA al 16% paso a paso y un ejemplo real. Arma la tuya en 2 minutos desde el celular.',
     date: '2026-07-29',
     readMin: 5,
     content: `
