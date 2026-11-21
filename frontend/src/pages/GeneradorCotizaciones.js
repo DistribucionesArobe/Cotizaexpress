@@ -20,6 +20,22 @@ const FAQS = [
 
 const emptyItem = { desc: '', qty: 1, precio: '' };
 
+// Saludos y plática del cliente ("buenas inge, me cotiza pa hoy") no son renglones de la cotización
+const PLATICA = /^(hola|buen[oa]s|buen d[ií]a|qu[eé] tal|saludos|gracias|oiga|disculpe|porfa|por favor|me (cotiza|pasa|puede|regala|ayuda|manda)|cot[ií]z|urge|ocupo|es para|para (la|una) obra|le encargo|inge\b|ingeniero|maestro|jefe|amigo|lo puede|cu[aá]ndo|cu[aá]nto)/i;
+const limpiarPlatica = (l) => {
+  let s = (l || '').trim();
+  const dos = s.indexOf(':');
+  if (dos > 0 && !/\d/.test(s.slice(0, dos)) && PLATICA.test(s.slice(0, dos).trim())) s = s.slice(dos + 1).trim();
+  return s;
+};
+const esPlatica = (l) => {
+  const s = (l || '').trim().toLowerCase();
+  if (!s) return true;
+  if (/^(urge|lo ocupo|lo necesito|para (hoy|ma[nñ]ana)|antes de las)/.test(s)) return true;
+  if (/\d/.test(s)) return false;
+  return PLATICA.test(s) || /\?$/.test(s) || /\b(cotiza|cotizaci[oó]n|gracias|urge)\b/.test(s);
+};
+
 export default function GeneradorCotizaciones() {
   const [showUpsell, setShowUpsell] = useState(false);
   const [negocio, setNegocio] = useState('');
@@ -75,10 +91,10 @@ export default function GeneradorCotizaciones() {
   const parseLista = (texto) => {
     const crudas = [];
     (texto || '').split('\n').forEach(l => {
-      l = l.replace(/`/g, '').trim();
-      if (!l) return;
+      l = limpiarPlatica(l.replace(/`/g, ''));
+      if (!l || esPlatica(l)) return;
       if ((l.match(/,/g) || []).length >= 2 || (l.match(/;/g) || []).length >= 2) {
-        l.split(/[,;]/).forEach(p2 => { if (p2.trim().length > 2) crudas.push(p2.trim()); });
+        l.split(/[,;]/).forEach(p2 => { const q = limpiarPlatica(p2); if (q.length > 2 && !esPlatica(q)) crudas.push(q); });
       } else crudas.push(l);
     });
     return crudas.slice(0, 40).map(l => {
@@ -341,9 +357,9 @@ export default function GeneradorCotizaciones() {
 
             <div className="mt-6 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-6 text-center">
               <p className="text-white font-bold mb-1">¿Cotizas varias veces al día?</p>
-              <p className="text-emerald-100 text-sm mb-4">CotizaBot lo hace solo en tu WhatsApp: tu cliente manda su lista y recibe esta misma cotización en 3 segundos, 24/7.</p>
-              <a href="https://wa.me/5218342472640?text=DEMO" target="_blank" rel="noopener noreferrer">
-                <Button className="bg-white text-emerald-700 hover:bg-emerald-50">Ver cómo funciona</Button>
+              <p className="text-emerald-100 text-sm mb-4">Con tu cuenta, tu lista de precios queda guardada: pegas el pedido del cliente y la cotización sale con tus precios en segundos. Tú la revisas y la mandas con tu nombre.</p>
+              <a href="/registro?plan=cotizador&utm_source=generador_box">
+                <Button className="bg-white text-emerald-700 hover:bg-emerald-50">Probarlo 7 días gratis</Button>
               </a>
             </div>
           </div>

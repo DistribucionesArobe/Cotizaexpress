@@ -10,6 +10,22 @@ import { Wand2, Trash2, Plus, Copy, FileText } from 'lucide-react';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL?.trim() || 'https://api.cotizaexpress.com';
 const API = `${BACKEND_URL}/api`;
 
+// Saludos y plática del cliente ("buenas inge, me cotiza pa hoy") no son renglones de la cotización
+const PLATICA = /^(hola|buen[oa]s|buen d[ií]a|qu[eé] tal|saludos|gracias|oiga|disculpe|porfa|por favor|me (cotiza|pasa|puede|regala|ayuda|manda)|cot[ií]z|urge|ocupo|es para|para (la|una) obra|le encargo|inge\b|ingeniero|maestro|jefe|amigo|lo puede|cu[aá]ndo|cu[aá]nto)/i;
+const limpiarPlatica = (l) => {
+  let s = (l || '').trim();
+  const dos = s.indexOf(':');
+  if (dos > 0 && !/\d/.test(s.slice(0, dos)) && PLATICA.test(s.slice(0, dos).trim())) s = s.slice(dos + 1).trim();
+  return s;
+};
+const esPlatica = (l) => {
+  const s = (l || '').trim().toLowerCase();
+  if (!s) return true;
+  if (/^(urge|lo ocupo|lo necesito|para (hoy|ma[nñ]ana)|antes de las)/.test(s)) return true;
+  if (/\d/.test(s)) return false;
+  return PLATICA.test(s) || /\?$/.test(s) || /\b(cotiza|cotizaci[oó]n|gracias|urge)\b/.test(s);
+};
+
 export default function Cotizador() {
   const navigate = useNavigate();
   const [texto, setTexto] = useState('');
@@ -146,8 +162,8 @@ export default function Cotizador() {
       const encontrados = r.data.encontrados || [];
       // Los que no están en el catálogo también van a la tabla: solo falta el precio
       const sinPrecio = (r.data.no_encontrados || [])
-        .map(x => (x || '').replace(/`/g, '').trim())
-        .filter(x => x.length > 1)
+        .map(x => limpiarPlatica((x || '').replace(/`/g, '')))
+        .filter(x => x.length > 1 && !esPlatica(x))
         .map(x => {
           const m = x.match(/^(\d+(?:[.,]\d+)?)\s+(.{2,})$/);
           return m
